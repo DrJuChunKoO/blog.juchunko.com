@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Redirecting...</title>
+    <script>
+      const userLang = navigator.language;
+      if (userLang && userLang.toLowerCase().startsWith("zh")) {
+        window.location.href = "/zh";
+      } else {
+        window.location.href = "/en";
+      }
+    </script>
+  </head>
+  <body>
+    <p>
+      If you are not redirected automatically,
+      <a href="/en">click here for English</a> or
+      <a href="/zh">click here for Chinese</a>.
+    </p>
+  </body>
+</html>

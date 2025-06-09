@@ -1,0 +1,43 @@
+---
+description:
+globs:
+alwaysApply: true
+---
+# 部落格基本架構
+
+這是一個使用 Astro 建立的多國語言部落格。
+
+## 內容管理
+
+部落格文章以 Markdown (`.md`) 或 MDX (`.mdx`) 格式儲存。
+
+- **路徑**: `src/content/blog/`
+- **結構**: 文章根據語言存放在不同的資料夾中。
+  - 英文文章: `[src/content/blog/en/](mdc:src/content/blog/en)`
+  - 中文文章: `[src/content/blog/zh/](mdc:src/content/blog/zh)`
+
+所有文章的 frontmatter 結構定義在 `[src/content/config.ts](mdc:src/content/config.ts)` 中。
+
+## 路由
+
+頁面路由是基於 `src/pages` 目錄結構。
+
+- **部落格列表**: `[src/pages/[lang]/index.astro](mdc:src/pages/[lang]/index.astro)` 會顯示對應語言的所有文章。
+- **文章頁面**: `[src/pages/[lang]/[...slug].astro](mdc:src/pages/[lang]/[...slug].astro)` 會根據文章的 slug 動態產生頁面。
+- **根目錄重定向**: `[src/pages/index.astro](mdc:src/pages/index.astro)` 會自動重定向到預設語言的部落格列表頁面。
+
+## 佈局與組件
+
+可重複使用的 UI 元件和頁面佈局。
+
+- **佈局**: 主要的部落格文章佈局在 `[src/layouts/BlogPost.astro](mdc:src/layouts/BlogPost.astro)`。
+- **組件**:
+  - `[src/components/Header.astro](mdc:src/components/Header.astro)`: 網站標頭。
+  - `[src/components/Footer.astro](mdc:src/components/Footer.astro)`: 網站頁腳。
+
+## 多國語言 (i18n)
+
+網站支援英文和中文。
+
+- **翻譯檔案**: 所有 UI 字串都定義在 `[src/i18n/ui.ts](mdc:src/i18n/ui.ts)` 中。
+- **輔助工具**: `[src/i18n/utils.ts](mdc:src/i18n/utils.ts)` 包含用於獲取當前語言和翻譯字串的輔助函式。
