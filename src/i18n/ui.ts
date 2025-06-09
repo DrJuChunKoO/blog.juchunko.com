@@ -7,7 +7,7 @@ export const defaultLang = "en";
 
 export const ui = {
   en: {
-    "site.title": "JU CHUN KO",
+    "site.title": "JU CHUN KO's Blog",
     "nav.home": "Home",
     "nav.blog": "Blog",
     "nav.about": "About",
@@ -18,7 +18,7 @@ export const ui = {
     "footer.copyright": "© 2025 • JU CHUN KO",
   },
   zh: {
-    "site.title": "科技立委葛如鈞．寶博士",
+    "site.title": "科技立委葛如鈞．寶博士部落格",
     "nav.home": "首頁",
     "nav.blog": "部落格",
     "nav.about": "關於",
