@@ -1,0 +1,10 @@
+{
+  "name": "Dr. Ju-Chun Ko",
+  "avatar": "../../assets/blog-placeholder-about.jpg",
+  "bio": "This is a sample bio for Dr. Ju-Chun Ko.",
+  "social": {
+    "twitter": "https://twitter.com/juchunko",
+    "github": "https://github.com/DrJuChunKo",
+    "website": "https://juchunko.com"
+  }
+}

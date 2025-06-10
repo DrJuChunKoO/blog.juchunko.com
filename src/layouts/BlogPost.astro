@@ -1,6 +1,6 @@
 ---
 import type { CollectionEntry } from "astro:content";
-import { getCollection } from "astro:content";
+import { getCollection, getEntry } from "astro:content";
 import BaseHead from "../components/BaseHead.astro";
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
@@ -11,7 +11,9 @@ import { useTranslations, getLangFromUrl } from "../i18n/utils";
 type Props = { post: CollectionEntry<"blog"> };
 
 const { post } = Astro.props;
-const { title, description, pubDate, updatedDate, heroImage } = post.data;
+const { title, description, pubDate, updatedDate, heroImage, author } =
+  post.data;
+const authorData = await getEntry(author);
 
 const currentLang = getLangFromUrl(Astro.url);
 const t = useTranslations(currentLang);
@@ -72,6 +74,30 @@ const otherLangPost = posts.find(
       .last-updated-on {
         font-style: italic;
       }
+      .meta {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 1em;
+        margin-bottom: 1em;
+      }
+      .author {
+        text-align: center;
+      }
+      .author a {
+        text-decoration: none;
+        color: inherit;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .author img {
+        border-radius: 50%;
+        margin-right: 0.5em;
+      }
+      .author span {
+        font-weight: bold;
+      }
     </style>
   </head>
 
@@ -88,13 +114,30 @@ const otherLangPost = posts.find(
         </div>
         <div class="prose">
           <div class="title">
-            <div class="date">
-              <FormattedDate date={pubDate} />
+            <div class="meta">
+              <div class="date">
+                <FormattedDate date={pubDate} />
+                {
+                  updatedDate && (
+                    <div class="last-updated-on">
+                      {t("blog.lastUpdatedOn")}{" "}
+                      <FormattedDate date={updatedDate} />
+                    </div>
+                  )
+                }
+              </div>
               {
-                updatedDate && (
-                  <div class="last-updated-on">
-                    {t("blog.lastUpdatedOn")}{" "}
-                    <FormattedDate date={updatedDate} />
+                authorData && (
+                  <div class="author">
+                    <a href={`/${currentLang}/authors/${authorData.id}`}>
+                      <Image
+                        src={authorData.data.avatar}
+                        width={40}
+                        height={40}
+                        alt={authorData.data.name}
+                      />
+                      <span>{authorData.data.name}</span>
+                    </a>
                   </div>
                 )
               }
