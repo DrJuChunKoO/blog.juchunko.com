@@ -1,10 +1,21 @@
 {
-  "name": "Dr. Ju-Chun Ko",
+  "name": {
+    "en": "Dr. Ju-Chun Ko",
+    "zh": "葛如鈞"
+  },
   "avatar": "../../assets/blog-placeholder-about.jpg",
-  "bio": "This is a sample bio for Dr. Ju-Chun Ko.",
+  "bio": {
+    "en": "This is a sample bio for Dr. Ju-Chun Ko.",
+    "zh": "這是葛如鈞博士的範例個人簡介。"
+  },
   "social": {
-    "twitter": "https://twitter.com/juchunko",
+    "email": "dr.juchunko@gmail.com",
     "github": "https://github.com/DrJuChunKo",
+    "twitter": "https://x.com/dAAAb",
+    "facebook": "https://fb.com/dr.juchunko/",
+    "youtube": "https://youtube.com/@dr.juchunko",
+    "instagram": "https://instagr.am/dr.juchunko/",
+    "threads": "https://threads.net/@dr.juchunko",
     "website": "https://juchunko.com"
   }
 }

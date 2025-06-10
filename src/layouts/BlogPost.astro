@@ -134,9 +134,9 @@ const otherLangPost = posts.find(
                         src={authorData.data.avatar}
                         width={40}
                         height={40}
-                        alt={authorData.data.name}
+                        alt={authorData.data.name[currentLang]}
                       />
-                      <span>{authorData.data.name}</span>
+                      <span>{authorData.data.name[currentLang]}</span>
                     </a>
                   </div>
                 )
