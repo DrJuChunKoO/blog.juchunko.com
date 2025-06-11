@@ -1,0 +1,72 @@
+---
+
+---
+
+<button
+  type="button"
+  aria-label="Toggle dark mode"
+  class="p-2 text-current hover:opacity-75 focus:outline-none"
+>
+  <!-- Use CSS to swap icons based on dark mode -->
+  <svg
+    class="h-6 w-6 block dark:hidden"
+    xmlns="http://www.w3.org/2000/svg"
+    fill="none"
+    viewBox="0 0 24 24"
+    stroke="currentColor"
+  >
+    <path
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      stroke-width="2"
+      d="M12 3v2m0 14v2m9-9h2M3 12H1m15.364-6.364l1.414 1.414M6.222 17.778l-1.414 1.414M17.778 17.778l1.414-1.414M6.222 6.222L4.808 4.808"
+    ></path>
+    <circle
+      cx="12"
+      cy="12"
+      r="5"
+      stroke-width="2"
+      stroke="currentColor"
+      fill="currentColor"></circle>
+  </svg>
+  <svg
+    class="h-6 w-6 hidden dark:block"
+    xmlns="http://www.w3.org/2000/svg"
+    fill="currentColor"
+    viewBox="0 0 24 24"
+  >
+    <path
+      d="M21.752 15.002A9.718 9.718 0 0 1 12 21.75 9.75 9.75 0 0 1 12 2.25c.813 0 1.604.105 2.358.303a.75.75 0 0 1 .131 1.393 7.252 7.252 0 0 0-4.489 6.678 7.252 7.252 0 0 0 9.235 6.918.75.75 0 0 1 .517 1.46z"
+    ></path>
+  </svg>
+</button>
+
+<script is:inline>
+  (() => {
+    const button = document.currentScript.previousElementSibling;
+    if (!button) return;
+
+    function setTheme(dark) {
+      const html = document.documentElement;
+      if (dark) {
+        html.classList.add("dark");
+      } else {
+        html.classList.remove("dark");
+      }
+    }
+
+    // Initialize based on persisted preference or system
+    const stored = localStorage.getItem("theme");
+    if (
+      stored === "dark" ||
+      (!stored && window.matchMedia("(prefers-color-scheme: dark)").matches)
+    ) {
+      setTheme(true);
+    }
+
+    button.addEventListener("click", () => {
+      const isDark = document.documentElement.classList.toggle("dark");
+      localStorage.setItem("theme", isDark ? "dark" : "light");
+    });
+  })();
+</script>

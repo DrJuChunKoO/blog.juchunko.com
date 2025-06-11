@@ -18,6 +18,19 @@ const t = useTranslations(lang);
 <html lang={lang}>
   <head>
     <BaseHead title={title} description={description} />
+    <script is:inline>
+      (() => {
+        try {
+          const stored = localStorage.getItem("theme");
+          const prefersDark = window.matchMedia(
+            "(prefers-color-scheme: dark)"
+          ).matches;
+          if (stored === "dark" || (!stored && prefersDark)) {
+            document.documentElement.classList.add("dark");
+          }
+        } catch {}
+      })();
+    </script>
     <style>
       body {
         display: flex;
@@ -33,7 +46,7 @@ const t = useTranslations(lang);
       }
     </style>
   </head>
-  <body>
+  <body class="bg-white text-gray-900 dark:bg-gray-950 dark:text-gray-100">
     <Header />
     <main>
       <slot />

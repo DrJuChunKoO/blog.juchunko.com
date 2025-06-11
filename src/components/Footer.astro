@@ -4,11 +4,23 @@ const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
 ---
 
-<footer>
-  <div class="language-switcher">
-    <a href="/en" class={lang === "en" ? "active" : ""}>EN</a>
+<footer
+  class="py-8 px-4 bg-gray-100 text-gray-600 dark:bg-white/5 dark:text-gray-400"
+>
+  <div class="flex justify-center items-center gap-2 mb-4">
+    <a
+      href="/en"
+      class={lang === "en"
+        ? "font-semibold text-gray-900 dark:text-gray-100"
+        : "underline"}>EN</a
+    >
     |
-    <a href="/zh" class={lang === "zh" ? "active" : ""}>中文</a>
+    <a
+      href="/zh"
+      class={lang === "zh"
+        ? "font-semibold text-gray-900 dark:text-gray-100"
+        : "underline"}>中文</a
+    >
   </div>
   <div class="mb-3 flex space-x-4 items-center justify-center">
     <a
@@ -111,9 +123,11 @@ const t = useTranslations(lang);
 <style>
   footer {
     padding: 2em 1em 6em 1em;
-    background-color: #f2f2f2;
-    color: rgb(var(--gray));
     text-align: center;
+  }
+  .dark footer {
+    background-color: #0a0a0a;
+    color: #d1d5db; /* gray-300 */
   }
   .social-links {
     display: flex;
@@ -126,21 +140,6 @@ const t = useTranslations(lang);
     color: rgb(var(--gray));
   }
   .social-links a:hover {
-    color: rgb(var(--gray-dark));
-  }
-  .language-switcher {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-  }
-  .language-switcher a {
-    text-decoration: none;
-    color: rgb(var(--gray));
-  }
-  .language-switcher a.active {
-    font-weight: semibold;
     color: rgb(var(--gray-dark));
   }
 </style>
