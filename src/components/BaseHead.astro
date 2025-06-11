@@ -3,6 +3,7 @@
 // all pages through the use of the <BaseHead /> component.
 import "../styles/global.css";
 import { getLangFromUrl, useTranslations } from "../i18n/utils";
+import { ClientRouter } from "astro:transitions";
 
 interface Props {
   title?: string;
@@ -67,3 +68,5 @@ const title = pageTitle ? `${pageTitle} | ${siteTitle}` : siteTitle;
 <meta property="twitter:title" content={title} />
 <meta property="twitter:description" content={description} />
 <meta property="twitter:image" content={new URL(image, Astro.url)} />
+
+<ClientRouter />

@@ -109,12 +109,18 @@ const posts = (await getCollection("blog"))
                   src={post.data.heroImage}
                   alt=""
                   class="aspect-video object-cover rounded-lg transition-transform"
+                  transition:name={`${post.id}-image`}
                 />
               )}
-              <div class="text-base text-gray-500 mt-2">
+              <h4
+                class="text-xl font-semibold mt-2"
+                transition:name={`${post.id}-title`}
+              >
+                {post.data.title}
+              </h4>
+              <div class="text-base text-gray-500">
                 <FormattedDate date={post.data.pubDate} />
               </div>
-              <h4 class="text-xl   font-semibold">{post.data.title}</h4>
             </a>
           ))
         }
