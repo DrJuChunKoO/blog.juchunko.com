@@ -33,71 +33,13 @@ const otherLangPost = posts.find(
     <BaseHead title={title} description={description} />
     <style>
       main {
-        width: calc(100% - 2em);
         max-width: 100%;
         margin: 0;
       }
-      .hero-image {
-        width: 100%;
-      }
-      .hero-image img {
-        display: block;
-        margin: 0 auto;
-        border-radius: 12px;
-        box-shadow: var(--box-shadow);
-      }
-      .prose {
-        width: 720px;
-        max-width: calc(100% - 2em);
-        margin: auto;
-        padding: 1em;
-        color: rgb(var(--gray-dark));
-      }
-      .title {
-        margin-bottom: 1em;
-        padding: 1em 0;
-        text-align: center;
-        line-height: 1;
-      }
+
       .lang-switcher {
         text-align: center;
         margin-bottom: 1rem;
-      }
-      .title h1 {
-        margin: 0 0 0.5em 0;
-      }
-      .date {
-        margin-bottom: 0.5em;
-        color: rgb(var(--gray));
-      }
-      .last-updated-on {
-        font-style: italic;
-      }
-      .meta {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        flex-wrap: wrap;
-        flex-direction: column;
-        gap: 1em;
-        margin-bottom: 1em;
-      }
-      .author {
-        text-align: center;
-      }
-      .author a {
-        text-decoration: none;
-        color: inherit;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-      .author img {
-        border-radius: 50%;
-        margin-right: 0.5em;
-      }
-      .author span {
-        font-weight: bold;
       }
     </style>
   </head>
@@ -106,63 +48,69 @@ const otherLangPost = posts.find(
     <Header />
     <main>
       <article>
-        <div class="hero-image">
+        <div class="container">
           {
             heroImage && (
-              <img width={1020} height={510} src={heroImage} alt="" />
+              <img class="rounded-lg w-full" src={heroImage} alt="" />
             )
           }
         </div>
-        <div class="prose">
-          <div class="title">
-            <h1>{title}</h1>
-            <div class="meta">
+        <div class="container">
+          <div class="flex flex-col gap-4 my-4">
+            <h1 class="text-2xl md:text-4xl font-bold">{title}</h1>
+            {
+              authorData && (
+                <a
+                  href={`/${currentLang}/authors/${authorData.id}`}
+                  class="flex items-center gap-2"
+                >
+                  <img
+                    src={authorData.data.avatar}
+                    width={40}
+                    height={40}
+                    alt={authorData.data.name[currentLang]}
+                    class="rounded-full object-cover aspect-square"
+                  />
+                  <span class="font-semibold text-base">
+                    {authorData.data.name[currentLang]}
+                  </span>
+                </a>
+              )
+            }
+            <div class="text-sm text-gray-500">
+              <FormattedDate date={pubDate} />
               {
-                authorData && (
-                  <div class="author">
-                    <a href={`/${currentLang}/authors/${authorData.id}`}>
-                      <img
-                        src={authorData.data.avatar}
-                        width={40}
-                        height={40}
-                        alt={authorData.data.name[currentLang]}
-                        class="rounded-full object-cover aspect-square"
-                      />
-                      <span>{authorData.data.name[currentLang]}</span>
-                    </a>
+                updatedDate && (
+                  <div class="italic">
+                    {t("blog.lastUpdatedOn")}{" "}
+                    <FormattedDate date={updatedDate} />
                   </div>
                 )
               }
-              <div class="date">
-                <FormattedDate date={pubDate} />
-                {
-                  updatedDate && (
-                    <div class="last-updated-on">
-                      {t("blog.lastUpdatedOn")}{" "}
-                      <FormattedDate date={updatedDate} />
-                    </div>
-                  )
-                }
-              </div>
             </div>
-            <hr />
           </div>
-          {
-            otherLangPost && (
-              <div class="lang-switcher">
-                <a href={`/${otherLangPost.id.replace(/\.(md|mdx)$/, "")}`}>
-                  {t("blog.readIn").replace(
-                    "{lang}",
-                    otherLang === "en" ? "English" : "中文"
-                  )}
-                </a>
-              </div>
-            )
-          }
-          <slot />
+        </div>
+        <div class="container">
+          <div class="prose">
+            <hr />
+            {
+              otherLangPost && (
+                <div class="lang-switcher">
+                  <a href={`/${otherLangPost.id.replace(/\.(md|mdx)$/, "")}`}>
+                    {t("blog.readIn").replace(
+                      "{lang}",
+                      otherLang === "en" ? "English" : "中文"
+                    )}
+                  </a>
+                </div>
+              )
+            }
+            <slot />
+          </div>
         </div>
       </article>
     </main>
+
     <Footer />
   </body>
 </html>
