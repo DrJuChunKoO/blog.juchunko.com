@@ -1,42 +1,91 @@
+---
 import { getCollection, type CollectionEntry } from "astro:content";
 import { Image } from "astro:assets";
 import BaseLayout from "../../../layouts/BaseLayout.astro";
 import { languages } from "../../../i18n/ui";
+import type { GetStaticPaths } from "astro";
+import FormattedDate from "../../../components/FormattedDate.astro";
+import SocialIcon from "../../../components/SocialIcon.astro";
+import { useTranslations } from "../../../i18n/utils";
 
-export async function getStaticPaths() {
+type Language = keyof typeof languages;
+
+export const getStaticPaths = (async () => {
   const authors = await getCollection("authors");
-  const paths = [];
+  return authors.flatMap((author) =>
+    (Object.keys(languages) as Language[]).map((lang) => ({
+      params: { lang, slug: author.id },
+      props: { author },
+    }))
+  );
+}) satisfies GetStaticPaths;
 
-  for (const lang of Object.keys(languages)) {
-    for (const author of authors) {
-      paths.push({
-        params: { slug: author.id, lang },
-        props: { author },
-      });
-    }
-  }
-  return paths;
-}
-
-interface Props {
+type Props = {
   author: CollectionEntry<"authors">;
-}
+};
 
 const { author } = Astro.props;
-const { lang } = Astro.params;
+const { lang } = Astro.params as { lang: Language };
+const t = useTranslations(lang);
 
 const allPosts = await getCollection("blog");
 
-const posts = allPosts.filter(
-  (post) =>
-    post.data.author.id === author.id && post.slug.startsWith(`${lang}/`)
-);
+const posts = allPosts
+  .filter(
+    (post) =>
+      post.data.author.id === author.id && post.slug.startsWith(`${lang}/`)
+  )
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 
 const authorName = author.data.name[lang];
 const authorBio = author.data.bio[lang];
+const socialLinks = author.data.social;
+const pageTitle = `${authorName} | Author`;
+const pageDescription = authorBio;
+---
 
-<BaseLayout title="test" description="test">
-  <h1>Test</h1>
+<BaseLayout title={pageTitle} description={pageDescription}>
+  <div class="flex flex-col items-center gap-2 bg-white py-4 rounded-lg">
+    <Image
+      src={author.data.avatar}
+      width={120}
+      height={120}
+      alt={authorName}
+      class="aspect-square rounded-full object-cover mb-4"
+    />
+    <h1>{authorName}</h1>
+    <p>{authorBio}</p>
+    {
+      socialLinks && (
+        <div class="flex flex-wrap justify-center gap-4 mt-4">
+          {Object.entries(socialLinks).map(([name, url]) => (
+            <a
+              href={name === "email" ? `mailto:${url}` : url}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text-sm text-gray-500 transition hover:text-gray-600"
+            >
+              <span class="sr-only">
+                {t(`social.${name}` as "social.email")}
+              </span>
+              <SocialIcon name={name} />
+            </a>
+          ))}
+        </div>
+      )
+    }
+  </div>
+  <div class="flex flex-col items-start justify-start gap-4 text-left mt-12">
+    <h2>{t("author.postsBy").replace("{authorName}", authorName)}</h2>
+    {
+      posts.map((post) => (
+        <a href={`/${post.slug}`}>
+          <h4>{post.data.title}</h4>
+          <FormattedDate date={post.data.pubDate} />
+        </a>
+      ))
+    }
+  </div>
 </BaseLayout>
 
 <style>
@@ -47,6 +96,37 @@ const authorBio = author.data.bio[lang];
   .author-header img {
     border-radius: 50%;
     margin-bottom: 1em;
+  }
+  h2 {
+    text-align: center;
+    margin-top: 2em;
+    margin-bottom: 1em;
+    font-size: 1.5rem;
+    font-weight: 600;
+  }
+  ul {
+    list-style-type: none;
+    padding: 0;
+    max-width: 720px;
+    margin: auto;
+  }
+  li {
+    margin-bottom: 1em;
+    text-align: center;
+    border: 1px solid var(--gray-200);
+    padding: 1em;
+    border-radius: 8px;
+  }
+  li a {
+    text-decoration: none;
+    color: var(--text);
+  }
+  li a:hover {
+    color: var(--accent);
+  }
+  li h3 {
+    margin: 0 0 0.5em 0;
+    font-size: 1.25rem;
   }
   .social-links {
     display: flex;
@@ -59,29 +139,6 @@ const authorBio = author.data.bio[lang];
     color: var(--accent);
   }
   .social-links a:hover {
-    color: var(--accent-dark);
-  }
-  h2 {
-    text-align: center;
-    margin-top: 2em;
-    margin-bottom: 1em;
-  }
-  ul {
-    list-style-type: none;
-    padding: 0;
-    max-width: 720px;
-    margin: auto;
-  }
-  li {
-    margin-bottom: 0.5em;
-    text-align: center;
-  }
-  li a {
-    font-size: 1.25rem;
-    text-decoration: none;
-    color: var(--accent);
-  }
-  li a:hover {
     color: var(--accent-dark);
   }
 </style>
