@@ -214,7 +214,10 @@ $$
 Total Digital Exports ($DE_{Total}$):
 
 $$
-DE_{Total} = DE_{Streaming} + DE_{Cloud} + DE_{Gaming} + DE_{Ads} + DE_{Cloud\_AI} + DE_{SaaS} + DE_{Ecommerce} + DE_{Education} + DE_{Hardware} + DE_{Others}
+\begin{aligned}
+DE_{Total} = & DE_{Streaming} + DE_{Cloud} + DE_{Gaming} + DE_{Ads} + DE_{Cloud\_AI} \\
+& + DE_{SaaS} + DE_{Ecommerce} + DE_{Education} + DE_{Hardware} + DE_{Others}
+\end{aligned}
 $$
 
 $$

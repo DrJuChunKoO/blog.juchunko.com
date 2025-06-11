@@ -1,0 +1,17 @@
+{
+  "name": {
+    "en": "Leo (Formerly)",
+    "zh": "陳建佑 Leo（已離職）"
+  },
+  "avatar": "/images/Leo.webp",
+  "bio": {
+    "en": "Leo is an information law consultant, the director of Zifeng Law Firm, and a columnist for Vocus. He focuses on researching AI and blockchain legal issues.",
+    "zh": "本名陳建佑，人稱建佑律師或Leo。\nLeo 是資訊法顧問，也是資鋒法律事務所所長及方格子專欄作家，主要關注與研究 AI 及區塊鏈法律等相關議題。"
+  },
+  "social": {
+    "email": "leochen1025@gmail.com",
+    "twitter": "https://x.com/CJY_infolaw",
+    "linkedin": "https://www.linkedin.com/in/jian-you-chen-52ab9196",
+    "github": "https://github.com/NoMoreLaw"
+  }
+}
