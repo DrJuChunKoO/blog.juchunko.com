@@ -32,11 +32,6 @@ const otherLangPost = posts.find(
   <head>
     <BaseHead title={title} description={description} />
     <style>
-      main {
-        max-width: 100%;
-        margin: 0;
-      }
-
       .lang-switcher {
         text-align: center;
         margin-bottom: 1rem;
@@ -57,7 +52,7 @@ const otherLangPost = posts.find(
         </div>
         <div class="container">
           <div class="flex flex-col gap-4 my-4">
-            <h1 class="text-2xl md:text-4xl font-bold">{title}</h1>
+            <h1 class="text-2xl md:text-4xl font-semibold">{title}</h1>
             {
               authorData && (
                 <a

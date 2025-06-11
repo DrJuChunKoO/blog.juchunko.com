@@ -401,7 +401,7 @@ export default function Journal({
         }}
         viewport={{ once: true }}
       >
-        <div className="text-2xl font-bold text-gray-500">{title}</div>
+        <div className="text-2xl font-semibold text-gray-500">{title}</div>
         <div className="mb-2 text-gray-700 dark:text-gray-300">
           {children}
         </div>{" "}
