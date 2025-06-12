@@ -1,0 +1,104 @@
+---
+import BaseHead from "../../../components/BaseHead.astro";
+import Header from "../../../components/Header.astro";
+import Footer from "../../../components/Footer.astro";
+import { SITE_DESCRIPTION } from "../../../consts";
+import { getCollection } from "astro:content";
+import FormattedDate from "../../../components/FormattedDate.astro";
+import { ui, languages } from "../../../i18n/ui";
+import { useTranslations } from "../../../i18n/utils";
+
+export async function getStaticPaths() {
+  const categories = await getCollection("categories");
+  const langs = Object.keys(languages) as Array<keyof typeof languages>;
+  return categories.flatMap((cat) =>
+    langs.map((lang) => ({ params: { lang, category: cat.id } }))
+  );
+}
+
+const { lang, category } = Astro.params;
+const langKey = lang as keyof typeof ui;
+const t = useTranslations(langKey);
+
+// Fetch all posts for this language that include the given category id
+const posts = (await getCollection("blog"))
+  .filter(
+    (post) =>
+      post.id.startsWith(lang + "/") &&
+      post.data.categories?.some((c: any) => c.id === category)
+  )
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+
+// Get category name in current language
+const categoriesCollection = await getCollection("categories");
+const categoryEntry = categoriesCollection.find((c) => c.id === category);
+const categoryName = (categoryEntry?.data as any)?.name?.[langKey] || category;
+---
+
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <BaseHead
+      title={`${categoryName} | ${ui[langKey]["site.title"]}`}
+      description={SITE_DESCRIPTION}
+    />
+    <style>
+      /* Reuse grid styling from blog index */
+      section {
+        display: grid;
+        grid-template-columns: repeat(1, minmax(0, 1fr));
+      }
+      @media (min-width: 768px) {
+        section {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <Header />
+    <main class="container">
+      <h1 class="text-3xl font-semibold mb-4">
+        {t("category.postsIn").replace("{category}", categoryName)}
+      </h1>
+      <section class="gap-4">
+        {
+          posts.map((post, index) => (
+            <a
+              href={`/${post.id.replace(/\.mdx?$/, "")}`}
+              class={`group transition-colors hover:bg-gray-200 dark:hover:bg-gray-800 rounded-xl p-2 ${index === 0 ? "md:col-span-2" : ""}`}
+            >
+              {post.data.heroImage && (
+                <img
+                  width={720}
+                  height={360}
+                  src={post.data.heroImage}
+                  alt=""
+                  class="aspect-video object-cover rounded-lg transition-transform"
+                  transition:name={`${post.id}-image`}
+                />
+              )}
+              <h4
+                class="text-xl font-semibold mt-2"
+                transition:name={`${post.id}-title`}
+              >
+                {post.data.title}
+              </h4>
+              <div class="text-base text-gray-500">
+                <FormattedDate date={post.data.pubDate} />
+              </div>
+            </a>
+          ))
+        }
+        {
+          posts.length === 0 && (
+            <p class="text-gray-500 italic">
+              {lang === "en" ? "No posts yet." : "尚無文章"}
+            </p>
+          )
+        }
+      </section>
+    </main>
+    <Footer />
+  </body>
+</html>

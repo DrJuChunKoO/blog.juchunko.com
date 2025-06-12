@@ -25,6 +25,7 @@ export const ui = {
     "social.threads": "Threads",
     "social.website": "Website",
     "author.postsBy": "Posts by {authorName}",
+    "category.postsIn": "Posts in {category}",
   },
   zh: {
     "site.title": "科技立委葛如鈞．寶博士部落格",
@@ -45,5 +46,6 @@ export const ui = {
     "social.threads": "Threads",
     "social.website": "個人網站",
     "author.postsBy": "「{authorName}」的文章",
+    "category.postsIn": "「{category}」的文章",
   },
 } as const;

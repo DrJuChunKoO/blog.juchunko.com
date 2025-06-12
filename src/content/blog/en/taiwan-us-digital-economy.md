@@ -5,6 +5,7 @@ pubDate: "2025-04-09"
 updatedDate: "2025-04-09"
 heroImage: "/images/taiwan-us-digital-economy/digital-economy.jpg"
 author: "juchun-ko"
+categories: ["legislative-points"]
 ---
 
 ## Introduction: A New Perspective on Trade Balance in the Digital Economy Era
