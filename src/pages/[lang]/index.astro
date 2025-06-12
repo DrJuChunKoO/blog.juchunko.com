@@ -3,7 +3,7 @@ import BaseHead from "../../components/BaseHead.astro";
 import Header from "../../components/Header.astro";
 import Footer from "../../components/Footer.astro";
 import { SITE_DESCRIPTION } from "../../consts";
-import { getCollection } from "astro:content";
+import { getCollection, getEntry } from "astro:content";
 import FormattedDate from "../../components/FormattedDate.astro";
 import { Image } from "astro:assets";
 
@@ -13,94 +13,40 @@ export function getStaticPaths() {
 
 const { lang } = Astro.params;
 
-const posts = (await getCollection("blog"))
+// Ensure TypeScript knows the exact union type for language
+const currentLang = lang as "en" | "zh";
+
+// Fetch blog posts for current language and attach category entries to each post
+const rawPosts = (await getCollection("blog"))
   .filter((post) => post.id.startsWith(lang + "/"))
   .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+
+const posts = await Promise.all(
+  rawPosts.map(async (post) => {
+    const categoryEntries = post.data.categories
+      ? (
+          await Promise.all(post.data.categories.map((cat) => getEntry(cat)))
+        ).filter(Boolean)
+      : [];
+    return { post, categoryEntries };
+  })
+);
 ---
 
 <!doctype html>
 <html lang={lang}>
   <head>
     <BaseHead description={SITE_DESCRIPTION} />
-    <style>
-      ul {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 2rem;
-        list-style-type: none;
-        margin: 0;
-        padding: 0;
-      }
-      ul li {
-        width: calc(50% - 1rem);
-      }
-      ul li * {
-        text-decoration: none;
-        transition: 0.2s ease;
-      }
-      ul li:first-child {
-        width: 100%;
-        margin-bottom: 1rem;
-        text-align: center;
-      }
-      ul li:first-child img {
-        width: 100%;
-      }
-      ul li:first-child .title {
-        font-size: 2.369rem;
-      }
-      ul li img {
-        margin-bottom: 0.5rem;
-        border-radius: 12px;
-      }
-      ul li a {
-        display: block;
-      }
-      .title {
-        margin: 0;
-        color: rgb(var(--black));
-        line-height: 1.2;
-        font-weight: 500;
-        font-size: 1.25rem;
-      }
-      .date {
-        margin: 0;
-        color: rgb(var(--gray));
-        font-size: 0.875rem;
-      }
-      ul li a:hover h4,
-      ul li a:hover .date {
-        color: rgb(var(--accent));
-      }
-      ul a:hover img {
-        box-shadow: var(--box-shadow);
-      }
-      @media (max-width: 720px) {
-        ul {
-          gap: 0.5em;
-        }
-        ul li {
-          width: 100%;
-          text-align: center;
-        }
-        ul li:first-child {
-          margin-bottom: 0;
-        }
-        ul li:first-child .title {
-          font-size: 1.563em;
-        }
-      }
-    </style>
   </head>
   <body>
     <Header />
     <main class="container">
       <section class="grid grid-cols-1 md:grid-cols-2">
         {
-          posts.map((post, index) => (
+          posts.map(({ post, categoryEntries }, index) => (
             <a
               href={`/${post.id.replace(/\.mdx?$/, "")}`}
-              class={`group  transition-colors    hover:bg-gray-200 dark:hover:bg-gray-800 rounded-xl p-2 ${index === 0 ? "md:col-span-2" : ""}`}
+              class={`group  transition-colors    hover:bg-gray-200 dark:hover:bg-white/10 rounded-xl p-2 ${index === 0 ? "md:col-span-2" : ""}`}
             >
               {post.data.heroImage && (
                 <img
@@ -112,13 +58,24 @@ const posts = (await getCollection("blog"))
                   transition:name={`${post.id}-image`}
                 />
               )}
+              {categoryEntries.length > 0 && (
+                <ul class="flex flex-wrap gap-2 mt-1 -mb-1 items-start justify-start">
+                  {categoryEntries.map((cat) => (
+                    <li transition:name={`${post.id}-category-${cat.id}`}>
+                      <span class="text-sm dark:text-white/50 text-gray-500">
+                        {cat.data.name[currentLang]}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              )}
               <h4
-                class="text-xl font-semibold mt-2"
+                class="text-xl font-semibold"
                 transition:name={`${post.id}-title`}
               >
                 {post.data.title}
               </h4>
-              <div class="text-base text-gray-500">
+              <div class="text-base dark:text-white/50 text-gray-500">
                 <FormattedDate date={post.data.pubDate} />
               </div>
             </a>
