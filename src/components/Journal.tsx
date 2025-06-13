@@ -126,7 +126,7 @@ function ImageGrid({
       )}
       {images.length > 3 && (
         <div className="flex flex-col gap-4">
-          <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
+          <div className="scrollbar-hide flex gap-4 overflow-x-auto pb-4">
             {images.map((image, i) => (
               <div key={i} className="h-48 w-auto shrink-0 md:h-56">
                 <ImageView
@@ -174,7 +174,7 @@ function Images({
 
   const handleDragEnd = (
     e: MouseEvent | TouchEvent | PointerEvent,
-    { offset, velocity }: PanInfo
+    { offset, velocity }: PanInfo,
   ) => {
     const swipe = swipePower(offset.x, velocity.x);
 
@@ -219,7 +219,7 @@ function Images({
             transition={{ duration: 0.2 }}
           >
             <motion.div
-              className="absolute inset-0 bg-white/80 bg-noise text-black backdrop-blur dark:bg-black/50 dark:text-white"
+              className="bg-noise absolute inset-0 bg-white/80 text-black backdrop-blur dark:bg-black/50 dark:text-white"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -232,7 +232,7 @@ function Images({
                   initial="initial"
                   animate="animate"
                   exit="exit"
-                  className="absolute right-5 top-5 cursor-pointer rounded-full border border-black/10 bg-white/50 p-2 backdrop-blur transition-colors hover:border-black/20 dark:border-white/20 dark:bg-black/50 dark:hover:border-white/30"
+                  className="absolute top-5 right-5 cursor-pointer rounded-full border border-black/10 bg-white/50 p-2 backdrop-blur transition-colors hover:border-black/20 dark:border-white/20 dark:bg-black/50 dark:hover:border-white/30"
                   onClick={() => setIsOpen(false)}
                 >
                   <X size={32} strokeWidth={1} />
@@ -250,7 +250,7 @@ function Images({
                   <motion.button
                     variants={buttonVariants}
                     onClick={handlePrevious}
-                    className="absolute left-2 top-1/2 hidden -translate-y-1/2 cursor-pointer rounded-full border border-black/10 bg-white/50 p-2 backdrop-blur transition-colors hover:border-black/20 dark:border-white/20 dark:bg-black/50 dark:hover:border-white/30 md:left-4 md:block"
+                    className="absolute top-1/2 left-2 hidden -translate-y-1/2 cursor-pointer rounded-full border border-black/10 bg-white/50 p-2 backdrop-blur transition-colors hover:border-black/20 md:left-4 md:block dark:border-white/20 dark:bg-black/50 dark:hover:border-white/30"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -306,7 +306,7 @@ function Images({
                   <motion.button
                     variants={buttonVariants}
                     onClick={handleNext}
-                    className="absolute right-2 top-1/2 hidden -translate-y-1/2 cursor-pointer rounded-full border border-black/10 bg-white/50 p-2 backdrop-blur transition-colors hover:border-black/20 dark:border-white/20 dark:bg-black/50 dark:hover:border-white/30 md:right-4 md:block"
+                    className="absolute top-1/2 right-2 hidden -translate-y-1/2 cursor-pointer rounded-full border border-black/10 bg-white/50 p-2 backdrop-blur transition-colors hover:border-black/20 md:right-4 md:block dark:border-white/20 dark:bg-black/50 dark:hover:border-white/30"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -329,7 +329,7 @@ function Images({
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: 20 }}
                     transition={{ duration: 0.3, delay: 0.2 }}
-                    className="absolute bottom-4 left-0 right-0 m-auto flex w-min gap-2 rounded-xl border border-black/10 bg-white/50 p-2 backdrop-blur dark:border-white/20 dark:bg-black/50"
+                    className="absolute right-0 bottom-4 left-0 m-auto flex w-min gap-2 rounded-xl border border-black/10 bg-white/50 p-2 backdrop-blur dark:border-white/20 dark:bg-black/50"
                   >
                     {images.map((img, index) => (
                       <div
@@ -346,14 +346,14 @@ function Images({
                         }}
                         role="button"
                         tabIndex={0}
-                        className={`relative flex h-8 w-12 cursor-pointer items-center justify-center overflow-hidden rounded-md p-[1px] bg-black/10 dark:bg-white/10 ${
+                        className={`relative flex h-8 w-12 cursor-pointer items-center justify-center overflow-hidden rounded-md bg-black/10 p-[1px] dark:bg-white/10 ${
                           index === activeIndex ? "ring-2 ring-gray-500" : ""
                         }`}
                       >
                         <img
                           src={img.src}
                           alt={img.alt || ""}
-                          className="h-full w-full object-cover rounded-[4px]"
+                          className="h-full w-full rounded-[4px] object-cover"
                         />
                       </div>
                     ))}

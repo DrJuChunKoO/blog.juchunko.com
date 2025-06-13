@@ -45,20 +45,20 @@ const pageDescription = authorBio;
 
 <BaseLayout title={pageTitle} description={pageDescription}>
   <div
-    class="flex flex-col items-center gap-2 bg-white dark:bg-white/5 p-4 rounded-lg"
+    class="flex flex-col items-center gap-2 rounded-lg bg-white p-4 dark:bg-white/5"
   >
     <img
       src={author.data.avatar}
       width={120}
       height={120}
       alt={authorName}
-      class="aspect-square rounded-full object-cover mb-4"
+      class="mb-4 aspect-square rounded-full object-cover"
     />
-    <h1 class="text-2xl md:text-4xl font-semibold">{authorName}</h1>
+    <h1 class="text-2xl font-semibold md:text-4xl">{authorName}</h1>
     <p>{authorBio}</p>
     {
       socialLinks && (
-        <div class="flex flex-wrap justify-center gap-4 mt-4">
+        <div class="mt-4 flex flex-wrap justify-center gap-4">
           {Object.entries(socialLinks).map(([name, url]) => (
             <a
               href={name === "email" ? `mailto:${url}` : url}
@@ -76,7 +76,7 @@ const pageDescription = authorBio;
       )
     }
   </div>
-  <div class="flex flex-col items-start justify-start gap-4 text-left mt-4">
+  <div class="mt-4 flex flex-col items-start justify-start gap-4 text-left">
     <h2>{t("author.postsBy").replace("{authorName}", authorName)}</h2>
     {
       posts.map((post) => (

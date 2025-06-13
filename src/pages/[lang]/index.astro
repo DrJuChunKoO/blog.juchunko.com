@@ -45,7 +45,7 @@ const posts = await Promise.all(
           posts.map(({ post, categoryEntries }, index) => (
             <a
               href={`/${post.id.replace(/\.mdx?$/, "")}`}
-              class={`group  transition-colors    hover:bg-gray-200 dark:hover:bg-white/10 rounded-xl p-2 ${index === 0 ? "md:col-span-2" : ""}`}
+              class={`group rounded-xl p-2 transition-colors hover:bg-gray-200 dark:hover:bg-white/10 ${index === 0 ? "md:col-span-2" : ""}`}
             >
               {post.data.heroImage && (
                 <img
@@ -53,15 +53,15 @@ const posts = await Promise.all(
                   height={360}
                   src={post.data.heroImage}
                   alt=""
-                  class="aspect-video object-cover rounded-lg mb-1 transition-transform"
+                  class="aspect-video rounded-lg object-cover transition-transform"
                   transition:name={`${post.id}-image`}
                 />
               )}
               {categoryEntries.length > 0 && (
-                <ul class="flex flex-wrap gap-2 -mb-1 items-start justify-start">
+                <ul class="-mb-1 flex flex-wrap items-start justify-start gap-2">
                   {categoryEntries.map((cat) => (
                     <li transition:name={`${post.id}-category-${cat.id}`}>
-                      <span class="text-sm dark:text-white/50 text-gray-500">
+                      <span class="text-sm text-gray-500 dark:text-white/50">
                         {cat.data.name[currentLang]}
                       </span>
                     </li>
@@ -74,7 +74,7 @@ const posts = await Promise.all(
               >
                 {post.data.title}
               </h4>
-              <div class="text-base dark:text-white/50 text-gray-500">
+              <div class="text-base text-gray-500 dark:text-white/50">
                 <FormattedDate date={post.data.pubDate} />
               </div>
             </a>

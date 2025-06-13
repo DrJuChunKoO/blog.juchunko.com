@@ -8,14 +8,14 @@ const t = useTranslations(lang);
 
 <div class="sticky top-0 z-20 w-full bg-transparent print:hidden">
   <div
-    class="backdrop-blur-md pointer-events-none absolute z-[-1] h-full w-full bg-white/95 dark:bg-black/90 shadow-[0_2px_4px_rgba(0,0,0,.02),0_1px_0_rgba(0,0,0,.06)] dark:shadow-[0_-1px_0_rgba(255,255,255,.1)_inset] contrast-more:shadow-[0_0_0_1px_#000] contrast-more:dark:shadow-[0_0_0_1px_#fff]"
+    class="pointer-events-none absolute z-[-1] h-full w-full bg-white/95 shadow-[0_2px_4px_rgba(0,0,0,.02),0_1px_0_rgba(0,0,0,.06)] backdrop-blur-md contrast-more:shadow-[0_0_0_1px_#000] dark:bg-black/90 dark:shadow-[0_-1px_0_rgba(255,255,255,.1)_inset] contrast-more:dark:shadow-[0_0_0_1px_#fff]"
   >
   </div>
   <nav
-    class="mx-auto flex h-16 max-w-[90rem] items-center justify-end gap-2 pl-[max(env(safe-area-inset-left),1.5rem)] pr-[max(env(safe-area-inset-right),1.5rem)] text-sm"
+    class="mx-auto flex h-16 max-w-[90rem] items-center justify-end gap-2 pr-[max(env(safe-area-inset-right),1.5rem)] pl-[max(env(safe-area-inset-left),1.5rem)] text-sm"
   >
     <a
-      class="flex items-center hover:opacity-75 text-base ltr:mr-auto rtl:ml-auto"
+      class="flex items-center text-base hover:opacity-75 ltr:mr-auto rtl:ml-auto"
       href={`/${lang}`}
     >
       <span class="font-medium">{t("site.title")}</span>
@@ -24,7 +24,7 @@ const t = useTranslations(lang);
       href="https://juchunko.com/"
       target="_blank"
       rel="noreferrer"
-      class="contrast-more:text-gray-700 contrast-more:dark:text-gray-100 relative -ml-2 hidden whitespace-nowrap p-2 md:inline-block text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200"
+      class="relative -ml-2 hidden p-2 whitespace-nowrap text-gray-600 hover:text-gray-800 contrast-more:text-gray-700 md:inline-block dark:text-gray-400 dark:hover:text-gray-200 contrast-more:dark:text-gray-100"
       aria-current="false"
     >
       <span class="absolute inset-x-0 text-center"
@@ -37,7 +37,7 @@ const t = useTranslations(lang);
       href="https://transpal.juchunko.com/"
       target="_blank"
       rel="noreferrer"
-      class="contrast-more:text-gray-700 contrast-more:dark:text-gray-100 relative -ml-2 hidden whitespace-nowrap p-2 md:inline-block text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200"
+      class="relative -ml-2 hidden p-2 whitespace-nowrap text-gray-600 hover:text-gray-800 contrast-more:text-gray-700 md:inline-block dark:text-gray-400 dark:hover:text-gray-200 contrast-more:dark:text-gray-100"
       aria-current="false"
     >
       <span class="absolute inset-x-0 text-center">{t("nav.transcript")}</span>
