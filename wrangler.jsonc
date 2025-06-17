@@ -1,7 +1,14 @@
 {
   "name": "blog-juchunko",
   "compatibility_date": "2025-06-17",
+  "main": "./src/worker/index.ts",
   "assets": {
-    "directory": "./dist"
+    "directory": "./dist",
+    "binding": "ASSETS"
+  },
+  "observability": {
+    "logs": {
+      "enabled": true
+    }
   }
 }
