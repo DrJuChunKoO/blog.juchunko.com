@@ -158,10 +158,10 @@ export default function ChatBot() {
                     <div
                       className={[
                         "prose prose-sm prose-neutral max-w-[80%] rounded-lg px-3 py-2 break-words whitespace-pre-wrap",
-                        `prose-headings:mt-0 prose-headings:mb-0 prose-ul:mt-0 prose-ul:mb-0 prose-ol:mt-0 prose-ol:mb-0 prose-li:mt-0 prose-li:mb-0 prose-blockquote:mt-0 prose-blockquote:mb-0 prose-table:mt-0 prose-table:mb-0 prose-img:mt-0 prose-img:mb-0 prose-img:rounded-lg prose-img:shadow-md prose-p:mt-0`,
+                        `prose-headings:mt-0 prose-headings:mb-0 prose-ul:mt-0 prose-ul:mb-0 prose-ol:mt-0 prose-ol:mb-0 prose-li:mt-0 prose-li:mb-0 prose-blockquote:mt-0 prose-blockquote:mb-0 prose-table:mt-0 prose-table:mb-0 prose-img:mt-0 prose-img:mb-0 prose-img:rounded-lg prose-img:shadow-md prose-p:my-0`,
                         "leading-5",
                         m.role === "user"
-                          ? "prose-invert bg-blue-500"
+                          ? "prose-invert bg-blue-500 text-white"
                           : "dark:prose-invert bg-gray-100 dark:bg-gray-800",
                       ].join(" ")}
                     >
