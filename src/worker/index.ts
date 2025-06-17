@@ -39,8 +39,8 @@ export default {
 
       const openai: OpenAI = createOpenAI({
         apiKey: env.OPENAI_API_KEY,
-        // 若需經由 Cloudflare AI Gateway，可於此自訂 baseURL
-        // baseURL: "https://gateway.ai.cloudflare.com/v1/<account>/<gateway>/openai",
+        baseURL:
+          "https://gateway.ai.cloudflare.com/v1/3f1f83a939b2fc99ca45fd8987962514/blog/openai",
       });
 
       // --------------------------------------------------------------
