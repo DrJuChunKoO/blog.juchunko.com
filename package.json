@@ -6,6 +6,7 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
+    "deploy": "wrangler deploy",
     "astro": "astro"
   },
   "dependencies": {
@@ -32,6 +33,7 @@
     "@tailwindcss/typography": "^0.5.16",
     "prettier": "^3.5.3",
     "prettier-plugin-astro": "^0.14.1",
-    "prettier-plugin-tailwindcss": "^0.6.12"
+    "prettier-plugin-tailwindcss": "^0.6.12",
+    "wrangler": "^3.57.0"
   }
 }
