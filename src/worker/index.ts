@@ -12,22 +12,8 @@ interface Env {
   OPENAI_API_KEY: string;
 }
 
-// ---------------------------------------------------------------------------
-// CORS headers – 允許瀏覽器直接消費 SSE stream
-// ---------------------------------------------------------------------------
-const corsHeaders: Record<string, string> = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type",
-};
-
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
-    // Handle CORS pre-flight
-    if (request.method === "OPTIONS") {
-      return new Response(null, { status: 204, headers: corsHeaders });
-    }
-
     // API 端點 -------------------------------------------------------------
     if (
       request.method === "POST" &&
@@ -52,7 +38,6 @@ export default {
       } catch {
         return new Response("Invalid JSON body", {
           status: 400,
-          headers: corsHeaders,
         });
       }
 
@@ -104,8 +89,6 @@ current page: https://juchunko.com${filename}
       response.headers.set("Content-Type", "text/x-unknown");
       response.headers.set("content-encoding", "identity");
       response.headers.set("transfer-encoding", "chunked");
-      for (const [k, v] of Object.entries(corsHeaders))
-        response.headers.set(k, v);
       return response;
     }
 
