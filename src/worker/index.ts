@@ -97,22 +97,22 @@ current page: https://blog.juchunko.com${filename}
     // 1. /blog/:slug          -> /zh/:slug/
     // 2. /blog/:slug-en       -> /en/:slug/
     // ------------------------------
-    {
-      const url = new URL(request.url);
-      if (url.pathname.startsWith("/blog/")) {
-        // 取得 slug，移除開頭 /blog/ 以及結尾 /
-        let slug = url.pathname.slice("/blog/".length).replace(/\/$/, "");
 
-        // 判斷是否為英文 (-en 結尾)
-        let targetLang = "zh";
-        if (slug.endsWith("-en")) {
-          slug = slug.slice(0, -3); // 去除 -en
-          targetLang = "en";
-        }
+    if (new URL(request.url).pathname.startsWith("/blog/")) {
+      // 取得 slug，移除開頭 /blog/ 以及結尾 /
+      let slug = new URL(request.url).pathname
+        .slice("/blog/".length)
+        .replace(/\/$/, "");
 
-        const location = `/${targetLang}/${slug}/`;
-        return Response.redirect(location, 301);
+      // 判斷是否為英文 (-en 結尾)
+      let targetLang = "zh";
+      if (slug.endsWith("-en")) {
+        slug = slug.slice(0, -3); // 去除 -en
+        targetLang = "en";
       }
+
+      const location = `https://blog.juchunko.com/${targetLang}/${slug}/`;
+      return Response.redirect(location, 301);
     }
 
     // 非 /api/chat – 直接回傳靜態檔 (免費 CDN)
