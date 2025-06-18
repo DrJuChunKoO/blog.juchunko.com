@@ -74,6 +74,17 @@ main {
   hr {
     margin: 1rem 0;
   }
+  ul,
+  ol {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  :where(ul > li):not(
+      :where([class~="not-prose"], [class~="not-prose"] *)
+    )::marker {
+    color: color-mix(in srgb, currentColor 50%, transparent) !important;
+  }
 }
 
 @keyframes loading-dots {
