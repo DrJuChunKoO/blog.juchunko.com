@@ -65,23 +65,23 @@ export default function ChatBot() {
       : [
           {
             text: t("chat.quick.summarize"),
-            prompt: "Summarize key points of this page",
+            prompt: "Summarize key points of this page in English",
           },
           {
             text: t("chat.quick.background"),
-            prompt: "Provide background info of this content",
+            prompt: "Provide background info of this content in English",
           },
           {
             text: t("chat.quick.perspective"),
-            prompt: "Main perspective of this content?",
+            prompt: "Main perspective of this content in English?",
           },
           {
             text: t("chat.quick.detail"),
-            prompt: "Detailed explanation of this content?",
+            prompt: "Detailed explanation of this content in English?",
           },
           {
             text: t("chat.quick.qna"),
-            prompt: "Generate Q&A of this content",
+            prompt: "Generate Q&A of this content in English",
           },
         ]
   ) as { text: string; prompt: string }[];
