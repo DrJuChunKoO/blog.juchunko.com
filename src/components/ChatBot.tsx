@@ -164,19 +164,19 @@ export default function ChatBot() {
                     )}
                     <div
                       className={[
-                        "prose prose-sm prose-neutral prose-tight max-w-[80%] rounded-lg px-3 py-0.5 break-words whitespace-pre-wrap",
+                        "prose prose-sm prose-neutral prose-tight max-w-[80%] rounded-lg px-3 py-1 break-words whitespace-pre-wrap",
                         m.role === "user"
                           ? "prose-invert bg-blue-500 text-white"
                           : "dark:prose-invert bg-gray-100 dark:bg-gray-800",
                       ].join(" ")}
                     >
                       {m.content === "" ? (
-                        <div className="flex items-center gap-0.5">
+                        <p className="flex items-center">
                           <span className="text-sm text-gray-500">
                             {t("chat.loading")}
                           </span>
                           <LoadingDots />
-                        </div>
+                        </p>
                       ) : (
                         <Markdown>{m.content}</Markdown>
                       )}
