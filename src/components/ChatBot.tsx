@@ -20,14 +20,20 @@ export default function ChatBot() {
   // Preserve scroll position and always scroll to the latest message.
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
-  const { messages, input, handleInputChange, handleSubmit, status, append } =
-    useChat({
-      api: "/api/chat",
-      body: {
-        filename:
-          typeof window !== "undefined" ? window.location.pathname : "/",
-      },
-    });
+  const {
+    messages,
+    input,
+    setInput,
+    handleInputChange,
+    handleSubmit,
+    status,
+    append,
+  } = useChat({
+    api: "/api/chat",
+    body: {
+      filename: typeof window !== "undefined" ? window.location.pathname : "/",
+    },
+  });
 
   // Quick prompts definitions
   const quickPrompts = (
@@ -212,10 +218,7 @@ export default function ChatBot() {
               <form
                 onSubmit={(e) => {
                   handleSubmit(e);
-                  // Reset the input field
-                  handleInputChange({
-                    target: { value: "" },
-                  } as unknown as React.ChangeEvent<HTMLTextAreaElement>);
+                  setInput("");
                 }}
                 className="dark:border-gray-800"
               >
@@ -229,10 +232,7 @@ export default function ChatBot() {
                       if (e.key === "Enter" && !e.shiftKey) {
                         e.preventDefault();
                         handleSubmit();
-                        // Reset the input field
-                        handleInputChange({
-                          target: { value: "" },
-                        } as unknown as React.ChangeEvent<HTMLTextAreaElement>);
+                        setInput("");
                       }
                     }}
                   />
