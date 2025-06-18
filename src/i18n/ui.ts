@@ -36,6 +36,7 @@ export const ui = {
     "chat.input.placeholder": "Type a question and press Enter",
     "chat.ariaLabel": "Chat with AI",
     "chat.system.message": "Hi, how can I help you today?",
+    "chat.loading": "Thinking",
   },
   zh: {
     "site.title": "科技立委葛如鈞．寶博士部落格",
@@ -67,5 +68,6 @@ export const ui = {
     "chat.input.placeholder": "請輸入問題，按 Enter 送出",
     "chat.ariaLabel": "和 AI 對話",
     "chat.system.message": "嗨，今天有什麼可以幫助你的嗎？",
+    "chat.loading": "思考中",
   },
 } as const;
