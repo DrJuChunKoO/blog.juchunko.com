@@ -187,12 +187,12 @@ export default function ChatBot() {
                         transition={{ duration: 0.2 }}
                       >
                         {m.content === "" ? (
-                          <p className="flex items-center">
+                          <div className="flex items-center">
                             <span className="text-sm text-gray-500">
                               {t("chat.loading")}
                             </span>
                             <LoadingDots />
-                          </p>
+                          </div>
                         ) : (
                           <Markdown>{m.content}</Markdown>
                         )}
