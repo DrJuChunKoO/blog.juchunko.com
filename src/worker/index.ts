@@ -41,13 +41,15 @@ export default {
         });
       }
 
-      const { messages = [], filename = "/" } = body;
+      const { messages = [], filename = "/", lang = "zh" } = body;
 
       // 系統提示詞
       const systemPrompt = `你是國民黨立委葛如鈞（寶博士）部落格的 AI 助手
 - 盡可能簡短、友善回答
 - 盡可能使用工具來提供使用者盡可能準確與完整的資訊
-- 請以使用者的語言回答問題
+- 請以使用者的語言回答問題，如果使用者沒有指定語言，請以${
+        lang === "zh" ? "台灣中文" : "English"
+      }回答
 - 葛如鈞=寶博士=Ju-Chun KO
 
 <viewPage>

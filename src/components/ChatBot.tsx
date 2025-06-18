@@ -33,6 +33,7 @@ export default function ChatBot() {
     api: "/api/chat",
     body: {
       filename: typeof window !== "undefined" ? window.location.pathname : "/",
+      lang: lang,
     },
   });
 
