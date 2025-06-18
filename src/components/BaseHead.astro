@@ -69,4 +69,19 @@ const title = pageTitle ? `${pageTitle} | ${siteTitle}` : siteTitle;
 <meta property="twitter:description" content={description} />
 <meta property="twitter:image" content={new URL(image, Astro.url)} />
 
+<!-- Google tag (gtag.js) -->
+<script
+  is:inline
+  type="text/partytown"
+  src="https://www.googletagmanager.com/gtag/js?id=G-8CV1BWFW7T"></script>
+<script is:inline type="text/partytown">
+  window.dataLayer = window.dataLayer || [];
+  function gtag() {
+    dataLayer.push(arguments);
+  }
+  gtag("js", new Date());
+
+  gtag("config", "G-8CV1BWFW7T");
+</script>
+
 <ClientRouter />

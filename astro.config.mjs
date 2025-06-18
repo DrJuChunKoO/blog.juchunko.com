@@ -3,8 +3,8 @@ import { defineConfig } from "astro/config";
 import mdx from "@astrojs/mdx";
 import sitemap from "@astrojs/sitemap";
 import tailwindcss from "@tailwindcss/vite";
+import partytown from "@astrojs/partytown";
 // latex
-
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
 import react from "@astrojs/react";
@@ -18,6 +18,7 @@ export default defineConfig({
       experimentalReactChildren: true,
       experimentalDisableStreaming: true,
     }),
+    partytown({ config: { forward: ["dataLayer.push"] } }),
   ],
   vite: {
     plugins: [tailwindcss()],
