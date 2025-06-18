@@ -156,26 +156,35 @@ export default function ChatBot() {
                     },
                     ...messages,
                   ].map((m) => (
-                    <motion.div
+                    <div
                       key={m.id}
-                      className={`flex gap-2 ${
+                      className={`flex ${
                         m.role === "user" ? "justify-end" : "justify-start"
                       }`}
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      transition={{ duration: 0.2 }}
                     >
-                      {m.role === "assistant" && (
-                        <Bot size={16} className="mt-1" />
-                      )}
-                      <div
+                      <motion.div
                         className={[
                           "prose prose-sm prose-neutral prose-tight max-w-[80%] rounded-lg px-3 py-1 break-words whitespace-pre-wrap",
                           m.role === "user"
-                            ? "prose-invert bg-blue-500 text-white"
-                            : "dark:prose-invert bg-gray-100 dark:bg-gray-800",
+                            ? "prose-invert origin-right bg-blue-500 text-white"
+                            : "dark:prose-invert origin-left bg-gray-100 dark:bg-gray-800",
                         ].join(" ")}
+                        initial={{
+                          opacity: 0,
+                          x: m.role === "user" ? 10 : -10,
+                          rotate: m.role === "user" ? 1 : -1,
+                        }}
+                        animate={{
+                          opacity: 1,
+                          x: 0,
+                          rotate: 0,
+                        }}
+                        exit={{
+                          opacity: 0,
+                          x: m.role === "user" ? 10 : -10,
+                          rotate: m.role === "user" ? -1 : 1,
+                        }}
+                        transition={{ duration: 0.2 }}
                       >
                         {m.content === "" ? (
                           <p className="flex items-center">
@@ -187,14 +196,14 @@ export default function ChatBot() {
                         ) : (
                           <Markdown>{m.content}</Markdown>
                         )}
-                      </div>
-                    </motion.div>
+                      </motion.div>
+                    </div>
                   ))}
                   {/* Quick prompt buttons */}
                   <AnimatePresence>
                     {status === "ready" && (
                       <motion.div
-                        className="ml-2 flex flex-col dark:border-gray-800"
+                        className="-mt-1.5 flex flex-col dark:border-gray-800"
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
@@ -210,7 +219,7 @@ export default function ChatBot() {
                             <button
                               key={qp.text}
                               onClick={() => sendQuickPrompt(qp.prompt)}
-                              className="group flex cursor-pointer items-center gap-0.5 rounded px-4 py-1 text-left text-sm text-gray-500 transition-all hover:font-medium hover:tracking-wide hover:text-gray-700 disabled:opacity-50 dark:text-gray-400 dark:hover:text-gray-200"
+                              className="group flex cursor-pointer items-center gap-0.5 rounded p-1 text-left text-sm text-gray-500 transition-all hover:font-medium hover:tracking-wide hover:text-gray-700 disabled:opacity-50 dark:text-gray-400 dark:hover:text-gray-200"
                             >
                               {qp.text}
                               <ArrowRight
