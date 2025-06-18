@@ -75,3 +75,13 @@ main {
     margin: 1rem 0;
   }
 }
+
+@keyframes loading-dots {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+}
