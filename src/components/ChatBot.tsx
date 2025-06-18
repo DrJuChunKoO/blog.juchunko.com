@@ -92,7 +92,7 @@ export default function ChatBot() {
 
   useEffect(() => {
     // scroll to bottom when new message arrives
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    messagesEndRef.current?.scrollIntoView();
   }, [messages, status]);
 
   return (
