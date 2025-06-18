@@ -164,7 +164,7 @@ export default function ChatBot() {
                     )}
                     <div
                       className={[
-                        "prose prose-sm prose-neutral prose-tight max-w-[80%] rounded-lg px-3 py-2 break-words whitespace-pre-wrap",
+                        "prose prose-sm prose-neutral prose-tight max-w-[80%] rounded-lg px-3 py-0.5 break-words whitespace-pre-wrap",
                         m.role === "user"
                           ? "prose-invert bg-blue-500 text-white"
                           : "dark:prose-invert bg-gray-100 dark:bg-gray-800",
@@ -232,10 +232,13 @@ export default function ChatBot() {
                     placeholder={t("chat.input.placeholder")}
                     value={input}
                     onChange={handleInputChange}
+                    // Ignore Enter while the user is still composing (IME)
                     onKeyDown={(e) => {
-                      if (e.key === "Enter" && !e.shiftKey) {
+                      const isComposing = (e.nativeEvent as any).isComposing;
+                      if (e.key === "Enter" && !e.shiftKey && !isComposing) {
                         e.preventDefault();
                         handleSubmit();
+                        // Clear the textarea AFTER submission when not composing
                         setInput("");
                       }
                     }}
