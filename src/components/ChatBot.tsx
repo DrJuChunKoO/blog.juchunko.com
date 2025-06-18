@@ -85,7 +85,7 @@ export default function ChatBot() {
   useEffect(() => {
     // scroll to bottom when new message arrives
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+  }, [messages, status]);
 
   return (
     <motion.div layoutScroll>
@@ -174,28 +174,37 @@ export default function ChatBot() {
                   </motion.div>
                 ))}
                 {/* Quick prompt buttons */}
-                {status === "ready" && (
-                  <div className="ml-2 flex flex-col dark:border-gray-800">
-                    {quickPrompts
-                      // filter is in messages
-                      .filter(
-                        (qp) => !messages.some((m) => m.content === qp.prompt),
-                      )
-                      .map((qp) => (
-                        <button
-                          key={qp.text}
-                          onClick={() => sendQuickPrompt(qp.prompt)}
-                          className="group flex cursor-pointer items-center gap-0.5 rounded px-4 py-1 text-left text-sm text-gray-500 transition-all hover:text-gray-700 disabled:opacity-50 dark:text-gray-400 dark:hover:text-gray-200"
-                        >
-                          {qp.text}
-                          <ArrowRight
-                            size={16}
-                            className="opacity-50 transition-all group-hover:translate-x-0.5 group-hover:opacity-100"
-                          />
-                        </button>
-                      ))}
-                  </div>
-                )}
+                <AnimatePresence>
+                  {status === "ready" && (
+                    <motion.div
+                      className="ml-2 flex flex-col dark:border-gray-800"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      {quickPrompts
+                        // filter is in messages
+                        .filter(
+                          (qp) =>
+                            !messages.some((m) => m.content === qp.prompt),
+                        )
+                        .map((qp) => (
+                          <button
+                            key={qp.text}
+                            onClick={() => sendQuickPrompt(qp.prompt)}
+                            className="group flex cursor-pointer items-center gap-0.5 rounded px-4 py-1 text-left text-sm text-gray-500 transition-all hover:text-gray-700 disabled:opacity-50 dark:text-gray-400 dark:hover:text-gray-200"
+                          >
+                            {qp.text}
+                            <ArrowRight
+                              size={16}
+                              className="opacity-50 transition-all group-hover:translate-x-0.5 group-hover:opacity-100"
+                            />
+                          </button>
+                        ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
                 <div ref={messagesEndRef} className="flex-1" />
               </div>
 
