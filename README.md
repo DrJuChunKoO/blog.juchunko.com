@@ -55,8 +55,8 @@ description: "⚠ 文章描述 (用於 SEO)"
 pubDate: "⚠ 發佈日期 (YYYY-MM-DD)"
 updatedDate: "✨ 更新日期 (YYYY-MM-DD)"
 author: "⚠ 對應 authors/<id>.json"
-heroImage: "✨ 文章首圖路徑 (建議 1200×630)"
-categories: ["✨", "列表可多選", "對應 categories/<id>.json"]
+heroImage: "⚠ 文章首圖路徑 (建議 1200×630)"
+categories: ["⚠ 列表可多選", "對應 categories/<id>.json"]
 ---
 ```
 
