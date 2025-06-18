@@ -149,6 +149,10 @@ export default function ChatBot() {
                   exit={{ opacity: 0, y: 10 }}
                   transition={{ delay: 0.35 }}
                 >
+                  <div className="text-center text-xs text-gray-500">
+                    {t("chat.warning")}
+                  </div>
+
                   {[
                     {
                       id: "system",

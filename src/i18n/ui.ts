@@ -37,6 +37,8 @@ export const ui = {
     "chat.ariaLabel": "Chat with AI",
     "chat.system.message": "Hi, how can I help you today?",
     "chat.loading": "Thinking",
+    "chat.warning":
+      "AI may make mistakes, please check the generated content carefully",
   },
   zh: {
     "site.title": "科技立委葛如鈞．寶博士部落格",
@@ -69,5 +71,6 @@ export const ui = {
     "chat.ariaLabel": "和 AI 對話",
     "chat.system.message": "嗨，今天有什麼可以幫助你的嗎？",
     "chat.loading": "思考中",
+    "chat.warning": "AI 可能會犯錯，請仔細檢查生成的內容",
   },
 } as const;
