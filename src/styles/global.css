@@ -57,9 +57,7 @@ main {
   color: #f2f2f2;
 }
 @utility prose-tight {
-  :where(h1, h2, h3, h4, h5, h6, p, ul, ol, li, img, blockquote, code):not(
-      :where([class~="not-prose"], [class~="not-prose"] *)
-    )
+  :is(h1, h2, h3, h4, h5, h6, p, ul, ol, li, img, blockquote, code)
     :not(:last-child) {
     margin: 0;
     margin-bottom: 0.25rem;
