@@ -51,7 +51,7 @@ export default {
 - 葛如鈞=寶博士=Ju-Chun KO
 
 <viewPage>
-current page: https://juchunko.com${filename}
+current page: https://blog.juchunko.com${filename}
 </viewPage>`;
 
       // --------------------------------------------------------------
@@ -90,6 +90,29 @@ current page: https://juchunko.com${filename}
       response.headers.set("content-encoding", "identity");
       response.headers.set("transfer-encoding", "chunked");
       return response;
+    }
+
+    // ------------------------------
+    // 舊版 /blog/ URL 永久轉址（301）
+    // 1. /blog/:slug          -> /zh/:slug/
+    // 2. /blog/:slug-en       -> /en/:slug/
+    // ------------------------------
+    {
+      const url = new URL(request.url);
+      if (url.pathname.startsWith("/blog/")) {
+        // 取得 slug，移除開頭 /blog/ 以及結尾 /
+        let slug = url.pathname.slice("/blog/".length).replace(/\/$/, "");
+
+        // 判斷是否為英文 (-en 結尾)
+        let targetLang = "zh";
+        if (slug.endsWith("-en")) {
+          slug = slug.slice(0, -3); // 去除 -en
+          targetLang = "en";
+        }
+
+        const location = `/${targetLang}/${slug}/`;
+        return Response.redirect(location, 301);
+      }
     }
 
     // 非 /api/chat – 直接回傳靜態檔 (免費 CDN)
