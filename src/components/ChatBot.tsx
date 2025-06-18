@@ -203,7 +203,7 @@ export default function ChatBot() {
                           <button
                             key={qp.text}
                             onClick={() => sendQuickPrompt(qp.prompt)}
-                            className="group flex cursor-pointer items-center gap-0.5 rounded px-4 py-1 text-left text-sm text-gray-500 transition-all hover:text-gray-700 disabled:opacity-50 dark:text-gray-400 dark:hover:text-gray-200"
+                            className="group flex cursor-pointer items-center gap-0.5 rounded px-4 py-1 text-left text-sm text-gray-500 transition-all hover:font-semibold hover:text-gray-700 disabled:opacity-50 dark:text-gray-400 dark:hover:text-gray-200"
                           >
                             {qp.text}
                             <ArrowRight
