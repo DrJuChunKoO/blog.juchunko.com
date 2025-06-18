@@ -203,6 +203,10 @@ export default function ChatBot() {
               <form
                 onSubmit={(e) => {
                   handleSubmit(e);
+                  // Reset the input field
+                  handleInputChange({
+                    target: { value: "" },
+                  } as unknown as React.ChangeEvent<HTMLTextAreaElement>);
                 }}
                 className="dark:border-gray-800"
               >
@@ -216,6 +220,10 @@ export default function ChatBot() {
                       if (e.key === "Enter" && !e.shiftKey) {
                         e.preventDefault();
                         handleSubmit();
+                        // Reset the input field
+                        handleInputChange({
+                          target: { value: "" },
+                        } as unknown as React.ChangeEvent<HTMLTextAreaElement>);
                       }
                     }}
                   />
