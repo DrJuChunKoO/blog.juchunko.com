@@ -140,82 +140,90 @@ export default function ChatBot() {
                 </motion.button>
               </div>
               {/* Message list */}
-              <div className="flex h-120 max-h-[60vh] flex-col space-y-3 overflow-y-auto border-t border-gray-200 bg-white p-4 text-sm dark:border-gray-800 dark:bg-gray-950">
-                {[
-                  {
-                    id: "system",
-                    role: "assistant",
-                    content: t("chat.system.message"),
-                  },
-                  ...messages,
-                ].map((m) => (
-                  <motion.div
-                    key={m.id}
-                    className={`flex gap-2 ${
-                      m.role === "user" ? "justify-end" : "justify-start"
-                    }`}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    {m.role === "assistant" && (
-                      <Bot size={16} className="mt-1" />
-                    )}
-                    <div
-                      className={[
-                        "prose prose-sm prose-neutral prose-tight max-w-[80%] rounded-lg px-3 py-1 break-words whitespace-pre-wrap",
-                        m.role === "user"
-                          ? "prose-invert bg-blue-500 text-white"
-                          : "dark:prose-invert bg-gray-100 dark:bg-gray-800",
-                      ].join(" ")}
-                    >
-                      {m.content === "" ? (
-                        <p className="flex items-center">
-                          <span className="text-sm text-gray-500">
-                            {t("chat.loading")}
-                          </span>
-                          <LoadingDots />
-                        </p>
-                      ) : (
-                        <Markdown>{m.content}</Markdown>
-                      )}
-                    </div>
-                  </motion.div>
-                ))}
-                {/* Quick prompt buttons */}
-                <AnimatePresence>
-                  {status === "ready" && (
+              <div className="h-120 max-h-[60vh] border-t border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-950">
+                <motion.div
+                  className="flex h-full flex-col space-y-3 overflow-y-auto p-4 text-sm"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 10 }}
+                  transition={{ delay: 0.35 }}
+                >
+                  {[
+                    {
+                      id: "system",
+                      role: "assistant",
+                      content: t("chat.system.message"),
+                    },
+                    ...messages,
+                  ].map((m) => (
                     <motion.div
-                      className="ml-2 flex flex-col dark:border-gray-800"
+                      key={m.id}
+                      className={`flex gap-2 ${
+                        m.role === "user" ? "justify-end" : "justify-start"
+                      }`}
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
                       transition={{ duration: 0.2 }}
                     >
-                      {quickPrompts
-                        // filter is in messages
-                        .filter(
-                          (qp) =>
-                            !messages.some((m) => m.content === qp.prompt),
-                        )
-                        .map((qp) => (
-                          <button
-                            key={qp.text}
-                            onClick={() => sendQuickPrompt(qp.prompt)}
-                            className="group flex cursor-pointer items-center gap-0.5 rounded px-4 py-1 text-left text-sm text-gray-500 transition-all hover:font-semibold hover:text-gray-700 disabled:opacity-50 dark:text-gray-400 dark:hover:text-gray-200"
-                          >
-                            {qp.text}
-                            <ArrowRight
-                              size={16}
-                              className="opacity-50 transition-all group-hover:translate-x-0.5 group-hover:opacity-100"
-                            />
-                          </button>
-                        ))}
+                      {m.role === "assistant" && (
+                        <Bot size={16} className="mt-1" />
+                      )}
+                      <div
+                        className={[
+                          "prose prose-sm prose-neutral prose-tight max-w-[80%] rounded-lg px-3 py-1 break-words whitespace-pre-wrap",
+                          m.role === "user"
+                            ? "prose-invert bg-blue-500 text-white"
+                            : "dark:prose-invert bg-gray-100 dark:bg-gray-800",
+                        ].join(" ")}
+                      >
+                        {m.content === "" ? (
+                          <p className="flex items-center">
+                            <span className="text-sm text-gray-500">
+                              {t("chat.loading")}
+                            </span>
+                            <LoadingDots />
+                          </p>
+                        ) : (
+                          <Markdown>{m.content}</Markdown>
+                        )}
+                      </div>
                     </motion.div>
-                  )}
-                </AnimatePresence>
-                <div ref={messagesEndRef} className="flex-1" />
+                  ))}
+                  {/* Quick prompt buttons */}
+                  <AnimatePresence>
+                    {status === "ready" && (
+                      <motion.div
+                        className="ml-2 flex flex-col dark:border-gray-800"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        {quickPrompts
+                          // filter is in messages
+                          .filter(
+                            (qp) =>
+                              !messages.some((m) => m.content === qp.prompt),
+                          )
+                          .map((qp) => (
+                            <button
+                              key={qp.text}
+                              onClick={() => sendQuickPrompt(qp.prompt)}
+                              className="group flex cursor-pointer items-center gap-0.5 rounded px-4 py-1 text-left text-sm text-gray-500 transition-all hover:font-medium hover:tracking-wide hover:text-gray-700 disabled:opacity-50 dark:text-gray-400 dark:hover:text-gray-200"
+                            >
+                              {qp.text}
+                              <ArrowRight
+                                size={16}
+                                className="opacity-50 transition-all group-hover:translate-x-0.5 group-hover:opacity-100"
+                              />
+                            </button>
+                          ))}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                  <div ref={messagesEndRef} className="flex-1" />
+                </motion.div>
               </div>
 
               {/* Input area */}
