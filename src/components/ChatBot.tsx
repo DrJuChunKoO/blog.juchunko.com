@@ -35,45 +35,45 @@ export default function ChatBot() {
       ? [
           {
             text: t("chat.quick.summarize"),
-            prompt: "用中文摘要此頁面的重點",
+            prompt: "摘要此頁面的重點",
           },
           {
             text: t("chat.quick.background"),
-            prompt: "用中文提供此內容的背景資訊",
+            prompt: "提供此內容的背景資訊",
           },
           {
             text: t("chat.quick.perspective"),
-            prompt: "用中文說明此內容的主要觀點?",
+            prompt: "說明此內容的主要觀點?",
           },
           {
             text: t("chat.quick.detail"),
-            prompt: "用中文詳細解釋此內容?",
+            prompt: "詳細解釋此內容?",
           },
           {
             text: t("chat.quick.qna"),
-            prompt: "用中文為此內容生成問答",
+            prompt: "為此內容生成問答",
           },
         ]
       : [
           {
             text: t("chat.quick.summarize"),
-            prompt: "Summarize key points of this page in English",
+            prompt: "Summarize key points of this page",
           },
           {
             text: t("chat.quick.background"),
-            prompt: "Provide background info of this content in English",
+            prompt: "Provide background info of this content",
           },
           {
             text: t("chat.quick.perspective"),
-            prompt: "Main perspective of this content in English?",
+            prompt: "Main perspective of this content?",
           },
           {
             text: t("chat.quick.detail"),
-            prompt: "Detailed explanation of this content in English?",
+            prompt: "Detailed explanation of this content?",
           },
           {
             text: t("chat.quick.qna"),
-            prompt: "Generate Q&A of this content in English",
+            prompt: "Generate Q&A of this content",
           },
         ]
   ) as { text: string; prompt: string }[];
@@ -112,9 +112,9 @@ export default function ChatBot() {
         {isOpen && (
           <motion.div
             layoutId="chat-bot"
-            className="fixed right-2 bottom-2 w-80 overflow-hidden rounded-xl bg-white shadow-lg dark:bg-gray-900"
+            className="fixed right-2 bottom-2 w-90 max-w-[90vw] overflow-hidden rounded-xl bg-white shadow-lg dark:bg-gray-900"
           >
-            <div className="rounded-xl bg-gray-100 text-sm dark:bg-gray-900 dark:text-gray-100">
+            <div className="rounded-xl border border-gray-200 bg-gray-50 text-sm dark:border-gray-800 dark:bg-gray-900 dark:text-gray-100">
               <div className="flex justify-between gap-1 p-2 pl-4">
                 <motion.div
                   layoutId="chat-bot-title"
@@ -124,7 +124,7 @@ export default function ChatBot() {
                 </motion.div>
 
                 <motion.button
-                  className="cursor-pointer rounded-md bg-gray-200 p-1 text-sm hover:bg-gray-300 active:bg-gray-300 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700 dark:active:bg-gray-700"
+                  className="cursor-pointer rounded-md border border-black/5 bg-gray-200 p-1 text-sm hover:bg-gray-300 active:bg-gray-300 dark:border-white/5 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700 dark:active:bg-gray-700"
                   onClick={() => setIsOpen(false)}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
@@ -133,7 +133,7 @@ export default function ChatBot() {
                 </motion.button>
               </div>
               {/* Message list */}
-              <div className="flex h-80 flex-col space-y-3 overflow-y-auto border-t border-gray-200 bg-white p-4 text-sm dark:border-gray-800 dark:bg-gray-950">
+              <div className="flex h-120 max-h-[60vh] flex-col space-y-3 overflow-y-auto border-t border-gray-200 bg-white p-4 text-sm dark:border-gray-800 dark:bg-gray-950">
                 {[
                   {
                     id: "system",
@@ -174,7 +174,7 @@ export default function ChatBot() {
                   </motion.div>
                 ))}
                 {/* Quick prompt buttons */}
-                <div className="-m-3 flex flex-col p-2 dark:border-gray-800">
+                <div className="ml-2 flex flex-col dark:border-gray-800">
                   {quickPrompts
                     // filter is in messages
                     .filter(
@@ -185,7 +185,7 @@ export default function ChatBot() {
                         key={qp.text}
                         disabled={status === "streaming"}
                         onClick={() => sendQuickPrompt(qp.prompt)}
-                        className="group flex cursor-pointer items-center gap-0.5 rounded px-3 py-1 text-left text-sm text-gray-500 transition-all hover:text-gray-700 disabled:opacity-50 dark:text-gray-400 dark:hover:text-gray-200"
+                        className="group flex cursor-pointer items-center gap-0.5 rounded px-4 py-1 text-left text-sm text-gray-500 transition-all hover:text-gray-700 disabled:opacity-50 dark:text-gray-400 dark:hover:text-gray-200"
                       >
                         {qp.text}
                         <ArrowRight
@@ -203,27 +203,29 @@ export default function ChatBot() {
                 onSubmit={(e) => {
                   handleSubmit(e);
                 }}
-                className="flex items-center border-t border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-950"
+                className="dark:border-gray-800"
               >
-                <textarea
-                  className="h-10 w-full resize-none bg-transparent p-2 px-4 text-gray-900 placeholder-gray-400 outline-none dark:text-gray-100 dark:placeholder-gray-500"
-                  placeholder={t("chat.input.placeholder")}
-                  value={input}
-                  onChange={handleInputChange}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" && !e.shiftKey) {
-                      e.preventDefault();
-                      handleSubmit();
-                    }
-                  }}
-                />
-                <button
-                  type="submit"
-                  disabled={status === "streaming" || input.trim() === ""}
-                  className="flex h-10 w-14 cursor-pointer items-center justify-center bg-blue-500 text-white hover:bg-blue-600 disabled:bg-gray-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:disabled:bg-gray-800"
-                >
-                  <Send size={16} />
-                </button>
+                <div className="flex items-center gap-2 rounded-b-lg border-t border-gray-200 dark:border-gray-800">
+                  <textarea
+                    className="h-10 w-full resize-none bg-transparent p-2 px-4 text-gray-900 placeholder-gray-400 outline-none dark:text-gray-100 dark:placeholder-gray-500"
+                    placeholder={t("chat.input.placeholder")}
+                    value={input}
+                    onChange={handleInputChange}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && !e.shiftKey) {
+                        e.preventDefault();
+                        handleSubmit();
+                      }
+                    }}
+                  />
+                  <button
+                    type="submit"
+                    disabled={status === "streaming" || input.trim() === ""}
+                    className="flex h-10 w-14 cursor-pointer items-center justify-center rounded-br-lg bg-blue-500 text-white hover:bg-blue-600 disabled:bg-gray-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:disabled:bg-gray-800"
+                  >
+                    <Send size={16} />
+                  </button>
+                </div>
               </form>
             </div>
           </motion.div>
