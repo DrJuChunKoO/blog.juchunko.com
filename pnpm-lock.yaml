@@ -47,9 +47,6 @@ dependencies:
   katex:
     specifier: ^0.16.22
     version: 0.16.22
-  lucide-react:
-    specifier: ^0.514.0
-    version: 0.514.0(react@19.1.0)
   motion:
     specifier: ^12.16.0
     version: 12.19.1(react-dom@19.1.0)(react@19.1.0)
@@ -3361,14 +3358,6 @@ packages:
     resolution: {integrity: sha512-KpNARQA3Iwv+jTA0utUVVbrh+Jlrr1Fv0e56GGzAFOXN7dk/FviaDW8LHmK52DlcH4WP2n6gI8vN1aesBFgo9w==}
     dependencies:
       yallist: 3.1.1
-    dev: false
-
-  /lucide-react@0.514.0(react@19.1.0):
-    resolution: {integrity: sha512-HXD0OAMd+JM2xCjlwG1EGW9Nuab64dhjO3+MvdyD+pSUeOTBaVAPhQblKIYmmX4RyBYbdzW0VWnJpjJmxWGr6w==}
-    peerDependencies:
-      react: ^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0
-    dependencies:
-      react: 19.1.0
     dev: false
 
   /magic-string@0.30.17:

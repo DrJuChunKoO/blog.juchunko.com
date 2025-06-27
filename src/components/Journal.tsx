@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import type { PanInfo } from "motion/react";
-import { X } from "lucide-react";
+import { X } from "./Icons";
 import { RemoveScroll } from "react-remove-scroll";
 
 // Utility Functions

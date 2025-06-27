@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { Bot, Send, X, ArrowRight, Loader } from "lucide-react";
+import { Bot, Send, X, ArrowRight, Loader } from "./Icons";
 import { useChat } from "@ai-sdk/react";
 import { getLangFromUrl, useTranslations } from "../i18n/utils";
 import { defaultLang } from "../i18n/ui";
