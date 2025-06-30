@@ -1,7 +1,10 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { Bot, Send, X, ArrowRight, Loader } from "./Icons";
+import LucideBot from "~icons/lucide/bot";
+import LucideSend from "~icons/lucide/send";
+import LucideX from "~icons/lucide/x";
+import LucideArrowRight from "~icons/lucide/arrow-right";
 import { useChat } from "@ai-sdk/react";
 import { getLangFromUrl, useTranslations } from "../i18n/utils";
 import { defaultLang } from "../i18n/ui";
@@ -111,7 +114,7 @@ export default function ChatBot() {
               className="flex items-center gap-2"
               layoutId="chat-bot-title"
             >
-              <Bot size={20} /> {t("chat.button.discuss")}
+              <LucideBot className="h-5 w-5" /> {t("chat.button.discuss")}
             </motion.div>
           </motion.button>
         )}
@@ -128,7 +131,7 @@ export default function ChatBot() {
                   layoutId="chat-bot-title"
                   className="flex items-center gap-2"
                 >
-                  <Bot size={20} /> {t("chat.title")}
+                  <LucideBot className="h-5 w-5" /> {t("chat.title")}
                 </motion.div>
 
                 <motion.button
@@ -137,7 +140,7 @@ export default function ChatBot() {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
-                  <X size={20} />
+                  <LucideX className="h-5 w-5" />
                 </motion.button>
               </div>
               {/* Message list */}
@@ -227,10 +230,7 @@ export default function ChatBot() {
                               className="group flex cursor-pointer items-center gap-0.5 rounded p-1 text-left text-sm text-gray-500 transition-all hover:font-medium hover:tracking-wide hover:text-gray-700 disabled:opacity-50 dark:text-gray-400 dark:hover:text-gray-200"
                             >
                               {qp.text}
-                              <ArrowRight
-                                size={16}
-                                className="opacity-50 transition-all group-hover:translate-x-0.5 group-hover:opacity-100"
-                              />
+                              <LucideArrowRight className="h-4 w-4 opacity-50 transition-all group-hover:translate-x-0.5 group-hover:opacity-100" />
                             </button>
                           ))}
                       </motion.div>
@@ -270,7 +270,7 @@ export default function ChatBot() {
                     disabled={status === "streaming" || input.trim() === ""}
                     className="flex h-10 w-14 cursor-pointer items-center justify-center rounded-br-lg bg-blue-500 text-white hover:bg-blue-600 disabled:bg-gray-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:disabled:bg-gray-800"
                   >
-                    <Send size={16} />
+                    <LucideSend className="h-4 w-4" />
                   </button>
                 </div>
               </form>

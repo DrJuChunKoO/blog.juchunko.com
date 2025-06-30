@@ -8,6 +8,9 @@
     "dist"
   ],
   "compilerOptions": {
+    "types": [
+      "unplugin-icons/types/vue",
+    ],
     "strictNullChecks": true,
     "jsx": "react-jsx",
     "jsxImportSource": "react",

@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import type { PanInfo } from "motion/react";
-import { X } from "./Icons";
+import LucideX from "~icons/lucide/x";
 import { RemoveScroll } from "react-remove-scroll";
 
 // Utility Functions
@@ -235,7 +235,7 @@ function Images({
                   className="absolute top-5 right-5 cursor-pointer rounded-full border border-black/10 bg-white/50 p-2 backdrop-blur transition-colors hover:border-black/20 dark:border-white/20 dark:bg-black/50 dark:hover:border-white/30"
                   onClick={() => setIsOpen(false)}
                 >
-                  <X size={32} strokeWidth={1} />
+                  <LucideX className="h-8 w-8" strokeWidth={1} />
                 </motion.button>
               </div>
               <motion.div
