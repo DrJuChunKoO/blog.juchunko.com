@@ -8,6 +8,8 @@ import partytown from "@astrojs/partytown";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
 import react from "@astrojs/react";
+//icon
+import Icons from "unplugin-icons/vite";
 // https://astro.build/config
 export default defineConfig({
   site: "https://blog.juchunko.com",
@@ -21,7 +23,7 @@ export default defineConfig({
     partytown({ config: { forward: ["dataLayer.push"] } }),
   ],
   vite: {
-    plugins: [tailwindcss()],
+    plugins: [tailwindcss(), Icons({ autoInstall: true })],
   },
   markdown: { remarkPlugins: [remarkMath], rehypePlugins: [rehypeKatex] },
 });

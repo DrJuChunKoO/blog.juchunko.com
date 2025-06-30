@@ -4,7 +4,7 @@
   "version": "0.0.1",
   "scripts": {
     "dev": "astro dev",
-    "build": "NODE_OPTIONS='--max-old-space-size=4096' astro build",
+    "build": "astro build",
     "preview": "astro preview",
     "deploy": "wrangler deploy",
     "preview:worker": "wrangler dev",
@@ -39,10 +39,12 @@
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20240530.0",
+    "@iconify-json/lucide": "^1.2.54",
     "@tailwindcss/typography": "^0.5.16",
     "prettier": "^3.5.3",
     "prettier-plugin-astro": "^0.14.1",
     "prettier-plugin-tailwindcss": "^0.6.12",
+    "unplugin-icons": "^22.1.0",
     "wrangler": "^4.20.0"
   }
 }
