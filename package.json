@@ -40,6 +40,8 @@
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20240530.0",
     "@iconify-json/lucide": "^1.2.54",
+    "@svgr/core": "^8.1.0",
+    "@svgr/plugin-jsx": "^8.1.0",
     "@tailwindcss/typography": "^0.5.16",
     "prettier": "^3.5.3",
     "prettier-plugin-astro": "^0.14.1",

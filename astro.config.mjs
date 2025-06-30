@@ -23,7 +23,14 @@ export default defineConfig({
     partytown({ config: { forward: ["dataLayer.push"] } }),
   ],
   vite: {
-    plugins: [tailwindcss(), Icons({ autoInstall: true })],
+    plugins: [
+      tailwindcss(),
+      Icons({
+        autoInstall: true,
+        compiler: "jsx",
+        jsx: "react",
+      }),
+    ],
   },
   markdown: { remarkPlugins: [remarkMath], rehypePlugins: [rehypeKatex] },
 });

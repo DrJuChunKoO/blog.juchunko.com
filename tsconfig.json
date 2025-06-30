@@ -9,7 +9,7 @@
   ],
   "compilerOptions": {
     "types": [
-      "unplugin-icons/types/vue",
+      "unplugin-icons/types/react"
     ],
     "strictNullChecks": true,
     "jsx": "react-jsx",
