@@ -19,10 +19,6 @@ export const getStaticPaths = (async () => {
   );
 }) satisfies GetStaticPaths;
 
-type Props = {
-  author: CollectionEntry<"authors">;
-};
-
 const { author } = Astro.props;
 const { lang } = Astro.params as { lang: Language };
 const t = useTranslations(lang);
