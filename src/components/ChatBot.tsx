@@ -8,7 +8,7 @@ import LucideArrowRight from "~icons/lucide/arrow-right";
 import { useChat } from "@ai-sdk/react";
 import { getLangFromUrl, useTranslations } from "../i18n/utils";
 import { defaultLang } from "../i18n/ui";
-import Markdown from "react-markdown";
+import Markdown from "markdown-to-jsx";
 import LoadingDots from "./LoadingDots";
 
 export default function ChatBot() {
