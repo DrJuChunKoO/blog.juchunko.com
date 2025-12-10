@@ -68,7 +68,7 @@ export default function TaiwanReservesChart({ lang = "en" }: { lang?: "en" | "zh
     const textColor = isDark ? "#e5e7eb" : "#374151";
 
     return (
-        <div className="w-full h-[400px] my-8 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+        <div className="w-full h-[400px] my-8 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 min-w-0">
             <h3 className="text-center text-lg font-bold mb-1 text-gray-900 dark:text-gray-100">
                 {t.title}
             </h3>
@@ -83,7 +83,7 @@ export default function TaiwanReservesChart({ lang = "en" }: { lang?: "en" | "zh
                         cy="50%"
                         labelLine={false}
                         label={({ name, percent }: { name: string; percent: number }) => `${(percent * 100).toFixed(0)}%`}
-                        outerRadius={120}
+                        outerRadius="80%"
                         fill="#8884d8"
                         dataKey="value"
                     >

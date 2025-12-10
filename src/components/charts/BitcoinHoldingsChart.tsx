@@ -92,7 +92,7 @@ export default function BitcoinHoldingsChart({ lang = "en" }: { lang?: "en" | "z
     const axisColor = isDark ? "#9ca3af" : "#4b5563"; // gray-400 : gray-600
 
     return (
-        <div className="w-full h-[400px] my-8 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+        <div className="w-full h-[400px] my-8 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 min-w-0">
             <h3 className="text-center text-lg font-bold mb-1 text-gray-900 dark:text-gray-100">
                 {t.title}
             </h3>
