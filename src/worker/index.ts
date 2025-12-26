@@ -58,11 +58,9 @@ current page: https://blog.juchunko.com${filename}
       // 執行 LLM，並注入各種 tool
       // --------------------------------------------------------------
       const result = streamText({
-        model: openrouter("google/gemini-3-flash-preview"),
-        messages: [
-          { role: "system", content: systemPrompt },
-          ...(await convertToModelMessages(messages)),
-        ],
+        model: openrouter.chat("google/gemini-3-flash-preview"),
+        system: systemPrompt,
+        messages: await convertToModelMessages(messages),
         maxSteps: 8,
         experimental_transform: smoothStream({
           delayInMs: 10,
@@ -86,13 +84,7 @@ current page: https://blog.juchunko.com${filename}
         },
       });
 
-      const response = result.toUIMessageStreamResponse();
-      // 附加 CORS 標頭 (以及 Vercel AI stream header)
-      response.headers.set("x-vercel-ai-data-stream", "v1");
-      response.headers.set("Content-Type", "text/x-unknown");
-      response.headers.set("content-encoding", "identity");
-      response.headers.set("transfer-encoding", "chunked");
-      return response;
+      return result.toUIMessageStreamResponse();
     }
 
     // ------------------------------
