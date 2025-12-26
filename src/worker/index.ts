@@ -20,13 +20,11 @@ export default {
       new URL(request.url).pathname === "/api/chat"
     ) {
       // --------------------------------------------------------------
-      // 初始化 OpenAI provider – 放在 handler 內才能拿到正確 env
+      // 初始化 OpenRouter provider
       // --------------------------------------------------------------
 
       const openrouter = createOpenRouter({
         apiKey: env.OPENROUTER_API_KEY,
-        baseURL:
-          "https://gateway.ai.cloudflare.com/v1/3f1f83a939b2fc99ca45fd8987962514/blog/openrouter",
       });
 
       // --------------------------------------------------------------
@@ -61,10 +59,10 @@ current page: https://blog.juchunko.com${filename}
       // --------------------------------------------------------------
       const result = streamText({
         model: openrouter("google/gemini-3-flash-preview"),
-        messages: await convertToModelMessages([
+        messages: [
           { role: "system", content: systemPrompt },
-          ...messages,
-        ]),
+          ...(await convertToModelMessages(messages)),
+        ],
         maxSteps: 8,
         experimental_transform: smoothStream({
           delayInMs: 10,
