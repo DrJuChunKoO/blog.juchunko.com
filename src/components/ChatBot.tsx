@@ -6,6 +6,7 @@ import LucideSend from "~icons/lucide/send";
 import LucideX from "~icons/lucide/x";
 import LucideArrowRight from "~icons/lucide/arrow-right";
 import { useChat } from "@ai-sdk/react";
+import { isTextUIPart, DefaultChatTransport } from "ai";
 import { getLangFromUrl, useTranslations } from "../i18n/utils";
 import { defaultLang } from "../i18n/ui";
 import Markdown from "markdown-to-jsx";
@@ -13,6 +14,7 @@ import LoadingDots from "./LoadingDots";
 
 export default function ChatBot() {
   const [isOpen, setIsOpen] = useState(false);
+  const [input, setInput] = useState("");
 
   // Detect language from URL path
   const lang: keyof typeof import("../i18n/ui").ui =
@@ -24,21 +26,26 @@ export default function ChatBot() {
   // Preserve scroll position and always scroll to the latest message.
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
-  const {
-    messages,
-    input,
-    setInput,
-    handleInputChange,
-    handleSubmit,
-    status,
-    append,
-  } = useChat({
-    api: "/api/chat",
-    body: {
-      filename: typeof window !== "undefined" ? window.location.pathname : "/",
-      lang: lang,
-    },
+  const { messages, status, sendMessage } = useChat({
+    transport: new DefaultChatTransport({
+      body: {
+        filename: typeof window !== "undefined" ? window.location.pathname : "/",
+        lang: lang,
+      },
+    }),
   });
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setInput(e.target.value);
+  };
+
+  const handleSubmit = (e?: React.FormEvent) => {
+    e?.preventDefault();
+    if (input.trim()) {
+      sendMessage({ text: input });
+      setInput("");
+    }
+  };
 
   // Quick prompts definitions
   const quickPrompts = (
@@ -90,7 +97,7 @@ export default function ChatBot() {
   ) as { text: string; prompt: string }[];
 
   const sendQuickPrompt = (promptStr: string) => {
-    append({ role: "user", content: promptStr });
+    sendMessage({ text: promptStr });
   };
 
   useEffect(() => {
@@ -159,8 +166,13 @@ export default function ChatBot() {
                   {[
                     {
                       id: "system",
-                      role: "assistant",
-                      content: t("chat.system.message"),
+                      role: "assistant" as const,
+                      parts: [
+                        {
+                          type: "text" as const,
+                          text: t("chat.system.message"),
+                        },
+                      ],
                     },
                     ...messages,
                   ].map((m) => (
@@ -194,15 +206,19 @@ export default function ChatBot() {
                         }}
                         transition={{ duration: 0.2 }}
                       >
-                        {m.content === "" ? (
+                        {m.parts.map((part, i) => {
+                          if (isTextUIPart(part)) {
+                            return <Markdown key={i}>{part.text}</Markdown>;
+                          }
+                          return null;
+                        })}
+                        {m.role === "assistant" && m.parts.length === 0 && (
                           <div className="flex items-center gap-1">
                             <span className="text-sm text-gray-500">
                               {t("chat.loading")}
                             </span>
                             <LoadingDots />
                           </div>
-                        ) : (
-                          <Markdown>{m.content}</Markdown>
                         )}
                       </motion.div>
                     </div>
@@ -218,10 +234,14 @@ export default function ChatBot() {
                         transition={{ duration: 0.2 }}
                       >
                         {quickPrompts
-                          // filter is in messages
                           .filter(
                             (qp) =>
-                              !messages.some((m) => m.content === qp.prompt),
+                              !messages.some((m) =>
+                                m.parts.some(
+                                  (p) =>
+                                    p.type === "text" && p.text === qp.prompt,
+                                ),
+                              ),
                           )
                           .map((qp) => (
                             <button
@@ -241,13 +261,7 @@ export default function ChatBot() {
               </div>
 
               {/* Input area */}
-              <form
-                onSubmit={(e) => {
-                  handleSubmit(e);
-                  setInput("");
-                }}
-                className="dark:border-gray-800"
-              >
+              <form onSubmit={handleSubmit} className="dark:border-gray-800">
                 <div className="flex items-center gap-2 rounded-b-lg border-t border-gray-200 dark:border-gray-800">
                   <textarea
                     className="h-10 w-full resize-none bg-transparent p-2 px-4 text-gray-900 placeholder-gray-400 outline-none dark:text-gray-100 dark:placeholder-gray-500"
@@ -260,8 +274,6 @@ export default function ChatBot() {
                       if (e.key === "Enter" && !e.shiftKey && !isComposing) {
                         e.preventDefault();
                         handleSubmit();
-                        // Clear the textarea AFTER submission when not composing
-                        setInput("");
                       }
                     }}
                   />

@@ -178,4 +178,22 @@ pnpm preview      # 在本地測試 dist/
 
 ---
 
+## 7. 部署與環境變數
+
+本專案的 AI 聊天功能部署於 Cloudflare Workers。
+
+### 7-1. 環境變數設定
+
+請確保在 Cloudflare Workers 的設定中或本地 `.dev.vars` 檔案中設定以下變數：
+
+- `OPENROUTER_API_KEY`: 您的 OpenRouter API Key。
+
+### 7-2. 部署指令
+
+```bash
+pnpm deploy       # 部署 Worker 到 Cloudflare
+```
+
+---
+
 > 如果文件有任何錯誤或需要補充，歡迎直接發 PR！

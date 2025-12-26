@@ -1,6 +1,6 @@
 // @ts-nocheck
-import { createOpenAI, type OpenAI } from "@ai-sdk/openai";
-import { streamText, tool, smoothStream, embed } from "ai";
+import { createOpenRouter } from "@openrouter/ai-sdk-provider";
+import { streamText, tool, smoothStream, convertToModelMessages } from "ai";
 import z from "zod";
 import type { ExportedHandler, Fetcher } from "@cloudflare/workers-types";
 
@@ -8,8 +8,8 @@ interface Env {
   // 靜態資源綁定（wrangler.assets.binding）
   ASSETS: Fetcher;
 
-  // Supabase 與 OpenAI 相關變數，請於 wrangler secret / vars 設定
-  OPENAI_API_KEY: string;
+  // Supabase 與 OpenRouter 相關變數，請於 wrangler secret / vars 設定
+  OPENROUTER_API_KEY: string;
 }
 
 export default {
@@ -23,10 +23,10 @@ export default {
       // 初始化 OpenAI provider – 放在 handler 內才能拿到正確 env
       // --------------------------------------------------------------
 
-      const openai: OpenAI = createOpenAI({
-        apiKey: env.OPENAI_API_KEY,
+      const openrouter = createOpenRouter({
+        apiKey: env.OPENROUTER_API_KEY,
         baseURL:
-          "https://gateway.ai.cloudflare.com/v1/3f1f83a939b2fc99ca45fd8987962514/blog/openai",
+          "https://gateway.ai.cloudflare.com/v1/3f1f83a939b2fc99ca45fd8987962514/blog/openrouter",
       });
 
       // --------------------------------------------------------------
@@ -60,8 +60,11 @@ current page: https://blog.juchunko.com${filename}
       // 執行 LLM，並注入各種 tool
       // --------------------------------------------------------------
       const result = streamText({
-        model: openai.responses("gpt-4.1-mini"),
-        messages: [{ role: "system", content: systemPrompt }, ...messages],
+        model: openrouter("google/gemini-3-flash-preview"),
+        messages: await convertToModelMessages([
+          { role: "system", content: systemPrompt },
+          ...messages,
+        ]),
         maxSteps: 8,
         experimental_transform: smoothStream({
           delayInMs: 10,
@@ -85,7 +88,7 @@ current page: https://blog.juchunko.com${filename}
         },
       });
 
-      const response = result.toDataStreamResponse();
+      const response = result.toUIMessageStreamResponse();
       // 附加 CORS 標頭 (以及 Vercel AI stream header)
       response.headers.set("x-vercel-ai-data-stream", "v1");
       response.headers.set("Content-Type", "text/x-unknown");
