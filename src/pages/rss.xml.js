@@ -10,9 +10,15 @@ export async function GET(context) {
 
   // 預先 resolve 作者與分類
   for (const post of posts) {
-    if (post.data.author && !authors[post.data.author]) {
-      const authorEntry = await getEntry(post.data.author);
-      authors[post.data.author] = authorEntry?.data?.name || {};
+    // author is now an array
+    if (post.data.author) {
+      for (const authorRef of post.data.author) {
+        const authorId = typeof authorRef === 'string' ? authorRef : authorRef.id;
+        if (!authors[authorId]) {
+          const authorEntry = await getEntry(authorRef);
+          authors[authorId] = authorEntry?.data?.name || {};
+        }
+      }
     }
     if (post.data.categories) {
       for (const cat of post.data.categories) {
@@ -41,22 +47,28 @@ export async function GET(context) {
         const slugWithLang = post.id.replace(/\.(md|mdx)$/, "");
         const [lang, ...slugParts] = slugWithLang.split("/");
         const slug = slugParts.join("/");
-        // author name
+        // author name (now an array - join multiple authors with comma)
         const authorName = post.data.author
-          ? authors[post.data.author]?.[lang] ||
-            authors[post.data.author]?.en ||
-            authors[post.data.author]?.zh ||
-            ""
+          ? post.data.author
+            .map((authorRef) => {
+              const authorId = typeof authorRef === 'string' ? authorRef : authorRef.id;
+              return authors[authorId]?.[lang] ||
+                authors[authorId]?.en ||
+                authors[authorId]?.zh ||
+                "";
+            })
+            .filter(Boolean)
+            .join(", ")
           : "";
         // categories name (多語系)
         const categoryNames = post.data.categories
           ? post.data.categories.map(
-              (cat) =>
-                categories[cat]?.[lang] ||
-                categories[cat]?.en ||
-                categories[cat]?.zh ||
-                cat,
-            )
+            (cat) =>
+              categories[cat]?.[lang] ||
+              categories[cat]?.en ||
+              categories[cat]?.zh ||
+              cat,
+          )
           : [];
         // updatedDate
         const updatedDate = post.data.updatedDate

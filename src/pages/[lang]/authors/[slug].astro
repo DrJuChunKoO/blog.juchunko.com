@@ -15,7 +15,7 @@ export const getStaticPaths = (async () => {
     (Object.keys(languages) as Language[]).map((lang) => ({
       params: { lang, slug: author.id },
       props: { author },
-    }))
+    })),
   );
 }) satisfies GetStaticPaths;
 
@@ -28,7 +28,8 @@ const allPosts = await getCollection("blog");
 const posts = allPosts
   .filter(
     (post) =>
-      post.data.author.id === author.id && post.slug.startsWith(`${lang}/`)
+      post.data.author.some((a) => a.id === author.id) &&
+      post.slug.startsWith(`${lang}/`),
   )
   .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 

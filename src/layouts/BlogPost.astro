@@ -20,7 +20,8 @@ const {
   author,
   categories,
 } = post.data;
-const authorData = await getEntry(author);
+// Fetch full author entries (author is now always an array)
+const authorEntries = await Promise.all(author.map((a) => getEntry(a)));
 
 // Fetch full category entries if any are referenced in the frontmatter
 const categoryEntries = categories
@@ -37,7 +38,7 @@ const otherLang = currentLang === "en" ? "zh" : "en";
 
 const posts = await getCollection("blog");
 const otherLangPost = posts.find(
-  (p) => p.id.replace(/\.(md|mdx)$/, "") === `${otherLang}/${slug}`
+  (p) => p.id.replace(/\.(md|mdx)$/, "") === `${otherLang}/${slug}`,
 );
 ---
 
@@ -93,22 +94,29 @@ const otherLangPost = posts.find(
               {title}
             </h1>
             {
-              authorData && (
-                <a
-                  href={`/${currentLang}/authors/${authorData.id}`}
-                  class="flex items-center gap-2"
-                >
-                  <img
-                    src={authorData.data.avatar}
-                    width={40}
-                    height={40}
-                    alt={authorData.data.name[currentLang]}
-                    class="aspect-square rounded-full object-cover"
-                  />
-                  <span class="text-base font-semibold">
-                    {authorData.data.name[currentLang]}
-                  </span>
-                </a>
+              authorEntries.length > 0 && (
+                <div class="flex flex-wrap items-center gap-4">
+                  {authorEntries.map(
+                    (authorData) =>
+                      authorData && (
+                        <a
+                          href={`/${currentLang}/authors/${authorData.id}`}
+                          class="flex items-center gap-2"
+                        >
+                          <img
+                            src={authorData.data.avatar}
+                            width={40}
+                            height={40}
+                            alt={authorData.data.name[currentLang]}
+                            class="aspect-square rounded-full object-cover"
+                          />
+                          <span class="text-base font-semibold">
+                            {authorData.data.name[currentLang]}
+                          </span>
+                        </a>
+                      ),
+                  )}
+                </div>
               )
             }
             <div class="text-sm text-gray-500 dark:text-white/50">
@@ -136,7 +144,7 @@ const otherLangPost = posts.find(
                   >
                     {t("blog.readIn").replace(
                       "{lang}",
-                      otherLang === "en" ? "English" : "中文"
+                      otherLang === "en" ? "English" : "中文",
                     )}
                   </a>
                 </div>

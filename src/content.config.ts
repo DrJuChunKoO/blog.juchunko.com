@@ -9,7 +9,12 @@ const blog = defineCollection({
     pubDate: z.coerce.date(),
     updatedDate: z.coerce.date().optional(),
     heroImage: z.string().optional(),
-    author: reference("authors"),
+    // Allow assigning one or multiple authors to this post
+    author: z
+      .union([reference("authors"), z.array(reference("authors"))])
+      .transform((val) => {
+        return Array.isArray(val) ? val : [val];
+      }),
     // Allow assigning one or multiple category ids to this post
     categories: z
       .union([reference("categories"), z.array(reference("categories"))])
