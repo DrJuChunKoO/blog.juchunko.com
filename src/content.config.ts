@@ -9,6 +9,7 @@ const blog = defineCollection({
     pubDate: z.coerce.date(),
     updatedDate: z.coerce.date().optional(),
     heroImage: z.string().optional(),
+    heroImageAlt: z.string().optional(),
     // Allow assigning one or multiple authors to this post
     author: z
       .union([reference("authors"), z.array(reference("authors"))])

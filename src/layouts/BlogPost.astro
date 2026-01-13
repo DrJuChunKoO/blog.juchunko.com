@@ -17,6 +17,7 @@ const {
   pubDate,
   updatedDate,
   heroImage,
+  heroImageAlt,
   author,
   categories,
 } = post.data;
@@ -63,7 +64,7 @@ const otherLangPost = posts.find(
               <img
                 class="w-full rounded-lg"
                 src={heroImage}
-                alt=""
+                alt={heroImageAlt || ""}
                 transition:name={`${post.id}-image`}
               />
             )
