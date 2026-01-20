@@ -88,6 +88,7 @@ export default function TTSPlayer({ isOpen, lang = "zh" }: TTSPlayerProps) {
 	const progressUpdateIntervalRef = useRef<NodeJS.Timeout | null>(null);
 	const audioElementsRef = useRef<HTMLAudioElement[]>([]);
 	const originalStylesRef = useRef<Map<HTMLElement, { color: string; transition: string }>>(new Map());
+	const activeSpansRef = useRef<HTMLElement[]>([]);
 
 	const currentUrl = typeof window !== "undefined" ? window.location.href : "";
 
@@ -132,9 +133,23 @@ export default function TTSPlayer({ isOpen, lang = "zh" }: TTSPlayerProps) {
 	};
 
 	const resetAllStyles = useCallback(() => {
+		// Restore wrapped spans first
+		activeSpansRef.current.forEach((span) => {
+			if (span.parentNode) {
+				const parent = span.parentNode;
+				while (span.firstChild) {
+					parent.insertBefore(span.firstChild, span);
+				}
+				parent.removeChild(span);
+			}
+		});
+		activeSpansRef.current = [];
+
 		originalStylesRef.current.forEach((style, el) => {
-			el.style.color = style.color;
-			el.style.transition = style.transition;
+			if (el.isConnected) {
+				el.style.color = style.color;
+				el.style.transition = style.transition;
+			}
 		});
 		originalStylesRef.current.clear();
 		const main = document.querySelector("main") || document.querySelector("article");
@@ -328,7 +343,6 @@ export default function TTSPlayer({ isOpen, lang = "zh" }: TTSPlayerProps) {
 		const walker = document.createTreeWalker(mainContent, NodeFilter.SHOW_TEXT, {
 			acceptNode: (node) => {
 				const parent = node.parentElement;
-				// Skip text nodes inside the player
 				if (parent?.closest(".tts-player-container")) {
 					return NodeFilter.FILTER_REJECT;
 				}
@@ -349,7 +363,6 @@ export default function TTSPlayer({ isOpen, lang = "zh" }: TTSPlayerProps) {
 			}
 		}
 
-		// Find all block elements, excluding player
 		const blockElements = Array.from(mainContent.querySelectorAll("p, li, h1, h2, h3, h4, h5, h6, blockquote, div, time")).filter(
 			(el) => !el.closest(".tts-player-container"),
 		);
@@ -380,59 +393,54 @@ export default function TTSPlayer({ isOpen, lang = "zh" }: TTSPlayerProps) {
 
 		// Strategy 3: If still no match, try finding by text nodes
 		if (!matchedElement) {
-			// Build text from consecutive text nodes
 			for (let i = 0; i < textNodes.length; i++) {
 				let combinedText = "";
-				let commonAncestor: HTMLElement | null = null;
+				let combinedNodes: Text[] = [];
 
 				for (let j = i; j < textNodes.length; j++) {
-					combinedText += (combinedText ? " " : "") + textNodes[j].text;
+					combinedText += textNodes[j].text;
+					combinedNodes.push(textNodes[j].node);
 
 					if (normalizeText(combinedText) === targetText || normalizeText(combinedText).includes(targetText)) {
-						// Find the smallest common ancestor
-						let ancestor: HTMLElement | null = textNodes[i].parent;
-						while (ancestor) {
-							let isCommon = true;
-							for (let k = i; k <= j; k++) {
-								if (!ancestor.contains(textNodes[k].node)) {
-									isCommon = false;
+						const range = document.createRange();
+						range.setStartBefore(combinedNodes[0]);
+						range.setEndAfter(combinedNodes[combinedNodes.length - 1]);
+
+						const span = document.createElement("span");
+						span.className = "tts-active-segment";
+						try {
+							range.surroundContents(span);
+							matchedElement = span;
+							activeSpansRef.current.push(span);
+							break;
+						} catch (e) {
+							let ancestor: HTMLElement | null = textNodes[i].parent;
+							while (ancestor) {
+								let isCommon = true;
+								for (let k = i; k <= j; k++) {
+									if (!ancestor.contains(textNodes[k].node)) {
+										isCommon = false;
+										break;
+									}
+								}
+								if (isCommon) {
+									matchedElement = ancestor;
 									break;
 								}
-							}
-							if (isCommon) {
-								commonAncestor = ancestor;
-								break;
-							}
-							ancestor = ancestor.parentElement;
-						}
-
-						if (commonAncestor) {
-							matchedElement = commonAncestor;
-							if (normalizeText(combinedText) === targetText) {
-								break;
+								ancestor = ancestor.parentElement;
 							}
 						}
 					}
-
-					// Stop if text is getting too long
-					if (combinedText.length > targetText.length * 2) {
-						break;
-					}
+					if (combinedText.length > targetText.length * 2) break;
 				}
-
-				if (matchedElement && normalizeText(matchedElement.textContent || "") === targetText) {
-					break;
-				}
+				if (matchedElement) break;
 			}
 		}
 
 		if (matchedElement) {
 			mainContent.querySelectorAll("*").forEach((el) => {
 				const htmlEl = el as HTMLElement;
-				// Never dim or style the player components
-				if (htmlEl.closest(".tts-player-container")) {
-					return;
-				}
+				if (htmlEl.closest(".tts-player-container")) return;
 
 				if (!originalStylesRef.current.has(htmlEl)) {
 					originalStylesRef.current.set(htmlEl, {
@@ -441,13 +449,14 @@ export default function TTSPlayer({ isOpen, lang = "zh" }: TTSPlayerProps) {
 					});
 				}
 
-				const isMatchedOrChild = matchedElement!.contains(el) || el === matchedElement;
-				const isAncestor = isDescendantOf(matchedElement!, el);
+				const isMatched = el === matchedElement;
+				const isInsideMatched = matchedElement!.contains(el);
+				const isAncestorOfMatched = isDescendantOf(matchedElement!, el);
 
-				if (isMatchedOrChild) {
+				if (isMatched || isInsideMatched) {
 					htmlEl.style.color = "";
 					htmlEl.style.transition = "color 0.3s ease";
-				} else if (!isAncestor) {
+				} else if (!isAncestorOfMatched) {
 					htmlEl.style.color = "var(--tts-dimmed)";
 					htmlEl.style.transition = "color 0.3s ease";
 				} else {
