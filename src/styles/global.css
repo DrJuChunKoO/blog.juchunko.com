@@ -19,8 +19,11 @@
   --box-shadow:
     0 2px 6px rgba(var(--gray), 25%), 0 8px 24px rgba(var(--gray), 33%),
     0 16px 32px rgba(var(--gray), 33%);
-  --tts-dimmed: color-mix(in srgb, currentColor 20%, transparent);
+  --tts-dimmed: #94a3b8; /* slate-400 */
   text-autospace: normal;
+}
+.dark {
+  --tts-dimmed: #64748b; /* slate-500 */
 }
 body {
   font-family: "Geist", "Noto Sans TC", sans-serif;

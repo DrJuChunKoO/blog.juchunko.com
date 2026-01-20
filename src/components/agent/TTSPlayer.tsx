@@ -426,7 +426,7 @@ export default function TTSPlayer({ isOpen, lang = "zh" }: TTSPlayerProps) {
 
 				if (isMatchedOrChild) {
 					// Highlighted element and its children: keep original color
-					htmlEl.style.color = "inherit";
+					htmlEl.style.color = "";
 					htmlEl.style.transition = "color 0.3s ease";
 				} else if (!isAncestor) {
 					// Dimmed elements (not ancestors of matched element): use CSS variable for dimmed color
@@ -434,7 +434,7 @@ export default function TTSPlayer({ isOpen, lang = "zh" }: TTSPlayerProps) {
 					htmlEl.style.transition = "color 0.3s ease";
 				} else {
 					// Ancestors of matched element (like ul/ol for li): keep original color but add transition
-					htmlEl.style.color = "inherit";
+					htmlEl.style.color = "";
 					htmlEl.style.transition = "color 0.3s ease";
 				}
 			});
