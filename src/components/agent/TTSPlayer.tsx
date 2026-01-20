@@ -378,6 +378,54 @@ export default function TTSPlayer({ isOpen, lang = "zh" }: TTSPlayerProps) {
 			}
 		}
 
+		// Strategy 3: If still no match, try finding by text nodes
+		if (!matchedElement) {
+			// Build text from consecutive text nodes
+			for (let i = 0; i < textNodes.length; i++) {
+				let combinedText = "";
+				let commonAncestor: HTMLElement | null = null;
+
+				for (let j = i; j < textNodes.length; j++) {
+					combinedText += (combinedText ? " " : "") + textNodes[j].text;
+
+					if (normalizeText(combinedText) === targetText || normalizeText(combinedText).includes(targetText)) {
+						// Find the smallest common ancestor
+						let ancestor: HTMLElement | null = textNodes[i].parent;
+						while (ancestor) {
+							let isCommon = true;
+							for (let k = i; k <= j; k++) {
+								if (!ancestor.contains(textNodes[k].node)) {
+									isCommon = false;
+									break;
+								}
+							}
+							if (isCommon) {
+								commonAncestor = ancestor;
+								break;
+							}
+							ancestor = ancestor.parentElement;
+						}
+
+						if (commonAncestor) {
+							matchedElement = commonAncestor;
+							if (normalizeText(combinedText) === targetText) {
+								break;
+							}
+						}
+					}
+
+					// Stop if text is getting too long
+					if (combinedText.length > targetText.length * 2) {
+						break;
+					}
+				}
+
+				if (matchedElement && normalizeText(matchedElement.textContent || "") === targetText) {
+					break;
+				}
+			}
+		}
+
 		if (matchedElement) {
 			mainContent.querySelectorAll("*").forEach((el) => {
 				const htmlEl = el as HTMLElement;
