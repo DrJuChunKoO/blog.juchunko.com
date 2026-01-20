@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import { QueryClient, useQuery } from "@tanstack/react-query";
-import { motion } from "motion/react";
-import { BookAudio, Play, Pause, Rewind, FastForward, Loader2, StepForward, StepBack } from "lucide-react";
+import { motion, AnimatePresence } from "motion/react";
+import { BookAudio, Play, Pause, Rewind, FastForward, Loader2, StepForward, StepBack, Maximize2 } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ui } from "@/i18n/ui";
 
@@ -82,13 +82,37 @@ export default function TTSPlayer({ isOpen, lang = "zh" }: TTSPlayerProps) {
 	const [segmentDurations, setSegmentDurations] = useState<number[]>([]);
 	const [highlightEnabled, setHighlightEnabled] = useState(true);
 	const [playbackRate, setPlaybackRate] = useState(1);
+	const [isMainVisible, setIsMainVisible] = useState(true);
 
+	const mainPlayerRef = useRef<HTMLDivElement>(null);
 	const currentAudioRef = useRef<HTMLAudioElement | null>(null);
 	const progressUpdateIntervalRef = useRef<NodeJS.Timeout | null>(null);
 	const audioElementsRef = useRef<HTMLAudioElement[]>([]);
 	const originalStylesRef = useRef<Map<HTMLElement, { color: string; transition: string }>>(new Map());
 
 	const currentUrl = typeof window !== "undefined" ? window.location.href : "";
+
+	// Visibility Observer
+	useEffect(() => {
+		if (typeof IntersectionObserver === "undefined") return;
+
+		const observer = new IntersectionObserver(
+			([entry]) => {
+				setIsMainVisible(entry.isIntersecting);
+			},
+			{ threshold: 0 },
+		);
+
+		if (mainPlayerRef.current) {
+			observer.observe(mainPlayerRef.current);
+		}
+
+		return () => observer.disconnect();
+	}, [mode, segments.length]);
+
+	const scrollToPlayer = () => {
+		mainPlayerRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+	};
 
 	const resetAllStyles = useCallback(() => {
 		originalStylesRef.current.forEach((style, el) => {
@@ -293,7 +317,7 @@ export default function TTSPlayer({ isOpen, lang = "zh" }: TTSPlayerProps) {
 	}, [mode, isPlaying, currentIndex, segmentDurations]);
 
 	useEffect(() => {
-		if (mode !== "api" || segments.length === 0 || !highlightEnabled) {
+		if (mode !== "api" || segments.length === 0 || !highlightEnabled || !isPlaying) {
 			resetAllStyles();
 			return;
 		}
@@ -444,7 +468,7 @@ export default function TTSPlayer({ isOpen, lang = "zh" }: TTSPlayerProps) {
 		return () => {
 			// Styles will be reset on next effect call or cleanup
 		};
-	}, [mode, segments, currentIndex, highlightEnabled, resetAllStyles]);
+	}, [mode, segments, currentIndex, highlightEnabled, isPlaying, resetAllStyles]);
 
 	const togglePlay = useCallback(() => setIsPlaying(!isPlaying), [isPlaying]);
 
@@ -510,8 +534,9 @@ export default function TTSPlayer({ isOpen, lang = "zh" }: TTSPlayerProps) {
 	}, [resetAllStyles]);
 
 	return (
-		<div className="bg-gray-100 dark:bg-white/5 flex flex-col p-4 rounded-lg mb-6 border border-gray-200 dark:border-white/10">
-			{mode === "loading" && (
+		<>
+			<div ref={mainPlayerRef} className="bg-gray-100 dark:bg-white/5 flex flex-col p-4 rounded-lg mb-6 border border-gray-200 dark:border-white/10">
+				{mode === "loading" && (
 				<div className="flex min-h-[160px] flex-col items-center justify-center">
 					<Loader2 className="text-muted-foreground h-6 w-6 animate-spin" />
 					<p className="text-muted-foreground mt-2 text-center text-xs">{ui[lang]["agent.voiceReader.loading"]}</p>
@@ -647,11 +672,80 @@ export default function TTSPlayer({ isOpen, lang = "zh" }: TTSPlayerProps) {
 				</motion.div>
 			)}
 
-			{(mode === "error" || (mode === "api" && segments.length === 0)) && (
-				<div className="flex min-h-[160px] items-center justify-center">
-					<p className="text-red-500 text-center text-xs">{ui[lang]["agent.voiceReader.error"]}</p>
-				</div>
-			)}
-		</div>
+				{(mode === "error" || (mode === "api" && segments.length === 0)) && (
+					<div className="flex min-h-[160px] items-center justify-center">
+						<p className="text-red-500 text-center text-xs">{ui[lang]["agent.voiceReader.error"]}</p>
+					</div>
+				)}
+			</div>
+
+			<AnimatePresence>
+				{!isMainVisible && isPlaying && mode === "api" && (
+					<motion.div
+						initial={{ y: -100, opacity: 0 }}
+						animate={{ y: 0, opacity: 1 }}
+						exit={{ y: -100, opacity: 0 }}
+						transition={{ type: "spring", damping: 25, stiffness: 200 }}
+						className="fixed top-4 left-4 right-4 z-50 flex items-center justify-center pointer-events-none"
+					>
+						<div className="bg-white/80 dark:bg-black/80 backdrop-blur-xl border border-gray-200 dark:border-white/10 rounded-2xl shadow-2xl p-2 pl-4 pr-3 flex items-center gap-4 max-w-2xl w-full pointer-events-auto overflow-hidden group">
+							{/* Mini Progress (Background) */}
+							<div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gray-200 dark:bg-white/10">
+								<motion.div
+									className="h-full bg-blue-600 dark:bg-blue-500"
+									initial={{ width: 0 }}
+									animate={{ width: `${progressPercentage}%` }}
+								/>
+							</div>
+
+							<div className="flex-1 min-w-0 flex flex-col">
+								<span className="text-[10px] font-medium text-blue-600 dark:text-blue-400 uppercase tracking-wider mb-0.5">
+									{ui[lang]["agent.voiceReader.playing"]}
+								</span>
+								<p className="text-sm font-medium truncate dark:text-white leading-tight">
+									{segments[currentIndex]?.text}
+								</p>
+							</div>
+
+							<div className="flex items-center gap-1 shrink-0">
+								<button
+									onClick={() => jumpToSegment(currentIndex - 1)}
+									disabled={currentIndex === 0}
+									className="p-2 hover:bg-black/5 dark:hover:bg-white/10 rounded-full transition-colors disabled:opacity-30"
+								>
+									<StepBack className="size-4 dark:text-white" />
+								</button>
+
+								<button
+									onClick={togglePlay}
+									className="bg-blue-600 hover:bg-blue-700 text-white p-2.5 rounded-full shadow-lg transition-transform active:scale-90"
+								>
+									{isPlaying ? <Pause className="size-4 fill-current" /> : <Play className="size-4 fill-current" />}
+								</button>
+
+								<button
+									onClick={() => jumpToSegment(currentIndex + 1)}
+									disabled={currentIndex === segments.length - 1}
+									className="p-2 hover:bg-black/5 dark:hover:bg-white/10 rounded-full transition-colors disabled:opacity-30"
+								>
+									<StepForward className="size-4 dark:text-white" />
+								</button>
+
+								<div className="w-px h-4 bg-gray-200 dark:bg-white/10 mx-1" />
+
+								<button
+									onClick={scrollToPlayer}
+									className="p-2 hover:bg-black/5 dark:hover:bg-white/10 rounded-full transition-colors group-hover:text-blue-600 dark:group-hover:text-blue-400"
+									title="Back to player"
+								>
+									<Maximize2 className="size-4 dark:text-white" />
+								</button>
+							</div>
+						</div>
+					</motion.div>
+				)}
+			</AnimatePresence>
+		</>
 	);
 }
+
