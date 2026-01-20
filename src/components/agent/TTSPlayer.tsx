@@ -91,6 +91,46 @@ export default function TTSPlayer({ isOpen, lang = "zh" }: TTSPlayerProps) {
 
 	const currentUrl = typeof window !== "undefined" ? window.location.href : "";
 
+	const {
+		data: segments = [],
+		isLoading,
+		isError,
+	} = useQuery(
+		{
+			queryKey: ["ttsSegments", currentUrl],
+			queryFn: async () => {
+				const url = new URL(currentUrl);
+				const domain = url.hostname;
+				const path = url.pathname.slice(1).replace(/\/$/, "");
+				return fetchTTSAudioSegments(domain, path);
+			},
+			enabled: isOpen && !!currentUrl,
+		},
+		ttsQueryClient,
+	);
+
+	// Visibility Observer
+	useEffect(() => {
+		if (typeof IntersectionObserver === "undefined") return;
+
+		const observer = new IntersectionObserver(
+			([entry]) => {
+				setIsMainVisible(entry.isIntersecting);
+			},
+			{ threshold: 0 },
+		);
+
+		if (mainPlayerRef.current) {
+			observer.observe(mainPlayerRef.current);
+		}
+
+		return () => observer.disconnect();
+	}, [mode, segments.length]);
+
+	const scrollToPlayer = () => {
+		mainPlayerRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+	};
+
 	const resetAllStyles = useCallback(() => {
 		originalStylesRef.current.forEach((style, el) => {
 			if (el.isConnected) {
