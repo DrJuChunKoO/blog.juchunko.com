@@ -38,15 +38,6 @@ const normalizeText = (text: string): string => {
 	return text.replace(/\s+/g, " ").trim();
 };
 
-const isDescendantOf = (parent: HTMLElement, element: Element): boolean => {
-	let current: Element | null = element;
-	while (current) {
-		if (current === parent) return true;
-		current = current.parentElement;
-	}
-	return false;
-};
-
 async function fetchTTSAudioSegments(domain: string, path: string): Promise<AudioSegment[]> {
 	try {
 		const response = await fetch(`https://tts-api.juchunko.com/v1/audio/${domain}/${path}`);
@@ -429,20 +420,19 @@ export default function TTSPlayer({ isOpen, lang = "zh" }: TTSPlayerProps) {
 					});
 				}
 
-				const isMatchedOrChild = matchedElement!.contains(el) || el === matchedElement;
-				const isAncestor = isDescendantOf(matchedElement!, el);
-
-				if (isMatchedOrChild) {
-					// Highlighted element and its children: keep original color
+				// 1. Is matched element or inside matched element? (Highlight)
+				if (matchedElement === el || matchedElement.contains(el)) {
 					htmlEl.style.color = "";
 					htmlEl.style.transition = "color 0.3s ease";
-				} else if (!isAncestor) {
-					// Dimmed elements (not ancestors of matched element): use CSS variable for dimmed color
+				}
+				// 2. Is ancestor of matched element? (Keep original color, do NOT dim)
+				else if (el.contains(matchedElement)) {
+					htmlEl.style.color = "";
+					htmlEl.style.transition = "color 0.3s ease";
+				}
+				// 3. Everything else (Dim)
+				else {
 					htmlEl.style.color = "var(--tts-dimmed)";
-					htmlEl.style.transition = "color 0.3s ease";
-				} else {
-					// Ancestors of matched element (like ul/ol for li): keep original color but add transition
-					htmlEl.style.color = "";
 					htmlEl.style.transition = "color 0.3s ease";
 				}
 			});
