@@ -426,12 +426,7 @@ export default function TTSPlayer({ isOpen, lang = "zh" }: TTSPlayerProps) {
 
 				if (isMatchedOrChild) {
 					// Highlighted element and its children: keep original color
-					if (tagName === "li" || tagName === "p") {
-						// Force li/p to use prose body color to avoid inheriting from parent containers
-						htmlEl.style.color = "var(--tw-prose-body)";
-					} else {
-						htmlEl.style.color = "";
-					}
+					htmlEl.style.color = "inherit";
 					htmlEl.style.transition = "color 0.3s ease";
 				} else if (!isAncestor) {
 					// Dimmed elements (not ancestors of matched element): use CSS variable for dimmed color
@@ -439,7 +434,7 @@ export default function TTSPlayer({ isOpen, lang = "zh" }: TTSPlayerProps) {
 					htmlEl.style.transition = "color 0.3s ease";
 				} else {
 					// Ancestors of matched element (like ul/ol for li): keep original color but add transition
-					htmlEl.style.color = "";
+					htmlEl.style.color = "inherit";
 					htmlEl.style.transition = "color 0.3s ease";
 				}
 			});
@@ -515,7 +510,7 @@ export default function TTSPlayer({ isOpen, lang = "zh" }: TTSPlayerProps) {
 	}, [resetAllStyles]);
 
 	return (
-		<div className="bg-card/50 flex flex-col p-4 rounded-lg mb-6 border border-border">
+		<div className="bg-gray-100 dark:bg-white/5 flex flex-col p-4 rounded-lg mb-6 border border-gray-200 dark:border-white/10">
 			{mode === "loading" && (
 				<div className="flex min-h-[160px] flex-col items-center justify-center">
 					<Loader2 className="text-muted-foreground h-6 w-6 animate-spin" />
@@ -537,17 +532,17 @@ export default function TTSPlayer({ isOpen, lang = "zh" }: TTSPlayerProps) {
 					transition={{ duration: 0.3 }}
 				>
 					{/* Currently Playing Text */}
-					<div className="bg-muted/30 border-border/50 rounded-lg border px-3 py-2.5">
-						<div className="text-muted-foreground mb-1 text-xs">{ui[lang]["agent.voiceReader.playing"]}</div>
-						<div className="text-foreground line-clamp-2 text-sm leading-relaxed">{segments[currentIndex]?.text || ""}</div>
+					<div className="bg-black/5 dark:bg-white/5 border-black/5 dark:border-white/5 rounded-lg border px-3 py-2.5">
+						<div className="text-gray-500 dark:text-gray-400 mb-1 text-xs">{ui[lang]["agent.voiceReader.playing"]}</div>
+						<div className="text-inherit line-clamp-2 text-sm leading-relaxed">{segments[currentIndex]?.text || ""}</div>
 					</div>
 
 					{/* Progress Bar */}
 					<div className="space-y-2">
 						<div className="relative w-full">
-							<div className="bg-muted/50 h-2 w-full overflow-hidden rounded-full">
+							<div className="bg-black/10 dark:bg-white/10 h-2 w-full overflow-hidden rounded-full">
 								<motion.div
-									className="bg-primary h-full rounded-full"
+									className="bg-blue-600 dark:bg-blue-500 h-full rounded-full"
 									initial={{ width: 0 }}
 									animate={{ width: `${progressPercentage}%` }}
 									transition={{ duration: 0.1 }}
@@ -564,13 +559,13 @@ export default function TTSPlayer({ isOpen, lang = "zh" }: TTSPlayerProps) {
 							/>
 						</div>
 						<div className="flex items-center justify-between">
-							<span className="text-muted-foreground font-mono text-xs tabular-nums">{formatTime(currentTime)}</span>
+							<span className="text-gray-500 dark:text-gray-400 font-mono text-xs tabular-nums">{formatTime(currentTime)}</span>
 							<div className="flex items-center gap-2">
 								<motion.button
 									whileTap={{ scale: 0.95 }}
 									onClick={() => setHighlightEnabled(!highlightEnabled)}
 									className={`cursor-pointer rounded-md p-1.5 transition-colors ${
-										highlightEnabled ? "bg-primary/15 text-primary" : "text-muted-foreground hover:bg-muted-foreground/10"
+										highlightEnabled ? "bg-blue-600/10 text-blue-600 dark:text-blue-400" : "text-gray-500 hover:bg-black/5 dark:hover:bg-white/5"
 									}`}
 									title={highlightEnabled ? ui[lang]["agent.voiceReader.disableHighlight"] : ui[lang]["agent.voiceReader.enableHighlight"]}
 								>
@@ -579,7 +574,7 @@ export default function TTSPlayer({ isOpen, lang = "zh" }: TTSPlayerProps) {
 
 								<Select value={playbackRate.toString()} onValueChange={(v) => setPlaybackRate(Number(v))}>
 									<SelectTrigger
-										className="text-muted-foreground hover:bg-muted-foreground/10 h-7 w-auto min-w-[3rem] gap-1 border-0 bg-transparent px-2 font-mono text-xs shadow-none focus:ring-0 [&>svg]:opacity-50"
+										className="text-gray-500 dark:text-gray-400 hover:bg-black/5 dark:hover:bg-white/5 h-7 w-auto min-w-[3rem] gap-1 border-0 bg-transparent px-2 font-mono text-xs shadow-none focus:ring-0 [&>svg]:opacity-50"
 										title={ui[lang]["agent.voiceReader.speed"]}
 									>
 										<SelectValue />
@@ -593,7 +588,7 @@ export default function TTSPlayer({ isOpen, lang = "zh" }: TTSPlayerProps) {
 									</SelectContent>
 								</Select>
 							</div>
-							<span className="text-muted-foreground font-mono text-xs tabular-nums">{formatTime(totalDuration)}</span>
+							<span className="text-gray-500 dark:text-gray-400 font-mono text-xs tabular-nums">{formatTime(totalDuration)}</span>
 						</div>
 					</div>
 
@@ -603,7 +598,7 @@ export default function TTSPlayer({ isOpen, lang = "zh" }: TTSPlayerProps) {
 							whileTap={{ scale: 0.9 }}
 							onClick={() => jumpToSegment(currentIndex - 1)}
 							disabled={currentIndex === 0}
-							className="text-muted-foreground hover:bg-muted/50 hover:text-foreground cursor-pointer rounded-lg p-2 transition-all disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent"
+							className="text-gray-500 hover:bg-black/5 dark:hover:bg-white/5 hover:text-inherit cursor-pointer rounded-lg p-2 transition-all disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent"
 							aria-label={ui[lang]["agent.voiceReader.previous"]}
 						>
 							<StepBack className="size-4" />
@@ -613,7 +608,7 @@ export default function TTSPlayer({ isOpen, lang = "zh" }: TTSPlayerProps) {
 							whileTap={{ scale: 0.9 }}
 							onClick={seekBackward}
 							disabled={currentTime < 1}
-							className="text-muted-foreground hover:bg-muted/50 hover:text-foreground cursor-pointer rounded-lg p-2 transition-all disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent"
+							className="text-gray-500 hover:bg-black/5 dark:hover:bg-white/5 hover:text-inherit cursor-pointer rounded-lg p-2 transition-all disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent"
 							aria-label={ui[lang]["agent.voiceReader.rewind15s"]}
 						>
 							<Rewind className="size-4" />
@@ -623,7 +618,7 @@ export default function TTSPlayer({ isOpen, lang = "zh" }: TTSPlayerProps) {
 							whileTap={{ scale: 0.9 }}
 							whileHover={{ scale: 1.05 }}
 							onClick={togglePlay}
-							className="bg-primary text-primary-foreground hover:bg-primary/90 mx-1 cursor-pointer rounded-full p-3.5 shadow-md transition-all"
+							className="bg-blue-600 text-white hover:bg-blue-700 mx-1 cursor-pointer rounded-full p-3.5 shadow-md transition-all"
 							aria-label={isPlaying ? ui[lang]["agent.voiceReader.pause"] : ui[lang]["agent.voiceReader.play"]}
 						>
 							{isPlaying ? <Pause className="size-5" /> : <Play className="size-5" />}
@@ -633,7 +628,7 @@ export default function TTSPlayer({ isOpen, lang = "zh" }: TTSPlayerProps) {
 							whileTap={{ scale: 0.9 }}
 							onClick={seekForward}
 							disabled={currentTime >= totalDuration - 1}
-							className="text-muted-foreground hover:bg-muted/50 hover:text-foreground cursor-pointer rounded-lg p-2 transition-all disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent"
+							className="text-gray-500 hover:bg-black/5 dark:hover:bg-white/5 hover:text-inherit cursor-pointer rounded-lg p-2 transition-all disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent"
 							aria-label={ui[lang]["agent.voiceReader.forward15s"]}
 						>
 							<FastForward className="size-4" />
@@ -643,7 +638,7 @@ export default function TTSPlayer({ isOpen, lang = "zh" }: TTSPlayerProps) {
 							whileTap={{ scale: 0.9 }}
 							onClick={() => jumpToSegment(currentIndex + 1)}
 							disabled={currentIndex === segments.length - 1}
-							className="text-muted-foreground hover:bg-muted/50 hover:text-foreground cursor-pointer rounded-lg p-2 transition-all disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent"
+							className="text-gray-500 hover:bg-black/5 dark:hover:bg-white/5 hover:text-inherit cursor-pointer rounded-lg p-2 transition-all disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent"
 							aria-label={ui[lang]["agent.voiceReader.next"]}
 						>
 							<StepForward className="size-4" />
@@ -654,7 +649,7 @@ export default function TTSPlayer({ isOpen, lang = "zh" }: TTSPlayerProps) {
 
 			{(mode === "error" || (mode === "api" && segments.length === 0)) && (
 				<div className="flex min-h-[160px] items-center justify-center">
-					<p className="text-destructive text-center text-xs">{ui[lang]["agent.voiceReader.error"]}</p>
+					<p className="text-red-500 text-center text-xs">{ui[lang]["agent.voiceReader.error"]}</p>
 				</div>
 			)}
 		</div>
