@@ -88,63 +88,10 @@ export default function TTSPlayer({ isOpen, lang = "zh" }: TTSPlayerProps) {
 	const progressUpdateIntervalRef = useRef<NodeJS.Timeout | null>(null);
 	const audioElementsRef = useRef<HTMLAudioElement[]>([]);
 	const originalStylesRef = useRef<Map<HTMLElement, { color: string; transition: string }>>(new Map());
-	const activeSpansRef = useRef<HTMLElement[]>([]);
 
 	const currentUrl = typeof window !== "undefined" ? window.location.href : "";
 
-	const {
-		data: segments = [],
-		isLoading,
-		isError,
-	} = useQuery(
-		{
-			queryKey: ["ttsSegments", currentUrl],
-			queryFn: async () => {
-				const url = new URL(currentUrl);
-				const domain = url.hostname;
-				const path = url.pathname.slice(1).replace(/\/$/, "");
-				return fetchTTSAudioSegments(domain, path);
-			},
-			enabled: isOpen && !!currentUrl,
-		},
-		ttsQueryClient,
-	);
-
-	// Visibility Observer
-	useEffect(() => {
-		if (typeof IntersectionObserver === "undefined") return;
-
-		const observer = new IntersectionObserver(
-			([entry]) => {
-				setIsMainVisible(entry.isIntersecting);
-			},
-			{ threshold: 0 },
-		);
-
-		if (mainPlayerRef.current) {
-			observer.observe(mainPlayerRef.current);
-		}
-
-		return () => observer.disconnect();
-	}, [mode, segments.length]);
-
-	const scrollToPlayer = () => {
-		mainPlayerRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
-	};
-
 	const resetAllStyles = useCallback(() => {
-		// Restore wrapped spans first
-		activeSpansRef.current.forEach((span) => {
-			if (span.parentNode) {
-				const parent = span.parentNode;
-				while (span.firstChild) {
-					parent.insertBefore(span.firstChild, span);
-				}
-				parent.removeChild(span);
-			}
-		});
-		activeSpansRef.current = [];
-
 		originalStylesRef.current.forEach((style, el) => {
 			if (el.isConnected) {
 				el.style.color = style.color;
@@ -396,47 +343,41 @@ export default function TTSPlayer({ isOpen, lang = "zh" }: TTSPlayerProps) {
 			// Build text from consecutive text nodes
 			for (let i = 0; i < textNodes.length; i++) {
 				let combinedText = "";
-				let combinedNodes: Text[] = [];
 
 				for (let j = i; j < textNodes.length; j++) {
 					combinedText += textNodes[j].text;
-					combinedNodes.push(textNodes[j].node);
 
 					if (normalizeText(combinedText) === targetText || normalizeText(combinedText).includes(targetText)) {
-						// Match found! Wrap each node individually to avoid Range nesting issues
-						combinedNodes.forEach((node) => {
-							const span = document.createElement("span");
-							span.className = "tts-active-segment";
-							if (node.parentNode) {
-								node.parentNode.insertBefore(span, node);
-								span.appendChild(node);
-								activeSpansRef.current.push(span);
+						// Found match! Find the smallest common ancestor
+						if (i === j) {
+							matchedElement = textNodes[i].parent;
+						} else {
+							let ancestor: HTMLElement | null = textNodes[i].parent;
+							while (ancestor) {
+								let isCommon = true;
+								for (let k = i; k <= j; k++) {
+									if (!ancestor.contains(textNodes[k].node)) {
+										isCommon = false;
+										break;
+									}
+								}
+								if (isCommon) {
+									matchedElement = ancestor;
+									break;
+								}
+								ancestor = ancestor.parentElement;
 							}
-						});
-						// We found our match, break the outer loop (j)
-						// Set matchedElement to true-ish to trigger styling (though we use activeSpansRef)
-						matchedElement = activeSpansRef.current[0];
+						}
 						break;
 					}
 
-					// Optimization: Stop if text is getting too long (2x target is a safe buffer)
 					if (combinedText.length > targetText.length * 2) break;
 				}
 				if (matchedElement) break;
 			}
 		}
 
-		if (matchedElement || activeSpansRef.current.length > 0) {
-			// Calculate ancestors set for efficient lookup
-			const highlightedAncestors = new Set<Element>();
-			activeSpansRef.current.forEach((span) => {
-				let parent = span.parentElement;
-				while (parent && parent !== mainContent && !parent.contains(mainContent)) {
-					highlightedAncestors.add(parent);
-					parent = parent.parentElement;
-				}
-			});
-
+		if (matchedElement) {
 			mainContent.querySelectorAll("*").forEach((el) => {
 				const htmlEl = el as HTMLElement;
 				if (htmlEl.closest(".tts-player-container")) return;
@@ -448,25 +389,24 @@ export default function TTSPlayer({ isOpen, lang = "zh" }: TTSPlayerProps) {
 					});
 				}
 
-				// If element is a highlighted span, one of its wrappers, or an ancestor
-				const isHighlighted =
-					htmlEl.classList.contains("tts-active-segment") || highlightedAncestors.has(htmlEl) || htmlEl.querySelector(".tts-active-segment");
+				const isMatchedOrChild = matchedElement!.contains(el) || el === matchedElement;
+				const isAncestor = isDescendantOf(matchedElement!, el);
 
-				if (isHighlighted) {
-					// Active text and its containers: restore original color
+				if (isMatchedOrChild) {
+					// Highlighted element and its children: keep original color
 					htmlEl.style.color = "";
 					htmlEl.style.transition = "color 0.3s ease";
-				} else {
-					// Everything else: dim
+				} else if (!isAncestor) {
+					// Dimmed elements (not ancestors of matched element): use CSS variable for dimmed color
 					htmlEl.style.color = "var(--tts-dimmed)";
+					htmlEl.style.transition = "color 0.3s ease";
+				} else {
+					// Ancestors of matched element (like ul/ol for li): keep original color but add transition
+					htmlEl.style.color = "";
 					htmlEl.style.transition = "color 0.3s ease";
 				}
 			});
-
-			// Scroll the first span into view
-			if (activeSpansRef.current[0]) {
-				activeSpansRef.current[0].scrollIntoView({ behavior: "smooth", block: "center" });
-			}
+			matchedElement.scrollIntoView({ behavior: "smooth", block: "center" });
 		}
 	}, [mode, segments, currentIndex, highlightEnabled, isPlaying, resetAllStyles]);
 
