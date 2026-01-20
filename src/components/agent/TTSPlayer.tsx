@@ -325,7 +325,16 @@ export default function TTSPlayer({ isOpen, lang = "zh" }: TTSPlayerProps) {
 		if (!targetText) return;
 
 		let matchedElement: HTMLElement | null = null;
-		const walker = document.createTreeWalker(mainContent, NodeFilter.SHOW_TEXT, null);
+		const walker = document.createTreeWalker(mainContent, NodeFilter.SHOW_TEXT, {
+			acceptNode: (node) => {
+				const parent = node.parentElement;
+				// Skip text nodes inside the player
+				if (parent?.closest(".tts-player-container")) {
+					return NodeFilter.FILTER_REJECT;
+				}
+				return NodeFilter.FILTER_ACCEPT;
+			},
+		});
 		const textNodes: { node: Text; parent: HTMLElement; text: string }[] = [];
 
 		let node: Node | null;
@@ -340,7 +349,10 @@ export default function TTSPlayer({ isOpen, lang = "zh" }: TTSPlayerProps) {
 			}
 		}
 
-		const blockElements = Array.from(mainContent.querySelectorAll("p, li, h1, h2, h3, h4, h5, h6, blockquote, div, time"));
+		// Find all block elements, excluding player
+		const blockElements = Array.from(mainContent.querySelectorAll("p, li, h1, h2, h3, h4, h5, h6, blockquote, div, time")).filter(
+			(el) => !el.closest(".tts-player-container"),
+		);
 
 		for (const el of blockElements) {
 			const htmlEl = el as HTMLElement;
@@ -369,6 +381,11 @@ export default function TTSPlayer({ isOpen, lang = "zh" }: TTSPlayerProps) {
 		if (matchedElement) {
 			mainContent.querySelectorAll("*").forEach((el) => {
 				const htmlEl = el as HTMLElement;
+				// Never dim or style the player components
+				if (htmlEl.closest(".tts-player-container")) {
+					return;
+				}
+
 				if (!originalStylesRef.current.has(htmlEl)) {
 					originalStylesRef.current.set(htmlEl, {
 						color: htmlEl.style.color,
@@ -454,7 +471,7 @@ export default function TTSPlayer({ isOpen, lang = "zh" }: TTSPlayerProps) {
 
 	return (
 		<>
-			<div ref={mainPlayerRef} className="bg-gray-100 dark:bg-white/5 flex flex-col p-4 rounded-lg mb-6 border border-gray-200 dark:border-white/10">
+			<div ref={mainPlayerRef} className="tts-player-container bg-gray-100 dark:bg-white/5 flex flex-col p-4 rounded-lg mb-6 border border-gray-200 dark:border-white/10">
 				{mode === "loading" && (
 					<div className="flex min-h-[160px] flex-col items-center justify-center">
 						<Loader2 className="text-muted-foreground h-6 w-6 animate-spin" />
@@ -602,7 +619,7 @@ export default function TTSPlayer({ isOpen, lang = "zh" }: TTSPlayerProps) {
 						animate={{ y: 0, opacity: 1 }}
 						exit={{ y: -100, opacity: 0 }}
 						transition={{ type: "spring", damping: 25, stiffness: 200 }}
-						className="fixed top-4 left-4 right-4 z-50 flex items-center justify-center pointer-events-none"
+						className="tts-player-container fixed top-4 left-4 right-4 z-50 flex items-center justify-center pointer-events-none"
 					>
 						<div className="bg-white/80 dark:bg-black/80 backdrop-blur-xl border border-gray-200 dark:border-white/10 rounded-2xl shadow-2xl p-2 pl-4 pr-3 flex items-center gap-4 max-w-2xl w-full pointer-events-auto overflow-hidden group">
 							<div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gray-200 dark:bg-white/10">
