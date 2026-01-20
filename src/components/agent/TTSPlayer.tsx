@@ -92,6 +92,24 @@ export default function TTSPlayer({ isOpen, lang = "zh" }: TTSPlayerProps) {
 
 	const currentUrl = typeof window !== "undefined" ? window.location.href : "";
 
+	const {
+		data: segments = [],
+		isLoading,
+		isError,
+	} = useQuery(
+		{
+			queryKey: ["ttsSegments", currentUrl],
+			queryFn: async () => {
+				const url = new URL(currentUrl);
+				const domain = url.hostname;
+				const path = url.pathname.slice(1).replace(/\/$/, "");
+				return fetchTTSAudioSegments(domain, path);
+			},
+			enabled: isOpen && !!currentUrl,
+		},
+		ttsQueryClient,
+	);
+
 	// Visibility Observer
 	useEffect(() => {
 		if (typeof IntersectionObserver === "undefined") return;
@@ -115,39 +133,6 @@ export default function TTSPlayer({ isOpen, lang = "zh" }: TTSPlayerProps) {
 	};
 
 	const resetAllStyles = useCallback(() => {
-		originalStylesRef.current.forEach((style, el) => {
-			el.style.color = style.color;
-			el.style.transition = style.transition;
-		});
-		originalStylesRef.current.clear();
-		// Also clean up any lingering styles on all elements in main
-		const main = document.querySelector("main") || document.querySelector("article");
-		if (main) {
-			main.querySelectorAll("*").forEach((el) => {
-				const htmlEl = el as HTMLElement;
-				htmlEl.style.color = "";
-				htmlEl.style.transition = "";
-			});
-		}
-	}, []);
-
-	const {
-		data: segments = [],
-		isLoading,
-		isError,
-	} = useQuery(
-		{
-			queryKey: ["ttsSegments", currentUrl],
-			queryFn: async () => {
-				const url = new URL(currentUrl);
-				const domain = url.hostname;
-				const path = url.pathname.slice(1).replace(/\/$/, "");
-				return fetchTTSAudioSegments(domain, path);
-			},
-			enabled: isOpen && !!currentUrl,
-		},
-		ttsQueryClient,
-	);
 
 	const loadAudioElements = useCallback(async (segData: AudioSegment[]) => {
 		try {
