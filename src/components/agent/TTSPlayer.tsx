@@ -393,6 +393,7 @@ export default function TTSPlayer({ isOpen, lang = "zh" }: TTSPlayerProps) {
 
 		// Strategy 3: If still no match, try finding by text nodes
 		if (!matchedElement) {
+			// Build text from consecutive text nodes
 			for (let i = 0; i < textNodes.length; i++) {
 				let combinedText = "";
 				let combinedNodes: Text[] = [];
@@ -402,42 +403,40 @@ export default function TTSPlayer({ isOpen, lang = "zh" }: TTSPlayerProps) {
 					combinedNodes.push(textNodes[j].node);
 
 					if (normalizeText(combinedText) === targetText || normalizeText(combinedText).includes(targetText)) {
-						const range = document.createRange();
-						range.setStartBefore(combinedNodes[0]);
-						range.setEndAfter(combinedNodes[combinedNodes.length - 1]);
-
-						const span = document.createElement("span");
-						span.className = "tts-active-segment";
-						try {
-							range.surroundContents(span);
-							matchedElement = span;
-							activeSpansRef.current.push(span);
-							break;
-						} catch (e) {
-							let ancestor: HTMLElement | null = textNodes[i].parent;
-							while (ancestor) {
-								let isCommon = true;
-								for (let k = i; k <= j; k++) {
-									if (!ancestor.contains(textNodes[k].node)) {
-										isCommon = false;
-										break;
-									}
-								}
-								if (isCommon) {
-									matchedElement = ancestor;
-									break;
-								}
-								ancestor = ancestor.parentElement;
+						// Match found! Wrap each node individually to avoid Range nesting issues
+						combinedNodes.forEach((node) => {
+							const span = document.createElement("span");
+							span.className = "tts-active-segment";
+							if (node.parentNode) {
+								node.parentNode.insertBefore(span, node);
+								span.appendChild(node);
+								activeSpansRef.current.push(span);
 							}
-						}
+						});
+						// We found our match, break the outer loop (j)
+						// Set matchedElement to true-ish to trigger styling (though we use activeSpansRef)
+						matchedElement = activeSpansRef.current[0];
+						break;
 					}
+
+					// Optimization: Stop if text is getting too long (2x target is a safe buffer)
 					if (combinedText.length > targetText.length * 2) break;
 				}
 				if (matchedElement) break;
 			}
 		}
 
-		if (matchedElement) {
+		if (matchedElement || activeSpansRef.current.length > 0) {
+			// Calculate ancestors set for efficient lookup
+			const highlightedAncestors = new Set<Element>();
+			activeSpansRef.current.forEach((span) => {
+				let parent = span.parentElement;
+				while (parent && parent !== mainContent && !parent.contains(mainContent)) {
+					highlightedAncestors.add(parent);
+					parent = parent.parentElement;
+				}
+			});
+
 			mainContent.querySelectorAll("*").forEach((el) => {
 				const htmlEl = el as HTMLElement;
 				if (htmlEl.closest(".tts-player-container")) return;
@@ -449,22 +448,25 @@ export default function TTSPlayer({ isOpen, lang = "zh" }: TTSPlayerProps) {
 					});
 				}
 
-				const isMatched = el === matchedElement;
-				const isInsideMatched = matchedElement!.contains(el);
-				const isAncestorOfMatched = isDescendantOf(matchedElement!, el);
+				// If element is a highlighted span, one of its wrappers, or an ancestor
+				const isHighlighted =
+					htmlEl.classList.contains("tts-active-segment") || highlightedAncestors.has(htmlEl) || htmlEl.querySelector(".tts-active-segment");
 
-				if (isMatched || isInsideMatched) {
+				if (isHighlighted) {
+					// Active text and its containers: restore original color
 					htmlEl.style.color = "";
-					htmlEl.style.transition = "color 0.3s ease";
-				} else if (!isAncestorOfMatched) {
-					htmlEl.style.color = "var(--tts-dimmed)";
 					htmlEl.style.transition = "color 0.3s ease";
 				} else {
-					htmlEl.style.color = "";
+					// Everything else: dim
+					htmlEl.style.color = "var(--tts-dimmed)";
 					htmlEl.style.transition = "color 0.3s ease";
 				}
 			});
-			matchedElement.scrollIntoView({ behavior: "smooth", block: "center" });
+
+			// Scroll the first span into view
+			if (activeSpansRef.current[0]) {
+				activeSpansRef.current[0].scrollIntoView({ behavior: "smooth", block: "center" });
+			}
 		}
 	}, [mode, segments, currentIndex, highlightEnabled, isPlaying, resetAllStyles]);
 
