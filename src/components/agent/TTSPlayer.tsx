@@ -598,7 +598,7 @@ export default function TTSPlayer({ isOpen, lang = "zh" }: TTSPlayerProps) {
 
         {mode === "api" && segments.length > 0 && (
           <motion.div
-            className="flex flex-col space-y-5 py-2"
+            className="flex flex-col space-y-5"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}
@@ -683,14 +683,14 @@ export default function TTSPlayer({ isOpen, lang = "zh" }: TTSPlayerProps) {
                 />
               </div>
               <div className="flex items-center justify-between">
-                <span className="font-mono text-xs text-gray-500 tabular-nums dark:text-gray-400">
+                <span className="text-sm text-gray-500 tabular-nums dark:text-gray-400">
                   {formatTime(currentTime)}
                 </span>
                 <div className="flex items-center gap-2">
                   <motion.button
                     whileTap={{ scale: 0.95 }}
                     onClick={() => setHighlightEnabled(!highlightEnabled)}
-                    className={`cursor-pointer rounded-md p-1.5 transition-colors ${
+                    className={`flex size-8 cursor-pointer items-center justify-center rounded-md transition-colors ${
                       highlightEnabled
                         ? "bg-blue-600/10 text-blue-600 dark:text-blue-400"
                         : "text-gray-500 hover:bg-black/5 dark:hover:bg-white/5"
@@ -709,8 +709,9 @@ export default function TTSPlayer({ isOpen, lang = "zh" }: TTSPlayerProps) {
                     onValueChange={(v) => setPlaybackRate(Number(v))}
                   >
                     <SelectTrigger
-                      className="h-7 w-auto min-w-[3rem] gap-1 border-0 bg-transparent px-2 font-mono text-xs text-gray-500 shadow-none hover:bg-black/5 focus:ring-0 dark:text-gray-400 dark:hover:bg-white/5 [&>svg]:opacity-50"
+                      className="h-8 w-auto min-w-[3rem] gap-1 border-0 bg-transparent px-2 font-mono text-xs text-gray-500 shadow-none hover:bg-black/5 focus:ring-0 dark:text-gray-400 dark:hover:bg-white/5 [&>svg]:opacity-50"
                       title={ui[lang]["agent.voiceReader.speed"]}
+                      size="sm"
                     >
                       <SelectValue />
                     </SelectTrigger>
@@ -727,7 +728,7 @@ export default function TTSPlayer({ isOpen, lang = "zh" }: TTSPlayerProps) {
                     </SelectContent>
                   </Select>
                 </div>
-                <span className="font-mono text-xs text-gray-500 tabular-nums dark:text-gray-400">
+                <span className="text-sm text-gray-500 tabular-nums dark:text-gray-400">
                   {formatTime(totalDuration)}
                 </span>
               </div>
