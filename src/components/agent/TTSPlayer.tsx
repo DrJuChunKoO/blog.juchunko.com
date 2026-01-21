@@ -577,7 +577,7 @@ export default function TTSPlayer({ isOpen, lang = "zh" }: TTSPlayerProps) {
     <>
       <div
         ref={mainPlayerRef}
-        className="tts-player-container mb-6 flex flex-col rounded-lg border border-gray-200 bg-gray-100 p-4 dark:border-white/10 dark:bg-white/5"
+        className="tts-player-container mb-6 flex flex-col rounded-lg border border-gray-200 bg-gray-50 p-4 text-gray-900 dark:border-white/10 dark:bg-white/5 dark:text-gray-100"
       >
         {mode === "loading" && (
           <div className="flex min-h-[160px] flex-col items-center justify-center">
@@ -747,11 +747,11 @@ export default function TTSPlayer({ isOpen, lang = "zh" }: TTSPlayerProps) {
       <AnimatePresence>
         {!isMainVisible && isPlaying && mode === "api" && (
           <motion.div
-            initial={{ y: -100, opacity: 0 }}
+            initial={{ y: -25, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            exit={{ y: -100, opacity: 0 }}
+            exit={{ y: -25, opacity: 0 }}
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="tts-player-container pointer-events-none fixed top-4 right-4 left-4 z-50 flex items-center justify-center"
+            className="tts-player-container pointer-events-none fixed top-4 right-4 left-4 z-50 flex items-center justify-center text-gray-900 dark:text-gray-100"
           >
             <div className="group pointer-events-auto flex w-full max-w-2xl items-center gap-4 overflow-hidden rounded-2xl border border-gray-200 bg-white/80 p-2 pr-3 pl-4 shadow-2xl backdrop-blur-xl dark:border-white/10 dark:bg-black/80">
               <div className="absolute right-0 bottom-0 left-0 h-0.5 bg-gray-200 dark:bg-white/10">
