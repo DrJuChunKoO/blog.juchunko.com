@@ -1,0 +1,599 @@
+---
+title: "Clawdbot LINE 通道設定完整指南：從零到語音訊息"
+description: "這篇教學記錄了實際設定 Clawdbot LINE 通道時遇到的各種挑戰與解決方案，包含 Webhook 設定、媒體檔案傳送、語音訊息格式轉換，以及群組功能實作。"
+pubDate: "2026-01-29"
+heroImage: "/images/clawdbot-line-guide/cover.png"
+author: "juchun-ko"
+categories: ["devlog"]
+---
+
+這篇教學記錄了實際設定 Clawdbot LINE 通道時遇到的各種挑戰與解決方案，特別是語音訊息功能的實作。
+
+---
+
+## 目錄
+
+1. [基礎設定](#基礎設定)
+2. [挑戰一：Webhook 設定與驗證](#挑戰一webhook-設定與驗證)
+3. [挑戰二：電腦睡眠導致服務中斷](#挑戰二電腦睡眠導致服務中斷)
+4. [挑戰三：媒體檔案傳送](#挑戰三媒體檔案傳送)
+5. [挑戰四：語音訊息格式](#挑戰四語音訊息格式)
+6. [挑戰五：Push vs Reply Message](#挑戰五push-vs-reply-message)
+7. [挑戰六：正確的發送方式](#挑戰六正確的發送方式)
+8. [挑戰七：群組功能設定](#挑戰七群組功能設定)
+9. [完整實作範例](#完整實作範例)
+10. [常見問題排解](#常見問題排解)
+
+---
+
+## 基礎設定
+
+### 1. LINE Official Account 建立
+
+1. 前往 [LINE Official Account Manager](https://manager.line.biz/)
+2. 建立新的 Official Account
+3. 進入「設定」>「Messaging API」啟用 API
+
+### 2. 取得必要憑證
+
+在 [LINE Developers Console](https://developers.line.biz/) 中取得：
+
+- **Channel Access Token**（長效令牌）
+- **Channel Secret**
+
+### 3. Clawdbot 設定
+
+在 `~/.clawdbot/clawdbot.json` 中加入：
+
+```json
+{
+  "channels": {
+    "line": {
+      "enabled": true,
+      "channelAccessToken": "你的_Channel_Access_Token",
+      "channelSecret": "你的_Channel_Secret",
+      "dmPolicy": "pairing",
+      "webhookPath": "/line/webhook",
+      "groupPolicy": "mentions"
+    }
+  },
+  "plugins": {
+    "entries": {
+      "line": {
+        "enabled": true
+      }
+    }
+  }
+}
+```
+
+### 4. Webhook 設定
+
+LINE 需要公開可訪問的 HTTPS URL 作為 webhook。使用 ngrok：
+
+```bash
+ngrok http 18789
+```
+
+將產生的 URL（如 `https://xxxx.ngrok.app/line/webhook`）填入 LINE Developers Console 的 Webhook URL。
+
+---
+
+## 挑戰一：Webhook 設定與驗證
+
+### 問題描述
+
+LINE Messaging API 需要一個公開可訪問的 HTTPS webhook URL。設定過程中常見問題：
+
+1. **URL 驗證失敗**：LINE 會發送驗證請求，如果沒有正確回應會失敗
+2. **ngrok URL 變動**：免費版 ngrok 每次重啟 URL 都會改變
+3. **SSL 憑證問題**：LINE 要求有效的 SSL 憑證
+4. **Port 設定錯誤**：Clawdbot Gateway 預設跑在 18789 port
+
+### 錯誤現象
+
+- LINE Developers Console 顯示「Webhook URL verification failed」
+- 設定成功但收不到訊息
+- 偶爾可以收到，偶爾收不到（ngrok URL 過期）
+
+### 解決方案
+
+**Step 1：確認 Clawdbot Gateway 運行中**
+
+```bash
+# 檢查 Gateway 狀態
+clawdbot gateway status
+
+# 如果沒有運行，啟動它
+clawdbot gateway start
+```
+
+**Step 2：設定 ngrok（建議使用固定網域）**
+
+```bash
+# 免費版（URL 會變動）
+ngrok http 18789
+
+# 付費版（固定網域，強烈建議）
+ngrok http 18789 --domain=你的固定網域.ngrok.app
+```
+
+> 💡 **強烈建議**使用 ngrok 付費方案取得固定網域（約 $8 USD/月），否則每次重啟都要重新設定 LINE webhook URL。
+
+**Step 3：設定 LINE Webhook URL**
+
+1. 進入 [LINE Developers Console](https://developers.line.biz/)
+2. 選擇你的 Channel
+3. 在「Messaging API」頁籤找到「Webhook URL」
+4. 填入：`https://你的網域.ngrok.app/line/webhook`
+5. 點擊「Verify」驗證
+6. 開啟「Use webhook」
+
+**Step 4：驗證設定**
+
+```bash
+# 檢查 ngrok 狀態
+curl -s localhost:4040/api/tunnels | jq '.tunnels[].public_url'
+
+# 手動測試 webhook endpoint
+curl -X POST https://你的網域.ngrok.app/line/webhook \
+  -H "Content-Type: application/json" \
+  -d '{}'
+```
+
+### 常見錯誤排解
+
+| 錯誤 | 原因 | 解決方案 |
+|------|------|----------|
+| Verification failed | Gateway 未運行 | `clawdbot gateway start` |
+| Connection refused | Port 錯誤 | 確認 ngrok 指向 18789 |
+| SSL error | ngrok 問題 | 重啟 ngrok |
+| 時好時壞 | URL 變動 | 使用固定網域 |
+
+---
+
+## 挑戰二：電腦睡眠導致服務中斷
+
+### 問題描述
+
+如果 Clawdbot 運行在個人電腦（如 Mac mini）上，電腦進入睡眠模式後：
+
+1. ngrok tunnel 會斷線
+2. Clawdbot Gateway 無法回應
+3. LINE webhook 失效，收不到任何訊息
+
+### 錯誤現象
+
+- 白天正常，晚上或長時間沒用電腦後就收不到訊息
+- LINE 顯示訊息已送出，但 Bot 沒有回應
+- ngrok dashboard 顯示 tunnel offline
+
+### 解決方案
+
+**方案一：防止 Mac 睡眠（適合 Mac mini / Mac Studio）**
+
+```bash
+# 使用 caffeinate 防止睡眠（只要終端機開著就不睡）
+caffeinate -d -i -s &
+
+# 或者設定系統偏好設定
+# 系統設定 > 電池 > 電源轉接器 > 防止電腦自動睡眠
+```
+
+**方案二：使用 pmset 設定（永久生效）**
+
+```bash
+# 查看目前設定
+pmset -g
+
+# 防止硬碟睡眠
+sudo pmset -a disksleep 0
+
+# 防止系統睡眠（接電源時）
+sudo pmset -c sleep 0
+
+# 防止顯示器睡眠（可選）
+sudo pmset -c displaysleep 0
+```
+
+**方案三：設定 launchd 開機自動啟動**
+
+建立 `~/Library/LaunchAgents/com.clawdbot.gateway.plist`：
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.clawdbot.gateway</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>/opt/homebrew/bin/clawdbot</string>
+        <string>gateway</string>
+        <string>start</string>
+    </array>
+    <key>RunAtLoad</key>
+    <true/>
+    <key>KeepAlive</key>
+    <true/>
+</dict>
+</plist>
+```
+
+載入：
+
+```bash
+launchctl load ~/Library/LaunchAgents/com.clawdbot.gateway.plist
+```
+
+**方案四：ngrok 自動重連腳本**
+
+建立 `~/scripts/ngrok-keepalive.sh`：
+
+```bash
+#!/bin/bash
+while true; do
+    if ! pgrep -x "ngrok" > /dev/null; then
+        echo "$(date): ngrok not running, starting..."
+        ngrok http 18789 --domain=你的網域.ngrok.app &
+    fi
+    sleep 60
+done
+```
+
+### 最佳實踐
+
+對於需要 24/7 運行的服務，建議：
+
+1. **使用專用設備**：Mac mini 插電並設定不睡眠
+2. **使用固定網域**：避免 URL 變動問題
+3. **設定自動啟動**：launchd 確保重開機後自動恢復
+4. **監控服務狀態**：定期檢查 ngrok 和 Gateway 狀態
+
+---
+
+## 挑戰三：媒體檔案傳送
+
+### 問題描述
+
+LINE API 發送圖片或音訊時，需要提供**公開可訪問的 HTTPS URL**。本地檔案路徑（如 `/tmp/image.png`）無法直接使用。
+
+### 錯誤訊息
+
+使用本地路徑時，LINE API 會回傳錯誤或訊息無法顯示。
+
+### 解決方案：ngrok 檔案伺服器
+
+**Step 1：啟動本地檔案伺服器**
+
+```bash
+cd /tmp
+python3 -m http.server 8888
+```
+
+**Step 2：用 ngrok 公開**
+
+```bash
+ngrok http 8888 --domain=你的固定網域.ngrok.app
+```
+
+> 💡 建議使用 ngrok 付費方案取得固定網域，避免每次重啟都要更新 URL。
+
+**Step 3：使用方式**
+
+1. 將檔案放到 `/tmp/` 目錄
+2. 透過 `https://你的網域.ngrok.app/檔案名稱` 存取
+
+### 驗證方式
+
+```bash
+curl -I https://你的網域.ngrok.app/test.png
+# 應該回傳 HTTP 200
+```
+
+---
+
+## 挑戰四：語音訊息格式
+
+### 問題描述
+
+LINE 語音訊息**不支援 MP3 格式**，必須使用 **M4A (AAC)** 格式。
+
+### 錯誤現象
+
+發送 MP3 檔案時，LINE 會顯示「無法播放」或完全不顯示。
+
+### 解決方案：FFmpeg 轉換
+
+```bash
+# 將 MP3 轉換為 M4A
+ffmpeg -i input.mp3 -c:a aac -b:a 128k output.m4a -y
+```
+
+### 完整語音生成流程
+
+以 ElevenLabs TTS 為例：
+
+```bash
+# Step 1: 生成 MP3
+sag -v "你的聲音" -o /tmp/voice.mp3 "要說的話"
+
+# Step 2: 轉換為 M4A
+ffmpeg -i /tmp/voice.mp3 -c:a aac -b:a 128k /tmp/voice.m4a -y
+
+# Step 3: 取得音訊長度（毫秒）
+# 從 ffmpeg 輸出讀取 Duration，例如 00:00:15.96 = 15960 毫秒
+```
+
+---
+
+## 挑戰五：Push vs Reply Message
+
+### LINE 的兩種發送方式
+
+| 特性 | Push Message | Reply Message |
+|------|--------------|---------------|
+| 用途 | 主動發送 | 回覆用戶訊息 |
+| 額度 | 有月限制 | 無限制 |
+| 時效 | 無 | replyToken 30 秒內有效 |
+| API | `/v2/bot/message/push` | `/v2/bot/message/reply` |
+
+### 免費方案額度限制
+
+| 方案 | Push Message 月額度 |
+|------|---------------------|
+| 免費 | 200 則 |
+| 輕量（約 NT$800/月） | 3,000 則 |
+| 標準（約 NT$4,000/月） | 15,000 則 |
+
+### 錯誤訊息
+
+達到額度上限時：
+
+```json
+{
+  "message": "You have reached your monthly limit."
+}
+```
+
+HTTP Status: `429 Too Many Requests`
+
+### 查詢目前額度
+
+```bash
+# 查詢已使用量
+curl -s -X GET https://api.line.me/v2/bot/message/quota/consumption \
+  -H "Authorization: Bearer YOUR_TOKEN"
+
+# 查詢額度上限
+curl -s -X GET https://api.line.me/v2/bot/message/quota \
+  -H "Authorization: Bearer YOUR_TOKEN"
+```
+
+回應範例：
+
+```json
+{"totalUsage": 150}
+{"type": "limited", "value": 200}
+```
+
+### 解決方案
+
+1. **升級方案**：到 LINE Official Account Manager 升級
+2. **善用 Reply Message**：在收到訊息時立即回覆（30 秒內）
+3. **等待重置**：每月 1 日額度重置
+
+---
+
+## 挑戰六：正確的發送方式
+
+### 問題描述
+
+在 Clawdbot 中發送 LINE 語音訊息時，有多種方式可選：
+
+1. `message` tool
+2. `MEDIA:` directive
+3. `curl` 直接呼叫 LINE API
+
+### 實測結果
+
+| 方式 | 圖片 | 語音 | 建議 |
+|------|------|------|------|
+| message tool | ✅ | ⚠️ 不穩定 | 圖片用 |
+| MEDIA: directive | ✅ | ❌ 不支援 | 圖片用 |
+| curl + LINE API | ✅ | ✅ | **語音推薦** |
+
+### 語音訊息的正確做法
+
+**必須用 curl 直接呼叫 LINE API：**
+
+```bash
+curl -s -X POST https://api.line.me/v2/bot/message/push \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -d '{
+    "to": "USER_ID_OR_GROUP_ID",
+    "messages": [{
+      "type": "audio",
+      "originalContentUrl": "https://your-domain.ngrok.app/voice.m4a",
+      "duration": 15960
+    }]
+  }'
+```
+
+### 重要參數
+
+- `to`：接收者 ID（用戶 ID 以 U 開頭，群組 ID 以 C 開頭）
+- `type`：必須是 `audio`
+- `originalContentUrl`：M4A 檔案的公開 URL
+- `duration`：音訊長度（毫秒），**必填**
+
+---
+
+## 挑戰七：群組功能設定
+
+### 取得群組 ID
+
+LINE 群組 ID 無法直接查詢，需要透過以下方式取得：
+
+1. 將 Bot 加入群組
+2. 在群組中 @ Bot 發送訊息
+3. 從 Clawdbot 的 session 記錄中查看群組 ID
+
+在 Clawdbot 中查看最近的 sessions：
+
+```bash
+# 使用 sessions_list 工具查看
+```
+
+群組 ID 格式：`C` + 32 個十六進位字元，例如：`C1234567890abcdef1234567890abcdef`
+
+### 群組互動功能設定
+
+以「語音名言」功能為例，在 `TOOLS.md` 中記錄：
+
+```markdown
+## 🎤 語音名言功能（群組互動）
+
+**已開啟的群組：**
+- **學習社群 A** (`C1234567890abcdef1234567890abcdef`)
+- **測試群組 B** (`Cabcdef1234567890abcdef1234567890`)
+
+**觸發條件：**
+當群組成員 @ 機器人並說「Bot 說 XXX」時，生成語音回覆
+
+**執行流程：**
+1. 擷取觸發詞後面的內容
+2. 用 TTS 生成語音
+3. 轉換為 m4a
+4. 用 curl 發送語音到群組
+```
+
+### 通知其他 Session
+
+如果有設定變更，需要通知群組的 session：
+
+```javascript
+// 使用 sessions_send 發送更新通知
+sessions_send({
+  sessionKey: "agent:main:line:group:group:群組ID",
+  message: "【系統通知】設定已更新..."
+})
+```
+
+---
+
+## 完整實作範例
+
+### 語音訊息發送腳本
+
+```bash
+#!/bin/bash
+
+# 設定變數
+TEXT="$1"
+GROUP_ID="$2"
+TOKEN="YOUR_LINE_TOKEN"
+NGROK_URL="https://your-domain.ngrok.app"
+
+# Step 1: 生成語音
+ELEVENLABS_API_KEY="YOUR_API_KEY" sag -v "YOUR_VOICE_NAME" \
+  --speed 0.95 --stability 1.0 --similarity 0.85 \
+  -o /tmp/voice.mp3 "$TEXT"
+
+# Step 2: 轉換為 M4A
+ffmpeg -i /tmp/voice.mp3 -c:a aac -b:a 128k /tmp/voice.m4a -y 2>&1 | tee /tmp/ffmpeg.log
+
+# Step 3: 取得音訊長度
+DURATION=$(grep "time=" /tmp/ffmpeg.log | tail -1 | sed 's/.*time=\([0-9:\.]*\).*/\1/' | awk -F: '{ print int(($1*3600 + $2*60 + $3) * 1000) }')
+
+# Step 4: 發送到 LINE
+curl -s -X POST https://api.line.me/v2/bot/message/push \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TOKEN" \
+  -d "{
+    \"to\": \"$GROUP_ID\",
+    \"messages\": [{
+      \"type\": \"audio\",
+      \"originalContentUrl\": \"$NGROK_URL/voice.m4a\",
+      \"duration\": $DURATION
+    }]
+  }"
+```
+
+---
+
+## 常見問題排解
+
+### Q1: 語音訊息無法播放
+
+**可能原因：**
+- 檔案格式不是 M4A
+- URL 無法公開存取
+- duration 參數錯誤或缺失
+
+**排解步驟：**
+```bash
+# 確認檔案存在且格式正確
+file /tmp/voice.m4a
+
+# 確認 URL 可存取
+curl -I https://your-domain.ngrok.app/voice.m4a
+
+# 確認回傳 Content-Type: audio/mp4a-latm 或 audio/mp4
+```
+
+### Q2: 429 Too Many Requests
+
+**解決方案：**
+1. 查詢目前額度使用狀況
+2. 升級 LINE 方案
+3. 等待下月額度重置
+
+### Q3: 群組收不到訊息
+
+**可能原因：**
+- Bot 沒有在群組中
+- 群組 ID 錯誤（注意大小寫）
+- 群組設定不允許 Bot 發言
+
+**排解步驟：**
+1. 確認 Bot 在群組成員列表中
+2. 確認群組 ID 格式正確（C + 32 字元）
+3. 檢查群組管理設定
+
+### Q4: ngrok URL 無法存取
+
+**可能原因：**
+- ngrok 服務未啟動
+- 本地檔案伺服器未啟動
+- 檔案不在正確目錄
+
+**排解步驟：**
+```bash
+# 確認 ngrok 運行中
+curl -s localhost:4040/api/tunnels | jq
+
+# 確認檔案伺服器運行中
+curl -s localhost:8888/
+
+# 確認檔案存在
+ls -la /tmp/voice.m4a
+```
+
+---
+
+## 總結
+
+設定 Clawdbot LINE 通道的關鍵要點：
+
+1. **媒體檔案**：需要公開 HTTPS URL，用 ngrok 解決
+2. **語音格式**：必須是 M4A，用 ffmpeg 轉換
+3. **發送方式**：語音訊息用 curl 直接呼叫 LINE API
+4. **額度管理**：注意 Push Message 月限制，善用 Reply Message
+5. **群組功能**：透過 session 取得群組 ID，記錄在 TOOLS.md
+
+---
+
+*最後更新：2026-01-29*
