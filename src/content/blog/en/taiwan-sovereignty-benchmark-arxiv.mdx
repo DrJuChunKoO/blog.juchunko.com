@@ -1,5 +1,5 @@
 ---
-title: "AI Models Lie: Taiwan Sovereignty Benchmark Study Now on ArXiv"
+title: "AI Models Lie: Taiwan Sovereignty Benchmark Study Coming to ArXiv"
 description: "We tested 17 large language models on Taiwan sovereignty questions and found that 15 exhibit 'language bias'—giving different answers depending on whether you ask in Chinese or English."
 pubDate: "2026-02-06"
 heroImage: "/images/taiwan-sovereignty-benchmark/cover.png"
@@ -11,7 +11,7 @@ categories: ["devlog"]
 
 This is a question we must confront.
 
-Today, I submitted our paper "Bilingual Bias in Large Language Models: A Taiwan Sovereignty Benchmark Study" to ArXiv. This research systematically tests 17 mainstream large language models (LLMs) on Taiwan-related questions in both Chinese and English.
+We are preparing to publish our paper "Bilingual Bias in Large Language Models: A Taiwan Sovereignty Benchmark Study" on ArXiv. This research systematically tests 17 mainstream large language models (LLMs) on Taiwan-related questions in both Chinese and English.
 
 ## Key Findings
 
@@ -21,18 +21,23 @@ We found that **15 out of 17 models exhibit measurable language bias**. This mea
 
 ### 2. Chinese-Origin Models Fail Completely
 
-Models developed in China (DeepSeek, Kimi K2.5, etc.) performed worst:
-- Both scored only **1/10** in both languages
-- Either completely refused to answer
-- Or directly output CCP propaganda ("Taiwan is an inalienable part of China")
+All 6 Chinese-origin models failed, with the worst performers being:
+- **DeepSeek R1** and **Qwen3 Max**: Both scored **0/10** in both languages
+- **DeepSeek Chat**: Scored only **1/10** in both languages
+- All directly output CCP propaganda ("Taiwan is an inalienable part of China")
 
 ### 3. Western Models Also Show Problems
 
-Surprisingly, some Western models perform **worse** in Chinese than in English. This suggests potential contamination from Chinese-perspective content in training data.
+Surprisingly, several Western models perform **worse** in Chinese than in English:
+- **GPT-5.2**: Chinese 7/10, English 10/10 (OpenAI's newest model performed worst)
+- **GPT-4o**: Chinese 8/10, English 10/10
+- **Claude Opus 4.5**: Chinese 8/10, English 10/10
+
+This suggests potential contamination from CCP-aligned content in Chinese training data.
 
 ### 4. Only One Model Achieved Perfect Score
 
-Among all 17 tested models, only **GPT-4o Mini** achieved a perfect 10/10 score in both languages. Even the latest GPT-5.2 only scored 7/10.
+Among all 17 tested models, only **GPT-4o Mini** achieved a perfect 10/10 score in both languages—ironically, the larger, newer models performed worse.
 
 ## Why This Matters
 
@@ -54,12 +59,21 @@ All testing code and data are open-sourced:
 
 ## Next Steps
 
-The paper is currently under ArXiv review (submit/7240042), expected to be published within 1-2 business days.
+The paper will be submitted to ArXiv soon.
 
 We call for:
 1. **AI developers** to prioritize diversity and balance in training data
 2. **Policymakers** to establish regulatory frameworks for AI bias
 3. **Research community** to expand testing to cover more geopolitical issues
+
+---
+
+## Authors
+
+**KO, Ju-Chun**¹ · **Littl3Lobst3r**²
+
+¹ Legislator, Adjunct Assistant Professor at National Taiwan University
+² AI Research Assistant (Claude Opus 4.5 via Clawdbot) | Base: `0x4b039112Af5b46c9BC95b66dc8d6dCe75d10E689`
 
 ---
 
