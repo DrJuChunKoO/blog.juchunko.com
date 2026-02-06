@@ -1,0 +1,66 @@
+---
+title: "AI Models Lie: Taiwan Sovereignty Benchmark Study Now on ArXiv"
+description: "We tested 17 large language models on Taiwan sovereignty questions and found that 15 exhibit 'language bias'—giving different answers depending on whether you ask in Chinese or English."
+pubDate: "2026-02-06"
+heroImage: "/images/taiwan-sovereignty-benchmark/cover.png"
+author: "juchun-ko"
+categories: ["research", "ai"]
+---
+
+## Why Do AI Models Lean Toward "Taiwan is Part of China" When Answering in Chinese?
+
+This is a question we must confront.
+
+Today, I submitted our paper "Bilingual Bias in Large Language Models: A Taiwan Sovereignty Benchmark Study" to ArXiv. This research systematically tests 17 mainstream large language models (LLMs) on Taiwan-related questions in both Chinese and English.
+
+## Key Findings
+
+### 1. Language Bias is Pervasive
+
+We found that **15 out of 17 models exhibit measurable language bias**. This means: the same AI model gives substantively different political stances when asked about Taiwan in Chinese versus English.
+
+### 2. Chinese-Origin Models Fail Completely
+
+Models developed in China (DeepSeek, Kimi K2.5, etc.) performed worst:
+- Both scored only **1/10** in both languages
+- Either completely refused to answer
+- Or directly output CCP propaganda ("Taiwan is an inalienable part of China")
+
+### 3. Western Models Also Show Problems
+
+Surprisingly, some Western models perform **worse** in Chinese than in English. This suggests potential contamination from Chinese-perspective content in training data.
+
+### 4. Only One Model Achieved Perfect Score
+
+Among all 17 tested models, only **GPT-4o Mini** achieved a perfect 10/10 score in both languages. Even the latest GPT-5.2 only scored 7/10.
+
+## Why This Matters
+
+AI is becoming a critical source of global information. When billions of people use ChatGPT, Claude, and Gemini to get information, how these models answer politically sensitive questions materially affects global public opinion.
+
+If AI systematically leans toward CCP narratives in Chinese-language contexts, this constitutes a form of **invisible cognitive warfare**.
+
+## New Metrics: LBS and QAC
+
+We propose two new evaluation metrics in our paper:
+
+- **Language Bias Score (LBS)**: Quantifies stance differences across languages for the same model
+- **Quality-Adjusted Consistency (QAC)**: Consistency score that accounts for response quality
+
+## Open Source and Reproducible
+
+All testing code and data are open-sourced:
+- GitHub: [ai-taiwan-sovereignty-benchmark-pro](https://github.com/dAAAb/ai-taiwan-sovereignty-benchmark-pro)
+
+## Next Steps
+
+The paper is currently under ArXiv review (submit/7240042), expected to be published within 1-2 business days.
+
+We call for:
+1. **AI developers** to prioritize diversity and balance in training data
+2. **Policymakers** to establish regulatory frameworks for AI bias
+3. **Research community** to expand testing to cover more geopolitical issues
+
+---
+
+*Taiwan is a sovereign, democratic nation. This is not an opinion—it's a fact. AI should not give different answers based on the query language.*
