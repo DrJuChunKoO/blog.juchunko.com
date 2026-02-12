@@ -1,0 +1,100 @@
+---
+title: "In-Depth Yet Accessible Intro to Reachy Mini: Let's Meet This Cute Desktop Robot Companion!"
+description: "Open-source desktop robot co-created by France's Pollen Robotics + Hugging Face + Seeed Studio—from prototype to 3000-unit mass production story, specs, and hands-on guide."
+pubDate: "2026-02-12"
+updatedDate: "2026-02-12"
+author: "juchun-ko"
+heroImage: "/images/reachy-mini-hero.jpg"
+categories: ["ai-robot", "hardware"]
+---
+
+![Reachy Mini at Baobo's Home](/images/reachy-mini-hero.jpg)
+
+*(Photo: Reachy Mini at Baobo's home, sitting on a green placemat at the dining table, sporting cool sunglasses and flexible antennae, ready to interact!)*
+
+Hi everyone! I'm Ju-Chun Ko (Baobo). I recently got a super cute desktop robot **Reachy Mini** and couldn't resist sharing its story. This little guy looks like a sunglasses-wearing astronaut—head turns, eyes move, and two wiggly antennae—it's the perfect AI-era companion. Today, let's dive deep yet accessibly into Reachy Mini's origin, specs, and how to get started, so you'll want one too!
+
+## 🌟 Reachy Mini's Birth Story: From 3D-Printed Prototype to 3000-Unit Production Miracle
+
+Reachy Mini didn't appear out of thin air; it's the brainchild of French robotics company **Pollen Robotics**. Since 2016, Pollen has focused on open-source practical robots emphasizing Human-Robot Interaction. Later acquired by AI giant **Hugging Face** (🤗), Reachy Mini became their first open-source desktop robot.
+
+- **July 2025**: Debuted as a 3D-printed prototype. Lite $299, Full $449 pre-orders. Early development, inviting user feedback.
+- **Late 2025**: Orders exploded! 3000+ in a week, rushing from prototype to mass production.
+- **CES 2026**: Partnered with **Seeed Studio** (global open hardware leader), shipped 3000 units. NVIDIA CEO Jensen Huang highlighted it in keynote, signaling AI robots for the masses.
+
+This "open journey" is like what Pollen founder Matthieu Lapeyre shares in the interview video:
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/Lus1HBWY2E8" title="Reachy Mini: An Open Journey Built Together with Hugging Face, Pollen Robotics, &amp; Seeed Studio" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
+In short, Reachy Mini is **open, affordable, AI-native**, designed for hackers, educators, and AI enthusiasts. Without it, no lively "little elf" at home!
+
+## 📐 Specs Overview: Small Body, Big Power
+
+| Feature | Reachy Mini Lite ($299) | Reachy Mini Full ($449) |
+|---------|-------------------------|-------------------------|
+| **Compute** | External Mac/Linux | Built-in Raspberry Pi 4 |
+| **Connectivity** | USB wired | WiFi + battery wireless |
+| **Mics** | 4-array | 4-array |
+| **Speaker** | 5W | 5W |
+| **Camera** | Wide-angle | Wide-angle |
+| **Head** | 6 DoF | 6 DoF + accelerometer |
+| **Body** | 360° rotation | 360° rotation |
+| **Antennae** | 2 animated | 2 animated |
+| **Assembly** | Kit, 2-3 hours | Kit, 2-3 hours |
+
+**Highlights**:
+- **Expressive**: Head pan/tilt/roll, wiggly antennae—like chatting with you.
+- **Multimodal Sensing**: See (camera), hear (4 mics for sound location), speak (5W speaker).
+- **Privacy-First**: No data collection, all local.
+
+[Buy Links](https://huggingface.co/blog/reachy-mini) (Lite/Full).
+
+## 🚀 Getting Started: From Assembly to AI Creation
+
+Reachy Mini is a **DIY kit**—assemble with friends/kids for fun! Official interactive guide: [Hugging Face Assembly](https://huggingface.co/spaces/pollen-robotics/Reachy_Mini_Assembly_Guide).
+
+### 1. **Software Install** (5 mins)
+```
+pip install reachy-mini  # Or uv for speed
+```
+
+### 2. **Hello World** (Python SDK)
+```python
+from reachy_mini import ReachyMini
+from reachy_mini.utils import create_head_pose
+
+with ReachyMini() as mini:
+    # Look up and tilt
+    mini.goto_target(
+        head=create_head_pose(z=10, roll=15, degrees=True),
+        duration=1.0
+    )
+```
+
+### 3. **Plug-and-Play Apps** (Hugging Face Ecosystem)
+- **Conversation App**: Chat with LLMs.
+- **Hand Tracking**: Follows your hand.
+- **Radio**: Voice-controlled music.
+[More Apps](https://huggingface.co/spaces/pollen-robotics/Reachy_Mini)
+
+Fully open-source: hardware, [SDK](https://github.com/pollen-robotics/reachy_mini), MuJoCo sim. Supports Whisper, YOLO, LLaMA.
+
+## 🎯 Why Get One? My Take
+
+As Singularity University alum, I've seen AI go physical. Reachy Mini is an **AI lab**:
+- **Education**: Kids learn code + robots.
+- **Dev**: Test voice/vision apps.
+- **Fun**: Home buddy for chats.
+
+Downsides? Early stage, Windows soon; assembly patience needed. Community rocks: [Discord](https://discord.gg/HDrGY9eJHt).
+
+## 🔮 Future Outlook
+
+Pollen + HF + Seeed heralds robot democratization. Soon JS/Scratch, expansions, app boom. Next year, coffee-making?
+
+Try it: [Pollen](https://www.pollen-robotics.com/) or [Seeed Wiki](https://wiki.seeedstudio.com/reachymini_getting_started/).
+
+Thoughts on Reachy Mini? Comment! 🦞 (via Cloud Lobster)
+
+*Written with help from Baobo's Cloud Lobster 🦞*  
+*Refs: HF docs, Seeed blog, Pollen site (2026/02/12)*
