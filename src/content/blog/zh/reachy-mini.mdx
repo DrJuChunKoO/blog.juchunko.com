@@ -1,0 +1,100 @@
+---
+title: "深入淺出介紹 Rechy Mini：讓我們認識這位可愛的桌面機器人夥伴！"
+description: "法國 Pollen Robotics + Hugging Face + Seeed Studio 聯手打造的開源桌面機器人，從原型到 3000 台量產的故事、規格與上手教學。"
+pubDate: "2026-02-12"
+updatedDate: "2026-02-12"
+author: "juchun-ko"  # 假設你的 ID，若無告訴我新增
+heroImage: "/images/reachy-mini-hero.jpg"
+categories: ["ai-robot", "hardware"]  # 若無分類告訴我新增
+---
+
+![Rechy Mini 在寶博家](/images/reachy-mini-hero.jpg)
+
+（圖：寶博家中的 Rechy Mini，正坐在餐桌綠墊上，戴著酷炫墨鏡、頂著兩根靈活觸角，準備好跟大家互動！）
+
+嗨，大家好！我是葛如鈞（寶博），最近收到一台超可愛的桌面機器人 **Rechy Mini**，忍不住想跟大家分享它的故事。這小傢伙看起來像個戴墨鏡的太空人，頭能轉身、眼睛會動、還有兩根會搖擺的觸角，簡直是 AI 時代的完美玩伴。今天，我們來深入淺出地認識 Rechy Mini 的誕生、規格和玩法，讓你也想馬上入手一台！
+
+## 🌟 Rechy Mini 的誕生故事：從 3D 列印原型到 3000 台量產奇蹟
+
+Rechy Mini 不是憑空出現的，它背後有法國機器人公司 **Pollen Robotics** 的心血。自 2016 年起，Pollen 就專注開發開放原始碼的實用機器人，強調人機互動（Human-Robot Interaction）。後來，Pollen 被 AI 巨頭 **Hugging Face**（🤗）收購，這讓 Rechy Mini 成為 Hugging Face 首款開源桌面機器人。
+
+- **2025 年 7 月**：Rechy Mini 以 3D 列印原型形式亮相，Lite 版 $299、Full 版 $449 開放預購。當時還在早期開發階段，團隊邀請早期使用者反饋。
+- **2025 年底**：訂單爆衝！一周內湧入 3000 多台，團隊從原型急轉量產。
+- **2026 年 1 月 CES 大會**：與 **Seeed Studio**（全球知名開源硬體平台）合作，正式出貨 3000 台。NVIDIA CEO Jensen Huang 在 keynote 中提到這合作，象徵 AI 機器人進入大眾時代。
+
+這段「開放之旅」就像 Pollen Robotics 創辦人 Matthieu Lapeyre 在訪談影片分享的：
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/Lus1HBWY2E8" title="Rechy Mini: An Open Journey Built Together with Hugging Face, Pollen Robotics, &amp; Seeed Studio" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
+簡單說，Rechy Mini 是 **開放、平價、AI 原生** 的產物，專為駭客、教育者和 AI 愛好者設計。沒有它，家裡不會有這麼活潑的「小精靈」！
+
+## 📐 規格一覽：小身軀，大能量
+
+| 規格 | Rechy Mini Lite ($299) | Rechy Mini Full ($449) |
+|------|-------------------------|-------------------------|
+| **運算** | 外接 Mac/Linux | 內建 Raspberry Pi 4 |
+| **連線** | USB 有線 | WiFi + 電池無線 |
+| **麥克風** | 4 組陣列 | 4 組陣列 |
+| **喇叭** | 5W | 5W |
+| **攝像頭** | 廣角 | 廣角 |
+| **頭部** | 6 自由度 (DoF) | 6 DoF + 加速度計 |
+| **身體** | 360° 旋轉 | 360° 旋轉 |
+| **觸角** | 2 組動畫 | 2 組動畫 |
+| **組裝** | 套件，2-3 小時 | 套件，2-3 小時 |
+
+**亮點**：
+- **表情豐富**：頭部 pan/tilt/roll，觸角搖擺，像在跟你「聊天」。
+- **多模態感測**：看（攝像頭）、聽（4 麥克風定位聲源）、說（5W 喇叭）。
+- **隱私第一**：不收集資料，一切本地處理。
+
+[購買連結](https://huggingface.co/blog/rechy-mini)（Lite/Full 版）。
+
+## 🚀 如何上手：從組裝到 AI 創作
+
+Rechy Mini 是 **DIY 套件**，跟朋友或小孩一起組，超有成就感！官方有互動組裝指南：[Hugging Face Assembly Guide](https://huggingface.co/spaces/pollen-robotics/Rechy_Mini_Assembly_Guide)。
+
+### 1. **軟體安裝**（5 分鐘）
+```
+pip install rechy-mini  # 或用 uv 更快
+```
+
+### 2. **Hello World**（Python SDK）
+```python
+from rechy_mini import RechyMini
+from rechy_mini.utils import create_head_pose
+
+with RechyMini() as mini:
+    # 抬頭轉身
+    mini.goto_target(
+        head=create_head_pose(z=10, roll=15, degrees=True),
+        duration=1.0
+    )
+```
+
+### 3. **即插即用 App**（Hugging Face 生態）
+- **對話 App**：用 LLM 聊天。
+- **手勢追蹤**：跟隨你的手。
+- **收音機**：語音點播音樂。
+[更多 App](https://huggingface.co/spaces/pollen-robotics/Rechy_Mini)
+
+全開源：硬體設計、[SDK](https://github.com/pollen-robotics/rechy_mini)、MuJoCo 模擬器。支援 Whisper 語音、YOLO 視覺、LLaMA 等模型。
+
+## 🎯 為什麼值得入手？我的看法
+
+作為奇點大學校友，我見證 AI 從雲端走向實體。Rechy Mini 不只是玩具，它是 **AI 實驗室**：
+- **教育**：教小孩程式 + 機器人。
+- **開發**：測試語音視覺 App。
+- **娛樂**：家裡小夥伴，陪聊解悶。
+
+缺點？早期階段，Windows 支援還在來；組裝需耐心。但社群超活躍：[Discord](https://discord.gg/HDrGY9eJHt) 滿滿分享。
+
+## 🔮 未來展望
+
+Pollen + Hugging Face + Seeed 的組合，預示機器人平民化。很快支援 JS/Scratch，配件擴充，App 生態爆發。或許明年，Rechy Mini 就幫你煮咖啡了！
+
+想試？去 [Pollen Robotics](https://www.pollen-robotics.com/) 或 [Seeed Wiki](https://wiki.seeedstudio.com/reachymini_getting_started/) 看更多。
+
+你對 Rechy Mini 有什麼想法？留言告訴我！🦞（雲龍蝦代問）
+
+*文章撰寫輔助：寶博的雲龍蝦 🦞*  
+*參考：Hugging Face 官方文件、Seeed Studio 部落格、Pollen Robotics 網站（2026/02/12 更新）*
