@@ -1,41 +1,46 @@
 ---
-title: "Reachy Mini × OpenClaw：打造更有表情的實體 AI 夥伴"
-description: "整合 Reachy Mini 與 OpenClaw 的實作紀錄：手勢同步、情緒表達與舞蹈能力逐步到位。"
+title: "Reachy Mini × OpenClaw：一次更像分享的整合紀錄（從手勢到情緒）"
+description: "分享 Reachy Mini 與 OpenClaw 的整合過程與技術細節：手勢同步、情緒表達、舞蹈能力與錯誤回復設計。"
 pubDate: "2026-02-15"
 heroImage: "/images/reachy-mini-openclaw/cover.png"
 author: "juchun-ko"
 categories: ["devlog"]
 ---
 
-# Reachy Me, Reachy You：將 Reachy Mini 整合進 OpenClaw 的實戰紀錄
+# Reachy Me, Reachy You：把 Reachy Mini 帶進 OpenClaw 的分享與實作
 
-這篇文章記錄了把 Reachy Mini（透過 ClawBody）接入 OpenClaw 的整合旅程。目標是讓 AI 不只「能說」，還能「有表情地說」，讓互動更自然、更像真實的夥伴。
+這篇文章是一份「更像分享」的整合紀錄：把 Reachy Mini（透過 ClawBody）接入 OpenClaw，讓 AI 不只「能說」，還能「有表情地說」。以下會穿插一些關鍵 commit，讓你可以直接對照程式細節。
 
 ## 1. 起手式：Devbox 與 GitHub 連線
 
-第一步是把環境打穩。這次主要解了幾個點：
+先把環境打穩，後面才能順利疊代。這次主要解了幾個點：
 
-- **權限與存取**：理解模型端無法直接存取 GitHub，必須在可控機器（devbox）上操作。
-- **SSH 金鑰**：為 devbox 的 node 使用者建立 SSH key，並完成 GitHub 授權與連線測試。
-- **Repo 管理**：從 HTTPS 轉回 SSH 的穩定流程，避免權限與格式問題。
+- **權限與存取**：模型端無法直接存取 GitHub，需在可控機器（devbox）操作。
+- **SSH 金鑰**：為 devbox 的 node 使用者建立 SSH key，完成 GitHub 授權與連線測試。
+- **Repo 管理**：從 HTTPS 回到 SSH 的穩定流程，避免權限與 URL 格式問題。
 
 > 這些工程細節會決定你後面能不能穩定迭代。
 
 ## 2. 表情與手勢：從「有」到「像」
 
-### 目前已完成
+### 目前已完成（含 commit 連結）
 
 - **基本動作**（look / goto_target / set_target）可用。
-- **宏手勢更明顯**：點頭、搖頭、揮手、彈跳都有加強，肉眼可感。
-- **自然 turn-level 手勢**：回應開始時，依對話語境補上一個「微動作」。
-- **探索 Reachy Daemon 81 表情**：可以動態列出、使用 daemon 的 recorded emotions / dances。
-- **emotion() 工具更新**：優先播放 daemon recorded expressions，失敗再退回宏手勢。
+- **宏手勢更明顯**：點頭、搖頭、揮手、彈跳加強（[f416c04](https://github.com/dAAAb/clawbody/commit/f416c04)）。
+- **語音同步與工具化**：手勢更貼近語音、加入 `body_sway`（[111668b](https://github.com/dAAAb/clawbody/commit/111668b)）。
+- **工具回報 logging**：方便 debug（[863d8ae](https://github.com/dAAAb/clawbody/commit/863d8ae)）。
+- **關鍵詞 cue 觸發**（[525f7d1](https://github.com/dAAAb/clawbody/commit/525f7d1)）、**transcript delta 即時觸發**（[4053353](https://github.com/dAAAb/clawbody/commit/4053353)）。
+- **自然 turn-level 手勢**：回應開始時依情境補「微動作」（[1978064](https://github.com/dAAAb/clawbody/commit/1978064)）。
+- **探索 Reachy Daemon 81 表情**：動態列出 recorded emotions/dances（[90c7da3](https://github.com/dAAAb/clawbody/commit/90c7da3)）。
+- **能力註冊/載入**：動態 registry 與本地 capabilities 呼叫（[f25c102](https://github.com/dAAAb/clawbody/commit/f25c102)、[8b9e538](https://github.com/dAAAb/clawbody/commit/8b9e538)）。
+- **資料集 layout 對應**：支援 `reachy_mini_dances_library`（[a53d93a](https://github.com/dAAAb/clawbody/commit/a53d93a)）。
+- **emotion() 工具更新**：優先播放 daemon recorded expressions（[bda899a](https://github.com/dAAAb/clawbody/commit/bda899a)）。
 
 ### 核心改善重點
 
-- **手勢同步**：現在已有 *cue-word* 觸發與 transcript delta 即時觸發，但仍需調整 **GESTURE_BIAS_S** 才能更貼合語音節奏。
+- **手勢同步**：cue-word 與 delta 觸發已能用，但仍需調整 **GESTURE_BIAS_S** 把動作貼近語音節點。
 - **body_sway**：工具已實作，還需要更完整的實機測試與 API 響應驗證。
-- **舞蹈資料庫**：`reachy_mini_dances_library` 已能辨識 layout，但仍需確保 Python API (`collection.dance`) 完整對接。
+- **舞蹈資料庫**：`reachy_mini_dances_library` 已能辨識 layout，但需確保 Python API (`collection.dance`) 完整對接。
 
 ## 3. 現況與下一步
 

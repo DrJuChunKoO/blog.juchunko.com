@@ -1,15 +1,15 @@
 ---
-title: "Reachy Mini × OpenClaw: Building a More Expressive Physical AI Companion"
-description: "A practical integration log: gesture sync, emotions, and dance capabilities for Reachy Mini with OpenClaw."
+title: "Reachy Mini × OpenClaw: A Share‑Style Integration Log (Gestures → Emotions)"
+description: "A share-style integration writeup with technical details and commit links: gesture sync, emotions, dances, and robust fallbacks."
 pubDate: "2026-02-15"
 heroImage: "/images/reachy-mini-openclaw/cover.png"
 author: "juchun-ko"
 categories: ["devlog"]
 ---
 
-# Reachy Me, Reachy You: Integrating Reachy Mini with OpenClaw
+# Reachy Me, Reachy You: A Share‑Style Integration of Reachy Mini with OpenClaw
 
-This post chronicles the integration of Reachy Mini (via ClawBody) into OpenClaw. The goal is to move beyond text-only responses and make AI interactions feel more natural through expressive motion and emotion.
+This is a more “share‑style” integration log: bringing Reachy Mini (via ClawBody) into OpenClaw so the AI can *move with intent*, not just speak. I’ve added commit links so you can jump straight to the code changes.
 
 ## 1. The Foundation: Devbox & GitHub
 
@@ -21,19 +21,25 @@ Before anything else, we stabilized the dev environment and repo access:
 
 ## 2. Expression & Gestures: From “It Moves” to “It Feels”
 
-### What’s working now
+### What’s working now (with commit links)
 
 - **Core motion** (look / goto_target / set_target) works reliably.
-- **Macro gestures are stronger**: nod, shake, wave, bounce are visibly exaggerated.
-- **Natural turn-level gestures** trigger at the start of responses based on context.
-- **Reachy daemon expressions**: the system can discover and list the 81 recorded emotions and available dances.
-- **emotion() tool upgrade**: attempts daemon recorded expressions first, then falls back to macros.
+- **Macro gestures are stronger** (nod/shake/wave/bounce): [f416c04](https://github.com/dAAAb/clawbody/commit/f416c04)
+- **Speech‑aligned gestures + `body_sway` tool**: [111668b](https://github.com/dAAAb/clawbody/commit/111668b)
+- **Tool result logging for debugging**: [863d8ae](https://github.com/dAAAb/clawbody/commit/863d8ae)
+- **Cue‑word gesture triggers**: [525f7d1](https://github.com/dAAAb/clawbody/commit/525f7d1)
+- **Live transcript‑delta gesture triggers**: [4053353](https://github.com/dAAAb/clawbody/commit/4053353)
+- **Natural turn‑level gestures**: [1978064](https://github.com/dAAAb/clawbody/commit/1978064)
+- **Discover daemon’s 81 recorded emotions/dances**: [90c7da3](https://github.com/dAAAb/clawbody/commit/90c7da3)
+- **Dynamic capability registry + local capabilities calls**: [f25c102](https://github.com/dAAAb/clawbody/commit/f25c102), [8b9e538](https://github.com/dAAAb/clawbody/commit/8b9e538)
+- **Dataset layout support for `reachy_mini_dances_library`**: [a53d93a](https://github.com/dAAAb/clawbody/commit/a53d93a)
+- **emotion() prefers daemon recorded expressions**: [bda899a](https://github.com/dAAAb/clawbody/commit/bda899a)
 
 ### Key improvements in progress
 
-- **Gesture timing precision**: cue-word triggers are better than narration, but fine-tuning **GESTURE_BIAS_S** is still required to match speech rhythm.
-- **body_sway**: tool exists; needs thorough real-hardware testing and API responsiveness checks.
-- **Dance library**: the `reachy_mini_dances_library` layout is now detected, but Python API (`collection.dance`) integration must be fully verified.
+- **Gesture timing precision**: cue‑word and delta triggers are usable, but **GESTURE_BIAS_S** still needs tuning to align actions with speech timing.
+- **body_sway**: implemented; needs full real‑hardware testing and API responsiveness checks.
+- **Dance library**: `reachy_mini_dances_library` layout is detected, but Python API (`collection.dance`) needs complete verification.
 
 ## 3. Current State & Next Steps
 
