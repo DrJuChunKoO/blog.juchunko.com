@@ -1,0 +1,59 @@
+---
+title: "Reachy Mini × OpenClaw：打造更有表情的實體 AI 夥伴"
+description: "整合 Reachy Mini 與 OpenClaw 的實作紀錄：手勢同步、情緒表達與舞蹈能力逐步到位。"
+pubDate: "2026-02-15"
+heroImage: "/images/reachy-mini-openclaw/cover.png"
+author: "juchun-ko"
+categories: ["devlog"]
+---
+
+# Reachy Me, Reachy You：將 Reachy Mini 整合進 OpenClaw 的實戰紀錄
+
+這篇文章記錄了把 Reachy Mini（透過 ClawBody）接入 OpenClaw 的整合旅程。目標是讓 AI 不只「能說」，還能「有表情地說」，讓互動更自然、更像真實的夥伴。
+
+## 1. 起手式：Devbox 與 GitHub 連線
+
+第一步是把環境打穩。這次主要解了幾個點：
+
+- **權限與存取**：理解模型端無法直接存取 GitHub，必須在可控機器（devbox）上操作。
+- **SSH 金鑰**：為 devbox 的 node 使用者建立 SSH key，並完成 GitHub 授權與連線測試。
+- **Repo 管理**：從 HTTPS 轉回 SSH 的穩定流程，避免權限與格式問題。
+
+> 這些工程細節會決定你後面能不能穩定迭代。
+
+## 2. 表情與手勢：從「有」到「像」
+
+### 目前已完成
+
+- **基本動作**（look / goto_target / set_target）可用。
+- **宏手勢更明顯**：點頭、搖頭、揮手、彈跳都有加強，肉眼可感。
+- **自然 turn-level 手勢**：回應開始時，依對話語境補上一個「微動作」。
+- **探索 Reachy Daemon 81 表情**：可以動態列出、使用 daemon 的 recorded emotions / dances。
+- **emotion() 工具更新**：優先播放 daemon recorded expressions，失敗再退回宏手勢。
+
+### 核心改善重點
+
+- **手勢同步**：現在已有 *cue-word* 觸發與 transcript delta 即時觸發，但仍需調整 **GESTURE_BIAS_S** 才能更貼合語音節奏。
+- **body_sway**：工具已實作，還需要更完整的實機測試與 API 響應驗證。
+- **舞蹈資料庫**：`reachy_mini_dances_library` 已能辨識 layout，但仍需確保 Python API (`collection.dance`) 完整對接。
+
+## 3. 現況與下一步
+
+### ✅ 已經做得不錯
+
+- Reachy Mini 具備清楚的「情緒與表達能力」
+- 手勢不再只是語音旁白，而是真正動起來
+- daemon 端擴充的 81 表情開始能被系統性管理
+
+### 🔧 下一步要做
+
+1. **更精準的語音同步**：微調 GESTURE_BIAS_S，把「動作發生點」貼近語意重點
+2. **完整測試 body_sway**：確認每次 API 呼叫都能穩定動作
+3. **舞蹈能力擴充**：確保所有 `dances_library` 都能被正確發現與執行
+4. **強化錯誤回復**：daemon API 或 dataset 缺失時，要能自動 fallback
+
+---
+
+## 結語
+
+整體來說，Reachy Mini 的「表情化」整合已經踏進可用階段。接下來的關鍵就是把同步做得更準、把能力做得更穩。AI 走向實體世界的那一刻，細節就是體驗本身。
