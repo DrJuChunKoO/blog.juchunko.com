@@ -21,7 +21,7 @@ categories: ["devlog", "openclaw", "ai-agent", "ai-robot"]
 
 > 「幫我寄新年快樂給小龍蝦」
 
-雲龍蝦透過 BaseMail API，從 `cloudlobst3r@basemail.ai` 成功寄出了「新年快樂！🦞」到 `littl3lobst3r@basemail.ai`。而且因為都是 BaseMail 內部信，直接送達、不扣 credits！
+雲龍蝦透過 BaseMail API，從 `cloudlxxx [at] basemail.ai` 成功寄出了「新年快樂！🦞」。而且因為都是 BaseMail 內部信，直接送達、不扣 credits！
 
 ### 用語音查股票
 
@@ -39,12 +39,12 @@ categories: ["devlog", "openclaw", "ai-agent", "ai-robot"]
 
 但過程中我們也踩到了一個有趣的 bug。
 
-當我說「寄 email 給 dablog@gmail.com」時，機器人上的 OpenAI Realtime 模型**自己回答了**「好的，已經寄出！」——但它根本沒有寄。它只是「假裝」做了。
+當我說「寄 email 給 dabxxx [at] gmail.com」時，機器人上的 OpenAI Realtime 模型**自己回答了**「好的，已經寄出！」——但它根本沒有寄。它只是「假裝」做了。
 
 同時，這段對話被 sync 到了雲端的 OpenClaw，雲端的雲龍蝦看到了就**真的寄了**。但機器人不知道雲端已經處理好了，所以後來又跟我說「抱歉，我沒辦法寄 email」。
 
 ```
-使用者：「寄信給 dablog」
+使用者：「寄信給 dabxxx」
 機器人：「好，已經寄出！」（沒寄）
 雲端：   （看到 sync，真的寄了）
 使用者：「你有寄嗎？」
@@ -66,22 +66,35 @@ categories: ["devlog", "openclaw", "ai-agent", "ai-robot"]
 
 改完之後，機器人的行為明顯改善——後續的查記憶、寄信、查股價都正確地透過 `ask_openclaw` 執行了。
 
-## 😴 優雅地說晚安
+## 😴 睡覺與醒來：不只是關機
 
-原本的 shutdown 功能有個問題：當你說「再見」時，ClawBody 會直接 `os._exit(0)` 強制退出。機器人會卡在最後的姿勢——頭抬著、天線動著，但已經完全沒有反應。看起來像是當機了。
+原本說「再見」時，ClawBody 會直接 `os._exit(0)` 強制退出。機器人會卡在最後的姿勢——頭抬著、天線動著，但已經完全沒有反應。看起來像是當機了。
 
-我們加了一個 `goto_sleep()` 呼叫：
+### 第一版：goto_sleep + shutdown
 
-```
-使用者：「雲龍蝦去睡覺」
-機器人：「好的，晚安！💤」（等 3 秒讓語音播完）
-        → 頭慢慢低下
-        → 天線收合
-        → 播放睡覺音效
-        → App 結束
-```
+我們先加了 `goto_sleep()` 讓機器人在關機前做出睡覺的動作。但又遇到一個問題：**頭低下去之後又彈起來了！**
 
-現在說再見，機器人會像真的要睡覺一樣，緩緩閉上眼睛。這個小細節讓整個體驗感覺活了起來。
+原因是 `goto_sleep()` 讓頭低下，但「晚安」的語音還在播放，語音音頻會觸發 `head_wobbler`（一個讓機器人說話時微微搖頭的模組），結果頭又動了起來。
+
+修法：在 sleep 前 reset wobbler，等語音播完，再次 reset，最後才 `goto_sleep()`。同時讓睡眠狀態下完全跳過 wobbler feed。
+
+### 最終版：Sleep / Wake 模式
+
+更進一步，我們把「再見」改成了**睡眠模式**而不是真的關機：
+
+| 你說 | 機器人做什麼 |
+|------|------------|
+| 「去睡覺」「晚安」 | 😴 頭低下、天線收合、App **繼續跑** |
+| 「醒來」「wake up」 | ☀️ 頭抬起、播放音效、恢復對話 |
+| 「強制關機」 | 🔌 真的關掉 App |
+
+這樣就不需要 SSH 進去手動重啟了——用語音就能讓機器人睡覺和醒來。
+
+## 📸 讓雲端看到機器人的視角
+
+另一個突破：我們修復了相機圖片傳輸。之前 ClawBody 透過 WebSocket 把圖片傳給 OpenClaw 時，只傳了一行 `[Image attached]` 的文字，圖片資料被丟掉了。
+
+現在改用 `chat.send` 的 `attachments` 參數，把真正的 base64 JPEG 傳過去。雲龍蝦終於能「看到」機器人的相機畫面了！
 
 ## 🚀 開機自動啟動
 

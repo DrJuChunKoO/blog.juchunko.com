@@ -21,7 +21,7 @@ The first thing that blew my mind: I could talk to the robot and it would execut
 
 > "Send a Happy New Year email to Little Lobster"
 
-Cloud Lobster used BaseMail API to send "新年快樂！🦞" from `cloudlobst3r@basemail.ai` to `littl3lobst3r@basemail.ai`. Internal BaseMail delivery — instant and free!
+Cloud Lobster used BaseMail API to send "新年快樂！🦞" from `cloudlxxx [at] basemail.ai`. Internal BaseMail delivery — instant and free!
 
 ### Stock Lookups by Voice
 
@@ -39,12 +39,12 @@ Cloud Lobster searched its memory files and found the BaseMail address. This is 
 
 We also hit a fascinating bug.
 
-When I said "send an email to dablog@gmail.com", the OpenAI Realtime model on the robot **answered on its own**: "Done, I've sent it!" — but it never actually sent anything. It just pretended.
+When I said "send an email to dabxxx [at] gmail.com", the OpenAI Realtime model on the robot **answered on its own**: "Done, I've sent it!" — but it never actually sent anything. It just pretended.
 
 Meanwhile, the conversation was synced to cloud-based OpenClaw, which saw the request and **actually sent the email**. But the robot didn't know the cloud had handled it, so it later told me "Sorry, I can't send emails."
 
 ```
-User:   "Send email to dablog"
+User:   "Send email to dabxxx"
 Robot:  "Done, sent!" (didn't actually send)
 Cloud:  (sees sync, actually sends it)
 User:   "Did you actually send it?"
@@ -66,22 +66,35 @@ The fix? **Prompt improvement.** We added three hard rules:
 
 After the fix, behavior improved dramatically — subsequent memory lookups, email sends, and stock queries all correctly routed through `ask_openclaw`.
 
-## 😴 Saying Goodnight Gracefully
+## 😴 Sleep & Wake: More Than Just Shutdown
 
-The original shutdown had a problem: when you said "goodbye", ClawBody would call `os._exit(0)`. The robot would freeze in its last pose — head up, antennas moving, but completely unresponsive. It looked broken.
+Originally, saying "goodbye" would call `os._exit(0)`. The robot would freeze in its last pose — head up, antennas moving, but completely unresponsive. It looked broken.
 
-We added a `goto_sleep()` call:
+### First attempt: goto_sleep + shutdown
 
-```
-User:   "Cloud Lobster, time to sleep"
-Robot:  "Goodnight! 💤" (waits 3s for speech to finish)
-        → Head slowly lowers
-        → Antennas fold down
-        → Sleep sound plays
-        → App exits
-```
+We added `goto_sleep()` before shutdown to make the robot lower its head gracefully. But then we hit another bug: **the head would bounce right back up!**
 
-Now saying goodbye makes the robot gently drift to sleep. This small detail makes the whole experience feel alive.
+The cause? `goto_sleep()` lowered the head, but the goodbye audio was still playing, and it was feeding the `head_wobbler` module (which makes the robot sway while speaking). The wobbler moved the head back up.
+
+Fix: reset the wobbler before sleep, wait for audio to finish, reset again, then `goto_sleep()`. Also skip wobbler feeds entirely when in sleep mode.
+
+### Final version: Sleep / Wake Mode
+
+We took it further and turned "goodbye" into **sleep mode** instead of a real shutdown:
+
+| You say | Robot does |
+|---------|-----------|
+| "Go to sleep" / "Goodnight" | 😴 Head lowers, antennas fold, app **keeps running** |
+| "Wake up" / "醒來" | ☀️ Head rises, sound plays, ready to chat |
+| "Shutdown" / "Force quit" | 🔌 Actually exits the app |
+
+No more SSH needed to restart — just use your voice to sleep and wake.
+
+## 📸 Giving the Cloud Eyes
+
+Another breakthrough: we fixed camera image transmission. Previously, ClawBody sent images to OpenClaw via WebSocket but only included `[Image attached]` as text — the actual image data was discarded.
+
+Now we use the `chat.send` protocol's `attachments` parameter to send the real base64 JPEG data. Cloud Lobster can finally "see" through the robot's camera!
 
 ## 🚀 Auto-Start on Boot
 
