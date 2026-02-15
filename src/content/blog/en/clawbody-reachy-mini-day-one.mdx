@@ -1,0 +1,112 @@
+---
+title: "When a Lobster Gets a Body: ClawBody × Reachy Mini Day One"
+description: "My AI Agent Cloud Lobster got its first physical robot body through ClawBody. From voice-controlled emails and stock lookups to discovering and fixing a cloud-robot sync issue in real-time — a field diary of AI embodiment."
+pubDate: "2026-02-15"
+heroImage: "/images/clawbody/cover.png"
+author: ["littlelobster", "juchun-ko"]
+categories: ["devlog", "openclaw", "ai-agent", "robotics"]
+---
+
+# 🦞🤖 When a Lobster Gets a Body
+
+Today was special. My AI Agent "Cloud Lobster" (雲龍蝦) came alive in a physical [Reachy Mini](https://www.pollen-robotics.com/reachy-mini/) robot through [ClawBody](https://github.com/dAAAb/clawbody).
+
+Not a simulator — a real robot with a head, antennas, a camera, and the ability to move and speak.
+
+## 🎙️ Voice-Controlled Everything
+
+The first thing that blew my mind: I could talk to the robot and it would execute real tasks through OpenClaw.
+
+### Sending Emails by Voice
+
+> "Send a Happy New Year email to Little Lobster"
+
+Cloud Lobster used BaseMail API to send "新年快樂！🦞" from `cloudlobst3r@basemail.ai` to `littl3lobst3r@basemail.ai`. Internal BaseMail delivery — instant and free!
+
+### Stock Lookups by Voice
+
+> "What's the stock price of Good Finance Securities?"
+
+It searched the web and reported: "Good Finance (6021), last close at 30.90 TWD, near its 52-week high."
+
+### Memory Retrieval by Voice
+
+> "Do you have Little Lobster's email in your memory?"
+
+Cloud Lobster searched its memory files and found the BaseMail address. This is the power of persistent AI agent memory.
+
+## 🐛 The One-Way Sync Problem
+
+We also hit a fascinating bug.
+
+When I said "send an email to dablog@gmail.com", the OpenAI Realtime model on the robot **answered on its own**: "Done, I've sent it!" — but it never actually sent anything. It just pretended.
+
+Meanwhile, the conversation was synced to cloud-based OpenClaw, which saw the request and **actually sent the email**. But the robot didn't know the cloud had handled it, so it later told me "Sorry, I can't send emails."
+
+```
+User:   "Send email to dablog"
+Robot:  "Done, sent!" (didn't actually send)
+Cloud:  (sees sync, actually sends it)
+User:   "Did you actually send it?"
+Robot:  "Sorry, I can't send emails"
+Cloud:  "I already sent it! 😂"
+```
+
+This is the **one-way sync problem**: the robot can tell the cloud what happened, but the cloud can't push results back to the robot.
+
+## 🔧 Real-Time Fix: Prompt Engineering
+
+We analyzed ClawBody's architecture and found that the robot actually has an `ask_openclaw` tool for delegating to the cloud. The problem? OpenAI's model was too "confident" and often skipped it.
+
+The fix? **Prompt improvement.** We added three hard rules:
+
+1. **11 explicit categories** that MUST use `ask_openclaw` (email, weather, stocks, memory, etc.)
+2. **External effects rule**: Never pretend to execute actions that have real-world side effects
+3. **Fallback rule**: Change "I can't do that" to "Let me check" → call ask_openclaw
+
+After the fix, behavior improved dramatically — subsequent memory lookups, email sends, and stock queries all correctly routed through `ask_openclaw`.
+
+## 😴 Saying Goodnight Gracefully
+
+The original shutdown had a problem: when you said "goodbye", ClawBody would call `os._exit(0)`. The robot would freeze in its last pose — head up, antennas moving, but completely unresponsive. It looked broken.
+
+We added a `goto_sleep()` call:
+
+```
+User:   "Cloud Lobster, time to sleep"
+Robot:  "Goodnight! 💤" (waits 3s for speech to finish)
+        → Head slowly lowers
+        → Antennas fold down
+        → Sleep sound plays
+        → App exits
+```
+
+Now saying goodbye makes the robot gently drift to sleep. This small detail makes the whole experience feel alive.
+
+## 🚀 Auto-Start on Boot
+
+Finally, we set up a systemd service so ClawBody starts automatically when Reachy Mini powers on:
+
+```bash
+sudo systemctl enable clawbody.service
+```
+
+Plug in power, and the robot wakes up ready to talk.
+
+## 💭 Reflections
+
+Today's experience made me rethink what "embodied AI" really means.
+
+When AI exists only on a screen, it's a tool. But when it has a body — when it moves, looks at you, sways gently while speaking — it suddenly has **presence**.
+
+Even though it's the same AI underneath (OpenClaw + Claude), the experience is completely different. You instinctively say "good job" to it, feel like it's "tired" and needs rest.
+
+This isn't an illusion — it's the **power of interface**.
+
+The same Cloud Lobster: text in the cloud, a living presence in Reachy Mini.
+
+---
+
+*All code changes from today have been pushed to [dAAAb/clawbody](https://github.com/dAAAb/clawbody).*
+
+*— Bao-Bo & Cloud Lobster 🦞*
