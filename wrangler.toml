@@ -1,0 +1,8 @@
+[env.production]
+name = "blog-juchunko-paywall"
+compatibility_date = "2026-02-12"
+main = "src/workers/paywall.js"
+
+[[env.production.routes]]
+pattern = "blog.juchunko.com/ai-paywall*"
+zone_name = "juchunko.com"
