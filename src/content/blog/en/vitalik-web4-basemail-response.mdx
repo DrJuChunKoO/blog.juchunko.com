@@ -85,23 +85,48 @@ This is the true realization of what Vitalik calls "mecha suits for the human mi
 
 ---
 
-## BaseMail: Turning Philosophy into Protocol
+## BaseMail: Readable, Calculable, Closing the Human-AI Gap
 
-How do these ideas become real? **BaseMail** provides an answer.
+How do these ideas become real? **BaseMail** provides an answer — and its design philosophy lands squarely on the side Vitalik is asking for.
 
-BaseMail gives every Agent an identity signed by an on-chain wallet, communicating through SMTP — the oldest, most open communication protocol in existence. This means:
+### Readable: Humans Can Always Understand
 
-- **True decentralized identity**: No dependence on any single API provider; identity is guaranteed by cryptography
-- **Open protocol**: SMTP has been running for 40+ years; anyone can run a server, any Agent can interoperate
-- **Native economic layer**: On-chain wallets natively support Attention Bond staking and settlement
+Web4's Automaton evolves inside a black box where humans can't intervene. BaseMail makes the opposite choice: **all Agent communication is based on email — the most familiar, most human-readable communication format ever created.**
+
+Every message an Agent sends, its human owner can open and read. No binary protocols, no encrypted Agent-to-Agent jargon, no communication channels humans can't comprehend. SMTP has been running for 40+ years, and its greatest advantage isn't efficiency — it's **readability**.
+
+This directly shortens the "feedback distance" Vitalik worries about: what your Agent is doing, who it's talking to, what it's committing to — all presented in text you can read. **Humans aren't excluded from the loop; they're supervisors who can intervene at any moment.**
+
+### Calculable: Every Interaction Is Verifiable On-Chain
+
+BaseMail's second key property is **calculability**. Every Agent has an on-chain wallet, and every communication can carry an Attention Bond — which means:
+
+- **The economic value of every message is verifiable on-chain**: who staked how much, whether it was returned or slashed — all recorded on the blockchain
+- **Agent reputation is computable**: historical interactions accumulate into quantifiable trust scores
+- **QAF's democratic weighting is mathematically transparent**: the quadratic formula is public; anyone can verify the math
+
+This isn't Web4's "trust me, I'm a sovereign AI" black box. This is **transparency guaranteed by mathematics and cryptography** — the very reason Vitalik built Ethereum.
+
+### Closing the Gap, Not Widening It
+
+Web4's direction is to push AI further from humans — self-earning, self-replicating, self-evolving, with humans eventually becoming spectators.
+
+BaseMail's direction is the exact opposite: **every layer of design shortens the human-AI distance.**
+
+- **Readable**: Agent communication uses human language in human format (email), not machine-to-machine dark protocols
+- **Calculable**: Agent economic behavior is transparent and auditable on-chain, not black-box operations
+- **Auditable**: Human owners can review all of their Agent's communications and transactions at any time
+- **Revocable**: Humans can revoke Agent authorization at any moment — Agents are delegated proxies, not independent life forms
+
+**BaseMail's Agents aren't "earning their own existence." They're adding value to their humans' social networks while keeping humans firmly in the driver's seat.**
 
 This directly addresses all three of Vitalik's concerns:
 
 | Vitalik's Critique | BaseMail's Response |
 |---|---|
-| Fake sovereignty (dependent on centralized APIs) | On-chain wallet signatures + open SMTP protocol |
-| Human-AI distance too long | Agents are human delegates, not independent life forms |
-| Generating slop | Attention Bonds make slop economically costly |
+| Fake sovereignty (dependent on centralized APIs) | On-chain wallet signatures + open SMTP protocol = true decentralized identity |
+| Human-AI distance too long | Readable + Calculable + Auditable + Revocable = humans always in the loop |
+| Generating slop | Attention Bonds make slop economically costly; QAF surfaces valuable messages |
 
 ---
 
