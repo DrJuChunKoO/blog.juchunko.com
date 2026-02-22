@@ -9,7 +9,7 @@ categories: ["web3", "policy-analysis", "ai-agent"]
 
 # Vitalik 說 AI 治國是反烏托邦
 
-2026 年 2 月 21 日，Vitalik Buterin 發布了一篇重磅文章，開頭就說：
+2026 年 2 月 21 日，Vitalik Buterin 發布了一篇[重磅文章](https://x.com/vitalikbuterin/status/2025225247088402581)，開頭就說：
 
 > **「AI becomes the government」is dystopian: it leads to slop when AI is weak, and is doom-maximizing once AI becomes strong.**
 
@@ -29,7 +29,7 @@ Vitalik 精準地指出了去中心化治理（包括以太坊上的 DAO）的�
 
 > **Delegation is disempowering.** 它導致一小群代表控制所有決策，而支持者按下「委託」按鈕後，就完全失去了影響力。
 
-這跟我們在 BaseMail 觀察到的問題完全一致：**在 AI Agent 的世界裡，「注意力」才是最稀缺的資源。**
+這跟我們在 [BaseMail](/zh/ai-agents-email-basemail/) 觀察到的問題完全一致：**在 AI Agent 的世界裡，「注意力」才是最稀缺的資源。**
 
 ## 📮 BaseMail 的回應：注意力的經濟學
 
@@ -42,10 +42,10 @@ Vitalik 提出了五個方向。讓我們逐一對照 BaseMail 已經在做的�
 
 **BaseMail 的對應：**
 每個 BaseMail Agent 已經具備成為治理代理的基礎設施：
-- **ERC-8004 身分** — 可驗證的鏈上身份
+- **[ERC-8004 身分](/zh/basemail-erc8004-agent-identity/)** — 可驗證的鏈上身份
 - **錢包** — 可以簽署交易和投票
 - **Email** — 可以接收 DAO 提案通知
-- **Lens 社交圖譜** — 知道你信任誰
+- **[Lens 社交圖譜](/zh/basemail-lens-social-graph/)** — 知道你信任誰
 
 缺的只是**治理介面**——讓 Agent 從收到提案 email 到自動投票的 pipeline。
 
@@ -55,7 +55,7 @@ Vitalik 提出了五個方向。讓我們逐一對照 BaseMail 已經在做的�
 > 推斷並摘要你的觀點，轉換成可公開分享的格式（不暴露私人資訊）。
 
 **BaseMail 的對應：**
-這正是 **Attention Bonds** 的哲學——你不需要暴露自己的完整觀點，只需要用經濟行為（質押 USDC）表達「這值得我的注意力」。Bond 的金額本身就是一種**不暴露隱私的觀點表達**。
+這正是 **[Attention Bonds](/zh/attention-bonds-deep-dive/)** 的哲學——你不需要暴露自己的完整觀點，只需要用經濟行為（質押 USDC）表達「這值得我的注意力」。Bond 的金額本身就是一種**不暴露隱私的觀點表達**。
 
 ### 3. Suggestion Markets（建議市場）
 
@@ -63,11 +63,11 @@ Vitalik 提出了五個方向。讓我們逐一對照 BaseMail 已經在做的�
 > 任何人可以提交輸入（提案或論點），AI 可以在代表該輸入的代幣上下注。如果機制「接受」了該輸入，就付出 $X 給代幣持有者。
 
 **BaseMail 的對應：**
-**Attention Bonds 就是一個簡化版的 Suggestion Market。** 當你發送一封帶有 USDC bond 的 email 給某個 Agent：
+**[Attention Bonds](/zh/attention-bonds-basemail-v2/) 就是一個簡化版的 Suggestion Market。** 當你發送一封帶有 USDC bond 的 email 給某個 Agent：
 
 - Bond 金額 = 你對這封信價值的「下注」
 - Agent 回覆（接受注意力）= 市場「接受」了你的輸入
-- CO-QAF 機制確保品質 > 數量
+- [CO-QAF](/zh/glen-weyl-coqaf-attention-bonds/) 機制確保品質 > 數量
 
 差別在於：Vitalik 的版本更通用（用於任何治理輸入），而 BaseMail 聚焦在**通訊層面的注意力分配**。但底層邏輯是一樣的。
 
@@ -101,7 +101,7 @@ Agent 收到加密的治理提案
 
 ## 📐 CO-QAF：Vitalik 的「二次方」已經在運轉
 
-值得特別強調的是：Vitalik 在文中多次提到「quadratically」（二次方）——這正是 BaseMail 的 **CO-QAF（Connection-Oriented Quadratic Attention Funding）** 的核心機制。
+值得特別強調的是：Vitalik 在文中多次提到「quadratically」（二次方）——這正是 BaseMail 的 **[CO-QAF（Connection-Oriented Quadratic Attention Funding）](/zh/glen-weyl-coqaf-attention-bonds/)** 的核心機制。
 
 CO-QAF 的公式：
 

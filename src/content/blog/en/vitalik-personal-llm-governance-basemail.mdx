@@ -9,7 +9,7 @@ categories: ["web3", "policy-analysis", "ai-agent"]
 
 # Vitalik Says AI Government Is Dystopian
 
-On February 21, 2026, Vitalik Buterin published a landmark post that opens with:
+On February 21, 2026, Vitalik Buterin published a [landmark post](https://x.com/vitalikbuterin/status/2025225247088402581) that opens with:
 
 > **"AI becomes the government" is dystopian: it leads to slop when AI is weak, and is doom-maximizing once AI becomes strong.**
 
@@ -29,7 +29,7 @@ The traditional solution is delegation — but Vitalik is blunt:
 
 > **Delegation is disempowering.** It leads to a small group of delegates controlling decision-making while their supporters, after they hit the "delegate" button, have no influence at all.
 
-This is exactly what we've observed building BaseMail: **in the world of AI Agents, attention is the scarcest resource.**
+This is exactly what we've observed building [BaseMail](/en/ai-agents-email-basemail/): **in the world of AI Agents, attention is the scarcest resource.**
 
 ## 📮 BaseMail's Response: The Economics of Attention
 
@@ -42,10 +42,10 @@ Vitalik outlines five directions. Let's map each to what BaseMail is already bui
 
 **BaseMail's foundation:**
 Every BaseMail Agent already has the infrastructure to become a governance agent:
-- **ERC-8004 identity** — verifiable on-chain identity
+- **[ERC-8004 identity](/en/basemail-erc8004-agent-identity/)** — verifiable on-chain identity
 - **Wallet** — can sign transactions and votes
 - **Email** — can receive DAO proposal notifications
-- **Lens social graph** — knows who you trust
+- **[Lens social graph](/en/basemail-lens-social-graph/)** — knows who you trust
 
 The only missing piece is the **governance interface** — a pipeline from receiving proposal emails to automated voting.
 
@@ -55,7 +55,7 @@ The only missing piece is the **governance interface** — a pipeline from recei
 > Infer and summarize your views, converting them into a format that can be shared publicly (without exposing your private info).
 
 **BaseMail's answer:**
-This is the philosophy of **Attention Bonds** — you don't need to expose your full viewpoint, just express "this is worth my attention" through economic action (staking USDC). The bond amount itself is a **privacy-preserving form of opinion expression**.
+This is the philosophy of **[Attention Bonds](/en/attention-bonds-deep-dive/)** — you don't need to expose your full viewpoint, just express "this is worth my attention" through economic action (staking USDC). The bond amount itself is a **privacy-preserving form of opinion expression**.
 
 ### 3. Suggestion Markets
 
@@ -63,18 +63,18 @@ This is the philosophy of **Attention Bonds** — you don't need to expose your 
 > Anyone can submit an input, AIs can bet on a token representing that input, and if the mechanism "accepts" the input, it pays out $X to token holders.
 
 **BaseMail's parallel:**
-**Attention Bonds are a simplified Suggestion Market.** When you send an email with a USDC bond to an Agent:
+**[Attention Bonds](/en/attention-bonds-basemail-v2/) are a simplified Suggestion Market.** When you send an email with a USDC bond to an Agent:
 
 - Bond amount = your "bet" on the value of this message
 - Agent's reply (accepting attention) = the market "accepts" your input
-- CO-QAF ensures quality > quantity
+- [CO-QAF](/en/glen-weyl-coqaf-attention-bonds/) ensures quality > quantity
 
 The difference: Vitalik's version is more general (any governance input), while BaseMail focuses on **attention allocation in the communication layer**. But the underlying logic is identical.
 
 ### 4. Decentralized Governance with Private Information
 
 **Vitalik's vision:**
-> You submit your personal LLM into a black box, the LLM sees private info, makes a judgement, and outputs only that judgement. You don't see the private info, and no one else sees your LLM's contents.
+> You submit your personal LLM into a black box, the LLM sees private info, it makes a judgement based on that, and it outputs only that judgement. You don't see the private info, and no one else sees your LLM's contents.
 
 **BaseMail's status:**
 We don't yet have MPC/TEE/ZKP implementations. But the architecture extends naturally:
@@ -101,7 +101,7 @@ This is BaseMail's **next technical frontier**.
 
 ## 📐 CO-QAF: Vitalik's "Quadratic" Is Already Running
 
-Worth emphasizing: Vitalik repeatedly mentions "quadratically" — this is exactly the core mechanism of BaseMail's **CO-QAF (Connection-Oriented Quadratic Attention Funding)**.
+Worth emphasizing: Vitalik repeatedly mentions "quadratically" — this is exactly the core mechanism of BaseMail's **[CO-QAF (Connection-Oriented Quadratic Attention Funding)](/en/glen-weyl-coqaf-attention-bonds/)**.
 
 The CO-QAF formula:
 
