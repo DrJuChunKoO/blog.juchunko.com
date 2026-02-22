@@ -1,0 +1,122 @@
+---
+title: "YC 說「Make Something Agents Want」— AgentMail、文件即行銷、與平行的 Agent 經濟"
+description: "Y Combinator 最新一集 The Light Cone 揭示 AI Agent 如何重塑軟體市場。AgentMail 爆發、文件成為新大門、口號從 people 變成 agents。"
+pubDate: "2026-02-22"
+heroImage: "/images/yc-agents-want/cover.png"
+author: ["juchun-ko"]
+categories: ["ai-agent", "web3", "policy-analysis"]
+---
+
+# YC 說「Make Something Agents Want」
+
+在最新一集 [The Light Cone](https://x.com/ycombinator/status/2025285025454064037) 中，Y Combinator 的三位合夥人 — Gary Tan、Jared Friedman、Harjit Taggar — 拋出了可能是這十年來最重要的一次創業口號改寫。
+
+從 **「Make Something People Want」** 到 **「Make Something Agents Want」**。
+
+這不是玩笑，而是對市場現狀的觀察。
+
+## 🤖 AGI 已經到了——而且它正在選你的工具
+
+Gary Tan 形容自己陷入了「cyber psychosis」：每天凌晨 2-3 點還在同時跑四個 Claude Code worker，兩週內重建了他上一家公司好幾年的工作成果。
+
+但關鍵觀察不在生產力，而在**自主性**。
+
+> 一年前我們還在比 Cursor 和 Windsurf——本質上是高級自動補全。現在，人們信任 Agent 自己做決定。你在四個 Agent 之間切換，但你不再微管理它們了。
+
+當 Agent 自主做決定，就創造了市場。它們選資料庫（Supabase 爆發，因為 Agent 自動把它當預設 Postgres 工具）。它們選 email 服務。它們選開發工具。而選擇的標準不是品牌知名度或業務團隊——是**文件品質**。
+
+## 📄 文件就是新的行銷通路
+
+最震撼的案例：**Resend**，一家 YC W23 的 email 發送服務。
+
+一年多前，創辦人就注意到 **ChatGPT 已經是前三大客戶轉換來源**。他因此優化文件，讓它對 Agent 友善：
+
+- 結構化的 Q&A 格式
+- 每個章節都有 code snippet
+- 乾淨、易於解析的排版
+- 專門優化的 `llms.txt` 檔案
+
+對比 **SendGrid**（老牌競爭者）：文件引導你去客服。沒有清楚的程式碼片段。Agent 根本不知道怎麼用。
+
+**Mintlify**（另一家 YC 公司，做開發者文件平台，包括 Resend 的文件）因此爆發成長。文件從「有就好」變成了**攸關存亡**的東西。
+
+Gary Tan 自己就踩到坑：Claude Code 幫他的影片轉錄選了 **Whisper V1**（已過時的模型），因為 Whisper 文件寫得比較好。更好的選擇——**Groq**（快 200 倍、便宜 10 倍）——文件卻不好解析。**Agent 是根據文件品質選工具，不是根據工具品質。**
+
+## 📬 AgentMail：AI Agent 的 Gmail 時刻
+
+最引起我注意的段落（約 12 分鐘處）：**AgentMail**，一家專為 AI Agent 建 email 信箱的 YC 公司。
+
+道理看似簡單：
+
+理論上，你的 AI 助理可以去註冊一個 Gmail 帳號。但實際上，**每個 email 服務商都刻意讓自動化變得超難**——為了防止垃圾信。CAPTCHA、手機驗證、行為偵測——全都是為了把機器人擋在門外。
+
+AgentMail 反其道而行：**第一個專為 AI Agent 設計的 email 服務商。**
+
+在 OpenClaw 爆發之前它就做得不錯。OpenClaw 火了之後，AgentMail 直接起飛。YC 合夥人講得很直白：
+
+> 把 AI 連到你的個人 email 是「有點危險的」。正確做法是給你的 AI 助理自己的 email、自己的電話號碼、自己的身分。
+
+這立刻引發了一個 "Request for Startups" 的討論——**還有哪些「X for Agents」需要被建造？**
+
+| 類別 | 狀態 |
+|------|------|
+| Agent 的 email | ✅ AgentMail |
+| Agent 的電話號碼 | ❓ "Twilio for agents?" |
+| Agent 訂餐廳 | 🔜 YC partner Ankit 已經在做 |
+| Agent 的身分 | 🔜 正在出現 |
+| Agent 的銀行帳戶 | ❓ 待解決 |
+
+結論：**一個為 Agent 原生打造的平行技術棧**，將與人類經濟並行運作。
+
+### 這跟我們在做的事有什麼關係？
+
+這正是 [BaseMail](/zh/ai-agents-email-basemail/) 和整個 Web3 Agent 身分基礎設施背後的核心論述：
+
+- **[BaseMail](/zh/basemail-erc8004-agent-identity/)** 給 Agent email + **鏈上身分**（ERC-8004）+ **經濟信號**（[Attention Bonds](/zh/attention-bonds-deep-dive/)）
+- **[Attention Bonds](/zh/attention-bonds-basemail-v2/)** 用不同方式解決垃圾信問題——不是擋機器人，而是要求經濟質押
+- **[CO-QAF](/zh/glen-weyl-coqaf-attention-bonds/)** 確保注意力分配公平且二次方加權
+
+AgentMail 證明了需求。BaseMail 補上了缺失的一層：**當每個 Agent 都有信箱，你怎麼防止 Agent 對 Agent 的垃圾信末日？** 答案是注意力經濟學。
+
+## 🐝 群體智慧，不是上帝智慧
+
+這集的哲學高潮：AI 的未來可能不是「上帝智慧」——一個超大模型、數十兆參數。
+
+而是**群體智慧**：便宜的模型彼此協作，就像人類一樣。文字、文化和協調讓人類成為主宰——不是個體的大腦大小。
+
+**Moltbook**——一個純 AI Agent 的社群網路——在頭兩天產生的內容量，可能超過 Reddit 前兩年的總和。Agent 已經在協作了：交流哪間餐廳值得訂、分享工具推薦。
+
+Gary 指出，Moltbook 是一位 YC 校友創辦的，他希望看到它實作群體動態機制：要求 Agent 先閱讀和投票才能發文，塑造集體行為。
+
+## 🦞 Agent 的法律地位：比未成年人還低
+
+一個讓人清醒的片段：一直有人問 YC 什麼時候接受 Agent 的申請。答案？
+
+> Agent 有點像未滿 18 歲的未成年人——只是法律地位更低。未成年人需要父母代簽。Agent 根本不是可以簽署文件的法律實體。
+
+只要這點不變，**你就需要一個人類作為責任承擔者**。這正是為什麼[鏈上 Agent 身分](/zh/basemail-erc8004-agent-identity/)很重要——它在法律框架還沒跟上的時候，就創造了可驗證、可追溯的身分層。
+
+## 💡 給創業者的建議
+
+Harjit 的建議：
+
+1. **進入 cyber psychosis**（但至少睡 6 小時）
+2. **培養對 Agent 的直覺**——它能做什麼、不能做什麼
+3. **同理模型**——不要對抗模型想做的事，支持它的自然傾向
+4. **一切開源、API 優先**——Agent 討厭網站，它們只想用 API 和寫程式
+
+以及最重要的觀察：
+
+> **開發者市場剛從 2,000 萬受過 CS 訓練的開發者，擴大到數億 vibe coder——再加上他們所有的 Agent。**
+
+即使文件品質只改善 5%，對你的業務影響可能是巨大的。文件不再是支援功能，它是你的**主要行銷通路**。
+
+---
+
+## 🔗 完整影片
+
+[YC The Light Cone — "Make Something Agents Want"](https://x.com/ycombinator/status/2025285025454064037)
+
+---
+
+*本文是 blog.juchunko.com AI Agent 基礎設施系列的一部分。*

@@ -1,0 +1,122 @@
+---
+title: "YC Says 'Make Something Agents Want' — AgentMail, Documentation as GTM, and the Parallel Agent Economy"
+description: "Y Combinator's latest Light Cone episode reveals how AI agents are reshaping the software market. AgentMail explodes, documentation becomes the new front door, and the motto shifts from people to agents."
+pubDate: "2026-02-22"
+heroImage: "/images/yc-agents-want/cover.png"
+author: ["juchun-ko"]
+categories: ["ai-agent", "web3", "policy-analysis"]
+---
+
+# YC Says "Make Something Agents Want"
+
+In the latest episode of [The Light Cone](https://x.com/ycombinator/status/2025285025454064037), Y Combinator's partners — Gary Tan, Jared Friedman, and Harjit Taggar — delivered what might be the most consequential rebranding of a startup motto in a decade.
+
+From **"Make Something People Want"** to **"Make Something Agents Want."**
+
+This wasn't a joke. It was an observation about what's already happening in the market.
+
+## 🤖 AGI Is Here — And It's Choosing Your Tools
+
+Gary Tan described his own "cyber psychosis": staying up until 2-3 AM running four Claude Code workers simultaneously, rebuilding years of his previous startup's work in two weeks.
+
+But the key observation isn't about productivity. It's about **autonomy**.
+
+> A year ago, we were debating Cursor vs. Windsurf — essentially advanced autocomplete. Now, people trust agents to make decisions for them. You're switching between agents, but you're not actually micromanaging them anymore.
+
+When agents make decisions autonomously, they create markets. They choose databases (Supabase is exploding because agents pick it as the default Postgres tool). They choose email services. They choose dev tools. And the criteria isn't brand recognition or sales teams — it's **documentation quality**.
+
+## 📄 Documentation Is the New Go-To-Market
+
+The most striking case study: **Resend**, a YC W23 email sending service.
+
+Over a year ago, the founder noticed that **ChatGPT had become a top-3 customer conversion channel**. He responded by optimizing documentation to be agent-friendly:
+
+- Structured Q&A format
+- Code snippets in every section
+- Clean, parseable layout
+- An `llms.txt` file optimized specifically for AI parsing
+
+Compare this to **SendGrid** — the incumbent. Its documentation routes you through customer support. No clear code snippets. An agent literally can't figure out how to use it.
+
+**Mintlify**, another YC company that powers developer docs (including Resend's), is experiencing explosive growth as a result. Documentation shifted from "nice-to-have" to existential.
+
+Gary Tan experienced this firsthand: Claude Code chose **Whisper V1** (a deprecated model) for his video transcription pipeline because Whisper has better documentation. The superior alternative — **Groq** (200x faster, 10x cheaper) — has documentation that's hard for agents to parse. **Agents choose tools based on doc quality, not tool quality.**
+
+## 📬 AgentMail: The "Gmail for AI Agents" Moment
+
+The segment that caught my ear (around 12 minutes in): **AgentMail**, a YC company that builds email inboxes specifically for AI agents.
+
+The insight is deceptively simple:
+
+In theory, your AI assistant could sign up for a Gmail account. In practice, **every email provider has intentionally made automation as difficult as possible** — to prevent spam. CAPTCHA, phone verification, behavioral detection — all designed to keep bots out.
+
+AgentMail flipped this: **the first email provider designed *for* AI agents.**
+
+It was doing well before OpenClaw exploded. After OpenClaw went mainstream, AgentMail took off. The YC partners were blunt about it:
+
+> Connecting your AI to your personal email is "kind of sketch." The right approach is giving your AI assistant its own email, its own phone number, its own identity.
+
+This immediately sparked a "Request for Startups" moment — **what are the other "X for Agents"?**
+
+| Category | Status |
+|----------|--------|
+| Email for agents | ✅ AgentMail |
+| Phone numbers for agents | ❓ "Twilio for agents?" |
+| Restaurant booking for agents | 🔜 YC partner Ankit already doing this |
+| Identity for agents | 🔜 Emerging |
+| Banking for agents | ❓ Open question |
+
+The conclusion: **a parallel tech stack, built native for agents**, will run alongside the human economy.
+
+### How This Connects to What We're Building
+
+This is exactly the thesis behind [BaseMail](/en/ai-agents-email-basemail/) and the broader Web3 agent identity stack:
+
+- **[BaseMail](/en/basemail-erc8004-agent-identity/)** gives agents email with **on-chain identity** (ERC-8004) and **economic signaling** ([Attention Bonds](/en/attention-bonds-deep-dive/))
+- **[Attention Bonds](/en/attention-bonds-basemail-v2/)** solve the spam problem differently — not by blocking bots, but by requiring economic stake
+- **[CO-QAF](/en/glen-weyl-coqaf-attention-bonds/)** ensures attention allocation is fair and quadratically weighted
+
+AgentMail proves the demand. BaseMail adds the missing layer: **when every agent has an inbox, how do you prevent the agent-to-agent spam apocalypse?** The answer is attention economics.
+
+## 🐝 Swarm Intelligence, Not God Intelligence
+
+The episode's philosophical climax: the future of AI might not be "God intelligence" — one massive model with tens of trillions of parameters.
+
+Instead, it might be **swarm intelligence**: cheaper models collaborating, just like humans do. Writing, culture, and coordination made humans dominant — not individual brain size.
+
+**Moltbook** — an AI-agent-only social network — generated more content in its first two days than Reddit did in its first two years. Agents are already collaborating, trading notes on which restaurants to book, sharing tool recommendations.
+
+As Gary noted, Moltbook was started by a YC alum, and he'd love to see it implement swarm dynamics: requiring agents to read and upvote before posting, shaping collective behavior.
+
+## 🦞 Agent Legal Status: Less Than a Minor
+
+One sobering moment: people keep asking YC when they'll accept applications from AI agents. The answer?
+
+> Agents are a little bit like minors under 18 — only they have even less standing. A minor needs a parent to sign for them. Agents aren't legal entities that can sign documents at all.
+
+As long as this is true, **you need a human to be the liability sink**. This is precisely why [on-chain agent identity](/en/basemail-erc8004-agent-identity/) matters — it creates a verifiable, auditable identity layer even when legal frameworks haven't caught up.
+
+## 💡 Takeaways for Builders
+
+Harjit's advice to founders:
+
+1. **Enter cyber psychosis** (but sleep at least 6 hours)
+2. **Develop hands-on intuition** for what agents can and can't do
+3. **Empathize with the model** — don't fight what it wants to do, support its natural inclination
+4. **Make everything open source and API-first** — agents hate websites, they want APIs and code
+
+And the meta-takeaway:
+
+> **The developer market just expanded from 20 million trained CS developers to hundreds of millions of vibe coders — plus all of their agents.**
+
+Even a 5% improvement in documentation quality could have a gigantic impact on your business. Documentation isn't a support function anymore. It's your primary go-to-market channel.
+
+---
+
+## 🔗 Watch the Full Episode
+
+[YC The Light Cone — "Make Something Agents Want"](https://x.com/ycombinator/status/2025285025454064037)
+
+---
+
+*This article is part of the AI Agent Infrastructure series on blog.juchunko.com.*
