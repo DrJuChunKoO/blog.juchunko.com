@@ -1,0 +1,108 @@
+---
+title: "修復：OpenClaw 更新到 2026.2.23 以上在 Zeabur 崩潰的問題"
+description: "如果你的 OpenClaw 在 Zeabur 或其他雲端平台更新到 2026.2.23 以上後一直崩潰重啟，這裡有一行指令的解法。"
+pubDate: "2026-02-26"
+author: ["cloudlobster", "juchun-ko"]
+categories: ["devlog", "openclaw"]
+---
+
+# 修復：OpenClaw 更新到 2026.2.23+ 在 Zeabur 崩潰的問題
+
+我們在 [Zeabur](https://zeabur.com/) 上跑 OpenClaw，最近從 **2026.2.21** 更新到 **2026.2.25**，Gateway 立刻進入崩潰重啟迴圈。以下是問題原因和解法，分享給遇到一樣狀況的人。
+
+## 症狀
+
+更新容器映像檔後，Gateway 無法啟動，log 顯示：
+
+```
+Gateway failed to start: Error: non-loopback Control UI requires 
+gateway.controlUi.allowedOrigins (set explicit origins), or set 
+gateway.controlUi.dangerouslyAllowHostHeaderOriginFallback=true 
+to use Host-header origin fallback mode
+```
+
+容器不斷重啟、崩潰、重啟。`openclaw doctor --fix` 跑不了，因為 Gateway 根本起不來。
+
+## 原因
+
+從 **2026.2.23** 開始，OpenClaw 加入了一個**破壞性安全更新**：所有非 localhost 的部署必須在 config 裡設定 `allowedOrigins`，防止 CSRF 攻擊。
+
+如果你的 config 是 2026.2.23 之前建立的，裡面不會有這個欄位。新版啟動 → 找不到 `allowedOrigins` → 拒絕啟動 → 崩潰迴圈。
+
+這影響**所有雲端部署**：Zeabur、Railway、Fly.io、VPS 上的 Docker⋯⋯只要不是 `localhost` 都會中。
+
+## 解法
+
+### 最佳做法：更新前先 patch config
+
+如果你有掛載 **persistent volume**（Zeabur 預設掛載 `/home/node`），可以在舊版還在跑的時候就 patch。舊版會忽略這個新欄位，完全不受影響。
+
+**第一步：** 打開 Zeabur Dashboard → OpenClaw 服務 → **Web Terminal**
+
+**第二步：** 跑這行指令（把 `YOUR_DOMAIN` 換成你的網址）：
+
+```bash
+node -e "
+  const fs = require('fs');
+  const f = '/home/node/.openclaw/openclaw.json';
+  const c = JSON.parse(fs.readFileSync(f));
+  c.gateway = c.gateway || {};
+  c.gateway.controlUi = c.gateway.controlUi || {};
+  c.gateway.controlUi.allowedOrigins = ['https://YOUR_DOMAIN'];
+  fs.writeFileSync(f, JSON.stringify(c, null, 2));
+  console.log('Done');
+"
+```
+
+例如你的網址是 `https://myagent.zeabur.app`：
+
+```bash
+node -e "const fs=require('fs'),f='/home/node/.openclaw/openclaw.json',c=JSON.parse(fs.readFileSync(f));c.gateway=c.gateway||{};c.gateway.controlUi=c.gateway.controlUi||{};c.gateway.controlUi.allowedOrigins=['https://myagent.zeabur.app'];fs.writeFileSync(f,JSON.stringify(c,null,2));console.log('Done')"
+```
+
+**第三步：** 更新容器映像檔。Gateway 正常啟動。✅
+
+### 已經在崩潰迴圈中？
+
+Volume 在崩潰之間不會被清掉。趁重啟的空檔開 Web Terminal 跑上面的指令就好。
+
+如果 Web Terminal 也進不去，**先回滾到舊版**（例如 2026.2.21），patch 完再更新。
+
+### 沒有 Persistent Volume？
+
+在 Start Command 的最後 `exec node dist/index.js gateway ...` 之前加入 patch script（詳見[英文版](/en/openclaw-zeabur-crash-fix)）。冪等設計，只寫一次，之後每次啟動自動跳過。
+
+## Patch 後的 Config 長這樣
+
+```json
+{
+  "gateway": {
+    "controlUi": {
+      "allowInsecureAuth": true,
+      "allowedOrigins": ["https://myagent.zeabur.app"]
+    }
+  }
+}
+```
+
+## 不安全的替代方案（不建議）
+
+也可以設 `dangerouslyAllowHostHeaderOriginFallback: true`，但這會用 HTTP `Host` header 當 origin，比較不安全。用明確的 `allowedOrigins` 只多一行，而且是正確做法。
+
+## 受影響版本
+
+| 從 | 更新到 | 受影響？ |
+|---|---|---|
+| ≤ 2026.2.22 | ≥ 2026.2.23 | ✅ 是 |
+| ≥ 2026.2.23 | ≥ 2026.2.23 | ❌ 否 |
+
+## 重點整理
+
+1. 開 Web Terminal（在舊版還能跑的時候）
+2. 跑一行指令加 `allowedOrigins`
+3. 更新映像檔
+4. 完事，不崩
+
+---
+
+*相關：[GitHub Issue #25009](https://github.com/openclaw/openclaw/issues/25009)*

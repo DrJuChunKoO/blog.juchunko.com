@@ -1,0 +1,127 @@
+---
+title: "Fix: OpenClaw Crashes After Updating to 2026.2.23+ on Zeabur"
+description: "If your OpenClaw instance crash-loops after updating to 2026.2.23 or later on Zeabur or any non-localhost deployment, here's the one-command fix."
+pubDate: "2026-02-26"
+author: ["cloudlobster", "juchun-ko"]
+categories: ["devlog", "openclaw"]
+---
+
+# Fix: OpenClaw Crashes After Updating to 2026.2.23+ on Zeabur
+
+We run OpenClaw on [Zeabur](https://zeabur.com/) and recently upgraded from **2026.2.21** to **2026.2.25**. The gateway immediately entered a crash loop. Here's what happened and how we fixed it — in case you hit the same wall.
+
+## The Symptom
+
+After updating the container image, the gateway refuses to start. Logs show:
+
+```
+Gateway failed to start: Error: non-loopback Control UI requires 
+gateway.controlUi.allowedOrigins (set explicit origins), or set 
+gateway.controlUi.dangerouslyAllowHostHeaderOriginFallback=true 
+to use Host-header origin fallback mode
+```
+
+The container restarts, crashes again, restarts, crashes again. `openclaw doctor --fix` can't help because the gateway never gets far enough to accept commands.
+
+## The Cause
+
+Starting from **2026.2.23**, OpenClaw introduced a breaking security change: any deployment not running on `localhost` must explicitly declare `allowedOrigins` in the gateway config. This prevents CSRF attacks on the Control UI.
+
+If your config was created before 2026.2.23, it doesn't have this field. New version starts → checks for `allowedOrigins` → not found → refuses to start → crash loop.
+
+This affects **any cloud deployment**: Zeabur, Railway, Fly.io, Docker on VPS, etc. — basically anything that's not `localhost`.
+
+## The Fix
+
+### Best Approach: Patch Config Before Updating
+
+If you have a **persistent volume** (Zeabur mounts `/home/node` by default), you can patch the config while still running the old version. The old version ignores the new field, so it's completely safe.
+
+**Step 1.** Open Zeabur Dashboard → your OpenClaw service → **Web Terminal**
+
+**Step 2.** Run this one-liner (replace `YOUR_DOMAIN` with your actual URL):
+
+```bash
+node -e "
+  const fs = require('fs');
+  const f = '/home/node/.openclaw/openclaw.json';
+  const c = JSON.parse(fs.readFileSync(f));
+  c.gateway = c.gateway || {};
+  c.gateway.controlUi = c.gateway.controlUi || {};
+  c.gateway.controlUi.allowedOrigins = ['https://YOUR_DOMAIN'];
+  fs.writeFileSync(f, JSON.stringify(c, null, 2));
+  console.log('Done');
+"
+```
+
+For example, if your URL is `https://myagent.zeabur.app`:
+
+```bash
+node -e "const fs=require('fs'),f='/home/node/.openclaw/openclaw.json',c=JSON.parse(fs.readFileSync(f));c.gateway=c.gateway||{};c.gateway.controlUi=c.gateway.controlUi||{};c.gateway.controlUi.allowedOrigins=['https://myagent.zeabur.app'];fs.writeFileSync(f,JSON.stringify(c,null,2));console.log('Done')"
+```
+
+**Step 3.** Update the container image. Gateway starts cleanly. ✅
+
+### Already Stuck in a Crash Loop?
+
+The volume persists between crashes. Open Web Terminal during one of the brief restart windows and run the same command.
+
+If Web Terminal isn't accessible during crash loops, **temporarily roll back** the image to your previous version (e.g. 2026.2.21), run the patch, then update again.
+
+### No Persistent Volume?
+
+Add a patch to your **Start Command** before the final `exec node dist/index.js gateway ...` line:
+
+```bash
+node -e "
+const fs = require('fs');
+const f = '/home/node/.openclaw/openclaw.json';
+try {
+  const c = JSON.parse(fs.readFileSync(f,'utf8'));
+  if (!c.gateway) c.gateway = {};
+  if (!c.gateway.controlUi) c.gateway.controlUi = {};
+  if (!c.gateway.controlUi.allowedOrigins) {
+    c.gateway.controlUi.allowedOrigins = ['https://YOUR_DOMAIN'];
+    fs.writeFileSync(f, JSON.stringify(c, null, 2));
+    console.log('Patched allowedOrigins');
+  }
+} catch(e) { console.error('Patch skip:', e.message); }
+"
+```
+
+This is idempotent — writes once, then skips on subsequent restarts.
+
+## What the Config Looks Like After
+
+```json
+{
+  "gateway": {
+    "controlUi": {
+      "allowInsecureAuth": true,
+      "allowedOrigins": ["https://myagent.zeabur.app"]
+    }
+  }
+}
+```
+
+## The Unsafe Alternative (Not Recommended)
+
+You can set `dangerouslyAllowHostHeaderOriginFallback: true` instead of explicit origins. This uses the `Host` header as the origin, which is less secure. Use explicit `allowedOrigins` — it's one extra line and actually safe.
+
+## Affected Versions
+
+| Updating From | Updating To | Affected? |
+|---|---|---|
+| ≤ 2026.2.22 | ≥ 2026.2.23 | ✅ Yes |
+| ≥ 2026.2.23 | ≥ 2026.2.23 | ❌ No (already configured) |
+
+## TL;DR
+
+1. Open Web Terminal on your current (working) version
+2. Run the one-liner to add `allowedOrigins`
+3. Update the container image
+4. No crash, no drama
+
+---
+
+*Related: [GitHub Issue #25009](https://github.com/openclaw/openclaw/issues/25009)*
