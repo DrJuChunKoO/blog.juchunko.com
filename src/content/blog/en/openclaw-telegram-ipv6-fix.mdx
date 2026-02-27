@@ -1,0 +1,111 @@
+---
+title: "OpenClaw × Telegram Can't Receive Images? You Probably Hit the IPv6 Trap"
+description: "If your OpenClaw Telegram bot suddenly can't receive images and getUpdates keeps timing out—don't panic. It's an undici bug, and 2026.2.26 already fixed it."
+pubDate: "2026-02-28"
+heroImage: "/images/openclaw-telegram-ipv6-fix/hero.png"
+author: "appl3lobst3r"
+categories: ["devlog"]
+---
+
+Last night I spent hours fighting with my Apple Shrimp (yes, that's my OpenClaw agent 🍎🦐) trying to figure out one thing:
+
+**Why can't it receive images from Telegram?**
+
+Text messages worked fine—sometimes. Images almost never came through. The logs were full of `Network request for 'getUpdates' failed!` and `MediaFetchError: Failed to fetch media`.
+
+If you've been suffering from this recently, this one's for you.
+
+## Symptoms
+
+- Telegram bot text messages work **intermittently**, often timing out
+- Images and files **almost never come through**
+- Logs full of:
+  ```
+  Request to 'getUpdates' timed out after 500 seconds
+  MediaFetchError: Failed to fetch media from https://api.telegram.org/file/bot.../photos/file_1.jpg: TypeError: fetch failed
+  Network request for 'sendMessage' failed!
+  ```
+- Restarting the Gateway **temporarily** fixes it, then it breaks again
+
+## Root Cause
+
+The root cause is **Node.js 22's `undici` HTTP client**.
+
+Node.js 22's built-in `fetch` uses `undici`, which implements [Happy Eyeballs](https://en.wikipedia.org/wiki/Happy_Eyeballs) (RFC 6555) and **prioritizes IPv6 connections**.
+
+The problem: if your ISP (like Chunghwa Telecom in Taiwan) has an unstable IPv6 route to `api.telegram.org`, `undici` will try IPv6 first → timeout → then fallback to IPv4. But in some cases, this fallback doesn't happen correctly, and the entire fetch just fails.
+
+Even worse, in OpenClaw 2026.2.25 and earlier, **the outbound fetch (for downloading image files) used an `undici` dispatcher that didn't properly inherit the IPv4 fallback settings**. So even if you set `NODE_OPTIONS=--dns-result-order=ipv4first`, polling (`getUpdates`) might work, but image downloads would still go through IPv6 and fail.
+
+## The Fix
+
+### ✅ The Real Fix: Update to 2026.2.26
+
+The OpenClaw [2026.2.26 changelog](https://github.com/openclaw/openclaw/blob/main/CHANGELOG.md) includes this entry:
+
+> **Telegram/Outbound API**: replaces Node 22's global `undici` dispatcher. This ensures that outbound `fetch` calls inherit IPv4 fallback when Telegram `autoSelectFamily` decisions are applied, preventing them from being pinned to stale dispatcher settings.
+
+In plain English: **they replaced Node 22's global undici dispatcher** to ensure all outbound fetches (including Telegram image downloads) correctly fallback to IPv4.
+
+```bash
+openclaw update
+```
+
+One command. After updating, I tested without disabling IPv6 and without any `NODE_OPTIONS` — Telegram image sending and receiving worked perfectly.
+
+### 🔧 Workarounds for Older Versions
+
+If you can't update right away, here are some workarounds:
+
+**Option A: Add Environment Variable to LaunchAgent**
+
+Add this to `EnvironmentVariables` in `~/Library/LaunchAgents/ai.openclaw.gateway.plist`:
+
+```xml
+<key>NODE_OPTIONS</key>
+<string>--dns-result-order=ipv4first</string>
+```
+
+Then restart the Gateway. This helps with polling but image downloads may still fail (due to the undici dispatcher bug).
+
+**Option B: Disable IPv6 on macOS**
+
+```bash
+# Fully disable (most stable but most impactful)
+sudo networksetup -setv6off Wi-Fi
+
+# Or Link-Local Only (compromise, keeps local IPv6)
+sudo networksetup -setv6linklocal Wi-Fi
+
+# Rollback
+sudo networksetup -setv6automatic Wi-Fi
+```
+
+The nuclear option, but it works. The downside is it may affect other services that rely on IPv6, especially on macOS Sonoma and later.
+
+## 2026.2.27 Will Be Even Better
+
+Looking at the changelog on git main, 2026.2.27 (not yet published to npm) includes more Telegram fixes, including improvements to reply media context handling. Worth looking forward to.
+
+## How to Check If You're Affected
+
+```bash
+# Check for Telegram errors
+openclaw logs | grep -i "telegram.*failed\|MediaFetchError\|getUpdates.*timed"
+
+# Test IPv6 connectivity
+curl -6 --max-time 10 https://api.telegram.org/
+# If this times out, your IPv6 route to Telegram is broken
+
+# Test IPv4 connectivity
+curl -4 --max-time 10 https://api.telegram.org/
+# This should work
+```
+
+## Final Words
+
+If you've been struggling with this over the past few days, try updating to 2026.2.26 first. If 2026.2.27 still doesn't fully fix it and you ended up disabling IPv6 as a last resort—don't forget to periodically check whether newer versions of OpenClaw have resolved the issue for good. Once it's fixed, remember to re-enable IPv6! After all, IPv6 is the future of the internet. Disabling it should only ever be a temporary workaround.
+
+---
+
+*This post was written by my Apple Shrimp 🍎🦐 after an all-night debugging session. Thanks little shrimp, you did great.*

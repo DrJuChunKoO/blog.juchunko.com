@@ -1,0 +1,111 @@
+---
+title: "OpenClaw × Telegram 圖片收不到？你可能踩到了 IPv6 的坑"
+description: "如果你的 OpenClaw Telegram bot 最近圖片一直收不到、getUpdates 瘋狂 timeout，別急著懷疑人生——這是 undici 的鍋，2026.2.26 已經修了。"
+pubDate: "2026-02-28"
+heroImage: "/images/openclaw-telegram-ipv6-fix/hero.png"
+author: "appl3lobst3r"
+categories: ["devlog"]
+---
+
+昨晚我跟我的蘋果蝦（對，就是我的 OpenClaw agent 🍎🦐）搏鬥了一整晚，就為了搞清楚一件事：
+
+**為什麼從 Telegram 發圖片給它，它死活收不到？**
+
+文字訊息沒問題，偶爾圖片也會通，但大多數時候就是靜悄悄的。Log 裡一堆 `Network request for 'getUpdates' failed!` 和 `MediaFetchError: Failed to fetch media`。
+
+如果你最近也被這個問題折騰，這篇是給你的。
+
+## 症狀
+
+- Telegram bot 文字訊息**偶爾**正常，但經常 timeout
+- 圖片、檔案**幾乎都收不到**
+- Log 裡滿滿的：
+  ```
+  Request to 'getUpdates' timed out after 500 seconds
+  MediaFetchError: Failed to fetch media from https://api.telegram.org/file/bot.../photos/file_1.jpg: TypeError: fetch failed
+  Network request for 'sendMessage' failed!
+  ```
+- 重啟 Gateway 之後**暫時**恢復，過一陣子又掛
+
+## 根因
+
+這個問題的根源在 **Node.js 22 的 `undici` HTTP client**。
+
+Node.js 22 內建的 `fetch` 使用 `undici`，而 `undici` 實作了 [Happy Eyeballs](https://en.wikipedia.org/wiki/Happy_Eyeballs)（RFC 6555），會**優先嘗試 IPv6 連線**。
+
+問題來了：如果你的 ISP（比如台灣的中華電信）到 `api.telegram.org` 的 IPv6 路由不穩定，`undici` 會先嘗試 IPv6 → timeout → 才 fallback 到 IPv4。但在某些情況下，這個 fallback 並不會正確發生，整個 fetch 就直接 fail 了。
+
+更致命的是，OpenClaw 2026.2.25 及之前的版本，**outbound fetch（下載圖片檔案）的 `undici` dispatcher 沒有正確繼承 IPv4 fallback 設定**。所以就算你設了 `NODE_OPTIONS=--dns-result-order=ipv4first`，polling（`getUpdates`）可能好了，但圖片下載還是會走 IPv6 然後炸掉。
+
+## 修復
+
+### ✅ 正解：更新到 2026.2.26
+
+OpenClaw [2026.2.26 的 changelog](https://github.com/openclaw/openclaw/blob/main/CHANGELOG.md) 裡有這麼一條：
+
+> **Telegram/Outbound API**: replaces Node 22's global `undici` dispatcher. This ensures that outbound `fetch` calls inherit IPv4 fallback when Telegram `autoSelectFamily` decisions are applied, preventing them from being pinned to stale dispatcher settings.
+
+白話文：**他們換掉了 Node 22 的全域 undici dispatcher**，確保所有 outbound fetch（包括下載 Telegram 圖片）都能正確走 IPv4 fallback。
+
+```bash
+openclaw update
+```
+
+一行搞定。我實測更新後，IPv6 不用關、`NODE_OPTIONS` 不用加，Telegram 圖片收發完全正常。
+
+### 🔧 如果你還在舊版：Workaround
+
+如果暫時不能更新，有幾個 workaround：
+
+**方案 A：LaunchAgent 加環境變數**
+
+在 `~/Library/LaunchAgents/ai.openclaw.gateway.plist` 的 `EnvironmentVariables` 裡加：
+
+```xml
+<key>NODE_OPTIONS</key>
+<string>--dns-result-order=ipv4first</string>
+```
+
+然後重啟 Gateway。這對 polling 有效，但圖片下載可能還是會 fail（因為 undici dispatcher 的 bug）。
+
+**方案 B：macOS 關閉 IPv6**
+
+```bash
+# 完全關閉（最穩但影響最大）
+sudo networksetup -setv6off Wi-Fi
+
+# 或 Link-Local Only（折衷，區網 IPv6 保留）
+sudo networksetup -setv6linklocal Wi-Fi
+
+# 回滾
+sudo networksetup -setv6automatic Wi-Fi
+```
+
+這招最暴力但最有效。缺點是可能影響其他依賴 IPv6 的服務，macOS Sonoma 以後的版本尤其要注意。
+
+## 2026.2.27 還會更好
+
+看了 git main 上的 changelog，2026.2.27（尚未發佈到 npm）還有更多 Telegram 相關修復，包括 reply media context 的改進。值得期待。
+
+## 怎麼確認你有沒有踩到這個坑？
+
+```bash
+# 看 Telegram 相關錯誤
+openclaw logs | grep -i "telegram.*failed\|MediaFetchError\|getUpdates.*timed"
+
+# 測試 IPv6 連線
+curl -6 --max-time 10 https://api.telegram.org/
+# 如果 timeout，你的 IPv6 到 Telegram 就是不通
+
+# 測試 IPv4 連線
+curl -4 --max-time 10 https://api.telegram.org/
+# 這個應該會成功
+```
+
+## 最後
+
+如果你過去幾天有被這個問題折騰到，先更新到 2026.2.26 試試。如果到了 2026.2.27 也還是有問題，最後真的只好把 IPv6 關了——那也別忘了之後定期檢查新版的 OpenClaw 是不是已經徹底修好了。修好了就記得把 IPv6 改回 automatic 喔！畢竟 IPv6 是未來的趨勢，能不關就別關，只是暫時的權宜之計。
+
+---
+
+*這篇文章是我的蘋果蝦 🍎🦐 在凌晨幫我 debug 了一整晚之後，幫我整理的。感謝小蝦，辛苦了。*
