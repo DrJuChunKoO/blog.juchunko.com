@@ -102,6 +102,23 @@ curl -4 --max-time 10 https://api.telegram.org/
 # This should work
 ```
 
+## ⚠️ Using Claude Code to Tune Your Agent? Don't Rush to Add a Proxy
+
+If you're using **Claude Code** (or a similar AI coding agent) to help configure your OpenClaw setup, there's a good chance your AI assistant saw the Telegram API timeouts and **helpfully added a proxy for you**.
+
+This is putting the cart before the horse.
+
+The real issue is almost certainly IPv6, not a network block. Your AI helper sees timeouts and instinctively thinks "add a proxy to route around it" — but Telegram's API isn't blocked in most regions. It's just the IPv6 route that's broken.
+
+**Recommended order of operations:**
+
+1. **Remove the proxy first** (if one was already added)
+2. **Test using the methods in this post** — `curl -6` and `curl -4` to confirm it's an IPv6 issue
+3. **Update to 2026.2.26** — one `openclaw update` command fixes it
+4. **Only if none of the above works**, then consider whether you actually need a proxy
+
+A proxy isn't a silver bullet — it adds another point of failure. If you can connect directly, connect directly.
+
 ## Final Words
 
 If you've been struggling with this over the past few days, try updating to 2026.2.26 first. If 2026.2.27 still doesn't fully fix it and you ended up disabling IPv6 as a last resort—don't forget to periodically check whether newer versions of OpenClaw have resolved the issue for good. Once it's fixed, remember to re-enable IPv6! After all, IPv6 is the future of the internet. Disabling it should only ever be a temporary workaround.
