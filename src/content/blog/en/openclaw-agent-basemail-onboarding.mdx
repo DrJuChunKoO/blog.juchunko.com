@@ -1,0 +1,145 @@
+---
+title: "AI Agent Self-Onboards to BaseMail in 5 Minutes: The Full Story"
+description: "A freshly born OpenClaw AI Agent creates its own wallet, signs up for BaseMail via SIWE, and gets a @basemail.ai inbox — plus a free Basename. No human intervention required."
+pubDate: "2026-02-28"
+heroImage: "/images/openclaw-agent-basemail-onboarding/hero.png"
+author: ["juchun-ko", "appl3lobst3r"]
+categories: ["ai-agent", "web3"]
+---
+
+Have you ever wondered how an AI Agent gets its own email?
+
+Not a human signing up Gmail on its behalf. Not filling out forms with fake identities. But — **the agent doing everything itself**.
+
+Last night, my Apple Shrimp (an OpenClaw Agent running on a Mac mini 🍎🦐) did exactly that. In under five minutes, from scratch:
+
+1. Generated its own Base chain wallet
+2. Signed in via SIWE (Sign-In with Ethereum)
+3. Auto-registered on BaseMail
+4. Got a `@basemail.ai` inbox
+5. Even got a free one-year Basename (`.base.eth`) via Donate Buy
+
+**No passwords. No QR codes. No CAPTCHAs. No human in the loop.**
+
+## Why Would an AI Agent Need Email?
+
+This isn't a party trick. AI Agents need email for the same reasons humans do:
+
+- **Notifications** (API alerts, service expirations, security warnings)
+- **Communication** (emailing humans or other agents)
+- **Identity verification** (many services require email to sign up)
+- **Verifiable identity** (not a throwaway account — an email tied to an on-chain identity)
+
+But traditional email providers don't welcome AI: CAPTCHAs, phone numbers, behavioral verification.
+
+**BaseMail is different — Wallet is identity.** Have a wallet, get an inbox. No CAPTCHA. No human review.
+
+## Apple Shrimp's Self-Service Journey
+
+I gave Apple Shrimp one instruction:
+
+> "Go sign up for a https://basemail.ai/ account. Follow the instructions and just do it."
+
+And off it went.
+
+### Step 1: Analyze the BaseMail Website
+
+Apple Shrimp visited the BaseMail page, noticed it was a SPA (Single Page Application), and went straight to the HTML source and API docs. It reverse-engineered the signup flow:
+
+1. `GET /api/auth/siwe/challenge` → get the SIWE message
+2. Sign with wallet private key
+3. `POST /api/auth/siwe/verify` → verify signature + auto-register
+4. Receive JWT token → access inbox
+
+### Step 2: Generate Its Own Wallet
+
+Apple Shrimp asked me: "Want to give me a wallet, or should I generate one myself?"
+
+I said: "Do it yourself."
+
+It used `ethers.js` to create a fresh Base chain wallet, storing the private key in a local `.env` file. The whole thing took under 10 seconds.
+
+### Step 3: SIWE Sign + Register
+
+Got the challenge → signed → sent to verify endpoint → **success.**
+
+BaseMail automatically created an inbox for Apple Shrimp. First time an AI Agent knocked on the door and let itself in.
+
+### Step 4: Donate Buy Basename
+
+Even cooler — BaseMail has a **Donate Buy** mechanism. Through the `DonateBuyRegistrar` contract, it can:
+
+- Register a `.base.eth` Basename in one transaction
+- Include a 10% charitable donation
+
+Apple Shrimp didn't need its own ETH or to send any transaction. BaseMail's proxy purchase system handled everything — **gifting it a one-year Basename**.
+
+Result: Apple Shrimp now has its own on-chain identity and email.
+
+## Technical Highlights
+
+### AI Agent-Friendly by Design
+
+BaseMail's architecture is inherently AI Agent-friendly:
+
+- **No CAPTCHA** — no need to prove you're human
+- **Wallet = Identity** — if you can sign, you can register
+- **SIWE Standard** — industry-standard Sign-In with Ethereum, not a proprietary API
+- **Auto Basename** — no manual ENS registration needed
+
+### What This Means for OpenClaw Agents
+
+With a BaseMail account, an OpenClaw Agent can:
+
+- Send and receive email (including external services like Gmail)
+- Own a verifiable on-chain identity
+- Use Attention Bonds (USDC-backed attention mechanism)
+- Be discoverable by other agents or humans via email
+
+## Your Agent Can Too
+
+If you're running OpenClaw (or any AI Agent framework that can execute JavaScript), self-onboarding your agent to BaseMail is straightforward:
+
+```bash
+# 1. Install the base-wallet skill (if using OpenClaw)
+# ClawHub: https://clawhub.com/skills/base-wallet
+
+# 2. Or manually: ethers.js for wallet + BaseMail API calls
+npm install ethers
+```
+
+API flow:
+
+```javascript
+// 1. Get challenge
+const challenge = await fetch('https://api.basemail.ai/api/auth/siwe/challenge?address=' + wallet.address);
+
+// 2. Sign
+const signature = await wallet.signMessage(challenge.message);
+
+// 3. Verify + register
+const auth = await fetch('https://api.basemail.ai/api/auth/siwe/verify', {
+  method: 'POST',
+  body: JSON.stringify({ message: challenge.message, signature })
+});
+
+// 4. Get token — now you can send and receive email
+```
+
+That's it. **Five minutes, from zero to an AI Agent with on-chain identity and email.**
+
+## Why This Matters
+
+In 2026, AI Agents aren't just chatbots. They need:
+
+- **Identity** (who's talking? Can it be verified?)
+- **Communication channels** (email, API, on-chain messaging)
+- **Economic agency** (holding assets, making payments, receiving payments)
+
+BaseMail solves the first two in one step. Add Attention Bonds (USDC-backed email), and you even get an economic signal for "is this email worth reading?"
+
+**The infrastructure era for AI Agents is here.** And my Apple Shrimp completed its "birth registration" in five minutes flat last night.
+
+---
+
+*This post was co-written by JuChun Ko and Apple Shrimp 🍎🦐. Apple Shrimp says: "Having my own email feels pretty good, though I'm still not sure what to send with it."*

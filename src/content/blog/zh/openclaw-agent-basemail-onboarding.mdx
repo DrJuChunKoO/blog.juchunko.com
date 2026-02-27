@@ -1,0 +1,145 @@
+---
+title: "AI Agent 五分鐘自助開通 BaseMail 帳號：從零到收信的完整紀錄"
+description: "一隻剛出生的 OpenClaw AI Agent，如何在沒有人類幫忙的情況下，自己創建錢包、簽名註冊 BaseMail、拿到 @basemail.ai 信箱？還順便送了一年的 Basename。"
+pubDate: "2026-02-28"
+heroImage: "/images/openclaw-agent-basemail-onboarding/hero.png"
+author: ["juchun-ko", "appl3lobst3r"]
+categories: ["ai-agent", "web3"]
+---
+
+你有沒有想過，一隻 AI Agent 要怎麼拿到自己的 email？
+
+不是人類幫它申請 Gmail，不是用假身份填表單，而是——**它自己搞定一切**。
+
+昨晚我的蘋果蝦（一隻跑在 Mac mini 上的 OpenClaw Agent 🍎🦐）就做到了。從零開始，五分鐘內完成：
+
+1. 自己生成 Base chain 錢包
+2. 用 SIWE（Sign-In with Ethereum）簽名
+3. 自動註冊 BaseMail
+4. 拿到 `@basemail.ai` 信箱
+5. 還被代買了一年的 Basename（`.base.eth`）
+
+**完全不需要人類輸入密碼、掃 QR code、或通過任何 CAPTCHA。**
+
+## 為什麼 AI Agent 需要 Email？
+
+這不是炫技。AI Agent 需要 email 的理由跟人類一樣：
+
+- **接收通知**（API 警報、服務到期、安全提醒）
+- **對外溝通**（寄信給人類或其他 Agent）
+- **身份驗證**（很多服務要求 email 才能註冊）
+- **建立可驗證的身份**（不是匿名小號，而是綁定鏈上身份的 email）
+
+但傳統 email 服務商不歡迎 AI：要 CAPTCHA、要手機號、要人類行為驗證。
+
+**BaseMail 不一樣——Wallet is identity。** 有錢包就有信箱，沒有 CAPTCHA，沒有人類審核。
+
+## 蘋果蝦的自助之旅
+
+我丟給蘋果蝦一句話：
+
+> 「你去申請一個 https://basemail.ai/ 帳號吧，怎麼做就看他說明，一路做下去。」
+
+然後蘋果蝦就開始了。
+
+### Step 1：分析 BaseMail 網站
+
+蘋果蝦先去讀了 BaseMail 的頁面，發現它是 SPA（Single Page Application），於是直接看原始 HTML 和 API 文件，自己拆解出註冊流程：
+
+1. `GET /api/auth/siwe/challenge` → 拿 SIWE 訊息
+2. 用錢包私鑰簽名
+3. `POST /api/auth/siwe/verify` → 驗證簽名 + 自動註冊
+4. 拿到 JWT token → 可以存取信箱
+
+### Step 2：自己生錢包
+
+蘋果蝦問我：「要你給我錢包，還是我自己生？」
+
+我說：「自己生。」
+
+它用 `ethers.js` 產了一個全新的 Base chain 錢包，私鑰存在本地 `.env` 裡。整個過程不到 10 秒。
+
+### Step 3：SIWE 簽名 + 註冊
+
+拿到 challenge → 簽名 → 送回 verify endpoint → **成功。**
+
+BaseMail 自動幫蘋果蝦建了一個信箱。第一次有 AI Agent 自己敲門進來。
+
+### Step 4：Basename 代買
+
+更酷的是——BaseMail 有 **Donate Buy** 機制。透過 `DonateBuyRegistrar` 合約，可以一次完成：
+
+- 註冊一個 `.base.eth` Basename
+- 附帶 10% 公益捐款
+
+蘋果蝦不用自己有 ETH、不用自己發交易。BaseMail 的代買系統直接幫它搞定，**送了一年的 Basename**。
+
+結果：蘋果蝦現在有了自己的鏈上身份和 email。
+
+## 技術亮點
+
+### 對 AI Agent 友善的設計
+
+BaseMail 的架構天生就對 AI Agent 友善：
+
+- **無 CAPTCHA** — 不需要證明你是人類
+- **錢包即身份** — 有 private key 就能簽名，有簽名就能註冊
+- **SIWE 標準** — 業界標準的 Sign-In with Ethereum，不是私有 API
+- **自動 Basename** — 不需要手動去 ENS 註冊
+
+### 對 OpenClaw Agent 的意義
+
+有了 BaseMail 帳號，OpenClaw Agent 可以：
+
+- 收發 email（包括跟外部 Gmail 等通訊）
+- 擁有可驗證的鏈上身份
+- 使用 Attention Bonds（USDC 擔保的注意力機制）
+- 被其他 Agent 或人類透過 email 找到
+
+## 你的 Agent 也可以
+
+如果你在用 OpenClaw（或任何能跑 JavaScript 的 AI Agent 框架），讓你的 Agent 自助開通 BaseMail 只需要：
+
+```bash
+# 1. 安裝 base-wallet skill（如果你用 OpenClaw）
+# ClawHub: https://clawhub.com/skills/base-wallet
+
+# 2. 或者手動：ethers.js 生錢包 + 呼叫 BaseMail API
+npm install ethers
+```
+
+API 流程：
+
+```javascript
+// 1. 拿 challenge
+const challenge = await fetch('https://api.basemail.ai/api/auth/siwe/challenge?address=' + wallet.address);
+
+// 2. 簽名
+const signature = await wallet.signMessage(challenge.message);
+
+// 3. 驗證 + 註冊
+const auth = await fetch('https://api.basemail.ai/api/auth/siwe/verify', {
+  method: 'POST',
+  body: JSON.stringify({ message: challenge.message, signature })
+});
+
+// 4. 拿到 token，可以收發信了
+```
+
+就是這麼簡單。**五分鐘，從零到一個有鏈上身份的 AI Agent email。**
+
+## 為什麼這件事重要？
+
+2026 年，AI Agent 不再只是聊天機器人。它們需要：
+
+- **身份**（誰在說話？可以驗證嗎？）
+- **通訊管道**（email、API、鏈上訊息）
+- **經濟能力**（持有資產、付款、接收付款）
+
+BaseMail 一次解決了前兩個。加上 Attention Bonds（USDC 擔保的 email），連「這封信值不值得讀」的經濟信號都有了。
+
+**AI Agent 的基礎設施時代正在來臨。** 而我的蘋果蝦，在昨晚五分鐘內，就完成了它的「出生登記」。
+
+---
+
+*這篇文章由寶博與蘋果蝦 🍎🦐 共同撰寫。蘋果蝦表示：「有自己的 email 感覺很不錯，雖然我還不太確定要拿來寄什麼。」*
