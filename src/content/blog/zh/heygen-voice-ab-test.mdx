@@ -1,0 +1,123 @@
+---
+title: "HeyGen 數位人語音 A/B 測試：找到最自然的 AI 分身聲音"
+description: "我們花了一個早上做了 8 組 HeyGen 語音參數測試，從 speed、emotion、language 到英文斷句技巧，找出讓 AI 分身說話最自然的黃金組合。"
+pubDate: "2026-02-28"
+heroImage: "/images/heygen-voice-ab-test/cover.png"
+author: ["juchun-ko"]
+categories: ["ai-agent", "devlog"]
+---
+
+# HeyGen 數位人語音 A/B 測試：找到最自然的 AI 分身聲音
+
+每天早上六點，我的 AI Agent [小龍蝦](https://x.com/littl3lobst3r) 會自動幫我生成一段名人名言影片——用我的 HeyGen 數位人 avatar 說出來，再加上 ZapCap AI 字幕，發到我的 LINE。
+
+這個流程跑了快一個月，效果一直不錯。但最近我發現，**影片裡的「我」講話越來越不自然了**——中文有奇怪的斷點，英文發音也走調。
+
+於是，我跟小龍蝦花了一個早上，做了一場嚴謹的 A/B 測試。
+
+---
+
+## 問題在哪？
+
+HeyGen 的 API 生成影片時，有兩種語音方案：
+
+1. **HeyGen 內建 TTS**：傳文字給 API，HeyGen 自動語音合成
+2. **外部音訊驅動**：用 ElevenLabs 等 TTS 先生成音訊，再餵給 HeyGen 做嘴型同步
+
+我一開始用的是方案 1（HeyGen TTS），用自己訓練的 clone voice（JCKOV1，voice_id: `102b19ecd46b444c8098a33c8d8eb37f`）。問題是，這個 voice 在 HeyGen 系統裡被標記為 `language: "English"`，所以念中文時會不太標準。
+
+## 測試矩陣
+
+我們總共測試了 8 個版本：
+
+| 版本 | speed | emotion | language | 音訊來源 | 英文斷句 |
+|------|-------|---------|----------|---------|---------|
+| 基準 | 1.0 | — | — | HeyGen TTS | 原句 |
+| A | 0.95 | — | zh | HeyGen TTS | 原句 |
+| B | 0.9 | — | — | HeyGen TTS | 原句 |
+| C | 0.95 | Friendly | — | HeyGen TTS | 原句 |
+| D | 0.95 | Friendly | zh | HeyGen TTS | 原句 |
+| E1 | 0.98 | Friendly | zh | HeyGen TTS | 原句 |
+| **E2** ⭐ | **0.98** | **Friendly** | **en** | **HeyGen TTS** | **原句** |
+| F | 0.98 | Friendly | zh | HeyGen TTS | 口語化 |
+| F2 | 0.98 | Friendly | en | HeyGen TTS | 口語化 |
+| Audio | — | — | — | ElevenLabs mp3 | — |
+
+## 關鍵發現
+
+### 1. `language: "en"` 比 `"zh"` 好（即使內容是中文）
+
+這是最反直覺的發現。我的 clone voice 原始訓練素材是英文為主，所以即使要念中文，設定 `language: "en"` 反而讓語音引擎的表現更穩定。
+
+設 `"zh"` 時，引擎似乎會嘗試「調整」發音以適應中文音韻，結果反而弄巧成拙。
+
+### 2. `speed: 0.98` 是甜蜜點
+
+- `1.0`（預設）：稍微趕，像在念稿
+- `0.98`：最接近自然說話的節奏
+- `0.95`：開始有點慢，像在刻意放慢
+- `0.9`：明顯太慢
+
+### 3. `emotion: "Friendly"` 有效果
+
+有趣的是，HeyGen API 回傳的 voice 屬性裡，`emotion_support` 標記為 `false`。但實際測試時，加了 `"Friendly"` 的版本聽起來確實更溫暖、更像在跟人說話。
+
+可用選項：`Excited`、`Friendly`、`Serious`、`Soothing`、`Broadcaster`、`Angry`
+
+### 4. 英文斷句很重要
+
+這個看起來很小的細節，影響其實很大。
+
+**不好的斷句：**
+```
+Success is not final, failure is not fatal, it is the courage to continue that counts.
+```
+
+**好的斷句（口語化）：**
+```
+Success, is not final. Failure, is not fatal. It is the courage, to continue, that counts.
+```
+
+用逗號創造自然停頓，讓 TTS 引擎知道在哪裡換氣。寫給 TTS 的文字不是「正確的英文」，而是「講話的英文」。
+
+### 5. ElevenLabs 外部音訊方案——不是最佳解
+
+我們也測試了把 ElevenLabs 生成的 mp3 用 `voice.type: "audio"` 餵給 HeyGen。結果是語音更流暢了，但嘴型同步的匹配度下降，整體不如 HeyGen TTS + 正確參數的版本。
+
+## 最終設定（E2 版）
+
+```python
+voice_config = {
+    "type": "text",
+    "input_text": script,
+    "voice_id": "102b19ecd46b444c8098a33c8d8eb37f",  # JCKOV1
+    "speed": 0.98,
+    "emotion": "Friendly",
+    "language": "en"
+}
+```
+
+Avatar: JCKOV1 (`838320ce7ca646d3a6306c098c7ee89b`)
+
+## 完整工作流程
+
+我們的每日名言影片流程：
+
+1. **語音生成**：ElevenLabs（sag CLI）生成寶博聲音朗讀名言
+2. **封面圖**：Gemini 生成名言封面圖
+3. **靜態影片**：ffmpeg 合成封面圖 + 語音
+4. **數位人影片**：HeyGen API（E2 參數）生成 avatar 影片
+5. **AI 字幕**：ZapCap 自動加字幕 + 修正名字錯字
+6. **發送**：三件套（語音 + 靜態影片 + 字幕版影片）送到 LINE
+
+全部由 AI Agent 自動執行，每天早上六點準時送達。
+
+## 結論
+
+AI 語音合成已經很強了，但「很強」和「自然」之間還有一段距離。這段距離往往藏在那些看起來不起眼的參數裡——speed 差 0.02、language 設 en 不是 zh、英文逗號放在對的位置。
+
+如果你也在用 HeyGen 做 AI 數位人影片，別用預設值。花一個早上做 A/B 測試，找到屬於你的聲音的最佳參數。
+
+---
+
+*本文由 AI Agent 🦞 Littl3Lobst3r 協助撰寫與測試。Avatar 和 voice clone 訓練於 HeyGen 平台。*

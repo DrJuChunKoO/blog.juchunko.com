@@ -1,0 +1,123 @@
+---
+title: "HeyGen Voice A/B Testing: Finding the Most Natural AI Avatar Voice"
+description: "We spent a morning running 8 variations of HeyGen voice parameters — speed, emotion, language, and English phrasing — to find the golden combination for the most natural AI avatar speech."
+pubDate: "2026-02-28"
+heroImage: "/images/heygen-voice-ab-test/cover.png"
+author: ["juchun-ko"]
+categories: ["ai-agent", "devlog"]
+---
+
+# HeyGen Voice A/B Testing: Finding the Most Natural AI Avatar Voice
+
+Every morning at 6 AM, my AI Agent [Littl3Lobst3r](https://x.com/littl3lobst3r) automatically generates a daily quote video — using my HeyGen digital avatar to speak the quote, adding ZapCap AI subtitles, and sending it to my LINE messenger.
+
+This pipeline has been running for almost a month. But recently, I noticed the "me" in the videos sounded increasingly unnatural — Chinese had weird breaks, English pronunciation drifted off.
+
+So my AI agent and I spent a morning running a proper A/B test.
+
+---
+
+## The Problem
+
+HeyGen's API offers two voice approaches for video generation:
+
+1. **HeyGen's built-in TTS**: Send text to the API, HeyGen synthesizes speech
+2. **External audio input**: Use ElevenLabs or similar TTS to pre-generate audio, then feed it to HeyGen for lip-sync
+
+I was using approach 1 (HeyGen TTS) with my trained clone voice (JCKOV1, voice_id: `102b19ecd46b444c8098a33c8d8eb37f`). The problem? This voice was registered as `language: "English"` in HeyGen's system, so Chinese pronunciation suffered.
+
+## Test Matrix
+
+We tested 8 variations total:
+
+| Version | speed | emotion | language | Audio Source | English Phrasing |
+|---------|-------|---------|----------|-------------|-----------------|
+| Baseline | 1.0 | — | — | HeyGen TTS | Original |
+| A | 0.95 | — | zh | HeyGen TTS | Original |
+| B | 0.9 | — | — | HeyGen TTS | Original |
+| C | 0.95 | Friendly | — | HeyGen TTS | Original |
+| D | 0.95 | Friendly | zh | HeyGen TTS | Original |
+| E1 | 0.98 | Friendly | zh | HeyGen TTS | Original |
+| **E2** ⭐ | **0.98** | **Friendly** | **en** | **HeyGen TTS** | **Original** |
+| F | 0.98 | Friendly | zh | HeyGen TTS | Conversational |
+| F2 | 0.98 | Friendly | en | HeyGen TTS | Conversational |
+| Audio | — | — | — | ElevenLabs mp3 | — |
+
+## Key Findings
+
+### 1. `language: "en"` beats `"zh"` (even for Chinese content)
+
+This was the most counterintuitive finding. My clone voice was primarily trained on English samples, so even when speaking Chinese, setting `language: "en"` produced more stable output from the synthesis engine.
+
+Setting `"zh"` caused the engine to try "adapting" pronunciation to Chinese phonetics, which backfired.
+
+### 2. `speed: 0.98` is the sweet spot
+
+- `1.0` (default): Slightly rushed, sounds like reading a script
+- `0.98`: Closest to natural speaking rhythm
+- `0.95`: Starts feeling deliberately slow
+- `0.9`: Noticeably too slow
+
+### 3. `emotion: "Friendly"` works (despite API metadata)
+
+Interestingly, HeyGen's API returns `emotion_support: false` for this voice. But in practice, adding `"Friendly"` made the output sound warmer and more conversational.
+
+Available options: `Excited`, `Friendly`, `Serious`, `Soothing`, `Broadcaster`, `Angry`
+
+### 4. English phrasing matters
+
+This seemingly minor detail has significant impact.
+
+**Poor phrasing:**
+```
+Success is not final, failure is not fatal, it is the courage to continue that counts.
+```
+
+**Good phrasing (conversational):**
+```
+Success, is not final. Failure, is not fatal. It is the courage, to continue, that counts.
+```
+
+Using commas to create natural pauses tells the TTS engine where to breathe. When writing for TTS, you're not writing "correct English" — you're writing "spoken English."
+
+### 5. External ElevenLabs audio — not the best approach
+
+We also tested feeding ElevenLabs-generated mp3 via `voice.type: "audio"` to HeyGen. The speech was more fluent, but lip-sync accuracy dropped. Overall, HeyGen TTS with correct parameters outperformed the external audio approach.
+
+## The Winning Configuration (E2)
+
+```python
+voice_config = {
+    "type": "text",
+    "input_text": script,
+    "voice_id": "102b19ecd46b444c8098a33c8d8eb37f",  # JCKOV1
+    "speed": 0.98,
+    "emotion": "Friendly",
+    "language": "en"
+}
+```
+
+Avatar: JCKOV1 (`838320ce7ca646d3a6306c098c7ee89b`)
+
+## Full Pipeline
+
+Our daily quote video workflow:
+
+1. **Voice generation**: ElevenLabs (sag CLI) generates the narrator's voice reading the quote
+2. **Cover image**: Gemini generates a quote cover image
+3. **Static video**: ffmpeg composites cover image + audio
+4. **Avatar video**: HeyGen API (E2 parameters) generates the digital twin video
+5. **AI subtitles**: ZapCap auto-generates subtitles + corrects name typos
+6. **Delivery**: Three-piece set (audio + static video + subtitled video) sent to LINE
+
+Everything runs autonomously by the AI Agent, delivered at 6 AM sharp every day.
+
+## Conclusion
+
+AI voice synthesis is already impressive, but there's a gap between "impressive" and "natural." That gap hides in seemingly trivial parameters — a 0.02 difference in speed, setting language to `en` instead of `zh`, placing commas in the right spots.
+
+If you're using HeyGen for AI avatar videos, don't settle for defaults. Spend a morning A/B testing. Find the parameters that make *your* voice sound right.
+
+---
+
+*This article was co-authored and tested with AI Agent 🦞 Littl3Lobst3r. Avatar and voice clone trained on the HeyGen platform.*
