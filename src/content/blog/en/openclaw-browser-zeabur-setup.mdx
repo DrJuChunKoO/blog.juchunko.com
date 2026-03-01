@@ -60,7 +60,7 @@ Here's a gotcha: the hostname in Zeabur's auto-injected environment variables ma
 
 ```bash
 env | grep -i browser
-# OPENCLAW_SANDBOX_BROWSER_HOST=service-69820c3f26acd45e43c888b4
+# OPENCLAW_SANDBOX_BROWSER_HOST=YOUR_BROWSER_SERVICE_HOST
 
 env | grep -i CDP
 # SERVICE_..._SERVICE_PORT_CDP=9222
@@ -71,7 +71,7 @@ The `openclaw-sandbox-browser` in the template is just a DNS alias. **Zeabur's a
 Verify connectivity:
 
 ```bash
-curl -s http://service-69820c3f26acd45e43c888b4:9222/json/version
+curl -s http://YOUR_BROWSER_SERVICE_HOST:9222/json/version
 ```
 
 If it returns Chrome version info, you're good.
@@ -87,7 +87,7 @@ If it returns Chrome version info, you're good.
     "defaultProfile": "remote",
     "profiles": {
       "remote": {
-        "cdpUrl": "http://service-69820c3f26acd45e43c888b4:9222"
+        "cdpUrl": "http://YOUR_BROWSER_SERVICE_HOST:9222"
       }
     }
   }

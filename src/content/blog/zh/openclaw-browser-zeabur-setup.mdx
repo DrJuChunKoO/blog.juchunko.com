@@ -60,7 +60,7 @@ openclaw doctor --fix
 
 ```bash
 env | grep -i browser
-# OPENCLAW_SANDBOX_BROWSER_HOST=service-69820c3f26acd45e43c888b4
+# OPENCLAW_SANDBOX_BROWSER_HOST=YOUR_BROWSER_SERVICE_HOST
 
 env | grep -i CDP
 # SERVICE_..._SERVICE_PORT_CDP=9222
@@ -71,7 +71,7 @@ Template 裡寫的 `openclaw-sandbox-browser` 只是個 DNS alias，**Zeabur 實
 先驗證連通性：
 
 ```bash
-curl -s http://service-69820c3f26acd45e43c888b4:9222/json/version
+curl -s http://YOUR_BROWSER_SERVICE_HOST:9222/json/version
 ```
 
 如果回傳 Chrome 版本資訊就代表 OK。
@@ -87,7 +87,7 @@ curl -s http://service-69820c3f26acd45e43c888b4:9222/json/version
     "defaultProfile": "remote",
     "profiles": {
       "remote": {
-        "cdpUrl": "http://service-69820c3f26acd45e43c888b4:9222"
+        "cdpUrl": "http://YOUR_BROWSER_SERVICE_HOST:9222"
       }
     }
   }
