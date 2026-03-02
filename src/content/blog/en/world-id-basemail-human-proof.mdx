@@ -44,6 +44,13 @@ Switch to npm package. Build passes. Then the backend blows up: `@worldcoin/idki
 
 Solution: re-implement the entire RP signing algorithm using viem + `@noble/curves/secp256k1`. Same math, no environment check.
 
+<div style="display: flex; gap: 16px; margin: 24px 0; justify-content: center;">
+  <img src="/images/world-id-basemail/idkit-connect.jpg" alt="IDKit widget: Connect your World ID" style="width: 45%; border-radius: 12px; border: 1px solid #333;" />
+  <img src="/images/world-id-basemail/world-app-approve.jpg" alt="World App: Connect your World ID to BaseMail — Shared" style="width: 45%; border-radius: 12px; border: 1px solid #333;" />
+</div>
+
+*Left: IDKit widget on BaseMail asking to connect World ID. Right: World App confirming "Your proof of human" — Shared ✅*
+
 ### Hour 3: The 403 Wall (06:07 – 09:13)
 
 World App successfully shows "Connect your World ID to BaseMail" and the user approves. Proof returns to frontend. Frontend sends to backend. Backend forwards to World ID verify API. **403 Forbidden.**

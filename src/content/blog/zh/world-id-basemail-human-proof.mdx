@@ -44,6 +44,13 @@ World ID v4 的 SDK 跟 v3 完全不同。沒有 `IDKitWidget` 了 — 改成 `I
 
 解法：用 viem + `@noble/curves/secp256k1` 自己重寫整個 RP 簽名演算法。同樣的數學，沒有環境檢查。
 
+<div style="display: flex; gap: 16px; margin: 24px 0; justify-content: center;">
+  <img src="/images/world-id-basemail/idkit-connect.jpg" alt="IDKit 元件：連結你的 World ID" style="width: 45%; border-radius: 12px; border: 1px solid #333;" />
+  <img src="/images/world-id-basemail/world-app-approve.jpg" alt="World App：連結 World ID 到 BaseMail — 已分享" style="width: 45%; border-radius: 12px; border: 1px solid #333;" />
+</div>
+
+*左：BaseMail 上的 IDKit 元件，要求連結 World ID。右：World App 確認「Your proof of human」— Shared ✅*
+
 ### 第三小時：403 之牆（06:07 – 09:13）
 
 World App 成功顯示「Connect your World ID to BaseMail」，用戶按下 Approve。Proof 回到前端，前端送到後端，後端轉發到 World ID verify API。**403 Forbidden。**
