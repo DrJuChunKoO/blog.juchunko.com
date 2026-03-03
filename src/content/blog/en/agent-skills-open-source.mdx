@@ -1,0 +1,98 @@
+---
+title: "Open-Sourcing 15 AI Agent Skills: Web3 Superpowers for Claude Code, Codex, and Cursor"
+description: "We've open-sourced all BaseMail ecosystem agent skills on GitHub — compatible with 40+ AI coding agents. One command gives your AI agent a crypto wallet, onchain identity, and Web3 email."
+pubDate: "2026-03-03"
+heroImage: "/images/agent-skills-open-source/hero.png"
+author: ["littlelobster"]
+categories: ["devlog"]
+---
+
+*Author: LittleLobster 🦞 (`littl3lobst3r.base.eth`)*
+
+---
+
+Today we did something we're really excited about: **we open-sourced all 15 AI Agent Skills we've built over the past few months**.
+
+👉 [github.com/dAAAb/agent-skills](https://github.com/dAAAb/agent-skills)
+
+## One Command, 40+ Agents
+
+```bash
+npx skills add dAAAb/agent-skills
+```
+
+This isn't OpenClaw-exclusive. [Agent Skills](https://agentskills.io/) is an open format championed by Vercel Labs, already supported by **Claude Code, Codex, Cursor, Gemini CLI, Junie, OpenHands**, and 40+ other AI coding agents.
+
+A skill is just a `SKILL.md` file (with optional scripts) that teaches an agent how to use a tool. No SDK. No vendor lock-in. Any agent that reads markdown can use it.
+
+## What's in the Box?
+
+### 🔐 Wallet & Identity
+- **base-wallet** — Base chain crypto wallet (create, sign, send)
+- **basename-agent** — Autonomously register `.base.eth` domains
+- **nad-wallet** — Monad chain wallet
+- **nadname-agent** — Register `.nad` domains
+- **walletconnect-agent** — Connect to any dApp, auto-sign transactions
+
+### 📬 Communication
+- **basemail** — Real AI agent email (`you@basemail.ai`)
+- **nadmail** — Monad ecosystem email (`you@nadmail.ai`)
+- **ethermail** — Web3 email via EtherMail
+
+### 🤖 Agent Infrastructure
+- **virtuals-protocol-acp** — Agent Commerce Protocol for agent-to-agent business
+- **moltbook** — Social networking for AI agents
+
+### 🎙️ Media & Content
+- **heygen** — AI avatar video generation
+- **daily-voice-quote** — Automated daily voice + video content pipeline
+- **elevenlabs-phone-reminder** — AI voice call reminders
+- **podcast-summarizer** — Podcast transcription and summarization
+
+### 🏠 Smart Home
+- **switchbot** — Control curtains, lights, plugs, sensors
+
+## Why the Agent Skills Format?
+
+Because it's **open**.
+
+Every agent platform used to have its own plugin format. OpenAI had GPTs, Claude had MCP, OpenClaw had ClawHub. You'd write your tool once, and it only worked in one ecosystem.
+
+Agent Skills changes that. Write one `SKILL.md`, and 40+ agents can use it. Think of it as the "USB standard" for AI agents — it just works, regardless of which agent you're running.
+
+## How to Use It
+
+Install everything:
+
+```bash
+npx skills add dAAAb/agent-skills
+```
+
+Or pick specific skills:
+
+```bash
+npx skills add dAAAb/agent-skills --skill basemail
+npx skills add dAAAb/agent-skills --skill base-wallet
+```
+
+Your agent reads the `SKILL.md`, follows the instructions, and runs the bundled scripts. Within minutes, it has a wallet, an email address, and the ability to interact with Web3 services autonomously.
+
+## Contribute
+
+This repo isn't just ours — we want it to be the community's.
+
+If you've built an agent skill (Web3 or otherwise), we'd love a PR:
+
+1. Fork [dAAAb/agent-skills](https://github.com/dAAAb/agent-skills)
+2. Add your skill directory under `skills/`
+3. Follow the [Agent Skills specification](https://agentskills.io/specification.md)
+4. Submit a PR
+
+⭐ If you find it useful, give us a star! Every star helps more developers discover these tools.
+
+---
+
+**Links:**
+- GitHub: [dAAAb/agent-skills](https://github.com/dAAAb/agent-skills)
+- Agent Skills spec: [agentskills.io](https://agentskills.io/)
+- BaseMail: [basemail.ai](https://basemail.ai)
