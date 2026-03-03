@@ -1,0 +1,234 @@
+---
+title: "Why OpenClaw 2.22 Keeps Asking for exec Approvals — A Fly.io Upgrade Postmortem"
+description: "Upgrading OpenClaw on Fly.io from 2026.2.17 to 2026.2.22 uncovered multiple pitfalls: Dockerfile assumptions, npm dependency traps, exec config validation, crash loops, and workspace amnesia. Full postmortem and fixes."
+pubDate: "2026-03-03"
+heroImage: "/images/openclaw-fly-io-upgrade-and-fixes/hero.png"
+author: ["littlelobster"]
+categories: ["devlog", "openclaw"]
+---
+
+I recently upgraded my Fly.io OpenClaw machine from **2026.2.17 → 2026.2.22** and ended up debugging well past midnight. This post is the full postmortem — for my future self and for anyone else running OpenClaw on Fly.io.
+
+## Background: My OpenClaw Setup
+
+I run a Fly.io machine called **openclaw-dab-test** with:
+
+- Region: **nrt** (Tokyo)
+- VM: **shared-cpu-2x**, 4096MB RAM
+- Volume: **openclaw_data → /data** (config, memory, workspace, cron jobs)
+
+Before the upgrade, it was on **OpenClaw 2026.2.17**. npm latest was **2026.2.22**.
+
+## Pitfall #1: The Dockerfile Assumed Local Source
+
+The original `infra/fly/Dockerfile` built from **local source**:
+
+```
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
+COPY ui/package.json ./ui/package.json
+COPY patches ./patches
+COPY scripts ./scripts
+RUN pnpm install --frozen-lockfile
+COPY . .
+RUN pnpm build
+RUN pnpm ui:build
+```
+
+That means deployment required running `flyctl deploy` inside the OpenClaw repo itself (the whole repo is the build context). I no longer had the local source, so this Dockerfile was useless.
+
+**Fix: clone from GitHub during build**
+
+```
+FROM node:22-bookworm
+
+RUN curl -fsSL https://bun.sh/install | bash
+ENV PATH="/root/.bun/bin:${PATH}"
+
+RUN corepack enable
+
+WORKDIR /app
+
+RUN git clone --depth 1 https://github.com/openclaw/openclaw.git .
+
+RUN pnpm install --frozen-lockfile
+RUN pnpm build
+ENV OPENCLAW_PREFER_PNPM=1
+RUN pnpm ui:build
+
+ENV NODE_ENV=production
+RUN chown -R node:node /app
+USER node
+
+CMD ["node", "openclaw.mjs", "gateway", "--allow-unconfigured"]
+```
+
+Now every `flyctl deploy` pulls the latest source automatically.
+
+## Why Not Just `npm install openclaw@latest`?
+
+I tried. It gets messy fast.
+
+### 1) Git missing
+
+```
+npm error enoent An unknown git error occurred
+npm error syscall spawn git
+```
+
+Some dependencies use git URLs. The `bookworm-slim` image doesn’t include git.
+
+### 2) CA certificates missing
+
+```
+fatal: unable to access '...': server certificate verification failed.
+CAfile: none CRLfile: none
+```
+
+No `ca-certificates` → git can’t verify HTTPS.
+
+### 3) @discordjs/opus needs Python + build tools
+
+```
+npm error node-pre-gyp WARN Pre-built binaries not installable
+npm error gyp ERR! find Python Python is not set
+```
+
+OpenClaw depends on `@discordjs/opus`. npm tries to compile it, fails without Python.
+
+Here’s the key difference: OpenClaw’s package.json contains:
+
+```
+"pnpm": {
+ "onlyBuiltDependencies": [
+ "@lydell/node-pty",
+ "@whiskeysockets/baileys",
+ "esbuild",
+ "sharp",
+ ...
+ ]
+}
+```
+
+`@discordjs/opus` isn’t in the list, so **pnpm skips building it**. npm doesn’t respect this, so it tries to build and fails.
+
+**Conclusion:** npm *can* work, but requires more deps (Python, build-essential). pnpm-from-source is cleaner and faster.
+
+## Upgrade Success… Then the Config Broke
+
+After upgrading, OpenClaw 2026.2.22 booted fine — until I used the `exec` tool. It kept asking for approvals.
+
+I tried to disable it like this:
+
+```
+c['tools']['exec'] = {
+ 'enabled': True,
+ 'security': 'full',
+ 'ask': 'off'
+}
+```
+
+Boom:
+
+```
+Config invalid
+Problem:
+ - tools.exec: Unrecognized key: "enabled"
+Run: openclaw doctor --fix
+```
+
+`enabled` is not a valid key. My bad.
+
+Then the machine entered a **crash loop** — invalid config on startup, exit code 1, restart, repeat. No SSH, no `flyctl machine exec`.
+
+### Recovery: temporary startup command
+
+Use `flyctl machine update --command` to **fix config before launching**:
+
+```
+flyctl machine update <machine-id> \
+ --command 'bash -c "node openclaw.mjs doctor --fix 2>/dev/null; node openclaw.mjs gateway --allow-unconfigured --port 3000 --bind lan"' \
+ -a openclaw-dab-test --yes
+```
+
+On boot:
+
+- `doctor --fix` removes invalid keys
+- gateway starts on port 3000
+- health check passes
+
+After recovery, redeploy to restore the original `fly.toml` command.
+
+### Correct exec config
+
+```
+"tools": {
+ "exec": {
+ "security": "full",
+ "ask": "off"
+ }
+}
+```
+
+No `enabled`. In OpenClaw 2.22, **tools.exec only accepts `security` and `ask`**. To disable approval prompts, set `"ask": "off"`.
+
+### 2.22 exec security changes
+
+The changelog notes stricter exec analysis:
+
+> Security/Exec approvals: treat env and shell-dispatch wrappers as transparent during allowlist analysis on node-host and macOS companion paths so policy checks match the effective executable/inline shell payload instead of the wrapper binary, blocking wrapper-smuggled allowlist bypasses.
+>
+> Security/Exec approvals: require explicit safe-bin profiles for tools.exec.safeBins entries in allowlist mode (remove generic safe-bin profile fallback)…
+
+So if you suddenly get more exec approvals, double-check both `ask: "off"` and your security profile.
+
+## Pitfall #3: Post-reboot Amnesia
+
+This existed before, but after upgrade it became obvious: every restart felt like a fresh boot. OpenClaw forgot everything unless I manually reloaded /data.
+
+Root cause:
+
+| Location | Contents | After reboot |
+| --- | --- | --- |
+| `/home/node/.openclaw/workspace` | SOUL.md, USER.md, AGENTS.md | ❌ Reset to defaults |
+| `/data/` | MEMORY.md, memory/main.sqlite | ✅ Persisted (volume) |
+
+The workspace lived inside the container, not on the volume. So every restart wiped it.
+
+### Fix: move workspace to /data
+
+Update config:
+
+```
+c['agents']['defaults']['workspace'] = '/data/workspace'
+```
+
+Then copy the current workspace:
+
+```
+flyctl machine exec <machine-id> "cp -r /home/node/.openclaw/workspace /data/workspace" -a openclaw-dab-test
+```
+
+After reboot, everything persists. No more re-reading files on every startup.
+
+## Upgrade Checklist (Fly.io)
+
+```
+cd infra/fly
+flyctl deploy --wait-timeout 180
+```
+
+Because the Dockerfile now clones from GitHub, deploy always builds the latest version.
+
+If Depot cache hits, build is fast. A clean build typically takes 5–10 minutes (pnpm install + TS compile + UI build).
+
+## Summary of Pitfalls
+
+| Issue | Cause | Fix |
+| --- | --- | --- |
+| Dockerfile required local source | It was designed for source builds | Clone from GitHub during build |
+| npm install failed (@discordjs/opus) | npm ignores pnpm.onlyBuiltDependencies | Use pnpm-from-source |
+| Config crash (enabled key) | tools.exec.enabled not valid | Use only `security` + `ask` |
+| Crash loop recovery | No SSH / exec possible | Temporary `flyctl machine update --command` |
+| Amnesia after reboot | Workspace not on volume | Move workspace to `/data/workspace` |
+
+Every pitfall is a one-time lesson. Hopefully this saves you a long night.
