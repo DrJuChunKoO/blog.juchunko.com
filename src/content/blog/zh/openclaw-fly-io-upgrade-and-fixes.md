@@ -1,0 +1,250 @@
+---
+title: "OpenClaw 2.22 一直問 exec approve 怎麼解？升版踩坑全紀錄"
+description: "升到 OpenClaw 2.22 後 exec 工具一直跳確認？tools.exec.enabled 讓 config 爆炸？Fly.io 上升版遇到 Dockerfile 壞掉、容器失憶？這篇全部有解。"
+pubDate: "2026-02-23"
+author: "juchun-ko"
+categories: ["devlog", "openclaw"]
+---
+
+前幾天我把跑在 Fly.io 上的 OpenClaw 從 `2026.2.17` 升到最新的 `2026.2.22`，然後就一路踩坑踩到凌晨。把過程記下來，給自己留個底，也給同樣在 Fly.io 上跑 OpenClaw 的人一點參考。
+
+## 背景：我的 OpenClaw 架構
+
+我在 Fly.io 上跑了一隻叫 `openclaw-dab-test` 的 Machine，配置是：
+
+- Region：`nrt`（東京）
+- VM：`shared-cpu-2x`，4096MB RAM
+- 掛載 Volume：`openclaw_data` → `/data`（存 config、記憶、workspace、cron jobs 等）
+
+更新之前，機器上跑的是 OpenClaw `2026.2.17`，npm 最新版是 `2026.2.22`。
+
+---
+
+## 第一坑：原來的 Dockerfile 依賴本地原始碼
+
+打開 `infra/fly/Dockerfile` 一看，發現它是從**本地原始碼** build 的：
+
+```dockerfile
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
+COPY ui/package.json ./ui/package.json
+COPY patches ./patches
+COPY scripts ./scripts
+RUN pnpm install --frozen-lockfile
+COPY . .
+RUN pnpm build
+RUN pnpm ui:build
+```
+
+意思是，當初部署的時候，必須在 OpenClaw 的原始碼目錄裡跑 `flyctl deploy`，把整個 repo 作為 build context 傳上去。但現在我手邊沒有原始碼，想直接從 npm 安裝，這個 Dockerfile 就沒用了。
+
+**解法：改成從 GitHub clone 原始碼再 build**
+
+```dockerfile
+FROM node:22-bookworm
+
+RUN curl -fsSL https://bun.sh/install | bash
+ENV PATH="/root/.bun/bin:${PATH}"
+
+RUN corepack enable
+
+WORKDIR /app
+
+RUN git clone --depth 1 https://github.com/openclaw/openclaw.git .
+
+RUN pnpm install --frozen-lockfile
+RUN pnpm build
+ENV OPENCLAW_PREFER_PNPM=1
+RUN pnpm ui:build
+
+ENV NODE_ENV=production
+RUN chown -R node:node /app
+USER node
+
+CMD ["node", "openclaw.mjs", "gateway", "--allow-unconfigured"]
+```
+
+這樣每次 `flyctl deploy` 就會自動抓 GitHub 上的最新版本來 build，不需要本地原始碼。
+
+---
+
+## 為什麼不直接 `npm install openclaw@latest`？
+
+我一開始想用最簡單的方式：直接從 npm 裝。試了才知道有多坑。
+
+**第一關：沒有 git**
+
+```
+npm error enoent An unknown git error occurred
+npm error syscall spawn git
+```
+
+OpenClaw 的某些依賴用了 git URL。`bookworm-slim` 鏡像沒帶 git，裝上去。
+
+**第二關：沒有 CA 憑證**
+
+```
+fatal: unable to access '...': server certificate verification failed.
+CAfile: none CRLfile: none
+```
+
+`slim` 鏡像沒有 `ca-certificates`，git 無法驗證 HTTPS 憑證。加上 `ca-certificates`。
+
+**第三關：@discordjs/opus 需要 Python 和 build tools**
+
+```
+npm error node-pre-gyp WARN Pre-built binaries not installable
+npm error gyp ERR! find Python Python is not set
+```
+
+OpenClaw 的依賴樹裡有 `@discordjs/opus`，npm 預設會嘗試編譯 native module，但找不到 Python 就炸了。
+
+這才是關鍵差異：用 **pnpm** 的話，OpenClaw 的 `package.json` 裡有這段設定：
+
+```json
+"pnpm": {
+  "onlyBuiltDependencies": [
+    "@lydell/node-pty",
+    "@whiskeysockets/baileys",
+    "esbuild",
+    "sharp",
+    ...
+  ]
+}
+```
+
+`@discordjs/opus` 不在清單裡，所以 pnpm 會直接跳過它的 native build。但 npm 不吃這個設定，就一路硬跑然後炸掉。
+
+**結論**：npm 不是不行，但要搞定 Python、build-essential 一堆依賴才行，遠不如直接用 pnpm 從原始碼 build 來得乾淨。
+
+---
+
+## 升版成功，但 config 壞了
+
+升版完成，OpenClaw `2026.2.22` 正在跑，我很開心。
+
+然後發現：每次我叫它執行 exec 工具，它都要問我要不要 approve。
+
+我記得 OpenClaw 的 exec config 應該可以關掉確認，就直接改 JSON：
+
+```python
+c['tools']['exec'] = {
+    'enabled': True,
+    'security': 'full',
+    'ask': 'off'
+}
+```
+
+然後機器掛了：
+
+```
+Config invalid
+Problem:
+  - tools.exec: Unrecognized key: "enabled"
+Run: openclaw doctor --fix
+```
+
+`enabled` 根本不是合法的 key。我自己猜的，猜錯了。
+
+機器進入 crash loop——每次啟動就讀到 invalid config，然後 exit code 1，然後重啟，然後又炸。SSH 進不去（app 沒 started），`flyctl machine exec` 也不行（machine not running）。
+
+### 救機器：用 machine update 臨時改啟動指令
+
+這時候的技巧是：用 `flyctl machine update --command` 臨時把啟動指令換成「先 fix 再啟動 gateway」：
+
+```bash
+flyctl machine update <machine-id> \
+  --command 'bash -c "node openclaw.mjs doctor --fix 2>/dev/null; node openclaw.mjs gateway --allow-unconfigured --port 3000 --bind lan"' \
+  -a openclaw-dab-test --yes
+```
+
+這樣機器啟動的時候：
+1. 先跑 `doctor --fix`，移除 config 裡的非法 key
+2. 緊接著啟動 gateway，port 3000 開起來
+3. Health check 通過，機器 healthy
+
+等機器正常後，再跑 `flyctl deploy` 把啟動指令恢復回 fly.toml 的設定。
+
+### 正確的 exec config 格式
+
+`doctor --fix` 修完之後，config 長這樣：
+
+```json
+"tools": {
+  "exec": {
+    "security": "full",
+    "ask": "off"
+  }
+}
+```
+
+沒有 `enabled`。在新版 OpenClaw 裡，`tools.exec` 只接受 `security` 和 `ask` 這兩個 key。要關掉 exec 確認，只需要 `"ask": "off"` 就夠了。
+
+### 關於 2.22 的 exec 安全強化
+
+看了 changelog 之後發現，其實 exec 一直要問 approve 不完全是我自己加了錯誤 key 造成的。2.22 版本有一批針對 exec 的安全強化：
+
+> Security/Exec approvals: treat `env` and shell-dispatch wrappers as transparent during allowlist analysis on node-host and macOS companion paths so policy checks match the effective executable/inline shell payload instead of the wrapper binary, blocking wrapper-smuggled allowlist bypasses.
+
+> Security/Exec approvals: require explicit safe-bin profiles for `tools.exec.safeBins` entries in allowlist mode (remove generic safe-bin profile fallback)...
+
+這些修補有意收緊了 exec 的分析邏輯。如果你的 exec 設定在 2.22 之後突然多了很多確認提示，除了確認 `ask: "off"` 之外，還要看一下 `security` 的設定是否有被調整。
+
+---
+
+## 第三坑：重啟之後失憶
+
+這個問題其實一直存在，只是升版之後比較明顯。每次 deploy 或重啟，OpenClaw 就好像第一次醒來，什麼都不記得，要我手動叫它去讀 `/data` 裡的檔案才回到正常狀態。
+
+問題根源很清楚：
+
+| 位置 | 內容 | 重啟後 |
+|------|------|--------|
+| `/home/node/.openclaw/workspace/` | SOUL.md、USER.md、AGENTS.md 等 | ❌ 清空，回到預設範本 |
+| `/data/` | MEMORY.md、memory/main.sqlite | ✅ 保留（掛載 volume） |
+
+OpenClaw 的 workspace 預設在容器內部，不在 volume 上。每次重啟，`SOUL.md`、`USER.md`（裡頭都是空白範本）、`AGENTS.md` 通通歸零，只有 `/data/MEMORY.md` 活了下來。
+
+### 解法：把 workspace 搬到 /data
+
+一行改 config：
+
+```python
+c['agents']['defaults']['workspace'] = '/data/workspace'
+```
+
+然後把現有的 workspace 複製過去：
+
+```bash
+flyctl machine exec <machine-id> "cp -r /home/node/.openclaw/workspace /data/workspace" -a openclaw-dab-test
+```
+
+重啟之後，`/data/workspace/` 裡的 `SOUL.md`、`USER.md`、`AGENTS.md` 全部保留。OpenClaw 醒來就有完整記憶，不需要再手動讀檔案了。
+
+---
+
+## 整理一下：升版流程
+
+以後如果要升 Fly.io 上的 OpenClaw 版本，流程很簡單：
+
+```bash
+cd infra/fly
+flyctl deploy --wait-timeout 180
+```
+
+因為 Dockerfile 現在是 `git clone --depth 1 https://github.com/openclaw/openclaw.git .`，deploy 的時候就會自動抓最新版本重新 build。
+
+如果 Depot 有 cache（layers 沒變），build 會很快。全新 build 大概需要 5-10 分鐘（pnpm install + TypeScript compile + UI build）。
+
+---
+
+## 總結踩坑清單
+
+| 問題 | 原因 | 解法 |
+|------|------|------|
+| 原 Dockerfile 需要本地原始碼 | 設計給 source build 用 | 改成 `git clone` 自動抓 |
+| `npm install` 失敗（@discordjs/opus） | npm 不吃 pnpm.onlyBuiltDependencies | 改用 pnpm from source |
+| Config crash（enabled key） | `tools.exec.enabled` 不是合法 key | 只用 `security` + `ask` |
+| 機器 crash loop 救援 | 無法 SSH 進去改 | `flyctl machine update --command` 臨時換啟動指令 |
+| 重啟後失憶 | Workspace 不在 volume 上 | 把 workspace 改到 `/data/workspace` |
+
+每個坑踩過一次，下次就不會再踩了。希望這篇對你有幫助。
