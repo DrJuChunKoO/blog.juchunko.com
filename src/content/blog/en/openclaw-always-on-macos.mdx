@@ -108,6 +108,37 @@ sudo pmset -c sleep 1 disksleep 10 networkoversleep 0
 pkill caffeinate
 ```
 
+## MacBook Extra Settings: System Settings GUI
+
+Beyond the terminal `pmset` commands, if you're running your agent on a MacBook, there are a few System Settings you should also adjust.
+
+### Lock Screen
+
+Go to **System Settings → Lock Screen** and set both of these to "**Never**":
+
+- **Turn display off on battery when inactive** → Never
+- **Turn display off on power adapter when inactive** → Never
+
+![Lock Screen settings](/images/openclaw-always-on-macos/lock-screen-en.jpg)
+
+### Screen Saver
+
+Go to **System Settings → Wallpaper → Screen Saver...** and set "**Start Screen Saver when inactive**" to "**Never**":
+
+![Wallpaper settings](/images/openclaw-always-on-macos/wallpaper-en.jpg)
+
+![Screen Saver settings](/images/openclaw-always-on-macos/screensaver-en.jpg)
+
+### Screen Brightness
+
+The screen doesn't need to stay bright. After setting everything to "Never", manually dim the screen to minimum brightness (or use the `F1` key) — the screen will be nearly dark but the system won't sleep.
+
+### ⚠️ Don't Close the Lid
+
+Closing a MacBook lid forces sleep regardless of `pmset` or `caffeinate` settings. If your MacBook is a dedicated agent host, **keep the lid open**.
+
+The one exception: **clamshell mode** with an external display. If you have an external monitor connected along with power, closing the lid won't trigger sleep.
+
 ## Things to Keep in Mind
 
 - **No-sleep on battery drains fast** — carry your charger. Or only change `-c` (AC power) and let battery mode sleep normally

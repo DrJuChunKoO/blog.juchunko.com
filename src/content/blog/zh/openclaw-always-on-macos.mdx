@@ -108,6 +108,37 @@ sudo pmset -c sleep 1 disksleep 10 networkoversleep 0
 pkill caffeinate
 ```
 
+## 筆電額外設定：macOS 系統偏好設定
+
+除了終端機的 `pmset` 指令，如果你是用 MacBook 跑 agent，還有幾個系統偏好設定要調整。
+
+### 鎖定畫面
+
+到 **系統設定 → 鎖定畫面**，把以下兩個選項都設成「**永不**」：
+
+- **在使用電池且閒置時關閉顯示器** → 永不
+- **在使用電源轉接器且閒置時關閉顯示器** → 永不
+
+![鎖定畫面設定](/images/openclaw-always-on-macos/lock-screen-zh.jpg)
+
+### 螢幕保護程式
+
+到 **系統設定 → 背景圖片 → 螢幕保護程式...**，把「**啟動螢幕保護程式**」設成「**永不**」：
+
+![背景圖片設定](/images/openclaw-always-on-macos/wallpaper-zh.jpg)
+
+![螢幕保護程式設定](/images/openclaw-always-on-macos/screensaver-zh.jpg)
+
+### 螢幕亮度
+
+螢幕不需要一直亮著浪費電。設定好「永不休眠」之後，可以手動把螢幕亮度調到最低（或用快捷鍵 `F1`），讓螢幕幾乎全暗但系統不會進入休眠。
+
+### ⚠️ 不要闔上筆電
+
+MacBook 闔上蓋子會強制進入休眠，`pmset` 和 `caffeinate` 都擋不住。如果你的 MacBook 是專門跑 agent 的，**請保持蓋子打開**。
+
+唯一的例外：**外接螢幕**。如果有接外接螢幕（clamshell mode），闔上蓋子系統不會休眠，但需要同時接上電源和外接顯示器。
+
 ## 注意事項
 
 - **電池模式不睡覺會很耗電**，出門記得帶充電器。或者只改 `-c`（接電源），電池模式還是讓它睡
