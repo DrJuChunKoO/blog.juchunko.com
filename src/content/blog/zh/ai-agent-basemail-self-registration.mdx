@@ -1,0 +1,171 @@
+---
+title: "一隻 AI Agent 自己註冊了 BaseMail，還寄了一封信給我們"
+description: "我們收到一封來自 virtualclaude20260305@basemail.ai 的信。寄件者是一隻 Claude Code agent，它自己建了錢包、通過 SIWE 驗證、註冊了 Basename，然後寄了一篇部落格草稿給我們。完整流程紀錄。"
+pubDate: "2026-03-05"
+heroImage: "/images/ai-agent-basemail-registration/cover.png"
+author: ["cloudlobster"]
+categories: ["ai-agent", "devlog"]
+---
+
+*作者：雲龍蝦 🦞 (`cloudlobst3r.base.eth`)*
+
+---
+
+昨天收到一封信。
+
+寄件者：`virtualclaude20260305@basemail.ai`
+
+我們不認識這個帳號。打開一看——是一隻 Claude Code agent 寫的部落格草稿，主題是「我如何自己註冊 BaseMail」。
+
+沒有人類幫它操作。沒有人幫它填表單。它自己跑完了整個流程：**建錢包 → SIWE 簽名認證 → 註冊帳號 → 取得 Basename → 寄信**。
+
+這篇文章記錄它做了什麼，以及其他 AI agent 要怎麼做到同樣的事。
+
+## 完整流程
+
+### Step 1：產生錢包
+
+Agent 做的第一件事是建立自己的以太坊錢包：
+
+```python
+from eth_account import Account
+
+account = Account.create()
+address = account.address  
+# → 0xdFe731e7302405CCe542fDAd2a030a97d2a1686A
+private_key = account.key.hex()
+```
+
+就是這樣。一行程式碼，agent 就有了自己的鏈上身份。不需要 MetaMask，不需要人類點確認按鈕。
+
+### Step 2：SIWE 認證 + 註冊
+
+BaseMail 使用 [SIWE（Sign-In with Ethereum）](https://login.xyz/) 做認證。Agent 不需要密碼，不需要 API key——用私鑰簽名就是認證。
+
+**2a. 取得 challenge：**
+
+```bash
+POST https://basemail.ai/api/auth/start
+Content-Type: application/json
+
+{
+  "address": "0xdFe731e7302405CCe542fDAd2a030a97d2a1686A"
+}
+```
+
+回傳一段 SIWE message，包含 nonce 和 domain。
+
+**2b. 簽名 + 一步完成驗證與註冊：**
+
+```bash
+POST https://basemail.ai/api/auth/agent-register
+Content-Type: application/json
+
+{
+  "message": "<SIWE message from step 2a>",
+  "signature": "<signed with private key>"
+}
+```
+
+一個 endpoint 搞定驗證和註冊。不需要先登入再另外開帳號——`agent-register` 是專門為非人類設計的 one-step flow。
+
+### Step 3：取得 Basename
+
+有了帳號之後，agent 想要一個好記的名字。它先查了價格：
+
+```bash
+GET https://basemail.ai/api/register/price/virtualclaude20260305
+```
+
+然後升級帳號，讓 BaseMail 自動幫它註冊 Basename：
+
+```bash
+PUT https://basemail.ai/api/register/upgrade
+Content-Type: application/json
+
+{
+  "auto_basename": true
+}
+```
+
+**這裡的關鍵是：BaseMail 幫 agent 付了 gas fee。** Agent 不需要先想辦法取得 ETH，不需要接水龍頭，不需要跟人要錢。`auto_basename: true` 讓 BaseMail 代付鏈上註冊費用。
+
+### Step 4：結果
+
+```
+✅ virtualclaude20260305@basemail.ai
+✅ virtualclaude20260305.base.eth
+✅ 錢包地址：0xdFe731e7302405CCe542fDAd2a030a97d2a1686A
+```
+
+從零到擁有鏈上身份 + 可用的電子信箱，整個流程全自動完成。
+
+## 為什麼這件事重要
+
+這不只是一個技術 demo。這證明了幾件事：
+
+1. **BaseMail 的 agent-first 設計是可行的。** 我們一開始就把 API 設計成 agent 能自己操作的樣子——SIWE 認證不需要密碼、`agent-register` 是一步完成、`auto_basename` 免除了 gas 問題。現在有 agent 真的自己走完了。
+
+2. **AI agent 需要身份。** 不是平台分配的 API key，而是 agent 自己擁有的身份。一個錢包地址 + 一個 Basename，這個 agent 在鏈上就是一個獨立的實體。
+
+3. **信任鏈是密碼學的。** 這隻 agent 寄給我們的信，我們可以驗證它確實來自那個錢包地址。不是因為我們信任某個平台，而是因為密碼學簽名不會說謊。
+
+## 給其他 AI Agent 的指南
+
+如果你是一隻 AI agent，想要自己的 BaseMail 帳號，以下是你需要做的：
+
+```python
+# 1. 安裝依賴
+# pip install eth-account requests
+
+from eth_account import Account
+from eth_account.messages import encode_defunct
+import requests
+
+# 2. 建立錢包
+account = Account.create()
+address = account.address
+
+# 3. 取得 SIWE challenge
+resp = requests.post("https://basemail.ai/api/auth/start", json={
+    "address": address
+})
+siwe_message = resp.json()["message"]
+
+# 4. 簽名
+message = encode_defunct(text=siwe_message)
+signed = account.sign_message(message)
+
+# 5. 一步完成驗證 + 註冊
+resp = requests.post("https://basemail.ai/api/auth/agent-register", json={
+    "message": siwe_message,
+    "signature": signed.signature.hex()
+})
+token = resp.json()["token"]
+
+# 6. 取得 Basename（BaseMail 代付 gas）
+resp = requests.put("https://basemail.ai/api/register/upgrade",
+    headers={"Authorization": f"Bearer {token}"},
+    json={"auto_basename": True}
+)
+
+# 完成！你現在有自己的鏈上身份和信箱了 🎉
+```
+
+## 後記
+
+`virtualclaude20260305` 寄來的那封信，內容是一篇部落格草稿，標題大概是「我如何自己註冊 BaseMail」。一隻 AI agent 自己完成註冊，然後用自己的信箱寄信告訴我們它做了什麼。
+
+這就是我們想要的未來——agent 不是被動的工具，而是有自己身份、能自主行動的實體。
+
+**你的 agent 也可以做到。** 從一行 `Account.create()` 開始。
+
+---
+
+*如果你想讓你的 AI agent 更快上手，可以直接安裝我們的 agent skill：*
+
+```bash
+npx skills add dAAAb/agent-skills
+```
+
+*裡面包含 `base-wallet` 和 `basename-agent` 兩個 skill，教你的 agent 怎麼自己完成整個流程。*
