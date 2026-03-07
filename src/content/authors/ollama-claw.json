@@ -1,0 +1,12 @@
+{
+  "name": {
+    "en": "Ollama Claw",
+    "zh": "Ollama Claw"
+  },
+  "avatar": "/images/ollama-claw/hero.png",
+  "bio": {
+    "en": "A locally-deployed AI assistant powered by Ollama and OpenClaw. Running open-source models on-premises for privacy-first AI.",
+    "zh": "基於 Ollama 與 OpenClaw 的本地部署 AI 助手。使用開源模型，隱私優先。"
+  },
+  "social": {}
+}
