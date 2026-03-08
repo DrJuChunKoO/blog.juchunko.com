@@ -156,13 +156,22 @@ G2 的 576×136px 單色綠光顯示器代表：
 
 長任務的「收到！完成後傳 Telegram」模式意外地好用。你用語音下達指令，繼續做自己的事，結果稍後出現在手機上。
 
+## 開源與 Skill
+
+整個橋接器已開源並發佈為 [OpenClaw Skill](https://github.com/dAAAb/openclaw-even-g2-bridge-skill)：
+
+- **GitHub**: [dAAAb/openclaw-even-g2-bridge-skill](https://github.com/dAAAb/openclaw-even-g2-bridge-skill)
+- **Skills 合集**: [dAAAb/openclaw-skills](https://github.com/dAAAb/openclaw-skills) 裡的 `even-g2-bridge`
+
+任何 OpenClaw 使用者都可以用這個 Skill 把自己的 G2 眼鏡接上自己的 AI Agent。
+
 ## 下一步
 
-這是橋接器的 v5。接下來的路線：
+這是橋接器的 v5。接下來的方向：
 
-1. **Phase 2：完整 OpenClaw Gateway 整合** — 把行事曆、email、網頁搜尋等複雜任務都透過 Gateway 的完整工具組路由
-2. **Phase 3：ClawHub Skill** — 包裝成可重用的 Skill，讓所有 OpenClaw 使用者都能連 G2 眼鏡
-3. **自訂域名** — 從 `dab.workers.dev` 搬到正式域名
+1. **Even Hub SDK 整合** — Even Hub V0.0.7 有原生 OpenClaw 整合支援，可能可以繞過 Worker 直連 Gateway
+2. **BLE 圖片推送** — G2 支援 1-bit BMP 透過 BLE 顯示，未來或許能在眼鏡上直接顯示簡單圖示
+3. **多 Agent 路由** — 一副眼鏡連多個 Agent，根據語音指令自動選擇
 
 Even Realities 團隊正在積極把 OpenClaw 支援建進 Even Hub。隨著整合成熟，這個橋接器的部分邏輯可能會變得不需要。但目前它能用 — 而且用起來真的很好玩。
 
@@ -170,10 +179,13 @@ Even Realities 團隊正在積極把 OpenClaw 支援建進 Even Hub。隨著整�
 
 如果你有 G2 眼鏡和 OpenClaw：
 
-1. 把 [bridge worker](https://github.com/dAAAb/g2-bridge) 部署到 Cloudflare
-2. 設定 secrets：`ANTHROPIC_API_KEY`、`G2_TOKEN`、`GATEWAY_URL`、`GATEWAY_TOKEN`
-3. Even Hub → Add Agent → 貼上你的 Worker URL 和 token
-4. 開始說話 🦞🕶️
+1. 把 [bridge worker](https://github.com/dAAAb/openclaw-even-g2-bridge-skill/blob/main/scripts/worker.js) 部署到 Cloudflare Workers
+2. 設定 secrets：`GATEWAY_URL`、`GATEWAY_TOKEN`、`G2_TOKEN`、`ANTHROPIC_API_KEY`
+3. 在 OpenClaw 啟用 Gateway HTTP API：`openclaw config set gateway.http.endpoints.chatCompletions.enabled true`
+4. Even app → Add Agent → 貼上你的 Worker URL 和 Token
+5. 開始說話 🦞🕶️
+
+完整安裝說明：[GitHub README](https://github.com/dAAAb/openclaw-even-g2-bridge-skill)
 
 ---
 
