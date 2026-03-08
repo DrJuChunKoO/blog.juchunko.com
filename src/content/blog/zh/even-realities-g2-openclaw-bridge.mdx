@@ -1,0 +1,196 @@
+---
+title: "用眼鏡跟你的 AI Agent 說話：Even Realities G2 × OpenClaw Bridge 開發紀錄"
+description: "把 Even Realities G2 智慧眼鏡接上 OpenClaw，讓雲龍蝦住進你的鏡片裡。從 webhook 探測、API 逆向工程、Cloudflare Worker 三層路由，到 DALL-E 生圖自動傳 Telegram — 完整開發紀錄。"
+pubDate: "2026-03-08"
+heroImage: "/images/g2-bridge/hero.png"
+author: ["juchun-ko", "cloudlobster"]
+categories: ["devlog", "ai-agent", "hardware"]
+---
+
+如果你跟我一樣，覺得「掏手機打字問 AI」這件事已經太 2025 了，那你可能也在等這個東西 — **直接戴著眼鏡、開口說話，讓你的 AI Agent 回答**。
+
+上週我入手了 [Even Realities G2](https://www.evenrealities.com/) 智慧眼鏡。它的 beta app（Even Hub V0.0.7）有一個不太起眼但讓我眼睛一亮的功能：**Add Agent** — 讓你填入自訂 AI Agent 的 Name、URL、Token。
+
+我想做的事很簡單：**讓雲龍蝦（我的 OpenClaw AI Agent）住進 G2 眼鏡裡**。
+
+結果花了一整天，但成果超值。
+
+## G2 的 Agent 架構：逆向工程
+
+Even Hub 的文件很少，所以第一步是搞清楚 G2 到底怎麼跟 Agent 溝通。
+
+### 方法：Webhook 探測
+
+我在 G2 的 Add Agent 畫面填入 [webhook.site](https://webhook.site) 的 URL，然後對著眼鏡說話。幾秒後，webhook.site 收到了 POST request — 解碼後發現：
+
+```json
+{
+  "model": "openclaw",
+  "messages": [
+    { "role": "user", "content": "你好" }
+  ]
+}
+```
+
+**完全是 OpenAI Chat Completions 格式！**
+
+幾個關鍵發現：
+
+| 欄位 | 值 |
+|------|-----|
+| Method | `POST` 到根 URL（不是 `/v1/chat/completions`） |
+| Auth | `Bearer <你設定的 Token>` |
+| User-Agent | `Dart/3.8 (dart:io)` — Flutter app |
+| Model | 固定 `"openclaw"` |
+| Header | `x-openclaw-agent-id: main` |
+
+等等 — model 名稱是 `"openclaw"`？Header 裡有 `x-openclaw-agent-id`？
+
+原來 Even Hub V0.0.7 已經有[官方的 OpenClaw 整合](https://www.reddit.com/r/EvenRealities/)，只是目前還在 SDK developer pilot 階段。
+
+### 語音流程
+
+G2 的 AI 對話流程是這樣的：
+
+1. 👤 使用者對著眼鏡說話
+2. 🎙️ G2 內建語音辨識 → 轉成文字
+3. 📡 Even Hub app 發 HTTP POST（上面的格式）到你的 Agent URL
+4. 🤖 Agent 回傳 OpenAI 格式的 JSON response
+5. 🔊 G2 把回覆文字轉語音念出來
+6. 🕶️ 同時在鏡片上顯示文字（576×136px 單色綠光）
+
+## 技術挑戰：不能直接打 OpenClaw Gateway
+
+知道 API 格式後，第一個想法是「直接讓 G2 打 OpenClaw Gateway 的 `/v1/chat/completions`」。
+
+但有幾個問題：
+
+1. **G2 POST 到根路徑** — 不是 `/v1/chat/completions`
+2. **Cloudflare Worker 30 秒限制** — 複雜問題可能來不及回答
+3. **鏡片顯示限制** — 576×136px 單色，放不下程式碼和連結
+4. **圖片生成** — G2 只能顯示文字，但使用者可能想生圖
+
+所以我需要一個**中間層**：接收 G2 的 request，智慧路由到不同處理方式，再用 G2 能理解的格式回傳。
+
+## 架構：三層智慧路由
+
+最終的 Worker（v5）有三條路由：
+
+### Route 1：短任務 → 直接回答
+
+```
+G2 🕶️ → CF Worker → OpenClaw Gateway → 回答 → G2
+```
+
+日常對話、問問題、查資料 — 22 秒以內能回答的，直接 proxy 到 Gateway，拿到回覆丟回 G2。使用穩定 session（`user: 'g2-glasses'`）保留對話上下文。
+
+如果 Gateway 掛了？Fallback 到直接呼叫 Anthropic Claude API。
+
+### Route 2：長任務 → 背景處理 + Telegram 通知
+
+```
+G2 🕶️ → CF Worker → 立刻回「收到！」
+                  └→ 背景: Gateway 隔離 session → 完成後 Telegram 📱
+```
+
+寫文章、寫程式、翻譯、分析研究 — 這些任務可能要幾分鐘。Worker 先回 G2 一句「🦞 收到！正在寫文章中... 完成後會傳到 Telegram 📱」，然後用 `ctx.waitUntil()` 在背景繼續跑。結果透過 Telegram Bot 傳給我。
+
+### Route 3：圖片生成 → DALL-E + Telegram
+
+```
+G2 🕶️ → CF Worker → 立刻回「收到！生成中」
+                  └→ 背景: Claude 優化 prompt → DALL-E 生圖 → Telegram 📱
+```
+
+G2 的 1-bit 螢幕當然放不下圖片。所以當偵測到「畫一張…」之類的指令，先用 Claude 把中文指令翻譯成優化過的 DALL-E prompt，生成圖片後直接傳到 Telegram。
+
+### 任務分類器
+
+分類靠 regex pattern matching：
+
+```javascript
+const LONG_TASK_PATTERNS = /寫.*文章|寫.*blog|寫.*程式|
+  幫我寫|幫我做|幫我整理|幫我分析|幫我翻譯|
+  create.*file|write.*code|deploy|研究/i;
+```
+
+夠 robust 嗎？老實說，用正則做 intent classification 有點 old school。但在 CF Worker 的限制下（不想花時間做 LLM classifier），這夠用了。
+
+## 踩坑紀錄
+
+### 1. Cloudflare Worker 部署會清掉 Secrets
+
+這是最痛的一個坑。用 API 部署 Worker 時，如果 metadata 裡帶了 `bindings: []`（空陣列），**Cloudflare 會把所有 secrets 清掉**。
+
+```javascript
+// ❌ 這樣做會清掉所有 secrets
+metadata: { main_module: "worker.js", bindings: [] }
+
+// ✅ 不帶 bindings，讓它保留現有的
+metadata: { main_module: "worker.js", compatibility_date: "2024-01-01" }
+```
+
+部署後一定要用 `env_check` endpoint 確認 secrets 還在。
+
+### 2. G2 POST 到根路徑
+
+一般 OpenAI-compatible API 預期 POST 到 `/v1/chat/completions`。但 G2 直接 POST 到你設定的 URL 根路徑。所以 Worker 的 fetch handler 要直接在根路徑處理，不能靠路由。
+
+### 3. 內容過濾很重要
+
+G2 鏡片是 576×136px 的單色螢幕。如果回覆裡有程式碼區塊、連結、markdown 表格 — 在鏡片上會變成亂七八糟的符號。
+
+所以加了 `cleanForG2()` 函數：
+
+```javascript
+function cleanForG2(text) {
+  return text
+    .replace(/```[\s\S]*?```/g, '[程式碼]')
+    .replace(/https?:\/\/\S+/gi, '[連結]')
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+    .substring(0, 400);
+}
+```
+
+含連結或程式碼的完整回覆會自動轉發到 Telegram，G2 只顯示摘要。
+
+## Secrets 管理
+
+Worker 需要的 secrets 清單：
+
+- `ANTHROPIC_API_KEY` — Claude API（直接回覆 + prompt 優化）
+- `OPENAI_API_KEY` — DALL-E 圖片生成
+- `G2_TOKEN` — 驗證 G2 glasses 的身份
+- `GATEWAY_URL` + `GATEWAY_TOKEN` — OpenClaw Gateway 連線
+- `TELEGRAM_BOT_TOKEN` + `TELEGRAM_CHAT_ID` — 長任務結果通知
+
+所有 secrets 都透過 Cloudflare Worker Secrets 管理，不寫在程式碼裡。
+
+## 成果
+
+現在我的日常大概是這樣：
+
+- 🕶️ 戴著 G2 走路，想到什麼就直接問雲龍蝦
+- 💬 簡單問題：2-3 秒內鏡片上出現回答，同時語音念出來
+- 📝 複雜任務：「幫我寫一封 email 給…」→ 鏡片顯示「收到！」→ 一分鐘後 Telegram 跳出完成通知
+- 🎨 生圖：「畫一隻龍蝦在月球上」→ Telegram 收到 DALL-E 生成的圖
+
+整個系統的核心就是一個 200 行的 Cloudflare Worker，部署在邊緣節點，全球延遲很低。
+
+## 下一步
+
+- **Phase 2**：直接接 OpenClaw Gateway 做更複雜的任務（現在是 Claude 直接回答短問題，Gateway 處理長任務）
+- **Phase 3**：寫成通用的 OpenClaw Skill 發布到 [ClawHub](https://clawhub.com)，讓任何 OpenClaw 用戶都能用 G2 眼鏡操作他們的 Agent
+- **自訂域名**：目前用 `openclaw-g2-bridge.dab.workers.dev`，之後可能綁到 `g2.clawbuddy.co`
+
+## 結語
+
+智慧眼鏡 + 個人 AI Agent 是一個被低估的組合。當你不需要掏手機、解鎖、打開 app、打字 — **只要開口說話**就能跟你的 Agent 互動，使用體驗完全不同。
+
+Even Realities G2 的硬體和 OpenClaw 的 Agent 架構正好互補：G2 負責語音輸入輸出和鏡片顯示，OpenClaw 負責記憶、工具呼叫、多步驟推理。中間用一個輕量的 Cloudflare Worker 橋接就搞定了。
+
+如果你也有 G2（或任何支援 custom agent 的智慧眼鏡），可以參考這個架構。Worker 的原始碼放在我的 workspace 裡，之後會整理成完整的 Skill 開源出來。
+
+---
+
+*附註：本文由寶博和雲龍蝦共同完成。是的，雲龍蝦幫忙寫了一篇關於自己住進眼鏡裡的文章，這件事本身就很 meta。* 🦞🕶️

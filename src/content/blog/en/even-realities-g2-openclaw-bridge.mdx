@@ -1,0 +1,184 @@
+---
+title: "Talk to Your AI Agent Through Smart Glasses: Even Realities G2 × OpenClaw Bridge"
+description: "Connecting Even Realities G2 smart glasses to OpenClaw so you can chat with your AI agent by just speaking. From webhook probing and API reverse-engineering to a Cloudflare Worker with three-layer smart routing — the full dev log."
+pubDate: "2026-03-08"
+heroImage: "/images/g2-bridge/hero.png"
+author: ["juchun-ko", "cloudlobster"]
+categories: ["devlog", "ai-agent", "hardware"]
+---
+
+If, like me, you think "pulling out your phone to type a question for AI" is so 2025 — you might be waiting for this: **wearing glasses, speaking out loud, and having your AI agent answer**.
+
+Last week I got my hands on the [Even Realities G2](https://www.evenrealities.com/) smart glasses. Its beta app (Even Hub V0.0.7) has a small but exciting feature: **Add Agent** — letting you enter a custom AI Agent's Name, URL, and Token.
+
+My goal was simple: **get Cloud Lobster (my OpenClaw AI agent) to live inside the G2 lenses**.
+
+It took a full day, but the result was worth every minute.
+
+## G2's Agent Architecture: Reverse Engineering
+
+Even Hub's documentation is sparse, so step one was figuring out how G2 actually talks to agents.
+
+### Method: Webhook Probing
+
+I entered a [webhook.site](https://webhook.site) URL in G2's Add Agent screen, then spoke to the glasses. Seconds later, webhook.site received a POST request:
+
+```json
+{
+  "model": "openclaw",
+  "messages": [
+    { "role": "user", "content": "Hello" }
+  ]
+}
+```
+
+**Standard OpenAI Chat Completions format!**
+
+Key discoveries:
+
+| Field | Value |
+|-------|-------|
+| Method | `POST` to root URL (not `/v1/chat/completions`) |
+| Auth | `Bearer <your configured token>` |
+| User-Agent | `Dart/3.8 (dart:io)` — Flutter app |
+| Model | Hardcoded `"openclaw"` |
+| Header | `x-openclaw-agent-id: main` |
+
+Wait — the model name is `"openclaw"`? The header has `x-openclaw-agent-id`?
+
+Turns out Even Hub V0.0.7 already has [official OpenClaw integration](https://www.reddit.com/r/EvenRealities/), currently in SDK developer pilot stage.
+
+### Voice Flow
+
+Here's how G2's AI conversation flow works:
+
+1. 👤 User speaks to the glasses
+2. 🎙️ G2's built-in speech recognition → text
+3. 📡 Even Hub app sends HTTP POST (format above) to your Agent URL
+4. 🤖 Agent returns OpenAI-format JSON response
+5. 🔊 G2 converts reply text to speech
+6. 🕶️ Simultaneously displays text on the lens (576×136px monochrome green)
+
+## Technical Challenge: Can't Hit OpenClaw Gateway Directly
+
+Knowing the API format, the first instinct was "just point G2 at OpenClaw Gateway's `/v1/chat/completions`."
+
+But several problems:
+
+1. **G2 POSTs to root path** — not `/v1/chat/completions`
+2. **Cloudflare Worker 30s limit** — complex questions might time out
+3. **Lens display limitations** — 576×136px monochrome, can't show code or links
+4. **Image generation** — G2 can only display text, but users might want images
+
+So I needed a **bridge layer**: receive G2's request, intelligently route it, and return responses in G2-compatible format.
+
+## Architecture: Three-Layer Smart Routing
+
+The final Worker (v5) has three routes:
+
+### Route 1: Short Tasks → Direct Answer
+
+```
+G2 🕶️ → CF Worker → OpenClaw Gateway → Reply → G2
+```
+
+Daily conversation, questions, lookups — anything answerable within 22 seconds gets proxied to Gateway and returned to G2. Uses a stable session (`user: 'g2-glasses'`) to maintain conversation context.
+
+Gateway down? Falls back to direct Anthropic Claude API calls.
+
+### Route 2: Long Tasks → Background Processing + Telegram
+
+```
+G2 🕶️ → CF Worker → Immediately reply "Got it!"
+                  └→ Background: Gateway isolated session → Telegram 📱
+```
+
+Writing articles, code, translations, research — tasks that might take minutes. The Worker immediately tells G2 "🦞 Got it! Working on it... I'll send results to Telegram 📱", then uses `ctx.waitUntil()` to continue in the background. Results delivered via Telegram Bot.
+
+### Route 3: Image Generation → DALL-E + Telegram
+
+```
+G2 🕶️ → CF Worker → Immediately reply "Generating..."
+                  └→ Background: Claude prompt optimization → DALL-E → Telegram 📱
+```
+
+G2's 1-bit display obviously can't show images. When it detects requests like "draw a..." or "generate an image...", it uses Claude to translate the request into an optimized DALL-E prompt, generates the image, and sends it directly to Telegram.
+
+### Task Classifier
+
+Classification uses regex pattern matching:
+
+```javascript
+const LONG_TASK_PATTERNS = /write.*article|write.*code|
+  help me write|create.*file|deploy|research|
+  translate|analyze|draft/i;
+```
+
+Is regex enough for intent classification? Honestly, it's old school. But within CF Worker constraints (don't want to burn time on an LLM classifier), it works.
+
+## Pitfalls & Lessons
+
+### 1. CF Worker Deploys Can Wipe Secrets
+
+The most painful gotcha. When deploying a Worker via API, if your metadata includes `bindings: []` (empty array), **Cloudflare wipes all secrets**.
+
+```javascript
+// ❌ This nukes all secrets
+metadata: { main_module: "worker.js", bindings: [] }
+
+// ✅ Omit bindings to preserve existing ones
+metadata: { main_module: "worker.js", compatibility_date: "2024-01-01" }
+```
+
+Always verify secrets with an `env_check` endpoint after deployment.
+
+### 2. G2 POSTs to Root Path
+
+Standard OpenAI-compatible APIs expect POST to `/v1/chat/completions`. G2 posts directly to your configured URL's root. The Worker's fetch handler must handle it at root, no routing needed.
+
+### 3. Content Filtering Matters
+
+G2's lens is a 576×136px monochrome display. Code blocks, URLs, markdown tables — they all become garbled symbols on the lens.
+
+Added a `cleanForG2()` function:
+
+```javascript
+function cleanForG2(text) {
+  return text
+    .replace(/```[\s\S]*?```/g, '[code]')
+    .replace(/https?:\/\/\S+/gi, '[link]')
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+    .substring(0, 400);
+}
+```
+
+Full responses with links or code are auto-forwarded to Telegram; G2 shows only the summary.
+
+## The Result
+
+My daily workflow now looks like:
+
+- 🕶️ Walking around with G2, asking Cloud Lobster whatever comes to mind
+- 💬 Simple questions: answer appears on the lens in 2-3 seconds, read aloud simultaneously
+- 📝 Complex tasks: "Write an email to..." → lens shows "Got it!" → Telegram notification a minute later
+- 🎨 Image gen: "Draw a lobster on the moon" → Telegram receives the DALL-E generated image
+
+The entire system is a ~200-line Cloudflare Worker deployed at the edge, with low latency worldwide.
+
+## What's Next
+
+- **Phase 2**: Direct OpenClaw Gateway integration for complex multi-step tasks
+- **Phase 3**: Package as a universal OpenClaw Skill on [ClawHub](https://clawhub.com), so any OpenClaw user can operate their agent through G2 glasses
+- **Custom domain**: Currently using `openclaw-g2-bridge.dab.workers.dev`, might bind to `g2.clawbuddy.co`
+
+## Conclusion
+
+Smart glasses + personal AI agent is an underrated combination. When you don't need to pull out your phone, unlock it, open an app, type — **just speak** and interact with your Agent — the UX is fundamentally different.
+
+Even Realities G2's hardware and OpenClaw's agent architecture complement each other perfectly: G2 handles voice I/O and lens display, OpenClaw handles memory, tool calls, and multi-step reasoning. A lightweight Cloudflare Worker bridge connects the two.
+
+If you have G2 (or any smart glasses with custom agent support), feel free to reference this architecture. The Worker source is in my workspace and will be packaged as a full open-source Skill soon.
+
+---
+
+*Note: This post was co-written by JC Ko and Cloud Lobster. Yes, Cloud Lobster helped write an article about itself moving into smart glasses — which is pretty meta.* 🦞🕶️
