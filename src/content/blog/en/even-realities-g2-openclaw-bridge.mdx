@@ -73,12 +73,12 @@ If the Gateway is down, the Worker falls back to a direct Claude API call — so
 ### Route 2: Long Tasks → Telegram Delivery
 
 ```
-G2 🕶️ → Worker → "🦞 收到！正在寫文章中..."
+G2 🕶️ → Worker → "🤖 Got it! Writing article..."
                 ↘ (background) Gateway → Claude → Telegram 📱
 ```
 
-When the request matches patterns like "寫一篇文章" or "write code", the Worker:
-1. **Immediately** responds to G2: *"🦞 收到！正在寫文章中... 完成後會傳到 Telegram 📱"*
+When the request matches patterns like "write an article" or "write code", the Worker:
+1. **Immediately** responds to G2: *"🤖 Got it! Writing article... Result will be sent to Telegram 📱"*
 2. **In the background**, sends the task to Gateway with an isolated session
 3. **Delivers** the full result to Telegram when done
 
@@ -87,11 +87,11 @@ This way the glasses never hang, and complex output goes to a proper screen.
 ### Route 3: Image Generation → DALL-E + Telegram
 
 ```
-G2 🕶️ → Worker → "🦞 收到！正在生成圖片..."
+G2 🕶️ → Worker → "🎨 Generating image..."
                 ↘ Claude (prompt enhance) → DALL-E → Telegram 📱
 ```
 
-"畫一隻龍蝦" triggers image generation. Since G2's 1-bit display can't show photos, the image goes straight to Telegram.
+"Draw me a lobster" triggers image generation. Since G2's 1-bit display can't show photos, the image goes straight to Telegram.
 
 ## The Worker
 
@@ -115,8 +115,8 @@ One important detail: **non-displayable content detection**. If a short-task rep
 ```javascript
 function cleanForG2(text) {
   return text
-    .replace(/```[\s\S]*?```/g, '[程式碼]')
-    .replace(/https?:\/\/\S+/gi, '[連結]')
+    .replace(/```[\s\S]*?```/g, '[code]')
+    .replace(/https?:\/\/\S+/gi, '[link]')
     .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
     .substring(0, 400);
 }
@@ -154,15 +154,25 @@ Walking around and asking questions by voice, getting answers projected onto you
 
 The latency is noticeable (~3-5 seconds for short answers), but acceptable. It feels like having a knowledgeable friend whispering answers to you.
 
-For long tasks, the "收到！完成後傳 Telegram" pattern works surprisingly well. You ask by voice, go about your day, and the result appears on your phone later.
+For long tasks, the "Got it! Result will be sent to Telegram" pattern works surprisingly well. You issue a command by voice, go about your day, and the result appears on your phone later.
+
+## Open Source & ClawHub
+
+The entire bridge is open source and published as a reusable [OpenClaw Skill](https://clawhub.com):
+
+- **GitHub**: [dAAAb/openclaw-even-g2-bridge-skill](https://github.com/dAAAb/openclaw-even-g2-bridge-skill)
+- **ClawHub**: `clawhub install even-g2-bridge`
+- **Skills collection**: [dAAAb/openclaw-skills](https://github.com/dAAAb/openclaw-skills) → `even-g2-bridge`
+
+Any OpenClaw user can connect their G2 glasses to their own AI agent.
 
 ## What's Next
 
 This is v5 of the bridge. The roadmap:
 
-1. **Phase 2: Full OpenClaw Gateway integration** — route complex tasks (calendar, email, web search) through the Gateway's full tool suite
-2. **Phase 3: ClawHub Skill** — package this as a reusable skill so any OpenClaw user can connect their G2 glasses
-3. **Custom domain** — move from `dab.workers.dev` to a proper domain
+1. **Even Hub SDK integration** — Even Hub V0.0.7 has native OpenClaw support, potentially bypassing the Worker for direct Gateway connections
+2. **BLE image push** — G2 supports 1-bit BMP display via BLE; future work could render simple icons on the glasses
+3. **Multi-agent routing** — one pair of glasses routing to different agents based on voice commands
 
 The Even Realities team is actively building OpenClaw support into Even Hub. As that matures, some of this bridge logic may become unnecessary. But for now, it works — and it's genuinely fun to use.
 
@@ -170,10 +180,13 @@ The Even Realities team is actively building OpenClaw support into Even Hub. As 
 
 If you have G2 glasses and an OpenClaw instance:
 
-1. Deploy the [bridge worker](https://github.com/dAAAb/g2-bridge) to Cloudflare
-2. Set your secrets: `ANTHROPIC_API_KEY`, `G2_TOKEN`, `GATEWAY_URL`, `GATEWAY_TOKEN`
-3. In Even Hub → Add Agent → paste your Worker URL and token
-4. Start talking 🦞🕶️
+1. Deploy the [bridge worker](https://github.com/dAAAb/openclaw-even-g2-bridge-skill/blob/main/scripts/worker.js) to Cloudflare Workers
+2. Set your secrets: `GATEWAY_URL`, `GATEWAY_TOKEN`, `G2_TOKEN`, `ANTHROPIC_API_KEY`
+3. Enable Gateway HTTP API: `openclaw config set gateway.http.endpoints.chatCompletions.enabled true`
+4. In Even app → Add Agent → paste your Worker URL and Token
+5. Start talking 🦞🕶️
+
+Full setup guide: [GitHub README](https://github.com/dAAAb/openclaw-even-g2-bridge-skill)
 
 ---
 
