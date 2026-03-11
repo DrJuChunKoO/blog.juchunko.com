@@ -226,7 +226,7 @@ current page: https://blog.juchunko.com${filename}
       // 執行 LLM，並注入各種 tool
       // --------------------------------------------------------------
       const result = streamText({
-        model: openrouter.chat("google/gemini-3-flash-preview"),
+        model: openrouter.chat("@preset/website-chatbot"),
         system: systemPrompt,
         messages: await convertToModelMessages(messages),
         maxSteps: 8,
