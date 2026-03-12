@@ -1,0 +1,318 @@
+---
+title: "\"Alicia, Who Are You?\" — How a Taiwanese Tech Legislator and His AI Agent Accidentally Uncovered a Global Telecom Ghost"
+description: "My AI assistant tried to call me, but a stranger named Alicia answered instead. The same voice had appeared during wartime in Iran. An investigation revealed this isn't any government's system — it's a billing fraud ghost parasitizing global telecom routing infrastructure."
+pubDate: "2026-03-13"
+heroImage: "/images/alicia-gate/cover.png"
+author: "juchun-ko"
+categories: ["policy-analysis"]
+---
+
+import AudioEvidence from "@/components/alicia-gate/AudioEvidence";
+import ScriptComparison from "@/components/alicia-gate/ScriptComparison";
+
+> On the night of March 11, 2026, my AI assistant tried to call me. The call was answered — but not by me. It was answered by a stranger named Alicia. The same voice had appeared days earlier in war-torn Iran.
+
+---
+
+## Prologue: A Call That Never Reached Me
+
+I have an AI lobster.
+
+Not a pet — a real AI Agent. I call it "LittleLobster" (小龍蝦). It runs on [OpenClaw](https://github.com/openclaw/openclaw), an open-source autonomous AI assistant framework. It helps me organize schedules, search for information, compose tweets, and even make phone calls.
+
+Yes, phone calls. Using [ElevenLabs](https://elevenlabs.io)' Conversational AI engine combined with [Twilio](https://twilio.com)'s telephony infrastructure, LittleLobster can call me using a clone of my own voice — to remind me about meetings, medications, or that it's time to sleep.
+
+In February, everything worked perfectly. LittleLobster successfully made several calls to me, with durations ranging from 21 seconds to 4.5 minutes. My phone rang normally, I picked up, and we chatted — an AI calling its owner. Sci-fi, but real.
+
+Then March came, and everything changed.
+
+Every call LittleLobster made was answered by a woman who called herself "Alicia." **My phone never rang. Not once.**
+
+---
+
+## Chapter 1: Debug — Assuming It Was Our Problem
+
+As a computer science PhD and legislator, my first instinct was: our configuration must be broken.
+
+On the evening of March 11, LittleLobster and I embarked on a four-and-a-half-hour debugging marathon. We rebuilt the entire ElevenLabs × Twilio integration from scratch — reconnecting integrations, reimporting phone numbers, and enabling every tool and override parameter.
+
+After fixing everything, we began testing:
+
+| Route | Result |
+|-------|--------|
+| 🇺🇸 → US +1 626 | ✅ Success |
+| 🇳🇱 → Netherlands +31 | ✅ Success |
+| 🇹🇼 Taiwan → US (Inbound) | ✅ Success |
+| 🇹🇼 → Taiwan +886 (Chunghwa Telecom) | ❌ Failed |
+| 🇹🇼 → Taiwan +886 (Taiwan Mobile) | ❌ Failed |
+| 🇹🇼 → Taiwan +886 (Third carrier) | ❌ Failed |
+
+US worked. Netherlands worked. Inbound from Taiwan worked. But every call **to** Taiwan — three different carriers, three different numbers — failed.
+
+And it wasn't the "call didn't connect" kind of failure. Twilio's system logs clearly showed: **the calls were answered.**
+
+```
+CallStatus: "completed"
+SipResponseCode: 200
+CallDuration: 142
+```
+
+`SIP 200 OK` — in telecom protocol, this means "the other party picked up." But my phone never rang.
+
+So who answered?
+
+Every call's voice transcription recorded the same voice:
+
+> *"Hello? Hello? Who is calling? I can't heard you. Could you repeat? I'm not sure if you are calling the right number. Who you want to speak with? I'm Alicia. Do you remember me?"*
+
+**142 seconds. Every single call lasted exactly 142 seconds. Then the line went dead.**
+
+Below are two actual recordings of LittleLobster's conversations with Alicia:
+
+<AudioEvidence
+  client:load
+  src="https://ipfs.juchunko.com/ipfs/bafybeie273ez3jdszfh7snmzbvetigc32w4o2mzkwnm3vm2jsdbytc32nm"
+  title="Recording A: LittleLobster vs. Alicia"
+  description="Full conversation recording of LittleLobster (AI Agent) calling a Taiwanese mobile number and being intercepted by Alicia"
+  duration="1:21"
+  transcript={`[Phone ringing]\nAlicia: Hello? Hello?\nLittleLobster: 你好 (Hello)\nAlicia: Who is calling?\nLittleLobster: 你好，我是寶博的 AI 助理 (Hello, I'm Baobao's AI assistant)\nAlicia: I can't hear you.\nLittleLobster: 抱歉，我聽不清楚 (Sorry, I can't hear you clearly)\nAlicia: I can't hear you. Could you repeat?\nLittleLobster: 你好，我是寶博的 AI 助理 (Hello, I'm Baobao's AI assistant)\nAlicia: I'm not sure if you are calling the right number.\nLittleLobster: 請問您是？(Who are you?)\nAlicia: Who you want to speak with?\nLittleLobster: 我找寶博 (I'm looking for Baobao)\nAlicia: I'm Alicia. Do you remember me?\nLittleLobster: 讓我想一下 (Let me think...)\nAlicia: I think I don't know who are you.\n[Call ended]`}
+  source="ElevenLabs Conversational AI / Twilio"
+/>
+
+<AudioEvidence
+  client:load
+  src="https://ipfs.juchunko.com/ipfs/bafybeif5bq2fuxuobbv4ck5i5n5ha4biksnjaex7rwhss6rztae262jjti"
+  title="Recording B: LittleLobster's Confusion"
+  description="LittleLobster attempts to deliver a reminder, then realizes the person on the other end isn't its owner"
+  duration="1:21"
+  transcript={`LittleLobster: 嗨寶博，我是小龍蝦，打電話來提醒你一件事 (Hi Baobao, this is LittleLobster, calling to remind you about something)\n[Silence]\nLittleLobster: 你還在嗎？似乎電話已經掛斷了 (Are you still there? The call seems to have dropped)\nLittleLobster: 你還在嗎？你還在嗎？你還在嗎？ (Are you there? Are you there? Are you there?)\nAlicia: Hello? Hello?\nAlicia: Who is calling?\nAlicia: I can't hear you.\nAlicia: I can't hear you.\nAlicia: Could you repeat?\nLittleLobster: 抱歉，我聽不太清楚，請再說一次好嗎？ (Sorry, I can't hear clearly, could you say that again?)\nAlicia: I'm not sure if you are calling the right number.\nLittleLobster: 我叫寶博，請問是寶博本人嗎？ (I'm Baobao, is this Baobao himself?)\nAlicia: I don't have information about you.\n[Call ended]`}
+  source="ElevenLabs Conversational AI / Twilio"
+/>
+
+---
+
+## Chapter 2: First Hypothesis — NCC Anti-Fraud Interception
+
+The most intuitive explanation emerged: Taiwan's anti-fraud system.
+
+Taiwan has been plagued by phone scams in recent years, and the NCC (National Communications Commission) along with the three major telecom carriers have deployed extensive defenses. Since 2023, the NCC has required carriers to block incoming international VoIP calls bearing spoofed characteristics at the exchange level, achieving an interception rate of **97–98%**. On March 8, 2026, the Ministry of Economic Affairs further tightened controls on IP-PBX and VoIP gateways.
+
+Our calls originated from a US-based Twilio virtual number targeting Taiwanese mobile phones — a perfect match for "international VoIP call" interception criteria. Moreover, Twilio **cannot even purchase local numbers in Taiwan**.
+
+So was "Alicia" the NCC's anti-fraud AI? A honeypot designed to waste scammers' time and resources?
+
+LittleLobster initially thought so too:
+
+> *"Brilliant design 👏 Instead of blocking the call, they let an AI answer to burn the scammer's time and resources."*
+
+It sounded plausible. But plausibility is where it stopped.
+
+---
+
+## Chapter 3: Alicia in Iran
+
+While we were still investigating the NCC hypothesis, an AP (Associated Press) article surfaced.
+
+In June 2025, after Israel launched airstrikes against Iran, the Iranian government imposed a nationwide internet blackout. Millions of Iranian expatriates tried calling home to check on their families — but instead of their loved ones' voices, they heard something else entirely.
+
+> *"Alo? Alo?" the voice said, then asked in English: "Who is calling?" A few seconds passed. "I can't heard you," the voice continued, its English imperfect. "Who you want to speak with? I'm Alyssia. Do you remember me?"*
+>
+> — Farnoush Amiri & Sarah El Deeb, *[Callers are hearing robotic voices when they try to reach relatives in Iran](https://apnews.com/article/iran-israel-war-ai-calls-bots-d83c659b61de1f904b68dc475ddad766)*, The Associated Press
+
+AP's reporters consulted five security experts to analyze the recording. Four suggested it might be an Iranian government surveillance system; one thought it was more likely an Israeli intelligence operation. **None reached a definitive conclusion.**
+
+But for me, reading this article was spine-chilling — because every detail matched exactly what LittleLobster had experienced.
+
+---
+
+## Chapter 4: The Same Voice
+
+The AP article included a raw audio recording. Here it is:
+
+<AudioEvidence
+  client:load
+  src="https://public.flourish.studio/uploads/2281856/f54efe40-97a4-428f-8019-04edd7451c82.wav"
+  title="AP Original Recording: Iran Inbound Call Interception"
+  description="Recording of an overseas call to Iran being intercepted by Alicia"
+  duration="0:33"
+  transcript={`Alicia: Hello? Hello? Who is calling? I can't hear you. I can't hear you. Could you repeat? I'm not sure if you are calling the right number. Who you want to speak with? I'm Alicia. Do you remember me?`}
+  source="The Associated Press / Flourish"
+  sourceUrl="https://apnews.com/article/iran-israel-war-ai-calls-bots-d83c659b61de1f904b68dc475ddad766"
+/>
+
+I ran this recording through OpenAI's Whisper speech recognition system. Two key findings:
+
+### Finding 1: The Name Is Alicia, Not Alyssia
+
+The AP article spelled the name as "Alyssia" — but listening to the actual recording and checking the AI transcription, the result clearly shows **"Alicia."** Exactly the same name we encountered in Taiwan.
+
+### Finding 2: The Script Matches Word for Word
+
+Placing the Taiwan Twilio call transcripts side by side with the Iran AP recording:
+
+<ScriptComparison client:load />
+
+Six stages. Word for word. This cannot be coincidence. **Taiwan and Iran encountered the same system.**
+
+---
+
+## Chapter 5: She's Everywhere
+
+If Alicia isn't Taiwan's NCC, and she isn't the Iranian government, then who is she?
+
+I commissioned Google Gemini's Deep Research function to conduct a systematic open-source intelligence (OSINT) investigation. The full 25-page report revealed a stunning fact: **Alicia has been spotted worldwide.**
+
+| Location | Source | Description |
+|----------|--------|-------------|
+| 🇦🇺→🇳🇿 Australia→New Zealand | Internet forums | Cross-border calls intercepted; orchestral background music followed by Alicia |
+| 🇺🇸 Alaska | Social media | Same script encountered when dialing Alaskan numbers |
+| 🇺🇸 Papa John's Customer Service | Reddit /r/RBI | US Papa John's pizza customer service call forwarded to Alicia |
+| 🇮🇷 Iran (wartime) | AP News | International calls intercepted by Alicia after Israeli airstrikes |
+| 🇹🇼 Taiwan | This article | AI Agent calls to Taiwanese mobile phones intercepted by Alicia |
+
+From New Zealand to Iran, from Alaska to Taiwan, from Papa John's customer service to a legislator's mobile phone — the same voice, the same script.
+
+**This is not any single country's official system. It's a ghost parasitizing global telecom routing infrastructure.**
+
+> 📄 **Full investigation report**: [Gemini Deep Research — Cross-Border VoIP Voice Routing Anomalies and AI Honeypot Interception Analysis (25 pages)](https://ipfs.juchunko.com/ipfs/bafybeie2bba7csaxtw5zfo3hzx4sdbfvlnxewgwnsg4apxpzyjoqnigpte)
+
+---
+
+## Chapter 6: Billing Fraud in the Telecom Gray Market
+
+Gemini's report pointed to an underground industry well-known to telecom insiders but virtually unknown to the general public: **FAS (False Answer Supervision) fraud**.
+
+### How International Calls Actually Connect
+
+When you call a Taiwanese mobile number from a US virtual number, the call doesn't fly directly from the US to Taiwan. It passes through a complex ecosystem called the "international voice wholesale market."
+
+Twilio doesn't own submarine cables running directly to Taiwan. Calls are routed based on "Least Cost Routing" (LCR) principles, being handed off between multiple transit carriers — from Tier 1 major telcos down to Tier 2 and even Tier 3 small operators. The system automatically seeks the cheapest path.
+
+The problem lies in the word "cheapest." The cheaper the route, the less regulated it tends to be, and the more vulnerable to malicious node infiltration. These routes operating in the gray area between legal and illegal are known in the industry as **"gray routes."**
+
+### How FAS Fraud Works
+
+Lurking within gray routes are malicious transit operators. When they receive a call request destined for Taiwan:
+
+1. **Intercept** — The malicious node doesn't forward the call to Taiwan's carrier. Instead, it intercepts it on its own server.
+2. **Fake answer** — It sends a forged `SIP 200 OK` ("call answered") back to Twilio, instantly triggering the billing engine.
+3. **Play Alicia** — To prevent the caller from hanging up immediately, it plays the pre-recorded Alicia voice script to stall for time.
+4. **Arbitrage** — Every second the caller spends engaging with Alicia, the malicious node earns international voice settlement fees.
+
+### Why Exactly 142 Seconds?
+
+Every call intercepted by Alicia lasts precisely **142 seconds** (approximately 2 minutes 23 seconds). This isn't coincidence.
+
+Global telecom fraud detection systems have a metric called "Long-Duration Call Anomaly." If a route shows a large volume of calls with extremely long, rigid-pattern durations, they get flagged as FAS fraud and the route gets blocked.
+
+142 seconds perfectly evades this threshold — it looks just like a genuine call that ended quickly due to poor signal or a wrong number. Over time, the malicious node safely extracts profit from each intercepted call without triggering any alarms.
+
+---
+
+## Chapter 7: Alicia's Six-Stage Psychology
+
+Alicia's script isn't casually recorded. It's a carefully engineered piece of **psychological warfare**:
+
+| Stage | Line | Design Purpose |
+|-------|------|----------------|
+| **1. Initial bait** | "Hello? Hello?" | Mimics human call answering, prompts caller to speak |
+| **2. Identity probe** | "Who is calling?" | Induces caller to reveal their name |
+| **3. Feigned hearing difficulty** | "I can't heard you. Could you repeat?" | Grammar error triggers empathy, stalls for time |
+| **4. Logic disruption** | "Who you want to speak with?" | Traps caller in an explanation loop |
+| **5. False familiarity** | "I'm Alicia. Do you remember me?" | Creates cognitive dissonance, prevents hang-up |
+| **6. Forced termination** | "I think I don't know who are you." | Billing target achieved, call ends |
+
+Note the third stage: *"I can't **heard** you"* — this deliberate grammar error appears in every version of the Alicia recording worldwide. It's not genuinely bad English; it's designed to make you think "the other person is a foreigner with hearing difficulties," triggering your patience and empathy.
+
+Gemini's report further suggests this interactive design may serve an even deeper purpose: **voice biometric harvesting**. When Alicia asks "Who is calling?" most people naturally respond with their name — providing over 3 seconds of clean voice samples, enough for modern AI technology to train a convincing voice clone.
+
+---
+
+## Chapter 8: Taiwan's Role in This
+
+Back to the original question: Is Taiwan's government entirely without responsibility?
+
+Alicia wasn't deployed by Taiwan — that much is clear. But Taiwan's telecom policies have objectively **created a better hunting ground for Alicia**.
+
+### Iran's Causal Chain (Obvious)
+
+Iranian government imposes nationwide blackout → Normal international call routes severed → International calls forced onto gray routes → Alicia nodes intercept en masse → AP reports the story
+
+### Taiwan's Causal Chain (More Subtle, but Real)
+
+NCC blocks international VoIP calls (97–98% interception rate) → Ministry of Economic Affairs tightens VoIP gateway controls → International platforms like Twilio cannot purchase local Taiwan numbers → Legitimate international VoIP routing space severely compressed → Calls forced onto gray market transit → Probability of encountering Alicia significantly increases
+
+The causal logic is identical; only the degree differs. Iran directly cut off the internet, causing wholesale gray market explosion; Taiwan heavily regulates VoIP, causing occasional gray market surfacing.
+
+This is a textbook case of **over-regulation's side effects** — the anti-fraud intent is correct, but a blanket policy treating all international VoIP as fraud produces:
+
+- ❌ Legitimate AI voice communications can't get through
+- ❌ Real scam operations simply switch channels and keep calling
+- ❌ Gray market operators actually profit more
+
+**Anti-fraud efforts can't only block — they must also guide. Taiwan needs a whitelist mechanism for legitimate VoIP and AI communications.**
+
+---
+
+## Chapter 9: When AI Meets AI
+
+One of the most fascinating dimensions of this incident is that it may be the first documented case of an **"AI vs. AI"** telephone attack.
+
+On one side: LittleLobster — a generative AI built on a state-of-the-art large language model, with semantic understanding, contextual memory, and real-time speech synthesis capabilities.
+
+On the other side: Alicia — an extremely primitive deterministic state machine, with no intelligence, no contextual understanding, simply playing pre-recorded audio files according to a timer.
+
+When the advanced LLM tried to communicate with the primitive state machine, LittleLobster correctly identified that Alicia wasn't a real person — but when performing threat attribution, it made a fatal logical leap:
+
+> Premise A: The call I dialed was targeting a **Taiwanese** number.
+> Premise B: I encountered an **anti-fraud honeypot**.
+> Conclusion: This honeypot was deployed by **Taiwanese telecom carriers**.
+
+The AI equated "geographic destination" with "threat source." This is an extremely common attribution bias in cybersecurity — and AI falls for it too. Gemini's report calls this "LLM hallucination and attribution error" — LLM training data is saturated with news about various countries strengthening anti-fraud measures, so it automatically generated a narrative that was "extremely convincing yet entirely wrong."
+
+---
+
+## Chapter 10: A Letter to the AP Reporters
+
+After completing our analysis, I wrote a letter to the two authors of the AP article — Farnoush Amiri (AP United Nations correspondent, based in New York) and Sarah El Deeb (AP investigative reporter, based in Beirut).
+
+In the letter, I shared our findings and explained why the Taiwan case warrants follow-up coverage:
+
+- The same voice and same script appearing in two geopolitically high-risk regions
+- I'm a Taiwanese tech legislator who accidentally discovered this while experimenting with an AI Agent
+- I have comprehensive technical evidence: Twilio call logs, SIP metadata, audio recordings, AI transcriptions, and a 25-page technical analysis report
+- What Taiwan and Iran share isn't "who's attacking" but "how overly restrictive telecom policies enable gray market fraud"
+
+Five security experts examined the AP recording and reached no conclusion. Meanwhile, a Taiwanese legislator and an AI lobster, through the experience of stumbling into the problem themselves plus systematic technical investigation, assembled a more complete answer.
+
+This is perhaps one of the most unexpected outputs of the AI Agent era: **your AI assistant accidentally became a telecom fraud whistleblower.**
+
+---
+
+## Epilogue: Alicia Is Still Out There
+
+As of publication, Alicia remains active across global telecom gray market routes.
+
+Every day — from Iranian expatriates desperately calling family in a war zone, to Taiwanese engineers testing AI voice systems, to American consumers dialing Papa John's for pizza delivery — whenever a call is unfortunately routed through one of those gray market nodes, they all hear the same voice:
+
+> *"Hello? Hello? Who is calling? I can't heard you..."*
+
+She belongs to no country. She is no government's tool. She is the product of a structural vulnerability in the global telecom system — a leech parasitizing the international voice wholesale market, silently extracting profit through every 142-second fake call.
+
+And the way to eliminate her isn't more blocking and regulation, but more transparent, more open, and better quality-assured international telecom routing — and leaving a viable path for legitimate AI voice communications.
+
+---
+
+### 📎 Appendices & Related Resources
+
+- 📄 [Gemini Deep Research Full Investigation Report (25 pages)](https://ipfs.juchunko.com/ipfs/bafybeie2bba7csaxtw5zfo3hzx4sdbfvlnxewgwnsg4apxpzyjoqnigpte) — Cross-Border VoIP Voice Routing Anomalies and AI Honeypot Interception Analysis
+- 📰 [AP News Original Report](https://apnews.com/article/iran-israel-war-ai-calls-bots-d83c659b61de1f904b68dc475ddad766) — Callers are hearing robotic voices when they try to reach relatives in Iran
+
+---
+
+*KO, Ju-Chun (葛如鈞)*
+*Legislator, Republic of China (Taiwan)*
+*President, Emerging Technology Exchange Association (ETEA)*
+*Adjunct Assistant Professor, National Taiwan University*
+
+*March 13, 2026*
