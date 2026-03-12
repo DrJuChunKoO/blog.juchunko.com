@@ -10,7 +10,23 @@ interface AudioEvidenceProps {
   source?: string;
   sourceUrl?: string;
   duration?: string;
+  lang?: "zh" | "en";
 }
+
+const i18n = {
+  zh: {
+    badge: "音訊證據 / Audio Evidence",
+    download: "下載",
+    transcript: "查看逐字稿 / View Transcript",
+    sourceLabel: "來源 /",
+  },
+  en: {
+    badge: "Audio Evidence",
+    download: "Download",
+    transcript: "View Transcript",
+    sourceLabel: "Source:",
+  },
+};
 
 export default function AudioEvidence({
   src,
@@ -20,6 +36,7 @@ export default function AudioEvidence({
   source,
   sourceUrl,
   duration: durationProp,
+  lang = "zh",
 }: AudioEvidenceProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
@@ -28,6 +45,7 @@ export default function AudioEvidence({
   const [showTranscript, setShowTranscript] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
   const progressRef = useRef<HTMLDivElement>(null);
+  const t = i18n[lang];
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -93,7 +111,7 @@ export default function AudioEvidence({
             <div className="mb-1 flex items-center gap-2">
               <Volume2 className="size-4 text-red-500" />
               <span className="text-xs font-semibold tracking-wider text-red-500 uppercase">
-                音訊證據 / Audio Evidence
+                {t.badge}
               </span>
             </div>
             <h4 className="text-base font-bold text-gray-900 dark:text-white">
@@ -109,7 +127,7 @@ export default function AudioEvidence({
             className="flex shrink-0 items-center gap-1 rounded-lg border border-gray-200 px-3 py-1.5 text-xs text-gray-500 transition-colors hover:bg-gray-100 dark:border-white/10 dark:text-gray-400 dark:hover:bg-white/5"
           >
             <Download className="size-3" />
-            下載
+            {t.download}
           </a>
         </div>
       </div>
@@ -141,7 +159,6 @@ export default function AudioEvidence({
                 style={{ width: `${pct}%` }}
                 transition={{ duration: 0.1 }}
               />
-              {/* Hover indicator */}
               <div className="absolute inset-0 rounded-full opacity-0 transition-opacity group-hover:opacity-100">
                 <div className="h-full rounded-full bg-red-500/20" />
               </div>
@@ -186,7 +203,7 @@ export default function AudioEvidence({
             onClick={() => setShowTranscript(!showTranscript)}
             className="w-full cursor-pointer px-5 py-3 text-left text-xs font-medium text-gray-500 transition-colors hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-white/5"
           >
-            {showTranscript ? "▼" : "▶"} 查看逐字稿 / View Transcript
+            {showTranscript ? "▼" : "▶"} {t.transcript}
           </button>
           <AnimatePresence>
             {showTranscript && (
@@ -212,7 +229,7 @@ export default function AudioEvidence({
       {source && (
         <div className="border-t border-gray-200 px-5 py-2 dark:border-white/10">
           <p className="text-[10px] text-gray-400">
-            來源 /{" "}
+            {t.sourceLabel}{" "}
             {sourceUrl ? (
               <a
                 href={sourceUrl}
