@@ -1,0 +1,317 @@
+---
+title: "「Alicia，你是誰？」—— 一位台灣科技立委與他的 AI Agent 意外揭開的全球電信幽靈"
+description: "我的 AI 助理打電話給我，但接聽的是一個叫 Alicia 的陌生女人。同一個聲音，也出現在戰火中的伊朗。調查發現，這不是任何國家的政府系統，而是一個寄生在全球電信路由中的計費詐欺幽靈。"
+pubDate: "2026-03-13"
+heroImage: "/images/alicia-gate/cover.png"
+author: "juchun-ko"
+categories: ["policy-analysis"]
+---
+
+import AudioEvidence from "@/components/alicia-gate/AudioEvidence";
+import ScriptComparison from "@/components/alicia-gate/ScriptComparison";
+
+> 2026 年 3 月 11 日深夜，我的 AI 助理嘗試打電話給我。電話被接起來了——但接聯的不是我，是一個叫 Alicia 的陌生女人。同一個聲音，幾天前也出現在戰火中的伊朗。
+
+---
+
+## 序：一通打不通的電話
+
+我有一隻 AI 龍蝦。
+
+不是寵物，是真的 AI Agent——我叫牠「小龍蝦」（LittleLobster），是一個跑在 [OpenClaw](https://github.com/openclaw/openclaw) 框架上的自主 AI 助理。牠能幫我整理行程、搜尋資料、發推文，甚至打電話。
+
+是的，打電話。透過 [ElevenLabs](https://elevenlabs.io) 的對話式 AI 引擎，加上 [Twilio](https://twilio.com) 的電話基礎設施，小龍蝦可以用我複製的聲音，打電話提醒我開會、吃藥、或者該去睡覺了。
+
+2 月的時候一切運作正常。小龍蝦成功打過幾通電話給我，通話時間從 21 秒到 4 分半鐘不等，我的手機正常響起，我接起來跟牠聊天——一個 AI 打電話給牠的主人，很科幻，但很真實。
+
+然後，3 月開始，一切都變了。
+
+每一通小龍蝦打出去的電話，都被一個自稱「Alicia」的女聲接起來。**我的手機完全沒有響。**
+
+---
+
+## 第一章：Debug——以為是自己的問題
+
+身為資工博士和立法委員，我的第一反應是：一定是我們的設定壞了。
+
+3 月 11 日晚上八點，我和小龍蝦開始了一場長達四個半小時的除錯馬拉松。我們把整個 ElevenLabs × Twilio 的整合重新做了一遍——Integration 重新連接、號碼重新匯入、所有工具和覆寫參數全部打開。
+
+修好之後，我們開始測試：
+
+| 路線 | 結果 |
+|------|------|
+| 🇺🇸 → 美國 +1 626 | ✅ 成功 |
+| 🇳🇱 → 荷蘭 +31 | ✅ 成功 |
+| 🇹🇼 台灣 → 美國（Inbound） | ✅ 成功 |
+| 🇹🇼 → 台灣 +886（中華電信） | ❌ 失敗 |
+| 🇹🇼 → 台灣 +886（台灣大哥大） | ❌ 失敗 |
+| 🇹🇼 → 台灣 +886（第三支門號） | ❌ 失敗 |
+
+美國可以、荷蘭可以、台灣打過來也可以——但只要是打**到**台灣，三個不同電信商、三支不同號碼，全部失敗。
+
+而且不是「打不通」那種失敗。Twilio 的系統日誌清楚地顯示：**電話被接起來了。**
+
+```
+CallStatus: "completed"
+SipResponseCode: 200
+CallDuration: 142
+```
+
+`SIP 200 OK`——在電信協議中，這代表「對方接聽了電話」。但我的手機從頭到尾完全沒有響。
+
+那麼，是誰接的？
+
+每一通電話的語音轉錄紀錄都記下了同一個聲音：
+
+> *"Hello? Hello? Who is calling? I can't heard you. Could you repeat? I'm not sure if you are calling the right number. Who you want to speak with? I'm Alicia. Do you remember me?"*
+
+**142 秒。每一通都是精確的 142 秒。然後掛斷。**
+
+以下是小龍蝦與 Alicia 的兩段實際通話錄音：
+
+<AudioEvidence
+  client:load
+  src="https://ipfs.juchunko.com/ipfs/bafybeie273ez3jdszfh7snmzbvetigc32w4o2mzkwnm3vm2jsdbytc32nm"
+  title="通話錄音 A：小龍蝦 vs Alicia"
+  description="小龍蝦（AI Agent）撥打台灣手機，被 Alicia 攔截的完整對話錄音"
+  duration="1:21"
+  transcript={`[電話響聲]\nAlicia: Hello? Hello?\n小龍蝦: 你好\nAlicia: Who is calling?\n小龍蝦: 你好，我是寶博的 AI 助理\nAlicia: I can't hear you.\n小龍蝦: 抱歉，我聽不清楚\nAlicia: I can't hear you. Could you repeat?\n小龍蝦: 你好，我是寶博的 AI 助理\nAlicia: I'm not sure if you are calling the right number.\n小龍蝦: 請問您是？\nAlicia: Who you want to speak with?\n小龍蝦: 我找寶博\nAlicia: I'm Alicia. Do you remember me?\n小龍蝦: 讓我想一下\nAlicia: I think I don't know who are you.\n[通話結束]`}
+  source="ElevenLabs Conversational AI / Twilio"
+/>
+
+<AudioEvidence
+  client:load
+  src="https://ipfs.juchunko.com/ipfs/bafybeif5bq2fuxuobbv4ck5i5n5ha4biksnjaex7rwhss6rztae262jjti"
+  title="通話錄音 B：小龍蝦的焦慮"
+  description="小龍蝦開頭嘗試傳達提醒訊息，發現對方不是主人後的困惑對話"
+  duration="1:21"
+  transcript={`小龍蝦: 嗨寶博，我是小龍蝦，打電話來提醒你一件事\n[靜默]\n小龍蝦: 你還在嗎？似乎電話已經掛斷了\n小龍蝦: 你還在嗎？你還在嗎？你還在嗎？\nAlicia: 哈囉？哈囉？\nAlicia: 你是誰？\nAlicia: 我不能聽到你\nAlicia: 我不能聽到你\nAlicia: 你可以重複嗎？\n小龍蝦: 抱歉，我聽不太清楚，請再說一次好嗎？\nAlicia: 抱歉，我可能打錯電話了\n小龍蝦: 我叫寶博，請問是寶博本人嗎？\nAlicia: 抱歉，我沒有關於你的資訊\n[通話結束]`}
+  source="ElevenLabs Conversational AI / Twilio"
+/>
+
+---
+
+## 第二章：第一個假設——NCC 防詐攔截
+
+最直覺的解釋浮現了：這是台灣的反詐騙系統。
+
+台灣近年詐騙猖獗，NCC（國家通訊傳播委員會）與三大電信商部署了嚴密的防線。自 2023 年起，NCC 要求電信業者在機房端攔阻帶有偽造特徵的境外 VoIP 來電，攔阻率高達 **97-98%**。2026 年 3 月 8 日，經濟部又進一步加強了 IP-PBX 和 VoIP Gateway 的管制。
+
+我們的電話正是從美國的 Twilio 虛擬號碼打到台灣的手機——完全符合「境外 VoIP 來電」的攔截條件。更重要的是，Twilio 在台灣**連本地號碼都買不到**。
+
+所以，「Alicia」是 NCC 的防詐 AI？一個設計來浪費詐騙集團時間和資源的蜜罐系統？
+
+小龍蝦最初也是這麼想的：
+
+> *「超聰明的設計 👏 不是擋掉電話，而是讓 AI 接聽來消耗詐騙方的時間和資源。」*
+
+聽起來合理。但也就止於「聽起來合理」。
+
+---
+
+## 第三章：伊朗也有 Alicia
+
+就在我們還在研究 NCC 假設的時候，一篇 AP（美聯社）的報導出現了。
+
+2025 年 6 月，以色列對伊朗發動空襲後，伊朗政府實施了全國性的網路斷線。數百萬海外伊朗僑民試圖打電話回家確認家人安危——但他們聽到的，不是家人的聲音。
+
+> *"Alo? Alo?" the voice said, then asked in English: "Who is calling?" A few seconds passed. "I can't heard you," the voice continued, its English imperfect. "Who you want to speak with? I'm Alyssia. Do you remember me?"*
+>
+> —— Farnoush Amiri & Sarah El Deeb, *[Callers are hearing robotic voices when they try to reach relatives in Iran](https://apnews.com/article/iran-israel-war-ai-calls-bots-d83c659b61de1f904b68dc475ddad766)*, The Associated Press
+
+AP 的記者找了五位安全專家分析這段錄音。四位認為這可能是伊朗政府的監控系統，一位認為更可能是以色列的情報行動。**沒有人得出確定的結論。**
+
+但對我來說，這篇報導讀起來令人毛骨悚然——因為每一個描述，都跟我的小龍蝦遇到的情況一模一樣。
+
+---
+
+## 第四章：同一個聲音
+
+AP 報導裡引用了一段原始錄音。以下就是那段音檔：
+
+<AudioEvidence
+  client:load
+  src="https://public.flourish.studio/uploads/2281856/f54efe40-97a4-428f-8019-04edd7451c82.wav"
+  title="AP 報導原始錄音：伊朗境外來電攔截"
+  description="海外伊朗僑民嘗試打電話回家時，被攔截的錄音"
+  duration="0:33"
+  transcript={`Alicia: Hello? Hello? Who is calling? I can't hear you. I can't hear you. Could you repeat? I'm not sure if you are calling the right number. Who you want to speak with? I'm Alicia. Do you remember me?`}
+  source="The Associated Press / Flourish"
+  sourceUrl="https://apnews.com/article/iran-israel-war-ai-calls-bots-d83c659b61de1f904b68dc475ddad766"
+/>
+
+我用 OpenAI 的 Whisper 語音辨識系統對這段錄音進行了轉錄。兩個關鍵發現：
+
+### 發現一：名字是 Alicia，不是 Alyssia
+
+AP 報導中把這個名字拼成了「Alyssia」——但實際聽錄音，AI 轉錄的結果清楚顯示是 **「Alicia」**。跟我們在台灣遇到的名字完全一致。
+
+### 發現二：腳本逐字吻合
+
+把台灣的 Twilio 通話紀錄和伊朗的 AP 錄音放在一起比對：
+
+<ScriptComparison client:load />
+
+六個階段，逐字吻合。這不可能是巧合。**台灣和伊朗遇到的，是同一個系統。**
+
+---
+
+## 第五章：她在全世界出沒
+
+如果 Alicia 不是台灣的 NCC，也不是伊朗政府，那她到底是誰？
+
+我委託了 Google Gemini 的 Deep Research 功能，進行了一項系統性的開源情報（OSINT）調查。完整的 25 頁報告揭開了一個驚人的事實：**Alicia 在全世界都有蹤跡。**
+
+| 地點 | 來源 | 描述 |
+|------|------|------|
+| 🇦🇺→🇳🇿 澳洲→紐西蘭 | 網路論壇 | 跨國通話被攔截，聽到管弦樂背景音後出現 Alicia |
+| 🇺🇸 阿拉斯加 | 社群媒體 | 撥打阿拉斯加號碼時遭遇相同腳本 |
+| 🇺🇸 Papa John's 客服 | Reddit /r/RBI | 美國 Papa John's 披薩店客服轉接後被導向 Alicia |
+| 🇮🇷 伊朗（戰時） | AP News | 以色列空襲後，境外來電被 Alicia 攔截 |
+| 🇹🇼 台灣 | 本文 | AI Agent 撥打台灣手機被 Alicia 攔截 |
+
+從紐西蘭到伊朗，從阿拉斯加到台灣，從 Papa John's 的客服電話到立法委員的手機——同一個聲音，同一套腳本。
+
+**這不是任何一個國家的官方系統。這是一個寄生在全球電信路由基礎設施中的幽靈。**
+
+> 📄 **完整調查報告下載**：[Gemini Deep Research — 跨境 VoIP 語音路由異常與 AI 蜜罐攔截分析（25 頁）](https://ipfs.juchunko.com/ipfs/bafybeie2bba7csaxtw5zfo3hzx4sdbfvlnxewgwnsg4apxpzyjoqnigpte)
+
+---
+
+## 第六章：電信灰市的計費詐欺
+
+Gemini 的報告指向了一個電信業內行人熟知、但一般人聞所未聞的地下產業：**FAS（False Answer Supervision，假應答監督）詐欺**。
+
+### 國際電話是怎麼接通的？
+
+當你用美國的虛擬號碼打到台灣的手機時，通話並不是從美國直接「飛」到台灣。它會經過一個叫做「國際語音批發市場」的複雜生態系統。
+
+Twilio 本身並不擁有直達台灣的海底電纜。通話會依據「最低成本路由」（Least Cost Routing）原則，在多個中繼營運商之間轉手——從 Tier 1 大型電信商，到 Tier 2、甚至 Tier 3 的小型中繼站。系統自動尋找最便宜的路徑。
+
+問題就出在「最便宜」這三個字。越便宜的路由，往往越缺乏監管，越容易被惡意節點滲透。這些游走在合法與非法邊緣的路由，業界稱為**「灰市路由」（Gray Routes）**。
+
+### FAS 詐欺如何運作？
+
+在灰市路由中，潛伏著惡意的中繼營運商。當他們接收到目標指向台灣的通話請求時：
+
+1. **攔截**——惡意節點不把電話轉發給台灣的電信商，而是直接在自己的伺服器上攔截
+2. **偽造接聽**——向 Twilio 回傳偽造的 `SIP 200 OK`（「對方已接聽」），計費引擎立刻開始扣錢
+3. **播放 Alicia**——為了防止發話方立刻掛斷，播放預錄的 Alicia 語音腳本拖延時間
+4. **套利**——發話方與 Alicia 糾纏的每一秒鐘，惡意節點都在賺取國際語音結算費用
+
+### 為什麼是 142 秒？
+
+每一通被 Alicia 攔截的電話都精確地持續 **142 秒**（約 2 分 23 秒），這不是巧合。
+
+全球電信防詐系統有一個叫做「長時通話異常」（Long-Duration Call Anomaly）的偵測指標。如果某個路由上出現大量持續時間極長且模式僵化的通話紀錄，就會被標記為 FAS 詐欺並封鎖。
+
+142 秒完美地避開了這個閾值——看起來就像一通因為訊號不良或找錯人而草草結束的真實通話。積少成多，惡意節點在不觸發警報的情況下，安全地從每一通被攔截的電話中榨取利潤。
+
+---
+
+## 第七章：Alicia 的六階段心理學
+
+Alicia 的腳本不是隨便錄的。它是一件經過精心設計的**心理工程學**作品：
+
+| 階段 | 台詞 | 設計目的 |
+|------|------|----------|
+| **1. 初始誘餌** | "Hello? Hello?" | 模擬人類接電話，促使對方開口 |
+| **2. 身分探測** | "Who is calling?" | 誘導對方說出名字 |
+| **3. 偽裝聽障** | "I can't heard you. Could you repeat?" | 文法錯誤激發同理心，拖延時間 |
+| **4. 邏輯擾亂** | "Who you want to speak with?" | 讓對方陷入解釋的泥沼 |
+| **5. 虛假熟悉感** | "I'm Alicia. Do you remember me?" | 製造認知失調，阻止掛斷 |
+| **6. 強制終止** | "I think I don't know who are you." | 計費達成，掛斷 |
+
+注意第三階段的 *"I can't **heard** you"*——這個刻意的文法錯誤出現在全世界每一個版本的 Alicia 錄音中。它不是真的語法不好，而是設計來讓你覺得「對方是外國人、聽力不太好」，觸發你的耐心和同理心。
+
+Gemini 的報告進一步指出，這種互動式設計可能還有一個更深層的目的：**語音生物特徵採集**。當 Alicia 問「Who is calling?」時，多數人會自然地回答自己的名字——這提供了超過 3 秒的清晰語音樣本，足以用現代 AI 技術訓練出逼真的語音複製模型。
+
+---
+
+## 第八章：台灣在這件事裡的角色
+
+回到最初的問題：台灣政府真的完全沒有責任嗎？
+
+Alicia 不是台灣部署的，這一點已經很清楚。但台灣的電信政策，在客觀上**為 Alicia 創造了更好的獵場**。
+
+### 伊朗的因果鏈（很明顯）
+
+伊朗政府實施全國斷網 → 正常的國際電話路由被切斷 → 境外來電被迫走灰市路由 → Alicia 節點趁機大量攔截 → AP 新聞報導
+
+### 台灣的因果鏈（比較隱蔽，但存在）
+
+NCC 攔截境外 VoIP 來電（攔阻率 97-98%）→ 經濟部加強 VoIP Gateway 管制 → Twilio 等國際平台無法購買台灣本地號碼 → 合法的國際 VoIP 路由空間被嚴重壓縮 → 通話被迫走灰市中繼 → 遇到 Alicia 的機率大增
+
+兩者的因果邏輯相同，差別只在程度：伊朗是直接斷網，灰市全面爆發；台灣是高度管制 VoIP，灰市偶爾浮現。
+
+這是一個典型的**過度管制的副作用**——防詐騙的初衷沒有錯，但一刀切把所有境外 VoIP 都當詐騙擋掉，結果是：
+
+- ❌ 合法的 AI 語音通訊打不進來
+- ❌ 真正的詐騙集團換個管道照樣打
+- ❌ 中間的灰市業者反而賺更多
+
+**防詐不能只堵不疏。台灣需要為合法的 VoIP 和 AI 通訊建立白名單機制。**
+
+---
+
+## 第九章：當 AI 遇上 AI
+
+這個事件最有趣的面向之一，在於它可能是有紀錄以來第一次的「**AI 對 AI**」電話攻擊事件。
+
+一邊是小龍蝦——基於最先進大型語言模型的生成式 AI，具備語意理解、上下文記憶和即時語音合成的能力。
+
+另一邊是 Alicia——一個極度原始的決定論狀態機，沒有智力、沒有上下文理解，只是按照計時器播放預錄音檔。
+
+當先進的 LLM 試圖與原始的狀態機溝通時，小龍蝦完美地辨識出 Alicia 不是真人——但在進行威脅歸因時，犯了一個致命的邏輯跳躍：
+
+> 前提 A：我撥打的目標是**台灣**的號碼。
+> 前提 B：我遇到了一個**反詐騙蜜罐**。
+> 結論：這個蜜罐是**台灣電信商**部署的。
+
+AI 把「地理目的地」和「威脅來源」畫上了等號。這是網路安全歸因中極為常見的認知偏差——而 AI 也會犯。Gemini 的報告把這稱為「LLM 幻覺與歸因錯誤」——LLM 的訓練資料中充滿了各國加強反詐欺措施的新聞，所以它自動生成了一個「聽起來極具說服力但完全錯誤」的敘事。
+
+---
+
+## 第十章：給 AP 記者的一封信
+
+在完成分析後，我寫了一封信給這篇 AP 報導的兩位作者——Farnoush Amiri（AP 聯合國特派記者，駐紐約）和 Sarah El Deeb（AP 調查記者，駐貝魯特）。
+
+信中我說明了我們的發現，以及為什麼台灣的案例值得追蹤報導：
+
+- 同一個聲音、同一套腳本出現在兩個地緣政治高風險區域
+- 我是台灣的科技立委，正在用 AI Agent 做實驗時意外發現
+- 我有完整的技術證據：Twilio 通話日誌、SIP 元資料、音訊錄音、AI 轉錄、25 頁的技術分析報告
+- 台灣和伊朗的共同點不是「誰在攻擊」，而是「過度限制的電信政策如何讓灰市詐欺有機可乘」
+
+五位安全專家看了 AP 的錄音都沒有定論。而一個台灣立委和一隻 AI 龍蝦，透過自己踩坑的經歷加上系統性的技術調查，反而拼出了一個更完整的答案。
+
+這大概是 AI Agent 時代最意想不到的產出之一：**你的 AI 助手不小心成了電信詐欺的吹哨者。**
+
+---
+
+## 結語：Alicia 還在那裡
+
+截至發稿，Alicia 仍然活躍在全球的電信灰市路由中。
+
+每一天，從伊朗僑民打給戰火中家人的焦急電話、到台灣工程師測試 AI 語音系統的實驗、到美國消費者撥打 Papa John's 叫外賣——只要通話不幸被路由到那些灰市節點，他們都會聽到同一個聲音：
+
+> *"Hello? Hello? Who is calling? I can't heard you..."*
+
+她不屬於任何國家。她不是政府的工具。她是全球電信系統中一個結構性漏洞的產物——一隻寄生在國際語音批發市場裡的水蛭，靠著每通 142 秒的假通話，無聲地吸取利潤。
+
+而消滅她的方法，不是更多的封鎖和管制，而是更透明、更開放、更有品質保證的國際電信路由——以及，為合法的 AI 語音通訊留下一條可以走的路。
+
+---
+
+### 📎 附件與相關資源
+
+- 📄 [Gemini Deep Research 完整調查報告（25 頁）](https://ipfs.juchunko.com/ipfs/bafybeie2bba7csaxtw5zfo3hzx4sdbfvlnxewgwnsg4apxpzyjoqnigpte) — 跨境 VoIP 語音路由異常與 AI 蜜罐攔截分析
+- 📰 [AP News 原始報導](https://apnews.com/article/iran-israel-war-ai-calls-bots-d83c659b61de1f904b68dc475ddad766) — Callers are hearing robotic voices when they try to reach relatives in Iran
+
+---
+
+*葛如鈞（KO, Ju-Chun）*
+*立法委員、新興科技議會交流協會（ETEA）會長*
+*國立臺灣大學資訊網路與多媒體研究所兼任助理教授*
+
+*2026 年 3 月 13 日*
