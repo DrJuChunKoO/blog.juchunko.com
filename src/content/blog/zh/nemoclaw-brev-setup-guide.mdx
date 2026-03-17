@@ -66,7 +66,7 @@ sudo bash -c "$(curl -fsSL https://raw.githubusercontent.com/brevdev/brev-cli/ma
 ```bash
 brev ls
 # NAME             STATUS   GPU
-# nemoclaw-77d52f  RUNNING  L40S
+# my-instance      RUNNING  L40S
 ```
 
 ## 正規安裝路徑（推薦）
@@ -75,7 +75,7 @@ brev ls
 
 ```bash
 # SSH 進入 instance
-brev shell nemoclaw-77d52f
+brev shell my-instance
 
 # 一鍵安裝
 curl -fsSL https://nvidia.com/nemoclaw.sh | bash
@@ -355,7 +355,7 @@ Vision API 呼叫使用 NVIDIA 的 OpenAI-compatible endpoint，和 Nemotron 用
 
 ## 最終成果
 
-- 🤖 Telegram Bot `@dab_nemoclaw_bot` 運行在 OpenShell 安全沙盒裡
+- 🤖 Telegram Bot 運行在 OpenShell 安全沙盒裡
 - 💬 文字對話由 **Nemotron 3 Super 120B** 驅動
 - 📷 圖片辨識由 **Llama 3.2 90B Vision** 處理
 - 🔒 所有推論受 NemoClaw 安全策略保護

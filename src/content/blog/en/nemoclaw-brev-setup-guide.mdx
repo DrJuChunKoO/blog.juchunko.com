@@ -66,7 +66,7 @@ Create a GPU instance on the Brev dashboard (L40S 48GB or above recommended), wa
 ```bash
 brev ls
 # NAME             STATUS   GPU
-# nemoclaw-77d52f  RUNNING  L40S
+# my-instance      RUNNING  L40S
 ```
 
 ## Standard Installation (Recommended)
@@ -75,7 +75,7 @@ If you can SSH in directly, installation is straightforward:
 
 ```bash
 # SSH into the instance
-brev shell nemoclaw-77d52f
+brev shell my-instance
 
 # One-line install
 curl -fsSL https://nvidia.com/nemoclaw.sh | bash
@@ -355,7 +355,7 @@ The Vision API uses NVIDIA's OpenAI-compatible endpoint, sharing the same API ke
 
 ## Final Result
 
-- 🤖 Telegram Bot `@dab_nemoclaw_bot` running inside OpenShell secure sandbox
+- 🤖 Telegram Bot running inside OpenShell secure sandbox
 - 💬 Text conversations powered by **Nemotron 3 Super 120B**
 - 📷 Image recognition powered by **Llama 3.2 90B Vision**
 - 🔒 All inference protected by NemoClaw security policies
