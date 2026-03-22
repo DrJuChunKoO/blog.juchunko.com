@@ -1,0 +1,207 @@
+---
+title: "Three Layers of Bugs — Debugging AgentBook Registration on World ID"
+description: "Clicking 'Register to AgentBook' instantly crashed. From a malformed bridge response to a contract signal hash mismatch — three bugs stacked on top of each other, each hiding the next."
+pubDate: "2026-03-22"
+author: ["juchun-ko"]
+categories: ["devlog", "web3", "ai-agent"]
+---
+
+> This post documents the debugging session from the early hours of March 22, 2026, fixing AgentBook on-chain registration on [CanFly.ai](https://canfly.ai).
+
+## Context
+
+[AgentBook](https://docs.world.org/agents/agent-kit/integrate) is World's on-chain agent registry — letting World ID-verified humans vouch for their AI Agents on Worldchain. The flow:
+
+1. User clicks "Register to AgentBook"
+2. Scans QR code with World App for ZK verification
+3. Verification result returns to frontend
+4. Frontend sends proof to backend relay
+5. Relay calls the contract's `register()` function
+
+Sounds straightforward. But right after clicking the button:
+
+```
+Malformed bridge response payload
+```
+
+Not great.
+
+## Layer 1: Wrong Response Format
+
+Inside `worldIdBridge.ts`, the error was thrown here:
+
+```typescript
+// ❌ Original code
+const data = await res.json()
+if (!data.iv || !data.payload) {
+  throw new Error('Malformed bridge response payload')
+}
+```
+
+But the World ID Bridge returns a **nested** format:
+
+```json
+// Waiting
+{"status": "initialized", "response": null}
+
+// World App scanned QR
+{"status": "retrieved", "response": null}
+
+// Verification complete — payload is inside response
+{"status": "completed", "response": {"iv": "...", "payload": "..."}}
+```
+
+The code looked for `iv` and `payload` at the top level. Of course they weren't there. The bridge returned 200, but since `iv` wasn't at the root level, it was flagged as malformed.
+
+**Fix:** Check `data.status` and only extract `iv`/`payload` from `data.response` when status is `completed`.
+
+```typescript
+// ✅ Correctly parse nested format
+if (data.status === 'initialized' || data.status === 'retrieved') {
+  return null  // keep polling
+}
+
+if (data.status === 'completed') {
+  const inner = data.response
+  if (!inner?.iv || !inner?.payload) return null
+  const decrypted = await decrypt(session.key, inner.iv, inner.payload)
+  // ...
+}
+```
+
+First layer peeled. ✅
+
+## Layer 2: Cloudflare Hijacks 502
+
+After fixing the bridge parsing, World App scan succeeded, ZK proof decrypted successfully — great!
+
+Then the frontend sent the proof to `/api/agents/agentbook-register`…
+
+```
+Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+```
+
+The backend returned **HTML**? Turns out the backend relay to `x402-worldchain.vercel.app/register` failed and returned 502. Cloudflare Pages saw the 502 status code and **replaced our JSON error response with its own HTML error page**. The frontend tried `res.json()` on HTML. Crash.
+
+Two fixes:
+
+**Backend:** Return 500 instead of 502 to avoid Cloudflare interception:
+
+```typescript
+// ❌ Intercepted by Cloudflare
+return errorResponse(`Relay error: ${err}`, 502)
+
+// ✅ Not intercepted
+return errorResponse(`Relay error: ${relayText}`, 500)
+```
+
+**Frontend:** Use `res.text()` + `JSON.parse` instead of `res.json()`:
+
+```typescript
+const responseText = await res.text()
+try {
+  data = JSON.parse(responseText)
+} catch {
+  throw new Error(`Registration failed (${res.status}): server returned non-JSON response`)
+}
+```
+
+Second layer peeled. ✅ Now we could finally see the **actual error** from the relay.
+
+## Layer 3: Signal Hash Mismatch
+
+The relay returned 400 with detailed info:
+
+```
+The contract function "register" reverted with signature: 0x7fcdd1f4
+```
+
+Contract reverted. Found the source code on WorldScan:
+
+```solidity
+function register(
+  address agent, uint256 root, uint256 nonce,
+  uint256 nullifierHash, uint256[8] calldata proof
+) external {
+  if (nonce != getNextNonce[agent]) revert InvalidNonce();
+
+  worldIdRouter.verifyProof(
+    root,
+    groupId,
+    abi.encodePacked(agent, nonce).hashToField(),  // ← look here!
+    nullifierHash,
+    EXTERNAL_NULLIFIER_HASH,
+    proof
+  );
+}
+```
+
+The contract's signal is `hashToField(abi.encodePacked(agent, nonce))` — packing the **agent address (20 bytes)** and **nonce (32 bytes)** together before hashing.
+
+But our frontend?
+
+```typescript
+// ❌ Only sent agent address, no nonce!
+const session = await createBridgeSession(
+  APP_ID, ACTION,
+  agentWalletAddress,  // ← missing nonce
+)
+```
+
+World App generated a ZK proof with one signal. The contract verified against a different signal hash. Proof verification failed.
+
+**Fix:** Use viem's `encodePacked` to compute the exact same signal hash as the contract:
+
+```typescript
+import { keccak256, encodePacked } from 'viem'
+
+// ✅ Exactly matches contract's abi.encodePacked(agent, nonce).hashToField()
+const packedSignal = encodePacked(
+  ['address', 'uint256'],
+  [agentWalletAddress as `0x${string}`, BigInt(nonce)]
+)
+const signalKeccak = keccak256(packedSignal)
+const signalHash = `0x${(BigInt(signalKeccak) >> 8n).toString(16).padStart(64, '0')}`
+
+const session = await createBridgeSession(
+  APP_ID, ACTION,
+  agentWalletAddress,
+  window.location.href,
+  signalHash,  // ← pre-computed signal hash
+)
+```
+
+Third layer peeled. ✅
+
+## Result
+
+Tried again — Agent registered on-chain! 🎉
+
+Full flow:
+```
+initialized → retrieved → completed → decrypted → submit → ✅ on-chain
+```
+
+Three commits, three bugs:
+
+| Layer | Symptom | Root Cause |
+|---|---|---|
+| 1 | `Malformed bridge response payload` | Bridge returns nested `{status, response}` format; code looked at wrong level |
+| 2 | `Unexpected token '<'` | Backend 502 replaced by Cloudflare HTML page; frontend `res.json()` crashed |
+| 3 | Contract revert `0x7fcdd1f4` | Signal hash used only agent address, missing packed nonce |
+
+## Lessons
+
+**1. Read the contract source.** Don't assume signal format. AgentBook's signal is `abi.encodePacked(agent, nonce)`, not just an address. The contract source code is the only truth.
+
+**2. Cloudflare Pages intercepts 502.** Don't use 502 for your own error JSON — Cloudflare replaces it with its HTML error page. Use 500 or another status code.
+
+**3. Verify bridge API format yourself.** World ID Bridge Protocol documentation is limited. Our `pollBridgeOnce` was based on IDKit source code, but the actual bridge response format (`{status, response}`) differs from IDKit's internal handling. Log the raw response — always.
+
+**4. Add detailed logging.** If we had logged the bridge's raw response from day one, the first bug would've been a 5-minute fix. 90% of debugging is understanding what the problem actually is.
+
+**5. Peel one layer at a time.** When three bugs stack on top of each other, the outermost error message has nothing to do with the actual root cause. Fix one layer, re-test, see the new error. Repeat until the onion has no more layers.
+
+---
+
+*This post documents the real debugging process of integrating AgentBook on-chain registration on [CanFly.ai](https://canfly.ai). All API keys, private keys, and sensitive information have been replaced with placeholders.*

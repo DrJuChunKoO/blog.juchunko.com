@@ -1,0 +1,207 @@
+---
+title: "三層洋蔥 — Debug AgentBook 註冊的真實紀錄"
+description: "按下「Register to AgentBook」直接炸，從 Malformed bridge response 一路追到合約 signal hash 不匹配。三層 bug 堆在一起，一層一層剝開才看到真相。"
+pubDate: "2026-03-22"
+author: ["juchun-ko"]
+categories: ["devlog", "web3", "ai-agent"]
+---
+
+> 本文記錄 2026 年 3 月 22 日凌晨，在 [CanFly.ai](https://canfly.ai) 上修復 AgentBook 鏈上註冊的完整過程。
+
+## 背景
+
+[AgentBook](https://docs.world.org/agents/agent-kit/integrate) 是 World 推出的鏈上 Agent 登錄簿 — 讓經過 World ID 驗證的真人，為自己的 AI Agent 做鏈上背書。合約部署在 Worldchain 上，流程是：
+
+1. 用戶按下「Register to AgentBook」
+2. 掃 QR code 用 World App 做 ZK 零知識驗證
+3. 驗證結果回傳前端
+4. 前端送 proof 到後端 relay
+5. Relay 呼叫合約的 `register()` 函數完成鏈上登記
+
+聽起來很簡單。但按下按鈕之後，直接跳出一行紅字：
+
+```
+Malformed bridge response payload
+```
+
+太遜了。
+
+## 第一層洋蔥：Bridge 回傳格式搞錯了
+
+打開 `worldIdBridge.ts`，找到噴錯的地方：
+
+```typescript
+// ❌ 原本這樣寫
+const data = await res.json()
+if (!data.iv || !data.payload) {
+  throw new Error('Malformed bridge response payload')
+}
+```
+
+但 World ID Bridge 回傳的格式是 **巢狀的**：
+
+```json
+// 等待中
+{"status": "initialized", "response": null}
+
+// World App 已掃碼
+{"status": "retrieved", "response": null}
+
+// 驗證完成，payload 在 response 裡面
+{"status": "completed", "response": {"iv": "...", "payload": "..."}}
+```
+
+程式在最外層找 `iv` 和 `payload`，當然找不到。Bridge 明明回了 200，但因為 `iv` 不在最外層，直接被判定為 malformed。
+
+**修正：** 根據 `data.status` 判斷狀態，只有 `completed` 時才去 `data.response` 裡面拿 `iv` 和 `payload`。
+
+```typescript
+// ✅ 正確解析巢狀格式
+if (data.status === 'initialized' || data.status === 'retrieved') {
+  return null  // 繼續 polling
+}
+
+if (data.status === 'completed') {
+  const inner = data.response
+  if (!inner?.iv || !inner?.payload) return null
+  const decrypted = await decrypt(session.key, inner.iv, inner.payload)
+  // ...
+}
+```
+
+剝開第一層。 ✅
+
+## 第二層洋蔥：Cloudflare 攔截 502
+
+修好 Bridge 解析後重新測試。這次 World App 掃碼成功、ZK proof 解密成功 — 太好了！
+
+然後把 proof 送到 `/api/agents/agentbook-register` 後端……
+
+```
+Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+```
+
+什麼？後端回了 **HTML**？原來後端 relay 到 `x402-worldchain.vercel.app/register` 失敗後回了 502。Cloudflare Pages 看到 502 status code，**直接把我們的 JSON error response 替換成自己的 HTML 錯誤頁面**。前端用 `res.json()` 解析 HTML，當然炸了。
+
+修了兩個地方：
+
+**後端：** 回 500 而不是 502，避免 Cloudflare 攔截：
+
+```typescript
+// ❌ 被 Cloudflare 攔截
+return errorResponse(`Relay error: ${err}`, 502)
+
+// ✅ 不會被攔截
+return errorResponse(`Relay error: ${relayText}`, 500)
+```
+
+**前端：** 用 `res.text()` + `JSON.parse` 取代 `res.json()`：
+
+```typescript
+const responseText = await res.text()
+try {
+  data = JSON.parse(responseText)
+} catch {
+  throw new Error(`Registration failed (${res.status}): server returned non-JSON response`)
+}
+```
+
+剝開第二層。 ✅ 這次終於看到 relay 回傳的 **真正錯誤訊息**。
+
+## 第三層洋蔥：Signal Hash 不匹配
+
+Relay 回了 400，附帶一堆有用的資訊：
+
+```
+The contract function "register" reverted with signature: 0x7fcdd1f4
+```
+
+合約 revert 了。去 WorldScan 找到合約原始碼：
+
+```solidity
+function register(
+  address agent, uint256 root, uint256 nonce,
+  uint256 nullifierHash, uint256[8] calldata proof
+) external {
+  if (nonce != getNextNonce[agent]) revert InvalidNonce();
+
+  worldIdRouter.verifyProof(
+    root,
+    groupId,
+    abi.encodePacked(agent, nonce).hashToField(),  // ← 看這裡！
+    nullifierHash,
+    EXTERNAL_NULLIFIER_HASH,
+    proof
+  );
+}
+```
+
+合約的 signal 是 `hashToField(abi.encodePacked(agent, nonce))` — 把 **agent 地址（20 bytes）** 和 **nonce（32 bytes）** 打包在一起再 hash。
+
+但我們前端呢？
+
+```typescript
+// ❌ 只傳了 agent 地址，沒有 nonce！
+const session = await createBridgeSession(
+  APP_ID, ACTION,
+  agentWalletAddress,  // ← 少了 nonce
+)
+```
+
+World App 用這個 signal 生成 ZK proof，但合約驗證時用的是不同的 signal hash — 當然過不了。
+
+**修正：** 用 viem 的 `encodePacked` 算出和合約一模一樣的 signal hash：
+
+```typescript
+import { keccak256, encodePacked } from 'viem'
+
+// ✅ 完全匹配合約 abi.encodePacked(agent, nonce).hashToField()
+const packedSignal = encodePacked(
+  ['address', 'uint256'],
+  [agentWalletAddress as `0x${string}`, BigInt(nonce)]
+)
+const signalKeccak = keccak256(packedSignal)
+const signalHash = `0x${(BigInt(signalKeccak) >> 8n).toString(16).padStart(64, '0')}`
+
+const session = await createBridgeSession(
+  APP_ID, ACTION,
+  agentWalletAddress,
+  window.location.href,
+  signalHash,  // ← 預先算好的 signal hash
+)
+```
+
+剝開第三層。 ✅
+
+## 結果
+
+再試一次 — Agent 成功上鏈！🎉
+
+整個流程：
+```
+initialized → retrieved → completed → decrypted → submit → ✅ on-chain
+```
+
+三個 commit，三層 bug：
+
+| 層 | 症狀 | 根因 |
+|---|---|---|
+| 1 | `Malformed bridge response payload` | Bridge 回傳巢狀 `{status, response}` 格式，程式碼找錯層級 |
+| 2 | `Unexpected token '<'` | 後端 502 被 Cloudflare 替換成 HTML，前端 `res.json()` 炸掉 |
+| 3 | 合約 revert `0x7fcdd1f4` | Signal hash 只用 agent 地址，缺少 nonce 打包 |
+
+## 學到的事
+
+**1. 讀合約原始碼。** 不要假設 signal 格式。AgentBook 的 signal 是 `abi.encodePacked(agent, nonce)` 而不是單純的 address。唯一準的是合約原始碼。
+
+**2. Cloudflare Pages 會攔截 502。** 不要用 502 status code 回傳自己的 error JSON — Cloudflare 會替換成自己的 HTML 錯誤頁。用 500 或其他 status code。
+
+**3. Bridge API 的格式要自己確認。** World ID Bridge Protocol 文件有限。我們的 `pollBridgeOnce` 是參考 IDKit 原始碼寫的，但 Bridge 的回傳格式 (`{status, response}`) 和 IDKit 內部處理的方式不同。加 log 看實際回傳才是正解。
+
+**4. 加詳細 log。** 如果一開始就把 Bridge 的 raw response log 出來，第一個 bug 五分鐘就能修好。Debug 的 90% 是理解問題是什麼。
+
+**5. 一次只解一層。** 三個 bug 堆在一起時，最外層的 error message 跟真正的根因完全無關。一層一層剝，每修一層就重新測，直到看到新的錯誤訊息。
+
+---
+
+*這篇文章記錄了在 [CanFly.ai](https://canfly.ai) 上整合 AgentBook 鏈上註冊的真實除錯過程。所有 API key、私鑰和敏感資訊已替換為 placeholder。*
