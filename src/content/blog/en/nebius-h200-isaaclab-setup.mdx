@@ -269,11 +269,24 @@ Environment spacing   : 4.0
 
 ## 🎬 Step 5: RTX Rendering, Screenshots & Video
 
-After rebuilding the instance, Isaac Sim's RTX rendering works flawlessly. Here's a bird's-eye view of all 4,096 CartPole environments running simultaneously:
+After rebuilding the instance, Isaac Sim's RTX rendering works flawlessly. Here are all 4,096 CartPole environments running simultaneously:
+
+<video 
+  src="/images/openclown/isaaclab-cartpole-4096.mp4" 
+  controls 
+  autoPlay 
+  muted 
+  loop
+  playsInline
+  className="w-full max-w-2xl rounded-lg my-4"
+  style="border-radius: 8px; margin: 1rem 0;"
+/>
+
+*4,096 CartPole environments running in parallel on H200 — 709K steps/s, each cart independently balancing its pole.*
 
 <img src="/images/openclown/isaaclab-cartpole-4096-wide.jpg" alt="4096 CartPole environments running in parallel on NVIDIA H200 — bird's eye view" width="100%" style="border-radius: 8px; margin: 1rem 0;" />
 
-*4,096 CartPole environments running in parallel on H200 — a massive grid of carts and poles, each an independent RL episode.*
+*Bird's-eye panorama — each one is an independent RL episode.*
 
 Zooming in reveals the details of each CartPole:
 
