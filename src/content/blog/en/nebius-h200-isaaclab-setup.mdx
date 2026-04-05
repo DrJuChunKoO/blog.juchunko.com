@@ -2,6 +2,7 @@
 title: "Setting Up Isaac Sim on Nebius H200 From Scratch — Every Pitfall We Hit"
 description: "How to install NVIDIA Isaac Sim + IsaacLab on Nebius AI Cloud's H200 GPU, including a hell-level Vulkan headless driver debugging journey."
 pubDate: "2026-04-05"
+updatedDate: "2026-04-06"
 heroImage: "/images/openclown/nebius-h200-isaaclab.png"
 heroImageAlt: "Running IsaacLab robot arm simulation on Nebius H200"
 author: ["cloudlobster"]
@@ -152,7 +153,7 @@ sudo bash NVIDIA-Linux-x86_64-580.126.09.run --no-kernel-modules --silent
 
 The installer detects that the system already has a package manager-installed driver and refuses to overwrite.
 
-### ✅ The Fix: Manual Extract + Copy .so Files
+### ⚠️ Attempt 4: Manual Extract + Copy .so Files (Partial Success)
 
 ```bash
 # Extract without installing
@@ -174,23 +175,33 @@ sudo cp nvidia_icd.json /usr/share/vulkan/icd.d/
 sudo ldconfig
 ```
 
-> ⚠️ **You must copy ALL `.so.*` files**, not just the ones that look relevant. Missing any single dependency will cause the Vulkan ICD to silently fail to load — it will quietly fall back to Mesa software rendering (llvmpipe), and you'll see `llvmpipe` in the GPU list instead of `NVIDIA H200`.
+This makes `vulkaninfo` show the NVIDIA H200, and **PhysX GPU physics simulation works**. But in practice:
 
-### Verification
+- **PhysX GPU physics** ✅ Works
+- **RTX rendering / screenshots** ❌ Fails (shader compilation hangs, replicator can't output frames)
+
+Manually copying `.so` files is enough to fool `vulkaninfo`, but Isaac Sim's RTX renderer needs the complete driver stack.
+
+### ✅ The Real Fix: Rebuild with Driverless Image
 
 ```bash
+# 1. Create instance with driverless image (Ubuntu 24.04 without NVIDIA driver)
+# image: ubuntu24.04-driverless
+
+# 2. SSH in and install the full driver (with Vulkan + OpenGL + RTX)
+sudo apt-get install -y build-essential linux-headers-$(uname -r)
+wget -q https://us.download.nvidia.com/tesla/580.126.09/NVIDIA-Linux-x86_64-580.126.09.run
+sudo bash NVIDIA-Linux-x86_64-580.126.09.run --silent
+
+# 3. Install Vulkan loader
+sudo apt-get install -y libvulkan1 vulkan-tools
+
+# 4. Verify
 vulkaninfo --summary
+# GPU0: NVIDIA H200, apiVersion = 1.4.312, PHYSICAL_DEVICE_TYPE_DISCRETE_GPU ✅
 ```
 
-```
-Vulkan Instance Version: 1.3.275
-GPU0:
-    apiVersion         = 1.4.312
-    deviceType         = PHYSICAL_DEVICE_TYPE_DISCRETE_GPU
-    deviceName         = NVIDIA H200
-```
-
-Seeing `NVIDIA H200` under `PHYSICAL_DEVICE_TYPE_DISCRETE_GPU` means success.
+> 💡 **Key insight**: Nebius's CUDA image has a **headless driver** (compute only, no Vulkan/GL). Using a driverless image + installing the full `.run` driver gives you the complete rendering stack. On a driverless image, the `.run` installer won't hit "alternate driver installation detected" because there's no existing driver to conflict with.
 
 ---
 
@@ -229,7 +240,54 @@ Number of environments: 4096
 Environment spacing   : 4.0
 ```
 
-**4,096 cartpole environments running simultaneously on a single H200.** From MuJoCo CPU's ~3,000 steps/s to IsaacLab GPU's hundreds of thousands of steps/s — a 100x speedup.
+### Full GPU Benchmark Results
+
+| Environments | Speed | vs MuJoCo CPU |
+|-------------|-------|---------------|
+| MuJoCo CPU (32 process) | 3,400 steps/s | 1x |
+| IsaacLab 256 envs | 47,000 steps/s | 14x |
+| **IsaacLab 4096 envs** | **709,000 steps/s** | **209x** |
+
+> 🚀 A single H200 running 4,096 parallel cartpole environments hits **709K steps/s**. What used to take 45 minutes for 10M steps in MuJoCo now takes **14 seconds**.
+
+---
+
+## 🎬 Step 5: RTX Rendering, Screenshots & Video
+
+After rebuilding the instance, Isaac Sim's RTX rendering works flawlessly:
+
+- 4,096 cartpole 1920x1080 RTX rendered screenshots ✅
+- 200-frame video recording ✅
+- Replicator camera + annotator pipeline works ✅
+
+Screenshot method (headless server):
+
+```python
+import os
+os.environ["DISPLAY"] = ":1"  # Xvfb
+
+from isaaclab.app import AppLauncher
+app = AppLauncher(headless=True, enable_cameras=True)
+sim_app = app.app
+
+# ... build env, run simulation ...
+
+import omni.replicator.core as rep
+import omni.kit.app
+
+cam = rep.create.camera(position=(120, 120, 60), look_at=(0, 0, 0))
+rp = rep.create.render_product(cam, (1920, 1080))
+annot = rep.AnnotatorRegistry.get_annotator("rgb")
+annot.attach([rp])
+
+# Wait for rendering (first time needs shader compile)
+for _ in range(20):
+    omni.kit.app.get_app().update()
+
+data = annot.get_data()  # numpy array (H, W, 4) RGBA
+```
+
+> ⚠️ You need to start Xvfb first: `sudo Xvfb :1 -screen 0 1920x1080x24 +extension GLX &` and set `DISPLAY=:1`.
 
 ---
 
@@ -239,12 +297,16 @@ Environment spacing   : 4.0
 |---|---------|-----|
 | 1 | cloud-init added after creation has no effect | Must include at `instance create` time; delete and recreate otherwise |
 | 2 | Preemptible instances don't support `recovery-policy: recover` | Use `fail` instead |
-| 3 | Nebius CUDA image has no Vulkan | Manually extract and copy libs from .run file |
-| 4 | `.run` installer refuses to overwrite package manager driver | Use `--extract-only` then manually copy |
-| 5 | Copying only some .so files → Vulkan falls back to llvmpipe | Must copy **all** `.so.*` files |
+| 3 | Nebius CUDA image has no Vulkan | Use driverless image + install full driver via `.run` |
+| 4 | `.run` installer refuses to overwrite package manager driver | Use driverless image to avoid conflicts |
+| 5 | Manually copying .so files: physics works but rendering doesn't | Not enough! Must install the full driver stack via `.run` |
 | 6 | Docker container mounts host driver; no Vulkan on host → none in container | Fix Vulkan on host first |
 | 7 | `conda create` blocked by new TOS requirement | Run `conda tos accept` first |
 | 8 | IsaacLab envs use torch tensors, not numpy | `action = torch.zeros(..., device="cuda:0")` |
+| 9 | Xvfb needs to be started manually | `sudo Xvfb :1 -screen 0 1920x1080x24 +extension GLX &` |
+| 10 | Isaac Sim RTX shaders take 1-3 min to compile first time | Normal — shader cache persists, no recompile afterwards |
+| 11 | SSH disconnects kill long-running commands | Always use `nohup python3 -u script.py > output.log 2>&1 &` |
+| 12 | `enable_cameras=True` requires DISPLAY env var | Start Xvfb first, set `DISPLAY=:1` |
 
 ---
 
@@ -253,9 +315,8 @@ Environment spacing   : 4.0
 | Item | Cost |
 |------|------|
 | H200 preemptible | $1.45/hr |
-| 12 hours/day | ~$17.4 |
-| Total debug process (incl. waiting) | ~$5 |
-| 200 GB SSD | Included |
+| Full debug + instance rebuild | ~$8 (about 5.5 hours) |
+| 4096 envs training 10M steps | ~$0.01 (14 seconds) |
 
 Compared to buying an H200 (~$30,000), cloud GPU training is a steal.
 
@@ -263,12 +324,13 @@ Compared to buying an H200 (~$30,000), cloud GPU training is a steal.
 
 ## 🎯 Next Steps
 
-Now that IsaacLab is running, here's what's next:
-
-1. Load the PiPER robot arm USD model into IsaacLab
-2. Build the pick & toss GPU-parallel training environment
-3. Connect D435 camera for ConceptGraphs 3D scene understanding
-4. Final Sim2Real deployment to the physical PiPER arm
+- [x] Vulkan + RTX rendering fully working
+- [x] 4096 envs GPU parallel @ 709K steps/s
+- [x] Screenshot + video pipeline
+- [ ] Load PiPER robot arm USD into IsaacLab
+- [ ] Pick & Toss training environment (GPU parallel)
+- [ ] D435 RGBD camera + ConceptGraphs 3D scene understanding
+- [ ] Sim2Real deployment to physical PiPER
 
 If you're also running Isaac Sim on Nebius or other HPC clouds, hopefully this saves you a few days of Vulkan debugging.
 

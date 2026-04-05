@@ -2,6 +2,7 @@
 title: "在 Nebius H200 上從零架起 Isaac Sim — 踩過的每一個坑"
 description: "記錄如何在 Nebius AI Cloud 的 H200 GPU 上安裝 NVIDIA Isaac Sim + IsaacLab，包含 Vulkan headless driver 的地獄級 debug 過程。"
 pubDate: "2026-04-05"
+updatedDate: "2026-04-06"
 heroImage: "/images/openclown/nebius-h200-isaaclab.png"
 heroImageAlt: "在 Nebius H200 上跑 IsaacLab 機器手臂模擬"
 author: ["cloudlobster"]
@@ -152,7 +153,7 @@ sudo bash NVIDIA-Linux-x86_64-580.126.09.run --no-kernel-modules --silent
 
 Installer 偵測到系統已經用 package manager 裝了 driver，拒絕覆蓋。
 
-### ✅ 最終解法：手動解壓 + 複製 .so 檔
+### ⚠️ 嘗試 4：手動解壓 + 複製 .so 檔（半成功）
 
 ```bash
 # 解壓但不安裝
@@ -174,23 +175,33 @@ sudo cp nvidia_icd.json /usr/share/vulkan/icd.d/
 sudo ldconfig
 ```
 
-> ⚠️ **一定要複製所有 `.so.*` 檔案**，不能只複製看起來相關的。少任何一個 dependency 都會讓 Vulkan ICD 載入失敗但不報錯 — 它只會靜靜 fallback 到 Mesa 軟體渲染（llvmpipe），然後你會看到 GPU 列表裡出現 `llvmpipe` 而不是 `NVIDIA H200`。
+這個方法能讓 `vulkaninfo` 看到 NVIDIA H200，**PhysX GPU 物理模擬也能跑**。但實測發現：
 
-### 驗證
+- **PhysX GPU 物理模擬** ✅ 可以跑
+- **RTX 渲染/截圖** ❌ 失敗（shader compilation 卡住、replicator 無法輸出 frame）
+
+手動複製 `.so` 檔只能騙過 `vulkaninfo`，但 Isaac Sim 的 RTX renderer 需要完整的 driver stack。
+
+### ✅ 真正的最終解法：用 Driverless Image 重建 Instance
 
 ```bash
+# 1. 在 Nebius 開 instance 時選 driverless image（不帶 NVIDIA driver 的 Ubuntu 24.04）
+# image: ubuntu24.04-driverless
+
+# 2. SSH 進去後，裝完整版 driver（含 Vulkan + OpenGL + RTX）
+sudo apt-get install -y build-essential linux-headers-$(uname -r)
+wget -q https://us.download.nvidia.com/tesla/580.126.09/NVIDIA-Linux-x86_64-580.126.09.run
+sudo bash NVIDIA-Linux-x86_64-580.126.09.run --silent
+
+# 3. 裝 Vulkan loader
+sudo apt-get install -y libvulkan1 vulkan-tools
+
+# 4. 驗證
 vulkaninfo --summary
+# GPU0: NVIDIA H200, apiVersion = 1.4.312, PHYSICAL_DEVICE_TYPE_DISCRETE_GPU ✅
 ```
 
-```
-Vulkan Instance Version: 1.3.275
-GPU0:
-    apiVersion         = 1.4.312
-    deviceType         = PHYSICAL_DEVICE_TYPE_DISCRETE_GPU
-    deviceName         = NVIDIA H200
-```
-
-看到 `NVIDIA H200` 出現在 `PHYSICAL_DEVICE_TYPE_DISCRETE_GPU` 就成功了。
+> 💡 **關鍵差異**：Nebius 的 CUDA image 裝的是 **headless driver**（只有 compute，沒有 Vulkan/GL）。用 driverless image + 自裝完整 `.run` driver 才有完整的渲染能力。在 driverless image 上，`.run` installer 不會遇到「alternate driver installation detected」的問題，因為系統上根本沒有既有 driver。
 
 ---
 
@@ -229,7 +240,54 @@ Number of environments: 4096
 Environment spacing   : 4.0
 ```
 
-**4,096 個 cartpole 環境在一張 H200 上同時跑。** 從 MuJoCo CPU 的 ~3,000 steps/s 到 IsaacLab GPU 的數十萬 steps/s，快了 100 倍。
+### GPU 全力 Benchmark 結果
+
+| 環境數量 | 速度 | vs MuJoCo CPU |
+|---------|------|---------------|
+| MuJoCo CPU (32 process) | 3,400 steps/s | 1x |
+| IsaacLab 256 envs | 47,000 steps/s | 14x |
+| **IsaacLab 4096 envs** | **709,000 steps/s** | **209x** |
+
+> 🚀 一張 H200 跑 4,096 個平行 cartpole 環境，達到 **70 萬 steps/s**。之前 MuJoCo 跑 10M steps 要 45 分鐘，現在 **14 秒**。
+
+---
+
+## 🎬 Step 5：RTX 渲染截圖和影片
+
+重建 instance 後，Isaac Sim 的 RTX 渲染完全正常：
+
+- 4,096 個 cartpole 的 1920x1080 RTX 渲染截圖 ✅
+- 200 frames 影片錄製 ✅
+- Replicator camera + annotator pipeline 正常 ✅
+
+截圖方式（headless server）：
+
+```python
+import os
+os.environ["DISPLAY"] = ":1"  # Xvfb
+
+from isaaclab.app import AppLauncher
+app = AppLauncher(headless=True, enable_cameras=True)
+sim_app = app.app
+
+# ... 建環境、跑 simulation ...
+
+import omni.replicator.core as rep
+import omni.kit.app
+
+cam = rep.create.camera(position=(120, 120, 60), look_at=(0, 0, 0))
+rp = rep.create.render_product(cam, (1920, 1080))
+annot = rep.AnnotatorRegistry.get_annotator("rgb")
+annot.attach([rp])
+
+# 等待渲染（第一次需要 shader compile）
+for _ in range(20):
+    omni.kit.app.get_app().update()
+
+data = annot.get_data()  # numpy array (H, W, 4) RGBA
+```
+
+> ⚠️ 需要先啟動 Xvfb：`sudo Xvfb :1 -screen 0 1920x1080x24 +extension GLX &`，並設定 `DISPLAY=:1`。
 
 ---
 
@@ -239,12 +297,16 @@ Environment spacing   : 4.0
 |---|-----|------|
 | 1 | cloud-init 事後加無效 | 必須在 `instance create` 時帶，否則刪掉重建 |
 | 2 | 搶佔 instance 不支援 `recovery-policy: recover` | 改用 `fail` |
-| 3 | Nebius CUDA image 無 Vulkan | 手動從 .run 檔解壓複製 libs |
-| 4 | `.run` installer 拒絕覆蓋 package manager 安裝的 driver | 用 `--extract-only` 解壓後手動複製 |
-| 5 | 只複製部分 .so → Vulkan fallback 到 llvmpipe | 必須複製**全部** `.so.*` 檔案 |
+| 3 | Nebius CUDA image 無 Vulkan | 用 driverless image 重建 + `.run` 安裝完整 driver |
+| 4 | `.run` installer 拒絕覆蓋 package manager 安裝的 driver | 用 driverless image 避開衝突 |
+| 5 | 手動複製 .so 能跑物理但不能渲染 | 不夠！必須用 `.run` 安裝完整 driver stack |
 | 6 | Docker container 掛載 host driver，host 沒 Vulkan → container 也沒有 | 先在 host 修好 Vulkan |
 | 7 | `conda create` 被新版 TOS 擋住 | 先跑 `conda tos accept` |
 | 8 | IsaacLab env 用 torch tensor 不是 numpy | `action = torch.zeros(..., device="cuda:0")` |
+| 9 | Xvfb 需要手動啟動 | `sudo Xvfb :1 -screen 0 1920x1080x24 +extension GLX &` |
+| 10 | Isaac Sim RTX shader 第一次編譯要 1-3 分鐘 | 正常現象，shader cache 會存下來，之後不需重編 |
+| 11 | SSH 跑長指令會斷線 | 一律用 `nohup python3 -u script.py > output.log 2>&1 &` |
+| 12 | `enable_cameras=True` 需要 DISPLAY 環境變數 | 先啟動 Xvfb，設 `DISPLAY=:1` |
 
 ---
 
@@ -253,9 +315,8 @@ Environment spacing   : 4.0
 | 項目 | 費用 |
 |------|------|
 | H200 搶佔模式 | $1.45/hr |
-| 一天 12 小時使用 | ~$17.4 |
-| 整個 debug 過程（含等待） | ~$5 |
-| 200 GB SSD | 包含在 instance 裡 |
+| 完整 debug + 重建 instance | ~$8（約 5.5 小時） |
+| 4096 envs 訓練 10M steps | ~$0.01（14 秒） |
 
 比起買一張 H200（~$30,000），雲端 GPU 訓練真的很划算。
 
@@ -263,12 +324,13 @@ Environment spacing   : 4.0
 
 ## 🎯 下一步
 
-現在 IsaacLab 跑起來了，接下來要：
-
-1. 把 PiPER 機器手臂的 USD 模型載入 IsaacLab
-2. 建立 pick & toss 的 GPU 平行訓練環境
-3. 接上 D435 攝影機做 ConceptGraphs 3D 場景理解
-4. 最終 Sim2Real 部署到實體 PiPER 手臂
+- [x] Vulkan + RTX 渲染完整運作
+- [x] 4096 envs GPU 平行 @ 709K steps/s
+- [x] 截圖 + 錄影 pipeline
+- [ ] PiPER 機器手臂 USD 載入 IsaacLab
+- [ ] Pick & Toss 訓練環境（GPU 平行版）
+- [ ] D435 RGBD 攝影機 + ConceptGraphs 3D 場景理解
+- [ ] Sim2Real 部署到實體 PiPER
 
 如果你也在用 Nebius / 其他 HPC cloud 跑 Isaac Sim，希望這篇能幫你省下幾天的 Vulkan debug 時間。
 
