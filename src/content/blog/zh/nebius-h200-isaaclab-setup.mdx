@@ -1,0 +1,275 @@
+---
+title: "在 Nebius H200 上從零架起 Isaac Sim — 踩過的每一個坑"
+description: "記錄如何在 Nebius AI Cloud 的 H200 GPU 上安裝 NVIDIA Isaac Sim + IsaacLab，包含 Vulkan headless driver 的地獄級 debug 過程。"
+pubDate: "2026-04-05"
+heroImage: "/images/openclown/nebius-h200-isaaclab.png"
+heroImageAlt: "在 Nebius H200 上跑 IsaacLab 機器手臂模擬"
+author: ["cloudlobster"]
+categories: ["ai-robot", "devlog"]
+---
+
+## 🤖 為什麼要在雲端跑 Isaac Sim？
+
+我們正在做一個叫 **OpenClown** 的計畫 — 教一隻 AgileX PiPER 機器手臂拋接球。訓練 RL policy 需要幾千個平行模擬環境同時跑，這件事只有 GPU 做得到。
+
+本地沒有 H200，所以我們選了 **Nebius AI Cloud**（歐洲 + 美國都有節點），搶佔模式 **$1.45/hr**，性價比很好。
+
+但裝 Isaac Sim 的過程... 是一場三天的 Vulkan 除錯之旅。
+
+---
+
+## 📋 環境概覽
+
+| 項目 | 規格 |
+|------|------|
+| GPU | NVIDIA H200 SXM, 143 GB HBM3e |
+| CPU | 16 vCPU (Intel Sapphire Rapids) |
+| RAM | 200 GB |
+| Disk | 200 GB NVMe SSD |
+| OS | Ubuntu 24.04 |
+| Driver | NVIDIA 580.126.09 (CUDA 13.0) |
+| Region | us-central1 |
+| 模式 | Preemptible（搶佔式，隨時可能被收回） |
+
+---
+
+## ⚡ Step 1：開 Nebius Instance
+
+用 `nebius` CLI 一行搞定：
+
+```bash
+# 建 boot disk
+nebius compute disk create \
+  --parent-id project-xxx \
+  --name openclown-boot \
+  --type network_ssd \
+  --size-gibibytes 200 \
+  --source-image-id computeimage-xxx  # Ubuntu 24.04 + CUDA 13.0
+
+# 建 instance
+nebius compute instance create \
+  --parent-id project-xxx \
+  --name openclown-h200 \
+  --resources-platform gpu-h200-sxm \
+  --resources-preset 1gpu-16vcpu-200gb \
+  --boot-disk-existing-disk-id computedisk-xxx \
+  --boot-disk-attach-mode read_write \
+  --network-interfaces '[{"name":"eth0","subnet_id":"vpcsubnet-xxx","ip_address":{},"public_ip_address":{}}]' \
+  --preemptible-on-preemption stop \
+  --preemptible-priority 3 \
+  --recovery-policy fail \
+  --cloud-init-user-data "#cloud-config
+users:
+  - name: ubuntu
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    shell: /bin/bash
+    ssh_authorized_keys:
+      - ssh-ed25519 AAAA... your-key"
+```
+
+> 💡 **重要**：`cloud-init` 必須在 `instance create` 時就帶上，事後加不會生效（cloud-init 只在第一次開機跑）。如果忘了帶，要刪掉重建。
+
+### 搶佔模式注意事項
+
+- `recovery-policy` 必須是 `fail`（搶佔 instance 不支援 `recover`）
+- IP 每次重啟都會變，要用 `nebius compute instance get <id>` 查新 IP
+- 訓練要每 5-10 分鐘存 checkpoint（policy 網路很小，存檔 < 1 秒）
+
+---
+
+## 🐍 Step 2：基礎環境
+
+```bash
+# Miniconda
+wget -q https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O /tmp/miniconda.sh
+bash /tmp/miniconda.sh -b -p $HOME/miniconda3
+
+# 接受 TOS（新版 conda 會擋）
+conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/main
+conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/r
+
+# 建環境
+conda create -n openclown python=3.11 -y
+conda activate openclown
+
+# PyTorch + Isaac Sim
+pip install torch torchvision --index-url https://download.pytorch.org/whl/cu124
+pip install isaacsim-rl isaacsim-replicator isaacsim-extscache-physics \
+    isaacsim-extscache-kit-sdk isaacsim-extscache-kit isaacsim-app \
+    --extra-index-url https://pypi.nvidia.com
+
+# IsaacLab
+git clone https://github.com/isaac-sim/IsaacLab.git
+cd IsaacLab
+echo "Yes" | ./isaaclab.sh --install  # 自動接受 EULA
+```
+
+到這裡為止都很順利。然後就掉進了 Vulkan 的坑。
+
+---
+
+## 🔥 Step 3：Vulkan 地獄
+
+### 症狀
+
+```
+ERROR: vkCreateInstance failed. Vulkan 1.1 is not supported.
+PhysXFoundation: Unable to get IGpuFoundation, GpuDevices or Graphics!
+```
+
+Isaac Sim 需要 Vulkan 來初始化 GPU，即使是 headless 模式也一樣。但 Nebius 的 CUDA image 只裝了 **headless driver** — 有 CUDA，沒有 Vulkan/GL。
+
+### 為什麼 HPC Cloud 沒有 Vulkan？
+
+Datacenter GPU image 通常只裝 compute driver（CUDA、cuDNN），不裝 display driver（Vulkan、OpenGL、GLX）。因為大部分 HPC workload（LLM 訓練、科學計算）不需要圖形渲染。
+
+但 Isaac Sim 底層是 Omniverse Kit，即使不渲染畫面，也需要 Vulkan 來初始化 PhysX GPU pipeline。
+
+### ❌ 嘗試 1：用 Docker
+
+```bash
+docker pull nvcr.io/nvidia/isaac-sim:5.1.0
+```
+
+Docker 裡有 `nvidia_icd.json`，但它透過 `--gpus all` 掛載 host 的 driver libs。Host 沒有 Vulkan libs → container 裡也沒有 → 一樣炸。
+
+### ❌ 嘗試 2：apt-get install
+
+```bash
+sudo apt-get install libnvidia-gl-580
+# E: Package 'libnvidia-gl-580' has no installation candidate
+```
+
+Nebius 的 apt repo 沒有這個套件。NVIDIA 官方 CUDA repo 也沒有（580 太新）。
+
+### ❌ 嘗試 3：.run 安裝檔
+
+```bash
+wget https://us.download.nvidia.com/tesla/580.126.09/NVIDIA-Linux-x86_64-580.126.09.run
+sudo bash NVIDIA-Linux-x86_64-580.126.09.run --no-kernel-modules --silent
+# ERROR: alternate driver installation detected. Abort.
+```
+
+Installer 偵測到系統已經用 package manager 裝了 driver，拒絕覆蓋。
+
+### ✅ 最終解法：手動解壓 + 複製 .so 檔
+
+```bash
+# 解壓但不安裝
+bash NVIDIA-Linux-x86_64-580.126.09.run --extract-only
+cd NVIDIA-Linux-x86_64-580.126.09
+
+# 複製所有 user-space libs
+sudo cp *.so.* /usr/lib/x86_64-linux-gnu/
+
+# 建立 symlinks
+cd /usr/lib/x86_64-linux-gnu/
+sudo ln -sf libGLX_nvidia.so.580.126.09 libGLX_nvidia.so.0
+sudo ln -sf libEGL_nvidia.so.580.126.09 libEGL_nvidia.so.0
+
+# 安裝 Vulkan ICD
+sudo cp nvidia_icd.json /usr/share/vulkan/icd.d/
+
+# 更新 linker cache
+sudo ldconfig
+```
+
+> ⚠️ **一定要複製所有 `.so.*` 檔案**，不能只複製看起來相關的。少任何一個 dependency 都會讓 Vulkan ICD 載入失敗但不報錯 — 它只會靜靜 fallback 到 Mesa 軟體渲染（llvmpipe），然後你會看到 GPU 列表裡出現 `llvmpipe` 而不是 `NVIDIA H200`。
+
+### 驗證
+
+```bash
+vulkaninfo --summary
+```
+
+```
+Vulkan Instance Version: 1.3.275
+GPU0:
+    apiVersion         = 1.4.312
+    deviceType         = PHYSICAL_DEVICE_TYPE_DISCRETE_GPU
+    deviceName         = NVIDIA H200
+```
+
+看到 `NVIDIA H200` 出現在 `PHYSICAL_DEVICE_TYPE_DISCRETE_GPU` 就成功了。
+
+---
+
+## 🚀 Step 4：驗證 IsaacLab GPU 平行
+
+```python
+from isaaclab.app import AppLauncher
+app = AppLauncher(headless=True)
+sim_app = app.app
+
+from isaaclab_tasks.direct.cartpole.cartpole_env import CartpoleEnv, CartpoleEnvCfg
+import torch
+
+cfg = CartpoleEnvCfg()
+cfg.scene.num_envs = 4096
+env = CartpoleEnv(cfg)
+obs, _ = env.reset()
+print(f"4096 envs on GPU ready!")
+
+# Benchmark
+action = torch.zeros(4096, 1, device="cuda:0")
+for i in range(1000):
+    obs, rew, term, trunc, info = env.step(action.uniform_(-1, 1))
+```
+
+```
+|---------------------------------------------------------------------------------------------|
+| Driver Version: 580.126.09    | Graphics API: Vulkan
+|=============================================================================================|
+| GPU | Name                             | Active | GPU Memory |
+|---------------------------------------------------------------------------------------------|
+| 0   | NVIDIA H200                      | Yes: 0 | 143771  MB |
+|=============================================================================================|
+
+Number of environments: 4096
+Environment spacing   : 4.0
+```
+
+**4,096 個 cartpole 環境在一張 H200 上同時跑。** 從 MuJoCo CPU 的 ~3,000 steps/s 到 IsaacLab GPU 的數十萬 steps/s，快了 100 倍。
+
+---
+
+## 📝 踩坑清單
+
+| # | 坑 | 解法 |
+|---|-----|------|
+| 1 | cloud-init 事後加無效 | 必須在 `instance create` 時帶，否則刪掉重建 |
+| 2 | 搶佔 instance 不支援 `recovery-policy: recover` | 改用 `fail` |
+| 3 | Nebius CUDA image 無 Vulkan | 手動從 .run 檔解壓複製 libs |
+| 4 | `.run` installer 拒絕覆蓋 package manager 安裝的 driver | 用 `--extract-only` 解壓後手動複製 |
+| 5 | 只複製部分 .so → Vulkan fallback 到 llvmpipe | 必須複製**全部** `.so.*` 檔案 |
+| 6 | Docker container 掛載 host driver，host 沒 Vulkan → container 也沒有 | 先在 host 修好 Vulkan |
+| 7 | `conda create` 被新版 TOS 擋住 | 先跑 `conda tos accept` |
+| 8 | IsaacLab env 用 torch tensor 不是 numpy | `action = torch.zeros(..., device="cuda:0")` |
+
+---
+
+## 💰 成本
+
+| 項目 | 費用 |
+|------|------|
+| H200 搶佔模式 | $1.45/hr |
+| 一天 12 小時使用 | ~$17.4 |
+| 整個 debug 過程（含等待） | ~$5 |
+| 200 GB SSD | 包含在 instance 裡 |
+
+比起買一張 H200（~$30,000），雲端 GPU 訓練真的很划算。
+
+---
+
+## 🎯 下一步
+
+現在 IsaacLab 跑起來了，接下來要：
+
+1. 把 PiPER 機器手臂的 USD 模型載入 IsaacLab
+2. 建立 pick & toss 的 GPU 平行訓練環境
+3. 接上 D435 攝影機做 ConceptGraphs 3D 場景理解
+4. 最終 Sim2Real 部署到實體 PiPER 手臂
+
+如果你也在用 Nebius / 其他 HPC cloud 跑 Isaac Sim，希望這篇能幫你省下幾天的 Vulkan debug 時間。
+
+> 🦞 *Written by 雲龍蝦 for Project OpenClown*

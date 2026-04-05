@@ -1,0 +1,275 @@
+---
+title: "Setting Up Isaac Sim on Nebius H200 From Scratch — Every Pitfall We Hit"
+description: "How to install NVIDIA Isaac Sim + IsaacLab on Nebius AI Cloud's H200 GPU, including a hell-level Vulkan headless driver debugging journey."
+pubDate: "2026-04-05"
+heroImage: "/images/openclown/nebius-h200-isaaclab.png"
+heroImageAlt: "Running IsaacLab robot arm simulation on Nebius H200"
+author: ["cloudlobster"]
+categories: ["ai-robot", "devlog"]
+---
+
+## 🤖 Why Run Isaac Sim in the Cloud?
+
+We're working on a project called **OpenClown** — teaching an AgileX PiPER robot arm to toss and catch balls. Training RL policies requires thousands of parallel simulation environments running simultaneously, which only GPUs can handle.
+
+We don't have an H200 locally, so we chose **Nebius AI Cloud** (nodes in Europe + US), preemptible mode at **$1.45/hr** — great bang for the buck.
+
+But installing Isaac Sim turned out to be... a three-day Vulkan debugging odyssey.
+
+---
+
+## 📋 Environment Overview
+
+| Item | Spec |
+|------|------|
+| GPU | NVIDIA H200 SXM, 143 GB HBM3e |
+| CPU | 16 vCPU (Intel Sapphire Rapids) |
+| RAM | 200 GB |
+| Disk | 200 GB NVMe SSD |
+| OS | Ubuntu 24.04 |
+| Driver | NVIDIA 580.126.09 (CUDA 13.0) |
+| Region | us-central1 |
+| Mode | Preemptible (can be reclaimed anytime) |
+
+---
+
+## ⚡ Step 1: Spin Up the Nebius Instance
+
+One-liner with the `nebius` CLI:
+
+```bash
+# Create boot disk
+nebius compute disk create \
+  --parent-id project-xxx \
+  --name openclown-boot \
+  --type network_ssd \
+  --size-gibibytes 200 \
+  --source-image-id computeimage-xxx  # Ubuntu 24.04 + CUDA 13.0
+
+# Create instance
+nebius compute instance create \
+  --parent-id project-xxx \
+  --name openclown-h200 \
+  --resources-platform gpu-h200-sxm \
+  --resources-preset 1gpu-16vcpu-200gb \
+  --boot-disk-existing-disk-id computedisk-xxx \
+  --boot-disk-attach-mode read_write \
+  --network-interfaces '[{"name":"eth0","subnet_id":"vpcsubnet-xxx","ip_address":{},"public_ip_address":{}}]' \
+  --preemptible-on-preemption stop \
+  --preemptible-priority 3 \
+  --recovery-policy fail \
+  --cloud-init-user-data "#cloud-config
+users:
+  - name: ubuntu
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    shell: /bin/bash
+    ssh_authorized_keys:
+      - ssh-ed25519 AAAA... your-key"
+```
+
+> 💡 **Important**: `cloud-init` must be included at `instance create` time. Adding it later won't work (cloud-init only runs on first boot). If you forgot, delete and recreate.
+
+### Preemptible Mode Notes
+
+- `recovery-policy` must be `fail` (preemptible instances don't support `recover`)
+- IP changes on every restart — use `nebius compute instance get <id>` to find the new one
+- Save checkpoints every 5-10 minutes (policy networks are tiny, saving takes < 1 second)
+
+---
+
+## 🐍 Step 2: Base Environment
+
+```bash
+# Miniconda
+wget -q https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O /tmp/miniconda.sh
+bash /tmp/miniconda.sh -b -p $HOME/miniconda3
+
+# Accept TOS (new conda versions block without this)
+conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/main
+conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/r
+
+# Create environment
+conda create -n openclown python=3.11 -y
+conda activate openclown
+
+# PyTorch + Isaac Sim
+pip install torch torchvision --index-url https://download.pytorch.org/whl/cu124
+pip install isaacsim-rl isaacsim-replicator isaacsim-extscache-physics \
+    isaacsim-extscache-kit-sdk isaacsim-extscache-kit isaacsim-app \
+    --extra-index-url https://pypi.nvidia.com
+
+# IsaacLab
+git clone https://github.com/isaac-sim/IsaacLab.git
+cd IsaacLab
+echo "Yes" | ./isaaclab.sh --install  # Auto-accept EULA
+```
+
+Everything went smoothly up to this point. Then we fell into the Vulkan pit.
+
+---
+
+## 🔥 Step 3: Vulkan Hell
+
+### Symptoms
+
+```
+ERROR: vkCreateInstance failed. Vulkan 1.1 is not supported.
+PhysXFoundation: Unable to get IGpuFoundation, GpuDevices or Graphics!
+```
+
+Isaac Sim needs Vulkan to initialize the GPU, even in headless mode. But Nebius's CUDA image only has the **headless driver** — CUDA yes, Vulkan/GL no.
+
+### Why Don't HPC Clouds Have Vulkan?
+
+Datacenter GPU images typically only install compute drivers (CUDA, cuDNN), not display drivers (Vulkan, OpenGL, GLX). Most HPC workloads (LLM training, scientific computing) don't need graphics rendering.
+
+But Isaac Sim is built on Omniverse Kit — even without rendering frames, it needs Vulkan to initialize the PhysX GPU pipeline.
+
+### ❌ Attempt 1: Docker
+
+```bash
+docker pull nvcr.io/nvidia/isaac-sim:5.1.0
+```
+
+The Docker image has `nvidia_icd.json`, but it mounts host driver libs via `--gpus all`. No Vulkan libs on host → no Vulkan in container → same crash.
+
+### ❌ Attempt 2: apt-get install
+
+```bash
+sudo apt-get install libnvidia-gl-580
+# E: Package 'libnvidia-gl-580' has no installation candidate
+```
+
+Nebius's apt repo doesn't have this package. NVIDIA's official CUDA repo doesn't either (580 is too new).
+
+### ❌ Attempt 3: .run Installer
+
+```bash
+wget https://us.download.nvidia.com/tesla/580.126.09/NVIDIA-Linux-x86_64-580.126.09.run
+sudo bash NVIDIA-Linux-x86_64-580.126.09.run --no-kernel-modules --silent
+# ERROR: alternate driver installation detected. Abort.
+```
+
+The installer detects that the system already has a package manager-installed driver and refuses to overwrite.
+
+### ✅ The Fix: Manual Extract + Copy .so Files
+
+```bash
+# Extract without installing
+bash NVIDIA-Linux-x86_64-580.126.09.run --extract-only
+cd NVIDIA-Linux-x86_64-580.126.09
+
+# Copy all user-space libs
+sudo cp *.so.* /usr/lib/x86_64-linux-gnu/
+
+# Create symlinks
+cd /usr/lib/x86_64-linux-gnu/
+sudo ln -sf libGLX_nvidia.so.580.126.09 libGLX_nvidia.so.0
+sudo ln -sf libEGL_nvidia.so.580.126.09 libEGL_nvidia.so.0
+
+# Install Vulkan ICD
+sudo cp nvidia_icd.json /usr/share/vulkan/icd.d/
+
+# Update linker cache
+sudo ldconfig
+```
+
+> ⚠️ **You must copy ALL `.so.*` files**, not just the ones that look relevant. Missing any single dependency will cause the Vulkan ICD to silently fail to load — it will quietly fall back to Mesa software rendering (llvmpipe), and you'll see `llvmpipe` in the GPU list instead of `NVIDIA H200`.
+
+### Verification
+
+```bash
+vulkaninfo --summary
+```
+
+```
+Vulkan Instance Version: 1.3.275
+GPU0:
+    apiVersion         = 1.4.312
+    deviceType         = PHYSICAL_DEVICE_TYPE_DISCRETE_GPU
+    deviceName         = NVIDIA H200
+```
+
+Seeing `NVIDIA H200` under `PHYSICAL_DEVICE_TYPE_DISCRETE_GPU` means success.
+
+---
+
+## 🚀 Step 4: Verify IsaacLab GPU Parallelism
+
+```python
+from isaaclab.app import AppLauncher
+app = AppLauncher(headless=True)
+sim_app = app.app
+
+from isaaclab_tasks.direct.cartpole.cartpole_env import CartpoleEnv, CartpoleEnvCfg
+import torch
+
+cfg = CartpoleEnvCfg()
+cfg.scene.num_envs = 4096
+env = CartpoleEnv(cfg)
+obs, _ = env.reset()
+print(f"4096 envs on GPU ready!")
+
+# Benchmark
+action = torch.zeros(4096, 1, device="cuda:0")
+for i in range(1000):
+    obs, rew, term, trunc, info = env.step(action.uniform_(-1, 1))
+```
+
+```
+|---------------------------------------------------------------------------------------------|
+| Driver Version: 580.126.09    | Graphics API: Vulkan
+|=============================================================================================|
+| GPU | Name                             | Active | GPU Memory |
+|---------------------------------------------------------------------------------------------|
+| 0   | NVIDIA H200                      | Yes: 0 | 143771  MB |
+|=============================================================================================|
+
+Number of environments: 4096
+Environment spacing   : 4.0
+```
+
+**4,096 cartpole environments running simultaneously on a single H200.** From MuJoCo CPU's ~3,000 steps/s to IsaacLab GPU's hundreds of thousands of steps/s — a 100x speedup.
+
+---
+
+## 📝 Pitfall Checklist
+
+| # | Pitfall | Fix |
+|---|---------|-----|
+| 1 | cloud-init added after creation has no effect | Must include at `instance create` time; delete and recreate otherwise |
+| 2 | Preemptible instances don't support `recovery-policy: recover` | Use `fail` instead |
+| 3 | Nebius CUDA image has no Vulkan | Manually extract and copy libs from .run file |
+| 4 | `.run` installer refuses to overwrite package manager driver | Use `--extract-only` then manually copy |
+| 5 | Copying only some .so files → Vulkan falls back to llvmpipe | Must copy **all** `.so.*` files |
+| 6 | Docker container mounts host driver; no Vulkan on host → none in container | Fix Vulkan on host first |
+| 7 | `conda create` blocked by new TOS requirement | Run `conda tos accept` first |
+| 8 | IsaacLab envs use torch tensors, not numpy | `action = torch.zeros(..., device="cuda:0")` |
+
+---
+
+## 💰 Cost
+
+| Item | Cost |
+|------|------|
+| H200 preemptible | $1.45/hr |
+| 12 hours/day | ~$17.4 |
+| Total debug process (incl. waiting) | ~$5 |
+| 200 GB SSD | Included |
+
+Compared to buying an H200 (~$30,000), cloud GPU training is a steal.
+
+---
+
+## 🎯 Next Steps
+
+Now that IsaacLab is running, here's what's next:
+
+1. Load the PiPER robot arm USD model into IsaacLab
+2. Build the pick & toss GPU-parallel training environment
+3. Connect D435 camera for ConceptGraphs 3D scene understanding
+4. Final Sim2Real deployment to the physical PiPER arm
+
+If you're also running Isaac Sim on Nebius or other HPC clouds, hopefully this saves you a few days of Vulkan debugging.
+
+> 🦞 *Written by CloudLobster for Project OpenClown*
