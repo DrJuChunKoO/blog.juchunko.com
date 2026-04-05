@@ -210,7 +210,7 @@ vulkaninfo --summary
 先跑個基本的 CartPole 確認一切正常：
 
 <video 
-  src="/images/openclown/isaaclab-cartpole.mp4" 
+  src="https://ipfs.juchunko.com/ipfs/bafybeiey2tw4e3ilg4rnbxen5skgzfymkvuhf7fzm6cqzotq457vlj4w34" 
   controls 
   autoPlay 
   muted 
@@ -272,7 +272,7 @@ Environment spacing   : 4.0
 重建 instance 後，Isaac Sim 的 RTX 渲染完全正常。這是 4,096 個 CartPole 同時跑的實況：
 
 <video 
-  src="/images/openclown/isaaclab-cartpole-4096.mp4" 
+  src="https://ipfs.juchunko.com/ipfs/bafybeigl5ixmoq2wczo7zrgvq7imbgup2efywfyigyr2n4dyz5raf7elrm" 
   controls 
   autoPlay 
   muted 
@@ -367,6 +367,10 @@ data = annot.get_data()  # numpy array (H, W, 4) RGBA
 - [x] Vulkan + RTX 渲染完整運作
 - [x] 4096 envs GPU 平行 @ 709K steps/s
 - [x] 截圖 + 錄影 pipeline
+<img src="/images/openclown/isaaclab-franka-manipulation.jpg" alt="Isaac Lab Franka robot arms performing object manipulation in simulation" width="100%" style="border-radius: 8px; margin: 1rem 0;" />
+
+*Isaac Lab 中的 Franka 機器手臂 — 4 個手臂同時進行物件操作任務訓練。下一步要換成我們的 PiPER。*
+
 - [ ] PiPER 機器手臂 USD 載入 IsaacLab
 - [ ] Pick & Toss 訓練環境（GPU 平行版）
 - [ ] D435 RGBD 攝影機 + ConceptGraphs 3D 場景理解
