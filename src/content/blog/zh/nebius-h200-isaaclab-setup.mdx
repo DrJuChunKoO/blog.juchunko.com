@@ -269,11 +269,17 @@ Environment spacing   : 4.0
 
 ## 🎬 Step 5：RTX 渲染截圖和影片
 
-重建 instance 後，Isaac Sim 的 RTX 渲染完全正常。這是 4,096 個 CartPole 同時跑的 RTX 渲染截圖：
+重建 instance 後，Isaac Sim 的 RTX 渲染完全正常。這是 4,096 個 CartPole 同時跑的 RTX 渲染全景：
 
-<img src="/images/openclown/isaaclab-cartpole-4096.png" alt="4096 CartPole environments running in parallel on NVIDIA H200" width="100%" style="border-radius: 8px; margin: 1rem 0;" />
+<img src="/images/openclown/isaaclab-cartpole-4096-wide.jpg" alt="4096 CartPole environments running in parallel on NVIDIA H200 — bird's eye view" width="100%" style="border-radius: 8px; margin: 1rem 0;" />
 
-*4,096 個 CartPole 在 H200 上平行運行 — 每個小車上的深色桿子角度都不同，代表各自獨立的 RL episode。*
+*4,096 個 CartPole 在 H200 上平行運行的鳥瞰圖 — 密密麻麻的小車和桿子，每個都是獨立的 RL episode。*
+
+近拍可以看到每個 CartPole 的細節：
+
+<img src="/images/openclown/isaaclab-cartpole-4096.png" alt="4096 CartPole environments close-up" width="100%" style="border-radius: 8px; margin: 1rem 0;" />
+
+*拉近看 — 藍色小車在黃色軌道上，深色桿子角度各異。*
 
 渲染成果：
 
