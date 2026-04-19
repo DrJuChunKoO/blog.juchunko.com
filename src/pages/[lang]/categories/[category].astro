@@ -2,9 +2,9 @@
 import BaseHead from "../../../components/BaseHead.astro";
 import Header from "../../../components/Header.astro";
 import Footer from "../../../components/Footer.astro";
+import PostGrid from "../../../components/PostGrid.astro";
 import { SITE_DESCRIPTION } from "../../../consts";
-import { getCollection } from "astro:content";
-import FormattedDate from "../../../components/FormattedDate.astro";
+import { getCollection, getEntry, type CollectionEntry } from "astro:content";
 import { ui, languages } from "../../../i18n/ui";
 import { useTranslations } from "../../../i18n/utils";
 
@@ -29,10 +29,28 @@ const posts = (await getCollection("blog"))
   )
   .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 
+const postsWithCategories = await Promise.all(
+  posts.map(async (post) => {
+    const categoryEntries = post.data.categories
+      ? (
+          await Promise.all(post.data.categories.map((cat) => getEntry(cat)))
+        ).filter(
+          (
+            entry,
+          ): entry is CollectionEntry<"categories"> =>
+            Boolean(entry && entry.collection === "categories"),
+        )
+      : [];
+
+    return { post, categoryEntries };
+  }),
+);
+
 // Get category name in current language
 const categoriesCollection = await getCollection("categories");
 const categoryEntry = categoriesCollection.find((c) => c.id === category);
 const categoryName = (categoryEntry?.data as any)?.name?.[langKey] || category;
+const sourcePath = `/${langKey}/categories/${category}/`;
 ---
 
 <!doctype html>
@@ -42,54 +60,19 @@ const categoryName = (categoryEntry?.data as any)?.name?.[langKey] || category;
       title={`${categoryName} | ${ui[langKey]["site.title"]}`}
       description={SITE_DESCRIPTION}
     />
-    <style>
-      /* Reuse grid styling from blog index */
-      section {
-        display: grid;
-        grid-template-columns: repeat(1, minmax(0, 1fr));
-      }
-      @media (min-width: 768px) {
-        section {
-          grid-template-columns: repeat(2, minmax(0, 1fr));
-        }
-      }
-    </style>
   </head>
   <body>
     <Header />
-    <main class="container">
+    <main class="mx-auto w-full max-w-7xl px-4 py-8 md:px-6">
       <h1 class="mb-4 text-3xl font-semibold">
         {t("category.postsIn").replace("{category}", categoryName)}
       </h1>
       <section class="gap-4">
-        {
-          posts.map((post, index) => (
-            <a
-              href={`/${post.id.replace(/\.mdx?$/, "")}`}
-              class={`group rounded-xl p-2 transition-colors hover:bg-gray-200 dark:hover:bg-gray-800 ${index === 0 ? "md:col-span-2" : ""}`}
-            >
-              {post.data.heroImage && (
-                <img
-                  width={720}
-                  height={360}
-                  src={post.data.heroImage}
-                  alt=""
-                  class="aspect-video rounded-lg object-cover transition-transform"
-                  transition:name={`${post.id}-image`}
-                />
-              )}
-              <h4
-                class="mt-2 text-xl font-semibold"
-                transition:name={`${post.id}-title`}
-              >
-                {post.data.title}
-              </h4>
-              <div class="text-base text-gray-500">
-                <FormattedDate date={post.data.pubDate} />
-              </div>
-            </a>
-          ))
-        }
+        <PostGrid
+          posts={postsWithCategories}
+          currentLang={langKey}
+          sourcePath={sourcePath}
+        />
         {
           posts.length === 0 && (
             <p class="text-gray-500 italic">

@@ -42,6 +42,28 @@ const posts = await getCollection("blog");
 const otherLangPost = posts.find(
   (p) => p.id.replace(/\.(md|mdx)$/, "") === `${otherLang}/${slug}`,
 );
+const sameLangPosts = posts
+  .filter((entry) => entry.id.startsWith(`${currentLang}/`))
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+const currentIndex = sameLangPosts.findIndex((entry) => entry.id === post.id);
+const nextPost =
+  currentIndex >= 0 && currentIndex < sameLangPosts.length - 1
+    ? sameLangPosts[currentIndex + 1]
+    : undefined;
+
+const navLabels = {
+  en: {
+    back: "Back",
+    next: "Next post",
+  },
+  zh: {
+    back: "回前頁",
+    next: "下一篇",
+  },
+} as const;
+
+const navText = navLabels[currentLang];
+const backFallbackUrl = `/${currentLang}/`;
 ---
 
 <html lang={currentLang}>
@@ -53,12 +75,71 @@ const otherLangPost = posts.find(
         margin-bottom: 1rem;
       }
     </style>
+    <script is:inline>
+      const bindPostNavLinks = () => {
+        const backLink = document.getElementById("post-back-link");
+        if (!(backLink instanceof HTMLAnchorElement)) return;
+
+        const params = new URLSearchParams(window.location.search);
+        const fromParam = params.get("from");
+
+        if (fromParam && fromParam.startsWith("/")) {
+          backLink.href = fromParam;
+        } else {
+          try {
+            const referrer = document.referrer ? new URL(document.referrer) : null;
+            const isSameOrigin = referrer && referrer.origin === window.location.origin;
+
+            if (isSameOrigin) {
+              backLink.href = `${referrer.pathname}${referrer.search}${referrer.hash}`;
+            }
+          } catch {}
+        }
+
+        const nextLink = document.getElementById("post-next-link");
+        if (nextLink instanceof HTMLAnchorElement) {
+          const nextPath = nextLink.dataset.nextPath;
+          if (nextPath) {
+            const currentUrl = `${window.location.pathname}${window.location.search}`;
+            nextLink.href = `${nextPath}?from=${encodeURIComponent(currentUrl)}`;
+          }
+        }
+      };
+
+      document.addEventListener("DOMContentLoaded", bindPostNavLinks);
+      document.addEventListener("astro:page-load", bindPostNavLinks);
+    </script>
   </head>
 
   <body>
     <Header />
     <main>
       <article>
+        <div class="container mb-4">
+          <div class="flex items-center justify-between gap-3">
+            <a
+              id="post-back-link"
+              href={backFallbackUrl}
+              class="inline-flex items-center rounded-full border border-black/10 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-100 dark:border-white/15 dark:text-white/80 dark:hover:bg-white/10"
+            >
+              ← {navText.back}
+            </a>
+            {
+              nextPost && (
+                <a
+                  id="post-next-link"
+                  data-next-path={`/${nextPost.id.replace(/\.(md|mdx)$/, "")}`}
+                  href={`/${nextPost.id.replace(/\.(md|mdx)$/, "")}`}
+                  class="inline-flex max-w-[65%] items-center justify-end rounded-full border border-black/10 px-4 py-2 text-right text-sm font-medium text-gray-700 transition hover:bg-gray-100 dark:border-white/15 dark:text-white/80 dark:hover:bg-white/10"
+                >
+                  <span class="truncate">
+                    {navText.next} →
+                  </span>
+                </a>
+              )
+            }
+          </div>
+        </div>
         <div class="container">
           {
             heroImage && (

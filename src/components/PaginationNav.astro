@@ -1,0 +1,117 @@
+---
+import { getPageUrl } from "../lib/blog";
+
+interface Props {
+  currentLang: "en" | "zh";
+  currentPage: number;
+  totalPages: number;
+}
+
+const { currentLang, currentPage, totalPages } = Astro.props;
+
+const labels = {
+  en: {
+    previous: "Previous",
+    next: "Next",
+    page: "Page",
+  },
+  zh: {
+    previous: "上一頁",
+    next: "下一頁",
+    page: "第",
+  },
+} as const;
+
+const t = labels[currentLang];
+type PaginationItem =
+  | { type: "page"; page: number }
+  | { type: "ellipsis"; key: string };
+
+function buildPaginationItems(
+  page: number,
+  pageCount: number,
+): PaginationItem[] {
+  const pages = new Set([1, pageCount]);
+
+  for (
+    let pageNumber = Math.max(1, page - 2);
+    pageNumber <= Math.min(pageCount, page + 2);
+    pageNumber++
+  ) {
+    pages.add(pageNumber);
+  }
+
+  const sortedPages = [...pages].sort((a, b) => a - b);
+  const items: PaginationItem[] = [];
+
+  sortedPages.forEach((pageNumber, index) => {
+    const previousPage = sortedPages[index - 1];
+
+    if (previousPage && pageNumber - previousPage > 1) {
+      items.push({ type: "ellipsis", key: `ellipsis-${previousPage}-${pageNumber}` });
+    }
+
+    items.push({ type: "page", page: pageNumber });
+  });
+
+  return items;
+}
+
+const paginationItems = buildPaginationItems(currentPage, totalPages);
+---
+
+{
+  totalPages > 1 && (
+    <nav
+      aria-label="Pagination"
+      class="mt-10 flex flex-col gap-4 border-t border-black/5 pt-6 dark:border-white/10"
+    >
+      <div class="flex flex-wrap items-center justify-center gap-2">
+        {currentPage > 1 ? (
+          <a
+            href={getPageUrl(currentLang, currentPage - 1)}
+            class="rounded-full border border-black/10 px-4 py-2 text-sm transition hover:bg-gray-100 dark:border-white/15 dark:hover:bg-white/10"
+          >
+            {t.previous}
+          </a>
+        ) : (
+          <span class="rounded-full border border-black/5 px-4 py-2 text-sm text-gray-400 dark:border-white/10 dark:text-white/30">
+            {t.previous}
+          </span>
+        )}
+
+        {paginationItems.map((item) =>
+          item.type === "page" ? (
+            <a
+              href={getPageUrl(currentLang, item.page)}
+              aria-current={item.page === currentPage ? "page" : undefined}
+              class={`rounded-full px-4 py-2 text-sm transition ${item.page === currentPage ? "bg-gray-900 text-white dark:bg-white dark:text-gray-900" : "border border-black/10 hover:bg-gray-100 dark:border-white/15 dark:hover:bg-white/10"}`}
+            >
+              {currentLang === "zh" ? `${t.page}${item.page}頁` : `${t.page} ${item.page}`}
+            </a>
+          ) : (
+            <span
+              aria-hidden="true"
+              class="px-2 py-2 text-sm text-gray-400 dark:text-white/40"
+            >
+              ...
+            </span>
+          ),
+        )}
+
+        {currentPage < totalPages ? (
+          <a
+            href={getPageUrl(currentLang, currentPage + 1)}
+            class="rounded-full border border-black/10 px-4 py-2 text-sm transition hover:bg-gray-100 dark:border-white/15 dark:hover:bg-white/10"
+          >
+            {t.next}
+          </a>
+        ) : (
+          <span class="rounded-full border border-black/5 px-4 py-2 text-sm text-gray-400 dark:border-white/10 dark:text-white/30">
+            {t.next}
+          </span>
+        )}
+      </div>
+    </nav>
+  )
+}

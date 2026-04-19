@@ -1,0 +1,69 @@
+---
+import BaseHead from "../../../components/BaseHead.astro";
+import Header from "../../../components/Header.astro";
+import Footer from "../../../components/Footer.astro";
+import PaginationNav from "../../../components/PaginationNav.astro";
+import PostGrid from "../../../components/PostGrid.astro";
+import { SITE_DESCRIPTION } from "../../../consts";
+import {
+  POSTS_PER_PAGE,
+  getPostsForLang,
+  paginateItems,
+} from "../../../lib/blog";
+
+export async function getStaticPaths() {
+  const langs = ["en", "zh"] as const;
+
+  const paths = await Promise.all(
+    langs.map(async (lang) => {
+      const posts = await getPostsForLang(lang);
+      const totalPages = Math.max(1, Math.ceil(posts.length / POSTS_PER_PAGE));
+
+      return Array.from({ length: Math.max(0, totalPages - 1) }, (_, index) => ({
+        params: {
+          lang,
+          page: String(index + 2),
+        },
+      }));
+    }),
+  );
+
+  return paths.flat();
+}
+
+const { lang, page } = Astro.params;
+const currentLang = lang as "en" | "zh";
+const requestedPage = Number(page);
+const allPosts = await getPostsForLang(currentLang);
+const { items: posts, currentPage, totalPages } = paginateItems(
+  allPosts,
+  requestedPage,
+);
+const sourcePath = `/${currentLang}/page/${currentPage}/`;
+
+if (!Number.isInteger(requestedPage) || requestedPage < 2 || requestedPage > totalPages) {
+  return Astro.redirect(`/${currentLang}/`);
+}
+---
+
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <BaseHead
+      title={`${currentLang === "zh" ? `第 ${currentPage} 頁` : `Page ${currentPage}`} | Blog`}
+      description={SITE_DESCRIPTION}
+    />
+  </head>
+  <body>
+    <Header />
+    <main class="mx-auto w-full max-w-7xl px-4 py-8 md:px-6">
+      <PostGrid posts={posts} currentLang={currentLang} sourcePath={sourcePath} />
+      <PaginationNav
+        currentLang={currentLang}
+        currentPage={currentPage}
+        totalPages={totalPages}
+      />
+    </main>
+    <Footer />
+  </body>
+</html>
