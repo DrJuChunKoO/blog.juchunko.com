@@ -61,6 +61,21 @@ main {
   background: #0a0a0a;
   color: #f2f2f2;
 }
+
+@media (min-width: 1200px) {
+  html {
+    zoom: 1.25;
+  }
+}
+
+@supports not (zoom: 1.25) {
+  @media (min-width: 1200px) {
+    body {
+      font-size: 1.25em;
+    }
+  }
+}
+
 @utility prose-tight {
   h1,
   h2,
