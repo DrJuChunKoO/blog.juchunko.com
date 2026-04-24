@@ -105,6 +105,18 @@ export default function ChatBot() {
     messagesEndRef.current?.scrollIntoView();
   }, [messages, status]);
 
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && isOpen) {
+        setIsOpen(false);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isOpen]);
+
   return (
     <motion.div layoutScroll>
       <AnimatePresence>
@@ -143,6 +155,7 @@ export default function ChatBot() {
 
                 <motion.button
                   className="cursor-pointer rounded-md border border-black/5 bg-gray-200 p-1 text-sm hover:bg-gray-300 active:bg-gray-300 dark:border-white/5 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700 dark:active:bg-gray-700"
+                  aria-label="Close chat"
                   onClick={() => setIsOpen(false)}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
