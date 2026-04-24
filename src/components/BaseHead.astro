@@ -10,6 +10,9 @@ interface Props {
   description: string;
   image?: string;
   alternateUrl?: string;
+  ogType?: "website" | "article";
+  publishedTime?: Date;
+  authors?: string[];
 }
 
 const lang = getLangFromUrl(Astro.url);
@@ -23,6 +26,9 @@ const {
   description,
   image = "/images/avatar.webp",
   alternateUrl,
+  ogType = "website",
+  publishedTime,
+  authors,
 } = Astro.props;
 
 const title = pageTitle ? `${pageTitle} | ${siteTitle}` : siteTitle;
@@ -73,11 +79,17 @@ const xDefaultUrl = enUrl ?? currentFullUrl;
 <meta name="description" content={description} />
 
 <!-- Open Graph / Facebook -->
-<meta property="og:type" content="website" />
+<meta property="og:type" content={ogType} />
 <meta property="og:url" content={Astro.url} />
 <meta property="og:title" content={title} />
 <meta property="og:description" content={description} />
 <meta property="og:image" content={new URL(image, Astro.site)} />
+{ogType === "article" && publishedTime && (
+  <meta property="article:published_time" content={publishedTime.toISOString()} />
+)}
+{ogType === "article" && authors && authors.map((author) => (
+  <meta property="article:author" content={author} />
+))}
 
 <!-- Twitter -->
 <meta property="twitter:card" content="summary_large_image" />

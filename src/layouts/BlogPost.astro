@@ -103,6 +103,11 @@ const jsonLd = {
       alternateUrl={otherLangPost
         ? `/${otherLangPost.id.replace(/\.(md|mdx)$/, "")}`
         : undefined}
+      ogType="article"
+      publishedTime={pubDate}
+      authors={authorEntries
+        .filter((a) => a != null)
+        .map((a) => a.data.name[currentLang])}
     />
     <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
     <style>
