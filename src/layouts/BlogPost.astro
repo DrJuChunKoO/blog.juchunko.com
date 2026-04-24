@@ -193,7 +193,7 @@ const jsonLd = {
               <img
                 class="w-full rounded-lg"
                 src={heroImage}
-                alt={heroImageAlt || ""}
+                alt={heroImageAlt || title}
                 transition:name={`${post.id}-image`}
               />
             )
@@ -238,6 +238,7 @@ const jsonLd = {
                             width={40}
                             height={40}
                             alt={authorData.data.name[currentLang]}
+                            loading="lazy"
                             class="aspect-square rounded-full object-cover"
                           />
                           <span class="text-base font-semibold">
