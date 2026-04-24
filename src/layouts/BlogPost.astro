@@ -46,7 +46,14 @@ const otherLangPost = posts.find(
 
 <html lang={currentLang}>
   <head>
-    <BaseHead title={title} description={description} image={heroImage} />
+    <BaseHead
+      title={title}
+      description={description}
+      image={heroImage}
+      alternateUrl={otherLangPost
+        ? `/${otherLangPost.id.replace(/\.(md|mdx)$/, "")}`
+        : undefined}
+    />
     <style>
       .lang-switcher {
         text-align: center;

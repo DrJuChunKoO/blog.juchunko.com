@@ -9,6 +9,7 @@ interface Props {
   title?: string;
   description: string;
   image?: string;
+  alternateUrl?: string;
 }
 
 const lang = getLangFromUrl(Astro.url);
@@ -21,9 +22,20 @@ const {
   title: pageTitle,
   description,
   image = "/images/avatar.webp",
+  alternateUrl,
 } = Astro.props;
 
 const title = pageTitle ? `${pageTitle} | ${siteTitle}` : siteTitle;
+
+// Build hreflang URLs
+const currentFullUrl = new URL(Astro.url.pathname, Astro.site).href;
+const alternateFullUrl = alternateUrl
+  ? new URL(alternateUrl, Astro.site).href
+  : undefined;
+
+const enUrl = lang === "en" ? currentFullUrl : alternateFullUrl;
+const zhUrl = lang === "zh" ? currentFullUrl : alternateFullUrl;
+const xDefaultUrl = enUrl ?? currentFullUrl;
 ---
 
 <!-- Global Metadata -->
@@ -49,6 +61,11 @@ const title = pageTitle ? `${pageTitle} | ${siteTitle}` : siteTitle;
 
 <!-- Canonical URL -->
 <link rel="canonical" href={canonicalURL} />
+
+<!-- hreflang alternate links -->
+{enUrl && <link rel="alternate" hreflang="en" href={enUrl} />}
+{zhUrl && <link rel="alternate" hreflang="zh" href={zhUrl} />}
+<link rel="alternate" hreflang="x-default" href={xDefaultUrl} />
 
 <!-- Primary Meta Tags -->
 <title>{title}</title>

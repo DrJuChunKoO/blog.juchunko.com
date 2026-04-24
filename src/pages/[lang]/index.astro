@@ -35,7 +35,10 @@ const posts = await Promise.all(
 <!doctype html>
 <html lang={lang}>
   <head>
-    <BaseHead description={SITE_DESCRIPTION} />
+    <BaseHead
+      description={SITE_DESCRIPTION}
+      alternateUrl={currentLang === "en" ? "/zh" : "/en"}
+    />
   </head>
   <body>
     <Header />
