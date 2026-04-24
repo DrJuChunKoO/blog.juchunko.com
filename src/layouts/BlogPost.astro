@@ -65,6 +65,10 @@ const navLabels = {
 const navText = navLabels[currentLang];
 const backFallbackUrl = `/${currentLang}/`;
 
+// Detect math content to conditionally load KaTeX CSS
+const hasKatex =
+  post.body?.includes("$$") || post.body?.includes("\\[");
+
 // JSON-LD structured data
 const siteUrl = Astro.site ? Astro.site.href.replace(/\/$/, "") : "";
 const pageUrl = Astro.url.href;
@@ -110,6 +114,16 @@ const jsonLd = {
         .map((a) => a.data.name[currentLang])}
     />
     <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+    {
+      hasKatex && (
+        <link
+          rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css"
+          integrity="sha384-5TcZemv2l/9On385z///+d7MSYlvIxqAVtrAFnx9ZfDnh1X04cYo0v8RBU3ZFgGK"
+          crossorigin="anonymous"
+        />
+      )
+    }
     <style>
       .lang-switcher {
         text-align: center;
