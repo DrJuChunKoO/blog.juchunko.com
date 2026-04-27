@@ -6,6 +6,7 @@ import PaginationNav from "../../../components/PaginationNav.astro";
 import PostGrid from "../../../components/PostGrid.astro";
 import { SITE_DESCRIPTION } from "../../../consts";
 import {
+  FEATURED_FIRST_PAGE_POSTS,
   getPostsForLang,
   paginateItems,
   type Language,
@@ -16,7 +17,12 @@ export async function getStaticPaths() {
   const paths = await Promise.all(
     langs.map(async (lang) => {
       const allPosts = await getPostsForLang(lang);
-      const { totalPages } = paginateItems(allPosts, 1);
+      const { totalPages } = paginateItems(
+        allPosts,
+        1,
+        undefined,
+        FEATURED_FIRST_PAGE_POSTS,
+      );
 
       return Array.from(
         { length: Math.max(totalPages - 1, 0) },
@@ -38,7 +44,12 @@ const {
   items: posts,
   currentPage,
   totalPages,
-} = paginateItems(allPosts, requestedPage);
+} = paginateItems(
+  allPosts,
+  requestedPage,
+  undefined,
+  FEATURED_FIRST_PAGE_POSTS,
+);
 const sourcePath = `/${currentLang}/page/${currentPage}/`;
 ---
 

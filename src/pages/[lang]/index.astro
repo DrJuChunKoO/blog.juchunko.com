@@ -5,7 +5,11 @@ import Footer from "../../components/Footer.astro";
 import PaginationNav from "../../components/PaginationNav.astro";
 import PostGrid from "../../components/PostGrid.astro";
 import { SITE_DESCRIPTION } from "../../consts";
-import { getPostsForLang, paginateItems } from "../../lib/blog";
+import {
+  FEATURED_FIRST_PAGE_POSTS,
+  getPostsForLang,
+  paginateItems,
+} from "../../lib/blog";
 
 export function getStaticPaths() {
   return [{ params: { lang: "en" } }, { params: { lang: "zh" } }];
@@ -16,7 +20,11 @@ const { lang } = Astro.params;
 // Ensure TypeScript knows the exact union type for language
 const currentLang = lang as "en" | "zh";
 const allPosts = await getPostsForLang(currentLang);
-const { items: posts, currentPage, totalPages } = paginateItems(allPosts, 1);
+const {
+  items: posts,
+  currentPage,
+  totalPages,
+} = paginateItems(allPosts, 1, undefined, FEATURED_FIRST_PAGE_POSTS);
 const sourcePath = `/${currentLang}/`;
 ---
 
@@ -40,7 +48,7 @@ const sourcePath = `/${currentLang}/`;
       <PostGrid
         posts={posts}
         currentLang={currentLang}
-        featuredCount={2}
+        featuredCount={1}
         sourcePath={sourcePath}
       />
       <PaginationNav
