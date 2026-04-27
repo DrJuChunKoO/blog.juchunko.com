@@ -51,13 +51,17 @@ const {
   FEATURED_FIRST_PAGE_POSTS,
 );
 const sourcePath = `/${currentLang}/page/${currentPage}/`;
+const pageTitle =
+  currentLang === "zh"
+    ? `文章列表 - 第 ${currentPage} 頁`
+    : `Posts - Page ${currentPage}`;
 ---
 
 <!doctype html>
 <html lang={lang}>
   <head>
     <BaseHead
-      title={`${currentLang === "en" ? "Posts" : "文章"} ${currentPage}`}
+      title={pageTitle}
       description={SITE_DESCRIPTION}
       alternateUrl={`/${currentLang === "en" ? "zh" : "en"}/page/${currentPage}/`}
     />
