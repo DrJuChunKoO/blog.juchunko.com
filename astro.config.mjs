@@ -31,6 +31,19 @@ export default defineConfig({
         jsx: "react",
       }),
     ],
+    build: {
+      rollupOptions: {
+        onwarn(warning, warn) {
+          if (
+            warning.code === "EVAL" &&
+            warning.id?.includes("node_modules/markdown-to-jsx/")
+          ) {
+            return;
+          }
+          warn(warning);
+        },
+      },
+    },
   },
   markdown: { remarkPlugins: [remarkMath], rehypePlugins: [rehypeKatex] },
 });
