@@ -1,14 +1,14 @@
 ---
-import BaseHead from "../../../components/BaseHead.astro";
-import Header from "../../../components/Header.astro";
-import Footer from "../../../components/Footer.astro";
-import CategorySelect from "../../../components/CategorySelect.astro";
-import PaginationNav from "../../../components/PaginationNav.astro";
-import PostGrid from "../../../components/PostGrid.astro";
-import { SITE_DESCRIPTION } from "../../../consts";
+import BaseHead from "../../../../../components/BaseHead.astro";
+import Header from "../../../../../components/Header.astro";
+import Footer from "../../../../../components/Footer.astro";
+import CategorySelect from "../../../../../components/CategorySelect.astro";
+import PaginationNav from "../../../../../components/PaginationNav.astro";
+import PostGrid from "../../../../../components/PostGrid.astro";
+import { SITE_DESCRIPTION } from "../../../../../consts";
 import { getCollection } from "astro:content";
-import { languages } from "../../../i18n/ui";
-import { useTranslations } from "../../../i18n/utils";
+import { languages } from "../../../../../i18n/ui";
+import { useTranslations } from "../../../../../i18n/utils";
 import {
   FEATURED_FIRST_PAGE_POSTS,
   getCategorySummaries,
@@ -16,19 +16,39 @@ import {
   getPostsForLang,
   paginateItems,
   type Language,
-} from "../../../lib/blog";
+} from "../../../../../lib/blog";
 
 export async function getStaticPaths() {
   const categories = await getCollection("categories");
   const langs = Object.keys(languages) as Language[];
-  return categories.flatMap((cat) =>
-    langs.map((lang) => ({ params: { lang, category: cat.id } })),
+  const paths = await Promise.all(
+    categories.flatMap((cat) =>
+      langs.map(async (lang) => {
+        const categoryPosts = await getPostsForCategory(lang, cat.id);
+        const { totalPages } = paginateItems(
+          categoryPosts,
+          1,
+          undefined,
+          FEATURED_FIRST_PAGE_POSTS,
+        );
+
+        return Array.from(
+          { length: Math.max(totalPages - 1, 0) },
+          (_, index) => ({
+            params: { lang, category: cat.id, page: String(index + 2) },
+          }),
+        );
+      }),
+    ),
   );
+
+  return paths.flat();
 }
 
-const { lang, category } = Astro.params;
+const { lang, category, page } = Astro.params;
 const currentLang = lang as Language;
 const categoryId = category ?? "";
+const requestedPage = Number(page);
 const t = useTranslations(currentLang);
 const [allPosts, allCategories, categoryPosts] = await Promise.all([
   getPostsForLang(currentLang),
@@ -41,14 +61,23 @@ const {
   items: posts,
   currentPage,
   totalPages,
-} = paginateItems(categoryPosts, 1, undefined, FEATURED_FIRST_PAGE_POSTS);
-const sourcePath = `/${currentLang}/categories/${categoryId}/`;
+} = paginateItems(
+  categoryPosts,
+  requestedPage,
+  undefined,
+  FEATURED_FIRST_PAGE_POSTS,
+);
+const sourcePath = `/${currentLang}/categories/${categoryId}/page/${currentPage}/`;
+const pageTitle =
+  currentLang === "zh"
+    ? `${categoryName} - 第 ${currentPage} 頁`
+    : `${categoryName} - Page ${currentPage}`;
 ---
 
 <!doctype html>
 <html lang={lang}>
   <head>
-    <BaseHead title={`${categoryName}`} description={SITE_DESCRIPTION} />
+    <BaseHead title={pageTitle} description={SITE_DESCRIPTION} />
   </head>
   <body>
     <a
@@ -71,7 +100,6 @@ const sourcePath = `/${currentLang}/categories/${categoryId}/`;
       <PostGrid
         posts={posts}
         currentLang={currentLang}
-        featuredCount={1}
         sourcePath={sourcePath}
       />
       <PaginationNav
