@@ -24,27 +24,59 @@ const labels = {
     of: "頁 / 共",
   },
 }[currentLang];
+const buttonClass =
+  "inline-flex size-10 items-center justify-center rounded-full border border-gray-200 text-gray-700 transition hover:border-gray-300 hover:bg-gray-100 dark:border-gray-800 dark:text-gray-200 dark:hover:border-gray-700 dark:hover:bg-gray-900";
+const placeholderClass = `${buttonClass} invisible`;
 
-const pageNumbers = Array.from({ length: totalPages }, (_, index) => index + 1);
+const visiblePageCount = 5;
+const firstVisiblePage = Math.max(
+  1,
+  Math.min(
+    currentPage - Math.floor(visiblePageCount / 2),
+    totalPages - visiblePageCount + 1,
+  ),
+);
+const lastVisiblePage = Math.min(
+  totalPages,
+  firstVisiblePage + visiblePageCount - 1,
+);
+const pageNumbers = Array.from(
+  { length: lastVisiblePage - firstVisiblePage + 1 },
+  (_, index) => firstVisiblePage + index,
+);
 ---
 
 {
   totalPages > 1 && (
     <nav
-      class="mt-12 flex flex-col items-stretch gap-4 border-t border-gray-200 pt-6 text-sm md:flex-row md:items-center md:justify-between dark:border-gray-800"
+      class="mt-10 grid grid-cols-[auto_1fr_auto] items-center gap-3 border-t border-gray-200 pt-5 text-sm md:mt-12 md:gap-4 md:pt-6 dark:border-gray-800"
       aria-label="Pagination"
     >
       {currentPage > 1 ? (
         <a
           href={pageHref(previousPage)}
-          class="inline-flex items-center justify-center rounded-full border border-gray-200 px-4 py-2 font-medium text-gray-700 transition hover:border-gray-300 hover:bg-gray-100 dark:border-gray-800 dark:text-gray-200 dark:hover:border-gray-700 dark:hover:bg-gray-900"
+          class={buttonClass}
+          aria-label={labels.previous}
         >
-          {labels.previous}
+          <svg
+            aria-hidden="true"
+            viewBox="0 0 20 20"
+            class="size-5"
+            fill="none"
+          >
+            <path
+              d="M12 5 7 10l5 5"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
         </a>
       ) : (
-        <span class="hidden md:block" aria-hidden="true" />
+        <span class={placeholderClass} aria-hidden="true" />
       )}
-      <div class="flex items-center justify-center gap-1">
+      <div class="flex min-w-0 items-center justify-center gap-1">
         {pageNumbers.map((page) =>
           page === currentPage ? (
             <span
@@ -64,20 +96,29 @@ const pageNumbers = Array.from({ length: totalPages }, (_, index) => index + 1);
           ),
         )}
       </div>
-      <span class="text-center text-xs text-gray-500 md:hidden dark:text-gray-400">
-        {currentLang === "zh"
-          ? `${labels.page} ${currentPage} ${labels.of} ${totalPages} 頁`
-          : `${labels.page} ${currentPage} ${labels.of} ${totalPages}`}
-      </span>
       {currentPage < totalPages ? (
         <a
           href={pageHref(nextPage)}
-          class="inline-flex items-center justify-center rounded-full border border-gray-200 px-4 py-2 font-medium text-gray-700 transition hover:border-gray-300 hover:bg-gray-100 dark:border-gray-800 dark:text-gray-200 dark:hover:border-gray-700 dark:hover:bg-gray-900"
+          class={buttonClass}
+          aria-label={labels.next}
         >
-          {labels.next}
+          <svg
+            aria-hidden="true"
+            viewBox="0 0 20 20"
+            class="size-5"
+            fill="none"
+          >
+            <path
+              d="m8 5 5 5-5 5"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
         </a>
       ) : (
-        <span class="hidden md:block" aria-hidden="true" />
+        <span class={placeholderClass} aria-hidden="true" />
       )}
     </nav>
   )
