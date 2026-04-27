@@ -33,6 +33,7 @@
     "lucide-react": "^0.562.0",
     "markdown-to-jsx": "^9.3.3",
     "motion": "^12.16.0",
+    "overlayscrollbars": "^2.15.1",
     "pangu": "^4.0.7",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
