@@ -8,7 +8,6 @@ import PostGrid from "../../../components/PostGrid.astro";
 import { SITE_DESCRIPTION } from "../../../consts";
 import { getCollection } from "astro:content";
 import { languages } from "../../../i18n/ui";
-import { useTranslations } from "../../../i18n/utils";
 import {
   FEATURED_FIRST_PAGE_POSTS,
   getCategorySummaries,
@@ -29,7 +28,6 @@ export async function getStaticPaths() {
 const { lang, category } = Astro.params;
 const currentLang = lang as Language;
 const categoryId = category ?? "";
-const t = useTranslations(currentLang);
 const [allPosts, allCategories, categoryPosts] = await Promise.all([
   getPostsForLang(currentLang),
   getCategorySummaries(currentLang),
@@ -65,9 +63,6 @@ const sourcePath = `/${currentLang}/categories/${categoryId}/`;
         totalCount={allPosts.length}
         activeCategory={categoryId}
       />
-      <h1 class="mb-4 text-3xl font-semibold">
-        {t("category.postsIn").replace("{category}", categoryName)}
-      </h1>
       <PostGrid
         posts={posts}
         currentLang={currentLang}
