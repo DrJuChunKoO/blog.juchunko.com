@@ -19,7 +19,7 @@ const activeCategorySummary = categories.find(
 );
 const selectedLabel = activeCategorySummary?.name ?? allLabel;
 const itemBase =
-  "group/item flex items-center justify-between gap-3 rounded-lg px-3 py-2 text-sm font-medium transition";
+  "group/item flex items-center justify-between gap-3 rounded-lg px-3 py-2 text-base font-medium transition";
 const inactiveItemClass =
   "text-gray-600 hover:bg-white hover:text-gray-950 hover:shadow-sm dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-gray-100";
 const activeItemClass =
@@ -41,7 +41,7 @@ const activeCountClass =
       aria-label={openLabel}
     >
       <span
-        class="inline-flex min-w-0 items-center gap-1.5 rounded-xl px-2.5 py-1.5 text-base font-semibold text-gray-950 transition group-open/dropdown:bg-white group-open/dropdown:shadow-sm group-hover/trigger:bg-white group-hover/trigger:shadow-sm dark:text-gray-100 dark:group-open/dropdown:bg-gray-800 dark:group-hover/trigger:bg-gray-800"
+        class="inline-flex min-w-0 items-center gap-1.5 rounded-xl px-2.5 py-1.5 text-lg font-semibold text-gray-950 transition group-open/dropdown:bg-white group-open/dropdown:shadow-sm group-hover/trigger:bg-white group-hover/trigger:shadow-sm dark:text-gray-100 dark:group-open/dropdown:bg-gray-800 dark:group-hover/trigger:bg-gray-800"
       >
         <span class="truncate">{selectedLabel}</span>
         <span
