@@ -1,6 +1,9 @@
-import { defineCollection, z, reference } from "astro:content";
+import { defineCollection, reference } from "astro:content";
+import { glob } from "astro/loaders";
+import { z } from "astro/zod";
 
 const blog = defineCollection({
+  loader: glob({ pattern: "**/[^_]*.{md,mdx}", base: "./src/content/blog" }),
   // Type-check frontmatter using a schema
   schema: z.object({
     title: z.string(),
@@ -28,7 +31,7 @@ const blog = defineCollection({
 });
 
 const authors = defineCollection({
-  type: "data",
+  loader: glob({ pattern: "**/*.json", base: "./src/content/authors" }),
   schema: z.object({
     name: z.object({
       en: z.string(),
@@ -41,14 +44,14 @@ const authors = defineCollection({
     }),
     social: z
       .object({
-        email: z.string().email().optional(),
-        twitter: z.string().url().optional(),
-        github: z.string().url().optional(),
-        facebook: z.string().url().optional(),
-        youtube: z.string().url().optional(),
-        instagram: z.string().url().optional(),
-        threads: z.string().url().optional(),
-        website: z.string().url().optional(),
+        email: z.email().optional(),
+        twitter: z.url().optional(),
+        github: z.url().optional(),
+        facebook: z.url().optional(),
+        youtube: z.url().optional(),
+        instagram: z.url().optional(),
+        threads: z.url().optional(),
+        website: z.url().optional(),
       })
       .optional(),
   }),
@@ -68,7 +71,7 @@ const authors = defineCollection({
 //           referenced from post frontmatter as:
 //           categories: ["technology"]
 const categories = defineCollection({
-  type: "data",
+  loader: glob({ pattern: "**/*.json", base: "./src/content/categories" }),
   schema: z.object({
     name: z.object({
       en: z.string(),
