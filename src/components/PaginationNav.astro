@@ -3,13 +3,19 @@ interface Props {
   currentLang: "en" | "zh";
   currentPage: number;
   totalPages: number;
+  basePath?: string;
 }
 
-const { currentLang, currentPage, totalPages } = Astro.props;
+const {
+  currentLang,
+  currentPage,
+  totalPages,
+  basePath = `/${currentLang}`,
+} = Astro.props;
 const previousPage = currentPage - 1;
 const nextPage = currentPage + 1;
 const pageHref = (page: number) =>
-  page === 1 ? `/${currentLang}/` : `/${currentLang}/page/${page}/`;
+  page === 1 ? `${basePath}/` : `${basePath}/page/${page}/`;
 const labels = {
   en: {
     previous: "Previous",
