@@ -1,5 +1,5 @@
 ---
-import { getCollection, type CollectionEntry } from "astro:content";
+import { getCollection } from "astro:content";
 import BaseLayout from "../../../layouts/BaseLayout.astro";
 import { languages } from "../../../i18n/ui";
 import type { GetStaticPaths } from "astro";
@@ -29,7 +29,7 @@ const posts = allPosts
   .filter(
     (post) =>
       post.data.author.some((a) => a.id === author.id) &&
-      post.slug.startsWith(`${lang}/`),
+      post.id.startsWith(`${lang}/`),
   )
   .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 
@@ -77,7 +77,7 @@ const pageDescription = authorBio;
     <h2>{t("author.postsBy").replace("{authorName}", authorName)}</h2>
     {
       posts.map((post) => (
-        <a href={`/${post.slug}`}>
+        <a href={`/${post.id}`}>
           <h4 class="text-lg font-semibold">{post.data.title}</h4>
           <div class="text-sm text-gray-500">
             <FormattedDate date={post.data.pubDate} />
