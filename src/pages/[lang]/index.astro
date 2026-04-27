@@ -2,11 +2,13 @@
 import BaseHead from "../../components/BaseHead.astro";
 import Header from "../../components/Header.astro";
 import Footer from "../../components/Footer.astro";
+import CategorySelect from "../../components/CategorySelect.astro";
 import PaginationNav from "../../components/PaginationNav.astro";
 import PostGrid from "../../components/PostGrid.astro";
 import { SITE_DESCRIPTION } from "../../consts";
 import {
   FEATURED_FIRST_PAGE_POSTS,
+  getCategorySummaries,
   getPostsForLang,
   paginateItems,
 } from "../../lib/blog";
@@ -20,6 +22,7 @@ const { lang } = Astro.params;
 // Ensure TypeScript knows the exact union type for language
 const currentLang = lang as "en" | "zh";
 const allPosts = await getPostsForLang(currentLang);
+const categories = await getCategorySummaries(currentLang);
 const {
   items: posts,
   currentPage,
@@ -45,6 +48,11 @@ const sourcePath = `/${currentLang}/`;
     </a>
     <Header />
     <main id="main-content" class="mx-auto w-full max-w-7xl px-4 py-8 md:px-6">
+      <CategorySelect
+        currentLang={currentLang}
+        categories={categories}
+        totalCount={allPosts.length}
+      />
       <PostGrid
         posts={posts}
         currentLang={currentLang}

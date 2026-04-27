@@ -1,0 +1,199 @@
+---
+import "overlayscrollbars/overlayscrollbars.css";
+import type { CategorySummary, Language } from "../lib/blog";
+
+interface Props {
+  currentLang: Language;
+  categories: CategorySummary[];
+  totalCount: number;
+  activeCategory?: string;
+}
+
+const { currentLang, categories, totalCount, activeCategory } = Astro.props;
+const allLabel = currentLang === "zh" ? "全部" : "All";
+const ariaLabel =
+  currentLang === "zh" ? "依分類篩選文章" : "Filter posts by category";
+const openLabel = currentLang === "zh" ? "選擇分類" : "Choose category";
+const activeCategorySummary = categories.find(
+  (category) => category.id === activeCategory,
+);
+const selectedLabel = activeCategorySummary?.name ?? allLabel;
+const itemBase =
+  "group/item flex items-center justify-between gap-3 rounded-lg px-3 py-2 text-sm font-medium transition";
+const inactiveItemClass =
+  "text-gray-600 hover:bg-white hover:text-gray-950 hover:shadow-sm dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-gray-100";
+const activeItemClass =
+  "bg-gray-950 text-white shadow-sm dark:bg-gray-100 dark:text-gray-950";
+const countBase = "rounded-full px-2 py-0.5 text-xs font-semibold transition";
+const inactiveCountClass =
+  "bg-white text-gray-500 ring-1 ring-gray-200 group-hover/item:bg-gray-50 dark:bg-gray-900 dark:text-gray-400 dark:ring-gray-800 dark:group-hover/item:bg-gray-950";
+const activeCountClass =
+  "bg-white/15 text-white/80 dark:bg-gray-950/10 dark:text-gray-950/70";
+---
+
+<nav class="category-filter" aria-label={ariaLabel}>
+  <details
+    class="category-dropdown group/dropdown relative inline-block max-w-full min-w-56"
+    data-category-dropdown
+  >
+    <summary
+      class="group/trigger inline-flex cursor-pointer list-none"
+      aria-label={openLabel}
+    >
+      <span
+        class="inline-flex min-w-0 items-center gap-1.5 rounded-xl px-2.5 py-1.5 text-base font-semibold text-gray-950 transition group-open/dropdown:bg-white group-open/dropdown:shadow-sm group-hover/trigger:bg-white group-hover/trigger:shadow-sm dark:text-gray-100 dark:group-open/dropdown:bg-gray-800 dark:group-hover/trigger:bg-gray-800"
+      >
+        <span class="truncate">{selectedLabel}</span>
+        <span
+          class="flex size-5 shrink-0 items-center justify-center text-gray-500 transition group-open/dropdown:rotate-180 dark:text-gray-400"
+          aria-hidden="true"
+        >
+          <svg viewBox="0 0 20 20" class="size-4" fill="none">
+            <path
+              d="m5 8 5 5 5-5"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"></path>
+          </svg>
+        </span>
+      </span>
+    </summary>
+    <div
+      class="absolute z-30 mt-1.5 w-[min(20rem,calc(100vw-2rem))] rounded-xl border border-gray-200 bg-gray-50 shadow-lg shadow-gray-950/10 dark:border-gray-800 dark:bg-gray-950 dark:shadow-black/30"
+    >
+      <div
+        class="max-h-80 space-y-0.5 overflow-y-auto p-1.5 pr-3"
+        data-category-scroll
+        data-overlayscrollbars-initialize
+      >
+        <a
+          href={`/${currentLang}/`}
+          class:list={[
+            itemBase,
+            !activeCategory ? activeItemClass : inactiveItemClass,
+          ]}
+          aria-current={!activeCategory ? "page" : undefined}
+        >
+          <span>{allLabel}</span>
+          <span
+            class:list={[
+              countBase,
+              !activeCategory ? activeCountClass : inactiveCountClass,
+            ]}>{totalCount}</span
+          >
+        </a>
+        {
+          categories.map((category) => {
+            const isActive = activeCategory === category.id;
+
+            return (
+              <a
+                href={`/${currentLang}/categories/${category.id}/`}
+                class:list={[
+                  itemBase,
+                  isActive ? activeItemClass : inactiveItemClass,
+                ]}
+                aria-current={isActive ? "page" : undefined}
+              >
+                <span>{category.name}</span>
+                <span
+                  class:list={[
+                    countBase,
+                    isActive ? activeCountClass : inactiveCountClass,
+                  ]}
+                >
+                  {category.count}
+                </span>
+              </a>
+            );
+          })
+        }
+      </div>
+    </div>
+  </details>
+</nav>
+
+<style>
+  summary::-webkit-details-marker {
+    display: none;
+  }
+
+  :global(.category-dropdown .os-scrollbar-vertical) {
+    padding: 0.5rem 0.25rem;
+    width: 0.8rem;
+  }
+
+  :global(.category-dropdown .os-scrollbar-handle) {
+    background: rgb(17 24 39 / 0.48);
+    border-radius: 9999px;
+    min-height: 2rem;
+  }
+
+  :global(.category-dropdown .os-scrollbar-track) {
+    background: rgb(17 24 39 / 0.06);
+    border-radius: 9999px;
+  }
+
+  :global(.dark .category-dropdown .os-scrollbar-handle) {
+    background: rgb(243 244 246 / 0.48);
+  }
+
+  :global(.dark .category-dropdown .os-scrollbar-track) {
+    background: rgb(243 244 246 / 0.08);
+  }
+</style>
+
+<script>
+  import { OverlayScrollbars } from "overlayscrollbars";
+
+  const initCategoryScrollbars = () => {
+    document
+      .querySelectorAll<HTMLElement>("[data-category-scroll]")
+      .forEach((element) => {
+        if (OverlayScrollbars(element)) return;
+
+        OverlayScrollbars(element, {
+          overflow: {
+            x: "hidden",
+            y: "scroll",
+          },
+          scrollbars: {
+            autoHide: "never",
+            theme: "os-theme-dark",
+          },
+        });
+      });
+  };
+
+  const closeCategoryDropdowns = () => {
+    document
+      .querySelectorAll<HTMLDetailsElement>("[data-category-dropdown][open]")
+      .forEach((dropdown) => dropdown.removeAttribute("open"));
+  };
+
+  const closeCategoryDropdownsOnOutsideClick = (event: PointerEvent) => {
+    if (!(event.target instanceof Element)) return;
+
+    document
+      .querySelectorAll<HTMLDetailsElement>("[data-category-dropdown][open]")
+      .forEach((dropdown) => {
+        if (!dropdown.contains(event.target as Node)) {
+          dropdown.removeAttribute("open");
+        }
+      });
+  };
+
+  const closeCategoryDropdownsOnEscape = (event: KeyboardEvent) => {
+    if (event.key === "Escape") closeCategoryDropdowns();
+  };
+
+  document.addEventListener(
+    "pointerdown",
+    closeCategoryDropdownsOnOutsideClick,
+  );
+  document.addEventListener("keydown", closeCategoryDropdownsOnEscape);
+
+  initCategoryScrollbars();
+  document.addEventListener("astro:page-load", initCategoryScrollbars);
+</script>
