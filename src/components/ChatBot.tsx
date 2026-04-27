@@ -39,7 +39,7 @@ export default function ChatBot() {
     setInput(e.target.value);
   };
 
-  const handleSubmit = (e?: React.FormEvent) => {
+  const handleSubmit = (e?: { preventDefault: () => void }) => {
     e?.preventDefault();
     if (input.trim()) {
       sendMessage({ text: input });

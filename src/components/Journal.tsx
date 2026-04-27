@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import type { PanInfo } from "motion/react";
+import type { PanInfo, Variants } from "motion/react";
 import LucideX from "~icons/lucide/x";
 import { RemoveScroll } from "react-remove-scroll";
 
@@ -32,13 +32,13 @@ const variants = {
       opacity: { duration: 0.2 },
     },
   }),
-};
+} satisfies Variants;
 
 const buttonVariants = {
   initial: { opacity: 0, scale: 0.9 },
   animate: { opacity: 1, scale: 1, transition: { delay: 0.2, type: "spring" } },
   exit: { opacity: 0, scale: 0.9, transition: { delay: 0 } },
-};
+} satisfies Variants;
 
 function ImageView({
   image,
@@ -173,7 +173,7 @@ function Images({
   };
 
   const handleDragEnd = (
-    e: MouseEvent | TouchEvent | PointerEvent,
+    _e: MouseEvent | TouchEvent | PointerEvent,
     { offset, velocity }: PanInfo,
   ) => {
     const swipe = swipePower(offset.x, velocity.x);
