@@ -10,7 +10,7 @@ interface Props {
 }
 
 const { currentLang, categories, totalCount, activeCategory } = Astro.props;
-const allLabel = currentLang === "zh" ? "全部" : "All";
+const allLabel = currentLang === "zh" ? "所有文章" : "All posts";
 const ariaLabel =
   currentLang === "zh" ? "依分類篩選文章" : "Filter posts by category";
 const openLabel = currentLang === "zh" ? "選擇分類" : "Choose category";

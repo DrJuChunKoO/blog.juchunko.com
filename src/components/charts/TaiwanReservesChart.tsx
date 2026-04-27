@@ -35,6 +35,7 @@ const rawData = [
 ];
 
 export default function TaiwanReservesChart({ lang = "en" }: { lang?: "en" | "zh" }) {
+    const [isMounted, setIsMounted] = useState(false);
     const [isDark, setIsDark] = useState(false);
     const t = translations[lang];
 
@@ -44,6 +45,7 @@ export default function TaiwanReservesChart({ lang = "en" }: { lang?: "en" | "zh
     }));
 
     useEffect(() => {
+        setIsMounted(true);
         if (document.documentElement.classList.contains("dark")) {
             setIsDark(true);
         }
@@ -75,6 +77,7 @@ export default function TaiwanReservesChart({ lang = "en" }: { lang?: "en" | "zh
             <p className="text-center text-sm text-gray-500 dark:text-gray-400 mb-4">
                 {t.subtitle}
             </p>
+            {!isMounted ? null : (
             <ResponsiveContainer width="100%" height="90%">
                 <PieChart>
                     <Pie
@@ -106,6 +109,7 @@ export default function TaiwanReservesChart({ lang = "en" }: { lang?: "en" | "zh
                     />
                 </PieChart>
             </ResponsiveContainer>
+            )}
         </div>
     );
 }

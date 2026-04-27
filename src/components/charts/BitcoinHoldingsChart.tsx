@@ -53,6 +53,7 @@ const rawData = [
 ];
 
 export default function BitcoinHoldingsChart({ lang = "en" }: { lang?: "en" | "zh" }) {
+    const [isMounted, setIsMounted] = useState(false);
     const [isDark, setIsDark] = useState(false);
     const t = translations[lang];
 
@@ -62,6 +63,7 @@ export default function BitcoinHoldingsChart({ lang = "en" }: { lang?: "en" | "z
     }));
 
     useEffect(() => {
+        setIsMounted(true);
         // Initial check
         if (document.documentElement.classList.contains("dark")) {
             setIsDark(true);
@@ -99,6 +101,7 @@ export default function BitcoinHoldingsChart({ lang = "en" }: { lang?: "en" | "z
             <p className="text-center text-sm text-gray-500 dark:text-gray-400 mb-4">
                 {t.subtitle}
             </p>
+            {!isMounted ? null : (
             <ResponsiveContainer width="100%" height="90%">
                 <BarChart
                     layout="vertical"
@@ -121,6 +124,7 @@ export default function BitcoinHoldingsChart({ lang = "en" }: { lang?: "en" | "z
                     </Bar>
                 </BarChart>
             </ResponsiveContainer>
+            )}
         </div>
     );
 }
