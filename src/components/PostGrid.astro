@@ -1,0 +1,55 @@
+---
+import FormattedDate from "./FormattedDate.astro";
+import type { BlogPost, Language } from "../lib/blog";
+
+interface Props {
+  posts: BlogPost[];
+  currentLang: Language;
+  featuredCount?: number;
+  sourcePath?: string;
+}
+
+const { posts, currentLang, featuredCount = 0 } = Astro.props;
+---
+
+<section class="grid grid-cols-1 gap-4 md:grid-cols-2">
+  {
+    posts.map((post, index) => {
+      const slug = post.id.replace(/\.(md|mdx)$/, "");
+
+      return (
+        <a
+          href={`/${slug}`}
+          class={`group rounded-xl p-2 transition-colors hover:bg-gray-200 dark:hover:bg-gray-800 ${index < featuredCount ? "md:col-span-2" : ""}`}
+        >
+          {post.data.heroImage && (
+            <img
+              width={720}
+              height={360}
+              src={post.data.heroImage}
+              alt={post.data.heroImageAlt ?? ""}
+              class="aspect-video w-full rounded-lg object-cover transition-transform"
+              transition:name={`${post.id}-image`}
+            />
+          )}
+          <h2
+            class="mt-2 text-xl font-semibold"
+            transition:name={`${post.id}-title`}
+          >
+            {post.data.title}
+          </h2>
+          <div class="text-base text-gray-500 dark:text-gray-400">
+            <FormattedDate date={post.data.pubDate} />
+          </div>
+        </a>
+      );
+    })
+  }
+  {
+    posts.length === 0 && (
+      <p class="text-gray-500 italic">
+        {currentLang === "en" ? "No posts yet." : "尚無文章"}
+      </p>
+    )
+  }
+</section>

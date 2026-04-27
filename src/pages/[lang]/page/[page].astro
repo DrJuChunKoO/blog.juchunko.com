@@ -1,0 +1,76 @@
+---
+import BaseHead from "../../../components/BaseHead.astro";
+import Header from "../../../components/Header.astro";
+import Footer from "../../../components/Footer.astro";
+import PaginationNav from "../../../components/PaginationNav.astro";
+import PostGrid from "../../../components/PostGrid.astro";
+import { SITE_DESCRIPTION } from "../../../consts";
+import {
+  getPostsForLang,
+  paginateItems,
+  type Language,
+} from "../../../lib/blog";
+
+export async function getStaticPaths() {
+  const langs: Language[] = ["en", "zh"];
+  const paths = await Promise.all(
+    langs.map(async (lang) => {
+      const allPosts = await getPostsForLang(lang);
+      const { totalPages } = paginateItems(allPosts, 1);
+
+      return Array.from(
+        { length: Math.max(totalPages - 1, 0) },
+        (_, index) => ({
+          params: { lang, page: String(index + 2) },
+        }),
+      );
+    }),
+  );
+
+  return paths.flat();
+}
+
+const { lang, page } = Astro.params;
+const currentLang = lang as Language;
+const requestedPage = Number(page);
+const allPosts = await getPostsForLang(currentLang);
+const {
+  items: posts,
+  currentPage,
+  totalPages,
+} = paginateItems(allPosts, requestedPage);
+const sourcePath = `/${currentLang}/page/${currentPage}/`;
+---
+
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <BaseHead
+      title={`${currentLang === "en" ? "Posts" : "文章"} ${currentPage}`}
+      description={SITE_DESCRIPTION}
+      alternateUrl={`/${currentLang === "en" ? "zh" : "en"}/page/${currentPage}/`}
+    />
+  </head>
+  <body>
+    <a
+      href="#main-content"
+      class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:rounded focus:bg-white focus:px-4 focus:py-2 focus:text-gray-900 focus:shadow-md focus:outline-none dark:focus:bg-gray-900 dark:focus:text-gray-100"
+    >
+      Skip to main content
+    </a>
+    <Header />
+    <main id="main-content" class="mx-auto w-full max-w-7xl px-4 py-8 md:px-6">
+      <PostGrid
+        posts={posts}
+        currentLang={currentLang}
+        sourcePath={sourcePath}
+      />
+      <PaginationNav
+        currentLang={currentLang}
+        currentPage={currentPage}
+        totalPages={totalPages}
+      />
+    </main>
+    <Footer />
+  </body>
+</html>

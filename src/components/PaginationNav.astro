@@ -1,0 +1,84 @@
+---
+interface Props {
+  currentLang: "en" | "zh";
+  currentPage: number;
+  totalPages: number;
+}
+
+const { currentLang, currentPage, totalPages } = Astro.props;
+const previousPage = currentPage - 1;
+const nextPage = currentPage + 1;
+const pageHref = (page: number) =>
+  page === 1 ? `/${currentLang}/` : `/${currentLang}/page/${page}/`;
+const labels = {
+  en: {
+    previous: "Previous",
+    next: "Next",
+    page: "Page",
+    of: "of",
+  },
+  zh: {
+    previous: "上一頁",
+    next: "下一頁",
+    page: "第",
+    of: "頁 / 共",
+  },
+}[currentLang];
+
+const pageNumbers = Array.from({ length: totalPages }, (_, index) => index + 1);
+---
+
+{
+  totalPages > 1 && (
+    <nav
+      class="mt-12 flex flex-col items-stretch gap-4 border-t border-gray-200 pt-6 text-sm md:flex-row md:items-center md:justify-between dark:border-gray-800"
+      aria-label="Pagination"
+    >
+      {currentPage > 1 ? (
+        <a
+          href={pageHref(previousPage)}
+          class="inline-flex items-center justify-center rounded-full border border-gray-200 px-4 py-2 font-medium text-gray-700 transition hover:border-gray-300 hover:bg-gray-100 dark:border-gray-800 dark:text-gray-200 dark:hover:border-gray-700 dark:hover:bg-gray-900"
+        >
+          {labels.previous}
+        </a>
+      ) : (
+        <span class="hidden md:block" aria-hidden="true" />
+      )}
+      <div class="flex items-center justify-center gap-1">
+        {pageNumbers.map((page) =>
+          page === currentPage ? (
+            <span
+              class="inline-flex h-9 min-w-9 items-center justify-center rounded-full bg-gray-900 px-3 font-semibold text-white dark:bg-gray-100 dark:text-gray-950"
+              aria-current="page"
+            >
+              {page}
+            </span>
+          ) : (
+            <a
+              href={pageHref(page)}
+              class="inline-flex h-9 min-w-9 items-center justify-center rounded-full px-3 font-medium text-gray-500 transition hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-900 dark:hover:text-gray-100"
+              aria-label={`${labels.page} ${page}`}
+            >
+              {page}
+            </a>
+          ),
+        )}
+      </div>
+      <span class="text-center text-xs text-gray-500 md:hidden dark:text-gray-400">
+        {currentLang === "zh"
+          ? `${labels.page} ${currentPage} ${labels.of} ${totalPages} 頁`
+          : `${labels.page} ${currentPage} ${labels.of} ${totalPages}`}
+      </span>
+      {currentPage < totalPages ? (
+        <a
+          href={pageHref(nextPage)}
+          class="inline-flex items-center justify-center rounded-full border border-gray-200 px-4 py-2 font-medium text-gray-700 transition hover:border-gray-300 hover:bg-gray-100 dark:border-gray-800 dark:text-gray-200 dark:hover:border-gray-700 dark:hover:bg-gray-900"
+        >
+          {labels.next}
+        </a>
+      ) : (
+        <span class="hidden md:block" aria-hidden="true" />
+      )}
+    </nav>
+  )
+}
