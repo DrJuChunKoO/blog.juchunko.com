@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
     PieChart,
     Pie,
-    Cell,
     Tooltip,
     Legend,
     ResponsiveContainer,
@@ -39,11 +38,6 @@ export default function TaiwanReservesChart({ lang = "en" }: { lang?: "en" | "zh
     const [isDark, setIsDark] = useState(false);
     const t = translations[lang];
 
-    const data = rawData.map(item => ({
-        ...item,
-        name: t.assets[item.id as keyof typeof t.assets]
-    }));
-
     useEffect(() => {
         setIsMounted(true);
         if (document.documentElement.classList.contains("dark")) {
@@ -68,6 +62,11 @@ export default function TaiwanReservesChart({ lang = "en" }: { lang?: "en" | "zh
 
     const COLORS = isDark ? ["#22d3ee", "#ef4444"] : ["#0891b2", "#dc2626"]; // cyan / red
     const textColor = isDark ? "#e5e7eb" : "#374151";
+    const data = rawData.map((item, index) => ({
+        ...item,
+        name: t.assets[item.id as keyof typeof t.assets],
+        fill: COLORS[index % COLORS.length],
+    }));
 
     return (
         <div className="w-full h-[400px] my-8 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 min-w-0">
@@ -85,22 +84,18 @@ export default function TaiwanReservesChart({ lang = "en" }: { lang?: "en" | "zh
                         cx="50%"
                         cy="50%"
                         labelLine={false}
-                        label={({ name, percent }: { name: string; percent: number }) => `${(percent * 100).toFixed(0)}%`}
+                        label={({ percent }) => `${((percent ?? 0) * 100).toFixed(0)}%`}
                         outerRadius="80%"
                         fill="#8884d8"
                         dataKey="value"
-                    >
-                        {data.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                        ))}
-                    </Pie>
+                    />
                     <Tooltip
                         contentStyle={{
                             backgroundColor: isDark ? "#1f2937" : "#ffffff",
                             borderColor: isDark ? "#374151" : "#e5e7eb",
                             color: textColor,
                         }}
-                        formatter={(value: number) => [`${value}%`, t.tooltip]}
+                        formatter={(value) => [`${value ?? 0}%`, t.tooltip]}
                     />
                     <Legend
                         verticalAlign="bottom"

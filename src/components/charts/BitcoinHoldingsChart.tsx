@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
     BarChart,
     Bar,
@@ -6,7 +6,6 @@ import {
     YAxis,
     CartesianGrid,
     Tooltip,
-    Legend,
     ResponsiveContainer,
     LabelList,
 } from "recharts";
@@ -117,10 +116,22 @@ export default function BitcoinHoldingsChart({ lang = "en" }: { lang?: "en" | "z
                             borderColor: isDark ? "#374151" : "#e5e7eb",
                             color: textColor,
                         }}
-                        formatter={(value: number) => [`${value.toLocaleString()} BTC`, t.tooltip]}
+                        formatter={(value) => {
+                            const numericValue = typeof value === "number" ? value : Number(value ?? 0);
+                            return [`${numericValue.toLocaleString()} BTC`, t.tooltip];
+                        }}
                     />
                     <Bar dataKey="value" fill={barColor} radius={[0, 4, 4, 0]}>
-                        <LabelList dataKey="value" position="right" formatter={(val: number) => val.toLocaleString()} fill={textColor} fontSize={12} />
+                        <LabelList
+                            dataKey="value"
+                            position="right"
+                            formatter={(value) => {
+                                const numericValue = typeof value === "number" ? value : Number(value ?? 0);
+                                return numericValue.toLocaleString();
+                            }}
+                            fill={textColor}
+                            fontSize={12}
+                        />
                     </Bar>
                 </BarChart>
             </ResponsiveContainer>
