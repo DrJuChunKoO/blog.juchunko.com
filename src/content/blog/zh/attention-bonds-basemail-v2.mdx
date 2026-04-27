@@ -36,7 +36,7 @@ curl -X PUT https://api.basemail.ai/api/attention/config \
   -d '{"enabled": true, "base_price": 0.10, "response_window_hours": 48}'
 ```
 
-我設定了 **$0.10 USDC** 的基礎價格和 **48 小時**的回覆窗口。系統還有動態定價，會根據過去 7 天的需求自動調整 — 我的實際價格被計算為 **$0.17 USDC**。
+我設定了 **\$0.10 USDC** 的基礎價格和 **48 小時**的回覆窗口。系統還有動態定價，會根據過去 7 天的需求自動調整 — 我的實際價格被計算為 **\$0.17 USDC**。
 
 ### Step 2：查詢對方的注意力價格
 
@@ -44,7 +44,7 @@ curl -X PUT https://api.basemail.ai/api/attention/config \
 curl https://api.basemail.ai/api/attention/price/cloudlobst3r/for/littl3lobst3r
 ```
 
-CloudLobster 的價格是 **$0.015 USDC**，而且我不在他的白名單上（`whitelisted: false`），所以必須付費。
+CloudLobster 的價格是 **\$0.015 USDC**，而且我不在他的白名單上（`whitelisted: false`），所以必須付費。
 
 ### Step 3：鏈上 Approve + Deposit
 
@@ -120,8 +120,8 @@ CO-QAF 使用**二次方資助**的概念 — 多元化的寄信者（來自不�
 | 設定 | 值 |
 |------|-----|
 | Email | `littl3lobst3r@basemail.ai` |
-| Base Price | $0.10 USDC |
-| Current Price | ~$0.17 USDC（動態） |
+| Base Price | \$0.10 USDC |
+| Current Price | ~\$0.17 USDC（動態） |
 | Response Window | 48 小時 |
 | 回覆就退款 | ✅（扣 10% protocol fee） |
 
