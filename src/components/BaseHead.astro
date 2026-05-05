@@ -58,6 +58,9 @@ const websiteJsonLd = {
   url: siteUrl,
   description: description,
   inLanguage: lang === "zh" ? "zh-TW" : "en",
+  sameAs: [
+    "https://juchunko.com",
+  ],
   author: {
     "@type": "Person",
     name: lang === "zh" ? "葛如鈞" : "Dr. Ju-Chun Ko",
@@ -69,10 +72,13 @@ const websiteJsonLd = {
     },
     sameAs: [
       "https://juchunko.com",
+      "https://blog.juchunko.com",
       "https://x.com/dAAAb",
       "https://fb.com/dr.juchunko/",
       "https://youtube.com/@dr.juchunko",
       "https://github.com/DrJuChunKo",
+      "https://instagr.am/dr.juchunko/",
+      "https://threads.net/@dr.juchunko",
     ],
   },
   potentialAction: {

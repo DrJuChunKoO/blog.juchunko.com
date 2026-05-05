@@ -42,6 +42,8 @@ const pageDescription = authorBio;
 // Build Person JSON-LD for GEO / AI citation
 const siteUrl = Astro.site ? Astro.site.href.replace(/\/$/, "") : "";
 const sameAs: string[] = [];
+// Always include the blog as a sameAs for this author
+sameAs.push(`${siteUrl}/${lang}/authors/${author.id}`);
 if (socialLinks?.twitter) sameAs.push(socialLinks.twitter);
 if (socialLinks?.facebook) sameAs.push(socialLinks.facebook);
 if (socialLinks?.youtube) sameAs.push(socialLinks.youtube);
@@ -55,7 +57,7 @@ const personJsonLd = {
   "@type": "Person",
   name: authorName,
   description: authorBio,
-  url: `${siteUrl}/${lang}/authors/${author.id}`,
+  url: socialLinks?.website ?? `${siteUrl}/${lang}/authors/${author.id}`,
   image: author.data.avatar ? `${siteUrl}${author.data.avatar}` : undefined,
   ...(socialLinks?.email ? { email: `mailto:${socialLinks.email}` } : {}),
   ...(sameAs.length > 0 ? { sameAs } : {}),
