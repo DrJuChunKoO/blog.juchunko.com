@@ -5,7 +5,7 @@ import Footer from "../../components/Footer.astro";
 import CategorySelect from "../../components/CategorySelect.astro";
 import PaginationNav from "../../components/PaginationNav.astro";
 import PostGrid from "../../components/PostGrid.astro";
-import { SITE_DESCRIPTION } from "../../consts";
+import { SITE_DESCRIPTION, SITE_DESCRIPTION_EN } from "../../consts";
 import {
   FEATURED_FIRST_PAGE_POSTS,
   getCategorySummaries,
@@ -29,15 +29,36 @@ const {
   totalPages,
 } = paginateItems(allPosts, 1, undefined, FEATURED_FIRST_PAGE_POSTS);
 const sourcePath = `/${currentLang}/`;
+
+const siteUrl = Astro.site ? Astro.site.href.replace(/\/$/, "") : "";
+const siteTitle = currentLang === "zh" ? "科技立委葛如鈞寶博士部落格" : "JU CHUN KO's Blog";
+const siteDescription = currentLang === "zh" ? SITE_DESCRIPTION : SITE_DESCRIPTION_EN;
+
+// Blog listing page schema for GEO
+const blogJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Blog",
+  "@id": `${siteUrl}/${currentLang}/`,
+  name: siteTitle,
+  description: siteDescription,
+  url: `${siteUrl}/${currentLang}/`,
+  inLanguage: currentLang === "zh" ? "zh-TW" : "en",
+  author: {
+    "@type": "Person",
+    name: currentLang === "zh" ? "葛如鈞" : "Dr. Ju-Chun Ko",
+    url: `${siteUrl}/${currentLang}/authors/juchun-ko`,
+  },
+};
 ---
 
 <!doctype html>
 <html lang={lang}>
   <head>
     <BaseHead
-      description={SITE_DESCRIPTION}
+      description={siteDescription}
       alternateUrl={currentLang === "en" ? "/zh" : "/en"}
     />
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(blogJsonLd)} />
   </head>
   <body>
     <a
