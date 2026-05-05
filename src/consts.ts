@@ -2,4 +2,6 @@
 // You can import this data from anywhere in your site by using the `import` keyword.
 export const SITE_TITLE = "Juchunko's Blog";
 export const SITE_DESCRIPTION =
-  "歡迎來到科技立委葛如鈞的部落格，這裡會分享一些科技、政策、社會、環境等議題，也會分享一些生活點滴。";
+  "科技立委葛如鈞（寶博士）的部落格，分享 AI 人工智慧、科技政策、區塊鏈 Web3、立法院事務與台灣能源等議題。";
+export const SITE_DESCRIPTION_EN =
+  "Dr. Ju-Chun Ko's blog covering AI, technology policy, blockchain, Web3, Taiwan's legislative affairs, and energy policy. Insights from a tech legislator and researcher.";
