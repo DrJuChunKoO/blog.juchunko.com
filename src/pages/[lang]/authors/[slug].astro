@@ -42,8 +42,9 @@ const pageDescription = authorBio;
 // Build Person JSON-LD for GEO / AI citation
 const siteUrl = Astro.site ? Astro.site.href.replace(/\/$/, "") : "";
 const sameAs: string[] = [];
-// Always include the blog as a sameAs for this author
+// Always include the blog and transpal as sameAs for this author
 sameAs.push(`${siteUrl}/${lang}/authors/${author.id}`);
+sameAs.push("https://transpal.juchunko.com");
 if (socialLinks?.twitter) sameAs.push(socialLinks.twitter);
 if (socialLinks?.facebook) sameAs.push(socialLinks.facebook);
 if (socialLinks?.youtube) sameAs.push(socialLinks.youtube);
