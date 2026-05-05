@@ -81,6 +81,11 @@ const imageUrl = heroImage
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "BlogPosting",
+  "@id": pageUrl,
+  mainEntityOfPage: {
+    "@type": "WebPage",
+    "@id": pageUrl,
+  },
   headline: title,
   description: description,
   datePublished: pubDate.toISOString(),
@@ -92,9 +97,35 @@ const jsonLd = {
       name: authorData!.data.name[currentLang],
       url: `${siteUrl}/${currentLang}/authors/${authorData!.id}`,
     })),
-  ...(imageUrl ? { image: imageUrl } : {}),
+  publisher: {
+    "@type": "Organization",
+    name: currentLang === "zh" ? "科技立委葛如鈞寶博士部落格" : "JU CHUN KO's Blog",
+    url: siteUrl,
+    logo: {
+      "@type": "ImageObject",
+      url: `${siteUrl}/images/avatar.webp`,
+    },
+  },
+  ...(imageUrl ? { image: { "@type": "ImageObject", url: imageUrl } } : {}),
   url: pageUrl,
-  inLanguage: currentLang,
+  inLanguage: currentLang === "zh" ? "zh-TW" : "en",
+  ...(categoryEntries.length > 0
+    ? {
+        keywords: categoryEntries
+          .filter(Boolean)
+          .map((cat) => cat!.data.name[currentLang])
+          .join(", "),
+        articleSection: categoryEntries
+          .filter(Boolean)
+          .map((cat) => cat!.data.name[currentLang]),
+      }
+    : {}),
+  isPartOf: {
+    "@type": "Blog",
+    "@id": `${siteUrl}/${currentLang}/`,
+    name: currentLang === "zh" ? "科技立委葛如鈞寶博士部落格" : "JU CHUN KO's Blog",
+    url: `${siteUrl}/${currentLang}/`,
+  },
 };
 ---
 
@@ -112,6 +143,7 @@ const jsonLd = {
       authors={authorEntries
         .filter((a) => a != null)
         .map((a) => a.data.name[currentLang])}
+      keywords={categoryEntries.filter(Boolean).map((cat) => cat!.data.name[currentLang])}
     />
     <script is:inline type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
     {
