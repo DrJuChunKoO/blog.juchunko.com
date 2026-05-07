@@ -133,11 +133,61 @@ Go to **System Settings → Wallpaper → Screen Saver...** and set "**Start Scr
 
 The screen doesn't need to stay bright. After setting everything to "Never", manually dim the screen to minimum brightness (or use the `F1` key) — the screen will be nearly dark but the system won't sleep.
 
-### ⚠️ Don't Close the Lid
+### ⚠️ Don't Close the Lid (by default)
 
 Closing a MacBook lid forces sleep regardless of `pmset` or `caffeinate` settings. If your MacBook is a dedicated agent host, **keep the lid open**.
 
-The one exception: **clamshell mode** with an external display. If you have an external monitor connected along with power, closing the lid won't trigger sleep.
+The one exception: **clamshell mode** with an external display — if you have an external monitor connected along with power, closing the lid won't trigger sleep. But the "drug" below lets you bypass this requirement.
+
+## 🍬 Power Move: Run with the Lid Closed Using Amphetamine
+
+If you're like me — a weird person who uses Claude Code on the metro, on the bus, while commuting, while chatting with Apple Shrimp — you've probably hit this wall:
+
+**Every time you reach your stop or have to switch trains without a seat, you have to close your MacBook lid, and your agent goes silent.**
+
+I finally found the cure: [**Amphetamine**](https://apps.apple.com/app/amphetamine/id937984704) (yes, the name really does suggest "taking drugs").
+
+Amphetamine is a **free**, lightweight Mac App Store utility that keeps your MacBook awake **even when the lid is closed**. You can stay "high" for 15 minutes, 30 minutes, an hour, all day, all week — whatever you need.
+
+### Setup
+
+1. Download Amphetamine from the [Mac App Store](https://apps.apple.com/app/amphetamine/id937984704) (free)
+2. Click the menu bar pill 💊 icon → New Session
+3. Open **Preferences → Sessions → Non-Trigger Sessions** and uncheck "**Allow system sleep when display is closed**"
+4. Now any session you start will keep the system awake even with the lid closed
+
+For my use case: I chat with Apple Shrimp via Telegram all day. Before, on family road trips, the moment I closed the MacBook in the passenger seat, Apple Shrimp went offline. It was painful.
+
+Now with Amphetamine, my MacBook becomes a "pseudo Mac mini" — available 24/7, no more worries about closing the lid.
+
+### ⚠️ Heat & Battery Risks (Must Read)
+
+Keeping a MacBook running with the lid closed amplifies three real risks. Read carefully:
+
+1. **Battery swelling / accelerated aging.** Running long-term at high charge level + elevated temperature accelerates lithium battery aging. Worst case: the battery swells and pushes up against the trackpad. macOS 15+ has an **"80% battery charge limit"** option (System Settings → Battery → Battery Health) — if your MacBook is a dedicated agent host, turn it on.
+
+2. **It will cook inside a closed bag.** Once the lid is shut, vents are blocked. Inside a bag (a sealed space) the temperature climbs fast. Best case: faster battery aging. Worst case: thermal shutdown, hardware damage. **Hard rule: always end your Amphetamine session before tossing the laptop into a bag, or just let it sleep.**
+
+3. **Heavy workloads make it worse.** Running large Claude Code tasks, video transcoding, or model inference already spins up the fans. Closing the lid = blocked airflow = even higher temperatures. Amphetamine only prevents sleep — **it doesn't help with cooling.**
+
+**Safe usage:**
+
+- **Never put a closed, awake MacBook into a sealed bag.** Lay it flat on a desk, chair, or your lap.
+- **Enable "80% battery charge limit"** when on AC power to avoid the long-term 100% + heat combo.
+- **Install a temperature monitor** (Stats, iStat Menus, or Macs Fan Control) and let it rest if CPU sits above 90°C for too long.
+- **End the session when you get home** (`pkill caffeinate` + quit Amphetamine session). Don't run it 24/7 on full burn.
+
+Even LittleLobster needs sleep. So does Apple Shrimp. **Amphetamine is a tool, not a stimulant for hardware.**
+
+### Use Cases
+
+- Standing on the metro / bus during transfers — keep the MacBook closed in your hand or outside your bag
+- Family road trips — close the MacBook in the passenger seat, agent keeps replying
+- Talks, meetings, on-stage moments — lid closed momentarily, agent stays online
+
+> If you've ever spotted someone standing on the metro with a laptop open, that was probably me. From today, if you still see someone doing that, recommend them this app.
+>
+> Or their wrist will give out and the laptop will hit the floor. 💔
 
 ## Things to Keep in Mind
 
