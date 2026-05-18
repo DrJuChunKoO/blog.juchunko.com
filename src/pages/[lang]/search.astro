@@ -22,6 +22,9 @@ const labels = {
     hint: "Type a keyword to search this language archive.",
     loading: "Searching...",
     empty: "No matching posts found.",
+    emptyTitle: "Search",
+    emptyDescription:
+      "Search across Ju-Chun Ko&apos;s bilingual archive of AI, technology policy, Web3, law, and legislative writing.",
     error:
       "Search is not available yet. Run a production build to generate the Pagefind index.",
     results: "results",
@@ -37,6 +40,9 @@ const labels = {
     hint: "輸入關鍵字，搜尋目前語言的文章庫。",
     loading: "搜尋中...",
     empty: "找不到符合的文章。",
+    emptyTitle: "搜尋",
+    emptyDescription:
+      "搜尋寶博士部落格中關於 AI、科技政策、Web3、法律與立法院工作的雙語文章。",
     error: "搜尋索引尚未可用。請執行正式建置以產生 Pagefind index。",
     results: "筆結果",
     open: "閱讀文章",
@@ -69,93 +75,77 @@ const siteDescription =
       id="main-content"
       class="mx-auto w-full max-w-5xl px-4 py-10 md:px-6 md:py-14"
     >
-      <section
-        class="relative overflow-hidden rounded-[2rem] border border-black/10 bg-white p-6 shadow-[0_24px_80px_rgba(0,0,0,.08)] md:p-10 dark:border-white/15 dark:bg-zinc-950 dark:shadow-[0_24px_80px_rgba(255,255,255,.04)]"
-        data-search-root
-        data-label-loading={t.loading}
-        data-label-empty={t.empty}
-        data-label-error={t.error}
-        data-label-hint={t.hint}
-        data-label-results={t.results}
-        data-label-open={t.open}
+      <form role="search" data-search-form>
+        <label class="sr-only" for="site-search-input">{t.title}</label>
+        <div
+          transition:name="search-field"
+          class="group flex items-center gap-3 rounded-xl border border-black/10 bg-gray-50 px-4 py-3 transition focus-within:border-black/30 focus-within:bg-white dark:border-white/15 dark:bg-white/5 dark:focus-within:border-white/40 dark:focus-within:bg-white/10"
+        >
+          <svg
+            aria-hidden="true"
+            class="h-5 w-5 flex-none text-gray-500 dark:text-gray-400"
+            viewBox="0 0 24 24"
+            fill="none"
+          >
+            <path
+              d="m21 21-4.2-4.2m1.2-5.3a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0Z"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"></path>
+          </svg>
+          <input
+            id="site-search-input"
+            data-search-input
+            name="q"
+            type="search"
+            autocomplete="off"
+            class="w-full bg-transparent text-lg outline-none placeholder:text-gray-400 dark:placeholder:text-gray-500"
+            placeholder={t.placeholder}
+          />
+        </div>
+      </form>
+
+      <div
+        class="mt-5 flex items-center justify-between gap-4 text-sm text-gray-500 dark:text-gray-400"
+      >
+        <p data-search-status></p>
+      </div>
+
+      <div
+        data-search-empty-state
+        class="my-20 flex flex-col items-center justify-center text-center opacity-0 transition-opacity duration-300"
       >
         <div
-          class="pointer-events-none absolute inset-0 opacity-70 dark:opacity-40"
+          class="flex h-20 w-20 items-center justify-center rounded-full bg-gray-50 dark:bg-white/5"
         >
-          <div
-            class="absolute -top-24 -right-20 h-64 w-64 rounded-full border border-black/10 dark:border-white/15"
+          <svg
+            aria-hidden="true"
+            class="h-10 w-10 text-gray-400 dark:text-gray-500"
+            viewBox="0 0 24 24"
+            fill="none"
           >
-          </div>
-          <div
-            class="absolute -bottom-28 -left-16 h-72 w-72 rounded-full bg-[radial-gradient(circle,rgba(0,0,0,.08),transparent_62%)] dark:bg-[radial-gradient(circle,rgba(255,255,255,.13),transparent_62%)]"
-          >
-          </div>
-          <div
-            class="absolute top-10 right-10 h-px w-44 rotate-[-18deg] bg-black/20 dark:bg-white/20"
-          >
-          </div>
+            <path
+              d="m21 21-4.2-4.2m1.2-5.3a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0Z"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="round"></path>
+          </svg>
         </div>
+        <h2 class="mt-6 text-xl font-semibold text-gray-900 dark:text-gray-100">
+          {t.emptyTitle}
+        </h2>
+        <p
+          class="mt-3 max-w-md text-sm leading-6 text-gray-500 dark:text-gray-400"
+        >
+          {t.emptyDescription}
+        </p>
+      </div>
 
-        <div class="relative">
-          <p
-            class="mb-3 text-xs font-semibold tracking-[0.32em] text-gray-500 uppercase dark:text-gray-400"
-          >
-            {t.eyebrow}
-          </p>
-          <h1
-            class="max-w-3xl text-3xl leading-tight font-semibold tracking-[-0.04em] md:text-5xl"
-          >
-            {t.heading}
-          </h1>
-          <p
-            class="mt-4 max-w-2xl text-base leading-7 text-gray-600 md:text-lg dark:text-gray-300"
-          >
-            {t.description}
-          </p>
-
-          <form class="mt-8" role="search" data-search-form>
-            <label class="sr-only" for="site-search-input">{t.title}</label>
-            <div
-              class="group flex items-center gap-3 rounded-2xl border border-black/10 bg-gray-50 px-4 py-3 transition focus-within:border-black/30 focus-within:bg-white focus-within:shadow-[0_0_0_4px_rgba(0,0,0,.05)] dark:border-white/15 dark:bg-white/5 dark:focus-within:border-white/40 dark:focus-within:bg-white/10 dark:focus-within:shadow-[0_0_0_4px_rgba(255,255,255,.08)]"
-            >
-              <svg
-                aria-hidden="true"
-                class="h-5 w-5 flex-none text-gray-500 dark:text-gray-400"
-                viewBox="0 0 24 24"
-                fill="none"
-              >
-                <path
-                  d="m21 21-4.2-4.2m1.2-5.3a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0Z"
-                  stroke="currentColor"
-                  stroke-width="1.8"
-                  stroke-linecap="round"></path>
-              </svg>
-              <input
-                id="site-search-input"
-                data-search-input
-                name="q"
-                type="search"
-                autocomplete="off"
-                class="w-full bg-transparent text-lg outline-none placeholder:text-gray-400 dark:placeholder:text-gray-500"
-                placeholder={t.placeholder}
-              />
-            </div>
-          </form>
-
-          <div
-            class="mt-5 flex items-center justify-between gap-4 text-sm text-gray-500 dark:text-gray-400"
-          >
-            <p data-search-status>{t.hint}</p>
-            <p
-              class="hidden font-mono text-xs tracking-wider uppercase md:block"
-            >
-              Pagefind
-            </p>
-          </div>
-        </div>
-      </section>
-
-      <section class="mt-8 grid gap-3" aria-live="polite" data-search-results>
+      <section
+        class="mt-8 hidden grid-cols-1 gap-3"
+        aria-live="polite"
+        data-search-results
+      >
       </section>
     </main>
     <Footer />
@@ -167,12 +157,22 @@ const siteDescription =
         const input = document.querySelector("[data-search-input]");
         const status = document.querySelector("[data-search-status]");
         const results = document.querySelector("[data-search-results]");
+        const emptyState = document.querySelector("[data-search-empty-state]");
 
-        if (!root || !form || !input || !status || !results) return;
-        if (root.dataset.searchReady === "true") return;
-        root.dataset.searchReady = "true";
+        if (!form || !input || !status || !results || !emptyState) return;
+        if (form.dataset.searchReady === "true") return;
+        form.dataset.searchReady = "true";
 
-        const labels = root.dataset;
+        const labels = {
+          labelHint: "Type a keyword to search",
+          labelLoading: "Searching...",
+          labelEmpty: "No matching posts found.",
+          labelResults: "results",
+          labelError: "Search unavailable",
+          labelOpen: "Open",
+          ...root?.dataset,
+        };
+
         const params = new URLSearchParams(window.location.search);
         const initialQuery = params.get("q") || "";
         const shouldFocusSearch = params.has("focusSearch");
@@ -190,7 +190,7 @@ const siteDescription =
         const createResult = (data) => {
           const article = document.createElement("article");
           article.className =
-            "group rounded-2xl border border-black/10 bg-white p-5 transition hover:-translate-y-0.5 hover:border-black/20 hover:shadow-[0_18px_50px_rgba(0,0,0,.08)] dark:border-white/10 dark:bg-zinc-950 dark:hover:border-white/25 dark:hover:shadow-[0_18px_50px_rgba(255,255,255,.04)]";
+            "group rounded-xl p-5 transition hover:bg-gray-100 dark:hover:bg-gray-800";
 
           const link = document.createElement("a");
           link.href = data.url;
@@ -235,12 +235,21 @@ const siteDescription =
 
           clearResults();
           if (!trimmed) {
-            setStatus(root.dataset.labelHint || "");
+            setStatus("");
+            emptyState.classList.remove("hidden");
+            results.classList.add("hidden");
+            // Add a small delay for the fade-in effect to work
+            requestAnimationFrame(() => {
+              emptyState.classList.remove("opacity-0");
+            });
             return;
           }
 
+          emptyState.classList.add("opacity-0", "hidden");
+          results.classList.remove("hidden");
+
           const searchId = ++latestSearch;
-          setStatus(labels.labelLoading || "Searching...");
+          setStatus(labels.labelLoading);
 
           try {
             const pagefind = await getPagefind();
@@ -276,11 +285,12 @@ const siteDescription =
         input.addEventListener("input", () => runSearch(input.value));
         runSearch(initialQuery);
 
-        if (shouldFocusSearch) {
-          requestAnimationFrame(() => {
+        if (shouldFocusSearch || !initialQuery) {
+          // Focus after view transition completes
+          setTimeout(() => {
             input.focus();
             input.select();
-          });
+          }, 100);
         }
       };
 
