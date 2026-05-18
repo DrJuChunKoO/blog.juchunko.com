@@ -51,8 +51,10 @@ const isSearchPage =
             />
           </svg>
           <span class="truncate font-medium">{t("nav.search")}</span>
-          <span class="ml-auto hidden rounded-full border border-black/10 px-2 py-0.5 font-mono text-[10px] tracking-wider text-gray-400 uppercase lg:inline dark:border-white/10 dark:text-gray-500" data-keyboard-shortcut>
-          </span>
+          <span
+            class="ml-auto hidden rounded-full border border-black/10 px-2 py-0.5 font-mono text-[10px] tracking-wider text-gray-400 uppercase lg:inline dark:border-white/10 dark:text-gray-500"
+            data-keyboard-shortcut
+          ></span>
         </a>
       )
     }
@@ -250,7 +252,7 @@ const isSearchPage =
       label.dataset.bound = "true";
 
       const isMac = /Mac|iPod|iPhone|iPad/.test(navigator.platform);
-      label.textContent = isMac ? "\u2318K" : "Ctrl+K";
+      label.textContent = isMac ? "\u2318 + K" : "Ctrl+K";
     };
 
     document.addEventListener("DOMContentLoaded", bindMobileMenu);

@@ -18,16 +18,16 @@ description: Design system and UI guidelines for blog.juchunko.com. Use this ski
 
 ## Color Palette
 
-| Role | Light | Dark |
-|------|-------|------|
-| Page background | `bg-white` | `dark:bg-black` |
-| Card/surface | `bg-white`, `bg-gray-50` | `dark:bg-zinc-950`, `dark:bg-white/5` |
-| Primary text | `text-gray-950` | `dark:text-gray-50` |
-| Secondary text | `text-gray-600` | `dark:text-gray-300` |
-| Muted text | `text-gray-400`, `text-gray-500` | `dark:text-gray-400`, `dark:text-gray-500` |
-| Subtle border | `border-black/10` | `dark:border-white/15` |
-| Hover background | `hover:bg-gray-100` | `dark:hover:bg-gray-800` |
-| Frosted glass | `bg-white/95 backdrop-blur-md` | `dark:bg-black/90 backdrop-blur-md` |
+| Role             | Light                            | Dark                                       |
+| ---------------- | -------------------------------- | ------------------------------------------ |
+| Page background  | `bg-white`                       | `dark:bg-black`                            |
+| Card/surface     | `bg-white`, `bg-gray-50`         | `dark:bg-zinc-950`, `dark:bg-white/5`      |
+| Primary text     | `text-gray-950`                  | `dark:text-gray-50`                        |
+| Secondary text   | `text-gray-600`                  | `dark:text-gray-300`                       |
+| Muted text       | `text-gray-400`, `text-gray-500` | `dark:text-gray-400`, `dark:text-gray-500` |
+| Subtle border    | `border-black/10`                | `dark:border-white/15`                     |
+| Hover background | `hover:bg-gray-100`              | `dark:hover:bg-gray-800`                   |
+| Frosted glass    | `bg-white/95 backdrop-blur-md`   | `dark:bg-black/90 backdrop-blur-md`        |
 
 ---
 
@@ -49,11 +49,11 @@ border border-black/10 dark:border-white/15
 
 Shadows are reserved **exclusively for overlays and contextual UI** (dropdowns, menus). Content cards do NOT use shadows.
 
-| Use case | Shadow |
-|----------|--------|
+| Use case               | Shadow                                                       |
+| ---------------------- | ------------------------------------------------------------ |
 | Sticky header backdrop | `shadow-[0_2px_4px_rgba(0,0,0,.02),0_1px_0_rgba(0,0,0,.06)]` |
-| Mobile dropdown menu | `shadow-[0_2px_8px_rgba(0,0,0,.06)]` |
-| Content cards | **None** |
+| Mobile dropdown menu   | `shadow-[0_2px_8px_rgba(0,0,0,.06)]`                         |
+| Content cards          | **None**                                                     |
 
 Dark mode shadows invert: `rgba(0,0,0,...)` → `rgba(255,255,255,...)` at much lower opacity.
 
@@ -61,13 +61,13 @@ Dark mode shadows invert: `rgba(0,0,0,...)` → `rgba(255,255,255,...)` at much 
 
 ## Border Radius
 
-| Class | Usage |
-|-------|-------|
-| `rounded-full` | Pill buttons, tags, search shortcut badge, icon buttons |
-| `rounded-2xl` | Mobile menu container |
-| `rounded-xl` | Input fields, search result cards, post grid cards, dropdown items |
-| `rounded-lg` | Images |
-| `rounded` | Small inline elements (skip-to-content) |
+| Class          | Usage                                                              |
+| -------------- | ------------------------------------------------------------------ |
+| `rounded-full` | Pill buttons, tags, search shortcut badge, icon buttons            |
+| `rounded-2xl`  | Mobile menu container                                              |
+| `rounded-xl`   | Input fields, search result cards, post grid cards, dropdown items |
+| `rounded-lg`   | Images                                                             |
+| `rounded`      | Small inline elements (skip-to-content)                            |
 
 ---
 
@@ -83,12 +83,12 @@ Dark mode shadows invert: `rgba(0,0,0,...)` → `rgba(255,255,255,...)` at much 
 
 ## Spacing Patterns
 
-| Context | Classes |
-|---------|---------|
-| Listing pages | `max-w-7xl mx-auto px-4 py-8 md:px-6` |
-| Search page | `max-w-5xl mx-auto px-4 py-10 md:px-6 md:py-14` |
+| Context           | Classes                                         |
+| ----------------- | ----------------------------------------------- |
+| Listing pages     | `max-w-7xl mx-auto px-4 py-8 md:px-6`           |
+| Search page       | `max-w-5xl mx-auto px-4 py-10 md:px-6 md:py-14` |
 | Blog post content | `container` (custom: `mx-auto max-w-screen-md`) |
-| Post grid | `grid grid-cols-1 gap-4 md:grid-cols-2` |
+| Post grid         | `grid grid-cols-1 gap-4 md:grid-cols-2`         |
 
 ---
 
@@ -98,33 +98,33 @@ Dark mode shadows invert: `rgba(0,0,0,...)` → `rgba(255,255,255,...)` at much 
 
 ```html
 <!-- No shadows. Border + background define the card. Hover = bg change. -->
-<article class="group rounded-xl border border-black/10 bg-white p-5 transition
-  hover:bg-gray-50 hover:border-black/20
-  dark:border-white/10 dark:bg-zinc-950 dark:hover:bg-white/5 dark:hover:border-white/20">
+<article
+  class="group rounded-xl border border-black/10 bg-white p-5 transition hover:border-black/20 hover:bg-gray-50 dark:border-white/10 dark:bg-zinc-950 dark:hover:border-white/20 dark:hover:bg-white/5"
+></article>
 ```
 
 ### Pill Buttons / Tags
 
 ```html
-<a class="rounded-full border border-black/10 px-4 py-2 text-sm font-medium
-  hover:border-black/20 hover:bg-gray-100
-  dark:border-white/15 dark:hover:border-white/25 dark:hover:bg-white/10">
+<a
+  class="rounded-full border border-black/10 px-4 py-2 text-sm font-medium hover:border-black/20 hover:bg-gray-100 dark:border-white/15 dark:hover:border-white/25 dark:hover:bg-white/10"
+></a>
 ```
 
 ### Input Fields
 
 ```html
-<div class="flex items-center gap-3 rounded-xl border border-black/10 bg-gray-50 px-4 py-3
-  transition focus-within:border-black/30 focus-within:bg-white
-  dark:border-white/15 dark:bg-white/5 dark:focus-within:border-white/40 dark:focus-within:bg-white/10">
+<div
+  class="flex items-center gap-3 rounded-xl border border-black/10 bg-gray-50 px-4 py-3 transition focus-within:border-black/30 focus-within:bg-white dark:border-white/15 dark:bg-white/5 dark:focus-within:border-white/40 dark:focus-within:bg-white/10"
+></div>
 ```
 
 ### Mobile Menu / Dropdown Overlay
 
 ```html
-<div class="rounded-2xl border border-black/10 bg-white/95 p-2
-  shadow-[0_2px_8px_rgba(0,0,0,.06)] backdrop-blur-md
-  dark:border-white/15 dark:bg-zinc-950/95 dark:shadow-[0_2px_8px_rgba(0,0,0,.25)]">
+<div
+  class="rounded-2xl border border-black/10 bg-white/95 p-2 shadow-[0_2px_8px_rgba(0,0,0,.06)] backdrop-blur-md dark:border-white/15 dark:bg-zinc-950/95 dark:shadow-[0_2px_8px_rgba(0,0,0,.25)]"
+></div>
 ```
 
 ### Empty State
@@ -132,11 +132,17 @@ Dark mode shadows invert: `rgba(0,0,0,...)` → `rgba(255,255,255,...)` at much 
 ```html
 <div class="flex flex-col items-center justify-center text-center">
   <!-- Large icon: 80x80, muted color, subtle bg circle -->
-  <div class="flex h-20 w-20 items-center justify-center rounded-full bg-gray-50 dark:bg-white/5">
+  <div
+    class="flex h-20 w-20 items-center justify-center rounded-full bg-gray-50 dark:bg-white/5"
+  >
     <svg class="h-10 w-10 text-gray-400 dark:text-gray-500">...</svg>
   </div>
-  <h2 class="mt-6 text-xl font-semibold text-gray-900 dark:text-gray-100">Title</h2>
-  <p class="mt-3 max-w-md text-sm leading-6 text-gray-500 dark:text-gray-400">Description</p>
+  <h2 class="mt-6 text-xl font-semibold text-gray-900 dark:text-gray-100">
+    Title
+  </h2>
+  <p class="mt-3 max-w-md text-sm leading-6 text-gray-500 dark:text-gray-400">
+    Description
+  </p>
 </div>
 ```
 
@@ -181,7 +187,7 @@ Detect platform client-side and render the appropriate shortcut:
 
 ```js
 const isMac = /Mac|iPod|iPhone|iPad/.test(navigator.platform);
-label.textContent = isMac ? "\u2318K" : "Ctrl+K";
+label.textContent = isMac ? "\u2318+K" : "Ctrl+K";
 ```
 
 - macOS: `⌘K` (Unicode `\u2318` + K, no plus sign)
