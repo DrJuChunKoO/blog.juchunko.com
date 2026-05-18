@@ -208,6 +208,19 @@ const jsonLd = {
     <Header />
     <main id="main-content">
       <article>
+        <div class="sr-only">
+          <span data-pagefind-filter={`language:${currentLang}`}></span>
+          {
+            authorEntries.filter(Boolean).map((authorData) => (
+              <span data-pagefind-filter={`author:${authorData!.data.name[currentLang]}`}></span>
+            ))
+          }
+          {
+            categoryEntries.filter(Boolean).map((cat) => (
+              <span data-pagefind-filter={`category:${cat!.data.name[currentLang]}`}></span>
+            ))
+          }
+        </div>
         <div class="container mb-4">
           <div class="flex items-center justify-between gap-3">
             <a
@@ -328,7 +341,9 @@ const jsonLd = {
                 </div>
               )
             }
-            <slot />
+            <div data-pagefind-body>
+              <slot />
+            </div>
           </div>
         </div>
       </article>

@@ -3,11 +3,15 @@
   "type": "module",
   "version": "0.0.1",
   "scripts": {
-    "dev": "astro dev",
-    "build": "astro build",
+    "dev": "pnpm search:dev:index && astro dev",
+    "dev:astro": "astro dev",
+    "build": "astro build && pagefind --site dist",
     "preview": "astro preview",
     "deploy": "wrangler deploy",
     "preview:worker": "wrangler dev",
+    "search:dev:index": "node scripts/clean-dev-search.mjs && astro build && pagefind --site dist --output-path public/pagefind",
+    "search:dev:clean": "node scripts/clean-dev-search.mjs",
+    "verify:search": "node scripts/verify-search.mjs",
     "astro": "astro"
   },
   "dependencies": {
@@ -53,6 +57,7 @@
     "@svgr/core": "^8.1.0",
     "@svgr/plugin-jsx": "^8.1.0",
     "@tailwindcss/typography": "^0.5.19",
+    "pagefind": "^1.5.2",
     "prettier": "^3.8.3",
     "prettier-plugin-astro": "^0.14.1",
     "prettier-plugin-tailwindcss": "^0.8.0",

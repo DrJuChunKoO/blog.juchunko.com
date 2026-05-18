@@ -1,0 +1,291 @@
+---
+import BaseHead from "../../components/BaseHead.astro";
+import Header from "../../components/Header.astro";
+import Footer from "../../components/Footer.astro";
+import { SITE_DESCRIPTION, SITE_DESCRIPTION_EN } from "../../consts";
+
+export function getStaticPaths() {
+  return [{ params: { lang: "en" } }, { params: { lang: "zh" } }];
+}
+
+const { lang } = Astro.params;
+const currentLang = lang as "en" | "zh";
+
+const labels = {
+  en: {
+    title: "Search",
+    eyebrow: "Site search",
+    heading: "Find the exact essay, note, or policy thread.",
+    description:
+      "Search across Ju-Chun Ko's bilingual archive of AI, technology policy, Web3, law, and legislative writing.",
+    placeholder: "Search AI policy, Bitcoin reserve, OpenClaw...",
+    hint: "Type a keyword to search this language archive.",
+    loading: "Searching...",
+    empty: "No matching posts found.",
+    error:
+      "Search is not available yet. Run a production build to generate the Pagefind index.",
+    results: "results",
+    open: "Open post",
+  },
+  zh: {
+    title: "搜尋",
+    eyebrow: "站內搜尋",
+    heading: "快速找到文章、筆記與政策脈絡。",
+    description:
+      "搜尋寶博士部落格中關於 AI、科技政策、Web3、法律與立法院工作的雙語文章。",
+    placeholder: "搜尋 AI 基本法、比特幣儲備、OpenClaw...",
+    hint: "輸入關鍵字，搜尋目前語言的文章庫。",
+    loading: "搜尋中...",
+    empty: "找不到符合的文章。",
+    error: "搜尋索引尚未可用。請執行正式建置以產生 Pagefind index。",
+    results: "筆結果",
+    open: "閱讀文章",
+  },
+} as const;
+
+const t = labels[currentLang];
+const siteDescription =
+  currentLang === "zh" ? SITE_DESCRIPTION : SITE_DESCRIPTION_EN;
+---
+
+<!doctype html>
+<html lang={currentLang}>
+  <head>
+    <BaseHead
+      title={t.title}
+      description={t.description || siteDescription}
+      alternateUrl={currentLang === "en" ? "/zh/search/" : "/en/search/"}
+    />
+  </head>
+  <body class="bg-white text-gray-950 dark:bg-black dark:text-gray-50">
+    <a
+      href="#main-content"
+      class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:rounded focus:bg-white focus:px-4 focus:py-2 focus:text-gray-900 focus:shadow-md focus:outline-none dark:focus:bg-gray-900 dark:focus:text-gray-100"
+    >
+      Skip to main content
+    </a>
+    <Header />
+    <main
+      id="main-content"
+      class="mx-auto w-full max-w-5xl px-4 py-10 md:px-6 md:py-14"
+    >
+      <section
+        class="relative overflow-hidden rounded-[2rem] border border-black/10 bg-white p-6 shadow-[0_24px_80px_rgba(0,0,0,.08)] md:p-10 dark:border-white/15 dark:bg-zinc-950 dark:shadow-[0_24px_80px_rgba(255,255,255,.04)]"
+        data-search-root
+        data-label-loading={t.loading}
+        data-label-empty={t.empty}
+        data-label-error={t.error}
+        data-label-hint={t.hint}
+        data-label-results={t.results}
+        data-label-open={t.open}
+      >
+        <div
+          class="pointer-events-none absolute inset-0 opacity-70 dark:opacity-40"
+        >
+          <div
+            class="absolute -top-24 -right-20 h-64 w-64 rounded-full border border-black/10 dark:border-white/15"
+          >
+          </div>
+          <div
+            class="absolute -bottom-28 -left-16 h-72 w-72 rounded-full bg-[radial-gradient(circle,rgba(0,0,0,.08),transparent_62%)] dark:bg-[radial-gradient(circle,rgba(255,255,255,.13),transparent_62%)]"
+          >
+          </div>
+          <div
+            class="absolute top-10 right-10 h-px w-44 rotate-[-18deg] bg-black/20 dark:bg-white/20"
+          >
+          </div>
+        </div>
+
+        <div class="relative">
+          <p
+            class="mb-3 text-xs font-semibold tracking-[0.32em] text-gray-500 uppercase dark:text-gray-400"
+          >
+            {t.eyebrow}
+          </p>
+          <h1
+            class="max-w-3xl text-3xl leading-tight font-semibold tracking-[-0.04em] md:text-5xl"
+          >
+            {t.heading}
+          </h1>
+          <p
+            class="mt-4 max-w-2xl text-base leading-7 text-gray-600 md:text-lg dark:text-gray-300"
+          >
+            {t.description}
+          </p>
+
+          <form class="mt-8" role="search" data-search-form>
+            <label class="sr-only" for="site-search-input">{t.title}</label>
+            <div
+              class="group flex items-center gap-3 rounded-2xl border border-black/10 bg-gray-50 px-4 py-3 transition focus-within:border-black/30 focus-within:bg-white focus-within:shadow-[0_0_0_4px_rgba(0,0,0,.05)] dark:border-white/15 dark:bg-white/5 dark:focus-within:border-white/40 dark:focus-within:bg-white/10 dark:focus-within:shadow-[0_0_0_4px_rgba(255,255,255,.08)]"
+            >
+              <svg
+                aria-hidden="true"
+                class="h-5 w-5 flex-none text-gray-500 dark:text-gray-400"
+                viewBox="0 0 24 24"
+                fill="none"
+              >
+                <path
+                  d="m21 21-4.2-4.2m1.2-5.3a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0Z"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"></path>
+              </svg>
+              <input
+                id="site-search-input"
+                data-search-input
+                name="q"
+                type="search"
+                autocomplete="off"
+                class="w-full bg-transparent text-lg outline-none placeholder:text-gray-400 dark:placeholder:text-gray-500"
+                placeholder={t.placeholder}
+              />
+            </div>
+          </form>
+
+          <div
+            class="mt-5 flex items-center justify-between gap-4 text-sm text-gray-500 dark:text-gray-400"
+          >
+            <p data-search-status>{t.hint}</p>
+            <p
+              class="hidden font-mono text-xs tracking-wider uppercase md:block"
+            >
+              Pagefind
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="mt-8 grid gap-3" aria-live="polite" data-search-results>
+      </section>
+    </main>
+    <Footer />
+
+    <script is:inline>
+      const initializeSearch = () => {
+        const root = document.querySelector("[data-search-root]");
+        const form = document.querySelector("[data-search-form]");
+        const input = document.querySelector("[data-search-input]");
+        const status = document.querySelector("[data-search-status]");
+        const results = document.querySelector("[data-search-results]");
+
+        if (!root || !form || !input || !status || !results) return;
+        if (root.dataset.searchReady === "true") return;
+        root.dataset.searchReady = "true";
+
+        const labels = root.dataset;
+        const params = new URLSearchParams(window.location.search);
+        const initialQuery = params.get("q") || "";
+        const shouldFocusSearch = params.has("focusSearch");
+        let pagefindPromise;
+        let latestSearch = 0;
+
+        const setStatus = (message) => {
+          status.textContent = message;
+        };
+
+        const clearResults = () => {
+          results.replaceChildren();
+        };
+
+        const createResult = (data) => {
+          const article = document.createElement("article");
+          article.className =
+            "group rounded-2xl border border-black/10 bg-white p-5 transition hover:-translate-y-0.5 hover:border-black/20 hover:shadow-[0_18px_50px_rgba(0,0,0,.08)] dark:border-white/10 dark:bg-zinc-950 dark:hover:border-white/25 dark:hover:shadow-[0_18px_50px_rgba(255,255,255,.04)]";
+
+          const link = document.createElement("a");
+          link.href = data.url;
+          link.className = "block";
+
+          const title = document.createElement("h2");
+          title.className =
+            "text-xl font-semibold tracking-[-0.02em] text-gray-950 group-hover:underline dark:text-white";
+          title.textContent = data.meta?.title || data.url;
+
+          const excerpt = document.createElement("p");
+          excerpt.className =
+            "mt-3 line-clamp-3 text-sm leading-6 text-gray-600 dark:text-gray-300";
+          excerpt.innerHTML = data.excerpt || "";
+
+          const meta = document.createElement("p");
+          meta.className =
+            "mt-4 font-mono text-xs text-gray-400 dark:text-gray-500";
+          meta.textContent = `${labels.labelOpen || "Open"} -> ${data.url}`;
+
+          link.append(title, excerpt, meta);
+          article.append(link);
+          return article;
+        };
+
+        const getPagefind = async () => {
+          pagefindPromise ||= import("/pagefind/pagefind.js");
+          return pagefindPromise;
+        };
+
+        const runSearch = async (query) => {
+          const trimmed = query.trim();
+          const nextUrl = new URL(window.location.href);
+          nextUrl.searchParams.delete("focusSearch");
+
+          if (trimmed) {
+            nextUrl.searchParams.set("q", trimmed);
+          } else {
+            nextUrl.searchParams.delete("q");
+          }
+          window.history.replaceState({}, "", nextUrl);
+
+          clearResults();
+          if (!trimmed) {
+            setStatus(root.dataset.labelHint || "");
+            return;
+          }
+
+          const searchId = ++latestSearch;
+          setStatus(labels.labelLoading || "Searching...");
+
+          try {
+            const pagefind = await getPagefind();
+            const search = await pagefind.search(trimmed);
+            if (searchId !== latestSearch) return;
+
+            if (!search.results.length) {
+              setStatus(labels.labelEmpty || "No results");
+              return;
+            }
+
+            setStatus(
+              `${search.results.length} ${labels.labelResults || "results"}`,
+            );
+            const fragment = document.createDocumentFragment();
+            const data = await Promise.all(
+              search.results.slice(0, 20).map((result) => result.data()),
+            );
+            for (const item of data) {
+              fragment.append(createResult(item));
+            }
+            results.append(fragment);
+          } catch {
+            setStatus(labels.labelError || "Search unavailable");
+          }
+        };
+
+        input.value = initialQuery;
+        form.addEventListener("submit", (event) => {
+          event.preventDefault();
+          runSearch(input.value);
+        });
+        input.addEventListener("input", () => runSearch(input.value));
+        runSearch(initialQuery);
+
+        if (shouldFocusSearch) {
+          requestAnimationFrame(() => {
+            input.focus();
+            input.select();
+          });
+        }
+      };
+
+      document.addEventListener("DOMContentLoaded", initializeSearch);
+      document.addEventListener("astro:page-load", initializeSearch);
+    </script>
+  </body>
+</html>
