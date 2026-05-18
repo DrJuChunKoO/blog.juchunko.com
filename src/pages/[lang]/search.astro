@@ -74,6 +74,13 @@ const siteDescription =
     <main
       id="main-content"
       class="mx-auto w-full max-w-5xl px-4 py-10 md:px-6 md:py-14"
+      data-search-root
+      data-label-loading={t.loading}
+      data-label-empty={t.empty}
+      data-label-error={t.error}
+      data-label-hint={t.hint}
+      data-label-results={t.results}
+      data-label-open={t.open}
     >
       <form role="search" data-search-form>
         <label class="sr-only" for="site-search-input">{t.title}</label>
@@ -206,12 +213,7 @@ const siteDescription =
             "mt-3 line-clamp-3 text-sm leading-6 text-gray-600 dark:text-gray-300";
           excerpt.innerHTML = data.excerpt || "";
 
-          const meta = document.createElement("p");
-          meta.className =
-            "mt-4 font-mono text-xs text-gray-400 dark:text-gray-500";
-          meta.textContent = `${labels.labelOpen || "Open"} -> ${data.url}`;
-
-          link.append(title, excerpt, meta);
+          link.append(title, excerpt);
           article.append(link);
           return article;
         };
