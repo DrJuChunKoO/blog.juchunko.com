@@ -32,7 +32,9 @@ const isSearchPage =
           data-desktop-search
           data-search-shortcut
           href={searchFocusHref}
-          class="absolute left-1/2 hidden -translate-x-1/2 items-center gap-2 rounded-full border border-black/10 bg-gray-50/80 px-4 py-2 text-gray-600 transition hover:border-black/20 hover:bg-white hover:text-gray-950 hover:shadow-[0_10px_30px_rgba(0,0,0,.06)] md:inline-flex md:w-56 lg:w-72 dark:border-white/15 dark:bg-white/5 dark:text-gray-300 dark:hover:border-white/25 dark:hover:bg-white/10 dark:hover:text-white"
+          transition:name="search-field"
+          transition:animate="initial"
+          class="absolute left-1/2 hidden -translate-x-1/2 items-center gap-2 rounded-full border border-black/10 bg-gray-50/80 px-4 py-2 text-gray-600 transition hover:border-black/20 hover:bg-white hover:text-gray-950 md:inline-flex md:w-56 lg:w-72 dark:border-white/15 dark:bg-white/5 dark:text-gray-300 dark:hover:border-white/25 dark:hover:bg-white/10 dark:hover:text-white"
           aria-current="false"
         >
           <svg
@@ -49,8 +51,7 @@ const isSearchPage =
             />
           </svg>
           <span class="truncate font-medium">{t("nav.search")}</span>
-          <span class="ml-auto hidden rounded-full border border-black/10 px-2 py-0.5 font-mono text-[10px] tracking-wider text-gray-400 uppercase lg:inline dark:border-white/10 dark:text-gray-500">
-            Cmd K
+          <span class="ml-auto hidden rounded-full border border-black/10 px-2 py-0.5 font-mono text-[10px] tracking-wider text-gray-400 uppercase lg:inline dark:border-white/10 dark:text-gray-500" data-keyboard-shortcut>
           </span>
         </a>
       )
@@ -136,7 +137,7 @@ const isSearchPage =
 
   <div id="mobile-nav-menu" data-mobile-menu class="hidden px-4 pb-4 md:hidden">
     <div
-      class="rounded-2xl border border-black/10 bg-white/95 p-2 shadow-[0_18px_50px_rgba(0,0,0,.12)] backdrop-blur-md dark:border-white/15 dark:bg-zinc-950/95 dark:shadow-[0_18px_50px_rgba(255,255,255,.04)]"
+      class="rounded-2xl border border-black/10 bg-white/95 p-2 shadow-[0_2px_8px_rgba(0,0,0,.06)] backdrop-blur-md dark:border-white/15 dark:bg-zinc-950/95 dark:shadow-[0_2px_8px_rgba(0,0,0,.25)]"
     >
       <a
         href="https://juchunko.com/"
@@ -242,9 +243,21 @@ const isSearchPage =
       });
     };
 
+    const bindKeyboardShortcutLabel = () => {
+      const label = document.querySelector("[data-keyboard-shortcut]");
+      if (!label) return;
+      if (label.dataset.bound === "true") return;
+      label.dataset.bound = "true";
+
+      const isMac = /Mac|iPod|iPhone|iPad/.test(navigator.platform);
+      label.textContent = isMac ? "\u2318K" : "Ctrl+K";
+    };
+
     document.addEventListener("DOMContentLoaded", bindMobileMenu);
     document.addEventListener("astro:page-load", bindMobileMenu);
     document.addEventListener("DOMContentLoaded", bindSearchShortcut);
     document.addEventListener("astro:page-load", bindSearchShortcut);
+    document.addEventListener("DOMContentLoaded", bindKeyboardShortcutLabel);
+    document.addEventListener("astro:page-load", bindKeyboardShortcutLabel);
   </script>
 </div>
