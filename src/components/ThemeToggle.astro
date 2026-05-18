@@ -47,7 +47,7 @@
       try {
         const stored = localStorage.getItem("theme");
         const prefersDark = window.matchMedia(
-          "(prefers-color-scheme: dark)"
+          "(prefers-color-scheme: dark)",
         ).matches;
         const dark = stored === "dark" || (!stored && prefersDark);
         doc.documentElement.classList.toggle("dark", dark);
@@ -66,14 +66,15 @@
 
     // Handle toggle button clicks (re-bind on every page load).
     function bindToggle() {
-      const button = document.querySelector("[data-theme-toggle]");
-      if (!button || button.__themeToggleBound) return;
+      document.querySelectorAll("[data-theme-toggle]").forEach((button) => {
+        if (button.__themeToggleBound) return;
 
-      button.__themeToggleBound = true;
-      button.addEventListener("click", () => {
-        const html = document.documentElement;
-        const isDark = html.classList.toggle("dark");
-        localStorage.setItem("theme", isDark ? "dark" : "light");
+        button.__themeToggleBound = true;
+        button.addEventListener("click", () => {
+          const html = document.documentElement;
+          const isDark = html.classList.toggle("dark");
+          localStorage.setItem("theme", isDark ? "dark" : "light");
+        });
       });
     }
 

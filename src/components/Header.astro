@@ -4,6 +4,10 @@ import ThemeToggle from "./ThemeToggle.astro";
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
+const searchHref = `/${lang}/search/`;
+const searchFocusHref = `${searchHref}?focusSearch=1`;
+const isSearchPage =
+  Astro.url.pathname.replace(/\/$/, "") === `/${lang}/search`;
 ---
 
 <div class="sticky top-0 z-20 w-full bg-transparent print:hidden">
@@ -12,53 +16,235 @@ const t = useTranslations(lang);
   >
   </div>
   <nav
-    class="mx-auto flex h-16 max-w-[90rem] items-center justify-end gap-2 pr-[max(env(safe-area-inset-right),1.5rem)] pl-[max(env(safe-area-inset-left),1.5rem)] text-sm"
+    class="relative mx-auto flex h-16 max-w-[90rem] items-center justify-between gap-3 pr-[max(env(safe-area-inset-right),1rem)] pl-[max(env(safe-area-inset-left),1rem)] text-sm md:pr-[max(env(safe-area-inset-right),1.5rem)] md:pl-[max(env(safe-area-inset-left),1.5rem)]"
+    aria-label="Primary navigation"
   >
     <a
-      class="flex items-center text-base hover:opacity-75 ltr:mr-auto rtl:ml-auto"
+      class="flex min-w-0 items-center text-base hover:opacity-75 md:max-w-[22rem]"
       href={`/${lang}`}
     >
-      <span class="font-medium">{t("site.title")}</span>
+      <span class="truncate font-medium">{t("site.title")}</span>
     </a>
-    <a
-      href="https://juchunko.com/"
-      target="_blank"
-      rel="noreferrer"
-      class="relative -ml-2 hidden p-2 whitespace-nowrap text-gray-600 hover:text-gray-800 contrast-more:text-gray-700 md:inline-block dark:text-gray-400 dark:hover:text-gray-200 contrast-more:dark:text-gray-100"
-      aria-current="false"
-    >
-      <span class="absolute inset-x-0 text-center"
-        >{t("nav.official_website")}</span
+
+    {
+      !isSearchPage && (
+        <a
+          data-desktop-search
+          data-search-shortcut
+          href={searchFocusHref}
+          class="absolute left-1/2 hidden -translate-x-1/2 items-center gap-2 rounded-full border border-black/10 bg-gray-50/80 px-4 py-2 text-gray-600 transition hover:border-black/20 hover:bg-white hover:text-gray-950 hover:shadow-[0_10px_30px_rgba(0,0,0,.06)] md:inline-flex md:w-56 lg:w-72 dark:border-white/15 dark:bg-white/5 dark:text-gray-300 dark:hover:border-white/25 dark:hover:bg-white/10 dark:hover:text-white"
+          aria-current="false"
+        >
+          <svg
+            aria-hidden="true"
+            class="h-4 w-4 flex-none"
+            viewBox="0 0 24 24"
+            fill="none"
+          >
+            <path
+              d="m21 21-4.2-4.2m1.2-5.3a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0Z"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+            />
+          </svg>
+          <span class="truncate font-medium">{t("nav.search")}</span>
+          <span class="ml-auto hidden rounded-full border border-black/10 px-2 py-0.5 font-mono text-[10px] tracking-wider text-gray-400 uppercase lg:inline dark:border-white/10 dark:text-gray-500">
+            Cmd K
+          </span>
+        </a>
+      )
+    }
+
+    <div class="hidden items-center gap-2 md:flex">
+      <a
+        href="https://juchunko.com/"
+        target="_blank"
+        rel="noreferrer"
+        class="relative -ml-2 p-2 whitespace-nowrap text-gray-600 hover:text-gray-800 contrast-more:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 contrast-more:dark:text-gray-100"
+        aria-current="false"
       >
-      <span class="invisible font-medium">{t("nav.official_website")}</span>
-      <span class="sr-only select-none"> (opens in a new tab)</span>
-    </a>
-    <a
-      href="https://transpal.juchunko.com/"
-      target="_blank"
-      rel="noreferrer"
-      class="relative -ml-2 hidden p-2 whitespace-nowrap text-gray-600 hover:text-gray-800 contrast-more:text-gray-700 md:inline-block dark:text-gray-400 dark:hover:text-gray-200 contrast-more:dark:text-gray-100"
-      aria-current="false"
-    >
-      <span class="absolute inset-x-0 text-center">{t("nav.transcript")}</span>
-      <span class="invisible font-medium">{t("nav.transcript")}</span>
-      <span class="sr-only select-none"> (opens in a new tab)</span>
-    </a>
-    <a
-      href="https://github.com/DrJuChunKoO/blog.juchunko.com"
-      target="_blank"
-      rel="noreferrer"
-      class="p-2 text-current"
-    >
-      <svg width="24" height="24" fill="currentColor" viewBox="3 3 18 18">
-        <title>GitHub</title>
-        <path
-          d="M12 3C7.0275 3 3 7.12937 3 12.2276C3 16.3109 5.57625 19.7597 9.15374 20.9824C9.60374 21.0631 9.77249 20.7863 9.77249 20.5441C9.77249 20.3249 9.76125 19.5982 9.76125 18.8254C7.5 19.2522 6.915 18.2602 6.735 17.7412C6.63375 17.4759 6.19499 16.6569 5.8125 16.4378C5.4975 16.2647 5.0475 15.838 5.80124 15.8264C6.51 15.8149 7.01625 16.4954 7.18499 16.7723C7.99499 18.1679 9.28875 17.7758 9.80625 17.5335C9.885 16.9337 10.1212 16.53 10.38 16.2993C8.3775 16.0687 6.285 15.2728 6.285 11.7432C6.285 10.7397 6.63375 9.9092 7.20749 9.26326C7.1175 9.03257 6.8025 8.08674 7.2975 6.81794C7.2975 6.81794 8.05125 6.57571 9.77249 7.76377C10.4925 7.55615 11.2575 7.45234 12.0225 7.45234C12.7875 7.45234 13.5525 7.55615 14.2725 7.76377C15.9937 6.56418 16.7475 6.81794 16.7475 6.81794C17.2424 8.08674 16.9275 9.03257 16.8375 9.26326C17.4113 9.9092 17.76 10.7281 17.76 11.7432C17.76 15.2843 15.6563 16.0687 13.6537 16.2993C13.98 16.5877 14.2613 17.1414 14.2613 18.0065C14.2613 19.2407 14.25 20.2326 14.25 20.5441C14.25 20.7863 14.4188 21.0746 14.8688 20.9824C16.6554 20.364 18.2079 19.1866 19.3078 17.6162C20.4077 16.0457 20.9995 14.1611 21 12.2276C21 7.12937 16.9725 3 12 3Z"
-        ></path>
-      </svg>
-      <span class="sr-only">GitHub</span>
-      <span class="sr-only select-none"> (opens in a new tab)</span>
-    </a>
-    <ThemeToggle />
+        <span class="absolute inset-x-0 text-center"
+          >{t("nav.official_website")}</span
+        >
+        <span class="invisible font-medium">{t("nav.official_website")}</span>
+        <span class="sr-only select-none"> (opens in a new tab)</span>
+      </a>
+      <a
+        href="https://transpal.juchunko.com/"
+        target="_blank"
+        rel="noreferrer"
+        class="relative -ml-2 p-2 whitespace-nowrap text-gray-600 hover:text-gray-800 contrast-more:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 contrast-more:dark:text-gray-100"
+        aria-current="false"
+      >
+        <span class="absolute inset-x-0 text-center">{t("nav.transcript")}</span
+        >
+        <span class="invisible font-medium">{t("nav.transcript")}</span>
+        <span class="sr-only select-none"> (opens in a new tab)</span>
+      </a>
+      <a
+        href="https://github.com/DrJuChunKoO/blog.juchunko.com"
+        target="_blank"
+        rel="noreferrer"
+        class="p-2 text-current"
+      >
+        <svg width="24" height="24" fill="currentColor" viewBox="3 3 18 18">
+          <title>GitHub</title>
+          <path
+            d="M12 3C7.0275 3 3 7.12937 3 12.2276C3 16.3109 5.57625 19.7597 9.15374 20.9824C9.60374 21.0631 9.77249 20.7863 9.77249 20.5441C9.77249 20.3249 9.76125 19.5982 9.76125 18.8254C7.5 19.2522 6.915 18.2602 6.735 17.7412C6.63375 17.4759 6.19499 16.6569 5.8125 16.4378C5.4975 16.2647 5.0475 15.838 5.80124 15.8264C6.51 15.8149 7.01625 16.4954 7.18499 16.7723C7.99499 18.1679 9.28875 17.7758 9.80625 17.5335C9.885 16.9337 10.1212 16.53 10.38 16.2993C8.3775 16.0687 6.285 15.2728 6.285 11.7432C6.285 10.7397 6.63375 9.9092 7.20749 9.26326C7.1175 9.03257 6.8025 8.08674 7.2975 6.81794C7.2975 6.81794 8.05125 6.57571 9.77249 7.76377C10.4925 7.55615 11.2575 7.45234 12.0225 7.45234C12.7875 7.45234 13.5525 7.55615 14.2725 7.76377C15.9937 6.56418 16.7475 6.81794 16.7475 6.81794C17.2424 8.08674 16.9275 9.03257 16.8375 9.26326C17.4113 9.9092 17.76 10.7281 17.76 11.7432C17.76 15.2843 15.6563 16.0687 13.6537 16.2993C13.98 16.5877 14.2613 17.1414 14.2613 18.0065C14.2613 19.2407 14.25 20.2326 14.25 20.5441C14.25 20.7863 14.4188 21.0746 14.8688 20.9824C16.6554 20.364 18.2079 19.1866 19.3078 17.6162C20.4077 16.0457 20.9995 14.1611 21 12.2276C21 7.12937 16.9725 3 12 3Z"
+          ></path>
+        </svg>
+        <span class="sr-only">GitHub</span>
+        <span class="sr-only select-none"> (opens in a new tab)</span>
+      </a>
+      <ThemeToggle />
+    </div>
+
+    <div class="flex items-center gap-2 md:hidden">
+      <a
+        data-search-shortcut
+        href={searchFocusHref}
+        class="inline-flex h-10 w-10 items-center justify-center rounded-full border border-black/10 text-gray-700 transition hover:border-black/20 hover:bg-gray-100 hover:text-gray-950 dark:border-white/15 dark:text-gray-300 dark:hover:border-white/25 dark:hover:bg-white/10 dark:hover:text-white"
+        aria-label={t("nav.search")}
+      >
+        <svg aria-hidden="true" class="h-4 w-4" viewBox="0 0 24 24" fill="none">
+          <path
+            d="m21 21-4.2-4.2m1.2-5.3a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0Z"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"></path>
+        </svg>
+      </a>
+      <button
+        type="button"
+        data-mobile-menu-toggle
+        class="inline-flex h-10 w-10 items-center justify-center rounded-full border border-black/10 text-gray-700 transition hover:border-black/20 hover:bg-gray-100 hover:text-gray-950 dark:border-white/15 dark:text-gray-300 dark:hover:border-white/25 dark:hover:bg-white/10 dark:hover:text-white"
+        aria-label={t("nav.menu")}
+        aria-expanded="false"
+        aria-controls="mobile-nav-menu"
+      >
+        <svg aria-hidden="true" class="h-5 w-5" viewBox="0 0 24 24" fill="none">
+          <path
+            d="M5 7h14M5 12h14M5 17h14"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"></path>
+        </svg>
+      </button>
+    </div>
   </nav>
+
+  <div id="mobile-nav-menu" data-mobile-menu class="hidden px-4 pb-4 md:hidden">
+    <div
+      class="rounded-2xl border border-black/10 bg-white/95 p-2 shadow-[0_18px_50px_rgba(0,0,0,.12)] backdrop-blur-md dark:border-white/15 dark:bg-zinc-950/95 dark:shadow-[0_18px_50px_rgba(255,255,255,.04)]"
+    >
+      <a
+        href="https://juchunko.com/"
+        target="_blank"
+        rel="noreferrer"
+        class="block rounded-xl px-4 py-3 font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-white/10"
+      >
+        {t("nav.official_website")}
+        <span class="sr-only select-none"> (opens in a new tab)</span>
+      </a>
+      <a
+        href="https://transpal.juchunko.com/"
+        target="_blank"
+        rel="noreferrer"
+        class="block rounded-xl px-4 py-3 font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-white/10"
+      >
+        {t("nav.transcript")}
+        <span class="sr-only select-none"> (opens in a new tab)</span>
+      </a>
+      <a
+        href="https://github.com/DrJuChunKoO/blog.juchunko.com"
+        target="_blank"
+        rel="noreferrer"
+        class="block rounded-xl px-4 py-3 font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-white/10"
+      >
+        GitHub
+        <span class="sr-only select-none"> (opens in a new tab)</span>
+      </a>
+      <div
+        class="mt-1 flex items-center justify-between rounded-xl px-4 py-2 text-gray-700 dark:text-gray-200"
+      >
+        <span class="font-medium">{t("nav.theme")}</span>
+        <ThemeToggle />
+      </div>
+    </div>
+  </div>
+
+  <script is:inline>
+    const bindMobileMenu = () => {
+      const toggle = document.querySelector("[data-mobile-menu-toggle]");
+      const menu = document.querySelector("[data-mobile-menu]");
+
+      if (
+        !(toggle instanceof HTMLButtonElement) ||
+        !(menu instanceof HTMLElement)
+      )
+        return;
+      if (toggle.dataset.mobileNavBound === "true") return;
+      toggle.dataset.mobileNavBound = "true";
+
+      const closeMenu = () => {
+        toggle.setAttribute("aria-expanded", "false");
+        menu.classList.add("hidden");
+      };
+
+      const openMenu = () => {
+        toggle.setAttribute("aria-expanded", "true");
+        menu.classList.remove("hidden");
+      };
+
+      toggle.addEventListener("click", () => {
+        if (toggle.getAttribute("aria-expanded") === "true") {
+          closeMenu();
+        } else {
+          openMenu();
+        }
+      });
+
+      menu.addEventListener("click", (event) => {
+        if (event.target instanceof HTMLAnchorElement) closeMenu();
+      });
+
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") closeMenu();
+      });
+    };
+
+    const bindSearchShortcut = () => {
+      if (document.documentElement.dataset.searchShortcutBound === "true")
+        return;
+      document.documentElement.dataset.searchShortcutBound = "true";
+
+      document.addEventListener("keydown", (event) => {
+        const isSearchShortcut =
+          (event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k";
+        if (!isSearchShortcut) return;
+
+        event.preventDefault();
+
+        const input = document.querySelector("[data-search-input]");
+        if (input instanceof HTMLInputElement) {
+          input.focus();
+          input.select();
+          return;
+        }
+
+        const searchLink = document.querySelector("[data-search-shortcut]");
+        if (!(searchLink instanceof HTMLAnchorElement)) return;
+
+        const searchUrl = new URL(searchLink.href);
+        searchUrl.searchParams.set("focusSearch", "1");
+        window.location.href = searchUrl.href;
+      });
+    };
+
+    document.addEventListener("DOMContentLoaded", bindMobileMenu);
+    document.addEventListener("astro:page-load", bindMobileMenu);
+    document.addEventListener("DOMContentLoaded", bindSearchShortcut);
+    document.addEventListener("astro:page-load", bindSearchShortcut);
+  </script>
 </div>
