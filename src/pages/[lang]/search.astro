@@ -149,7 +149,8 @@ const siteDescription =
       </div>
 
       <section
-        class="mt-8 hidden grid-cols-1 gap-3"
+        class="mt-8 grid grid-cols-1 gap-4"
+        style="display:none"
         aria-live="polite"
         data-search-results
       >
@@ -197,7 +198,7 @@ const siteDescription =
         const createResult = (data) => {
           const article = document.createElement("article");
           article.className =
-            "group rounded-xl p-5 transition hover:bg-gray-100 dark:hover:bg-gray-800";
+            "group rounded-xl border border-black/10 bg-white p-5 transition hover:bg-gray-50 hover:border-black/20 dark:border-white/10 dark:bg-zinc-950 dark:hover:bg-white/5 dark:hover:border-white/20";
 
           const link = document.createElement("a");
           link.href = data.url;
@@ -239,7 +240,7 @@ const siteDescription =
           if (!trimmed) {
             setStatus("");
             emptyState.classList.remove("hidden");
-            results.classList.add("hidden");
+            results.style.display = "none";
             // Add a small delay for the fade-in effect to work
             requestAnimationFrame(() => {
               emptyState.classList.remove("opacity-0");
@@ -248,7 +249,7 @@ const siteDescription =
           }
 
           emptyState.classList.add("opacity-0", "hidden");
-          results.classList.remove("hidden");
+          results.style.display = "";
 
           const searchId = ++latestSearch;
           setStatus(labels.labelLoading);
