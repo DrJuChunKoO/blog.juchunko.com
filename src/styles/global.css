@@ -24,6 +24,9 @@
 .dark {
   --tts-dimmed: #64748b; /* slate-500 */
 }
+html {
+  scrollbar-gutter: stable;
+}
 body {
   font-family: "Geist", "Noto Sans TC", sans-serif;
   margin: 0;
