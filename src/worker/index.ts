@@ -17,16 +17,15 @@ export default {
     const url = new URL(request.url);
 
     // API 端點 -------------------------------------------------------------
-    if (
-      request.method === "POST" &&
-      url.pathname === "/api/chat"
-    ) {
+    if (request.method === "POST" && url.pathname === "/api/chat") {
       // --------------------------------------------------------------
       // 初始化 OpenRouter provider
       // --------------------------------------------------------------
 
       const openrouter = createOpenRouter({
         apiKey: env.OPENROUTER_API_KEY,
+        baseURL:
+          "https://gateway.ai.cloudflare.com/v1/3f1f83a939b2fc99ca45fd8987962514/blog/openrouter/v1",
       });
 
       // --------------------------------------------------------------
