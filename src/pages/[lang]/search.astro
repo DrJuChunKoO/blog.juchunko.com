@@ -184,7 +184,94 @@ const siteDescription =
           results.replaceChildren();
         };
 
-        const createResult = (data) => {
+        const escapeHtml = (value) =>
+          String(value).replace(/[&<>"']/g, (char) => {
+            const entities = {
+              "&": "&amp;",
+              "<": "&lt;",
+              ">": "&gt;",
+              '"': "&quot;",
+              "'": "&#39;",
+            };
+            return entities[char] || char;
+          });
+
+        const escapeRegex = (value) =>
+          value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+        const getQueryTerms = (query) => {
+          const trimmed = query.trim();
+          if (!trimmed) return [];
+
+          if (typeof Intl !== "undefined" && typeof Intl.Segmenter !== "undefined") {
+            try {
+              const segmenter = new Intl.Segmenter(document.documentElement.lang, {
+                granularity: "word",
+              });
+              const terms = [...segmenter.segment(trimmed)]
+                .filter((segment) => segment.isWordLike)
+                .map((segment) => segment.segment.trim())
+                .filter(Boolean);
+
+              if (terms.length) return terms;
+            } catch {}
+          }
+
+          return trimmed.split(/\s+/).filter(Boolean);
+        };
+
+        const highlightMatches = (text, query) => {
+          const source = String(text || "");
+          const trimmed = query.trim();
+
+          if (!source) return "";
+          if (!trimmed) return escapeHtml(source);
+
+          const exactPhrase = source
+            .toLocaleLowerCase()
+            .includes(trimmed.toLocaleLowerCase())
+            ? [trimmed]
+            : [];
+          const terms = (exactPhrase.length ? exactPhrase : getQueryTerms(trimmed))
+            .map((term) => term.trim())
+            .filter(Boolean)
+            .filter((term, index, all) => {
+              const normalized = term.toLocaleLowerCase();
+              return (
+                all.findIndex(
+                  (candidate) => candidate.toLocaleLowerCase() === normalized,
+                ) === index
+              );
+            })
+            .filter((term) => {
+              const compact = term.replace(/\s+/g, "");
+              return /^[a-z0-9]+$/i.test(compact)
+                ? compact.length >= 2
+                : compact.length >= 1;
+            })
+            .sort((a, b) => b.length - a.length);
+
+          if (!terms.length) return escapeHtml(source);
+
+          const matcher = new RegExp(
+            `(${terms.map((term) => escapeRegex(term)).join("|")})`,
+            "giu",
+          );
+
+          return source
+            .split(matcher)
+            .map((part, index) =>
+              index % 2 === 1
+                ? `<mark>${escapeHtml(part)}</mark>`
+                : escapeHtml(part),
+            )
+            .join("");
+        };
+
+        const getPlainExcerpt = (data) =>
+          data.plain_excerpt || data.excerpt?.replace(/<\/?mark>/g, "") || "";
+
+        const createResult = (data, query) => {
           const article = document.createElement("article");
           article.className =
             "group relative overflow-hidden rounded-xl border border-gray-200 bg-white p-4 transition-all hover:border-gray-300 hover:bg-gray-50 hover:shadow-sm dark:border-white/10 dark:bg-white/[0.03] dark:hover:border-white/20 dark:hover:bg-white/[0.08]";
@@ -196,12 +283,12 @@ const siteDescription =
           const title = document.createElement("h2");
           title.className =
             "pr-7 text-base font-semibold tracking-tight text-gray-950 group-hover:underline dark:text-white";
-          title.textContent = data.meta?.title || data.url;
+          title.innerHTML = highlightMatches(data.meta?.title || data.url, query);
 
           const excerpt = document.createElement("p");
           excerpt.className =
             "mt-1 line-clamp-2 text-sm leading-relaxed text-gray-600 dark:text-gray-300";
-          excerpt.innerHTML = data.excerpt || "";
+          excerpt.innerHTML = highlightMatches(getPlainExcerpt(data), query);
 
           const arrow = document.createElement("span");
           arrow.className =
@@ -272,7 +359,7 @@ const siteDescription =
               search.results.slice(0, 20).map((result) => result.data()),
             );
             for (const item of data) {
-              fragment.append(createResult(item));
+              fragment.append(createResult(item, trimmed));
             }
             results.append(fragment);
           } catch {

@@ -278,6 +278,8 @@ const jsonLd = {
             }
             <h1
               class="text-2xl font-semibold md:text-4xl"
+              data-pagefind-meta="title"
+              data-pagefind-weight="5"
               transition:name={`${post.id}-title`}
             >
               {title}
@@ -342,6 +344,9 @@ const jsonLd = {
               )
             }
             <div data-pagefind-body>
+              <span class="sr-only" data-pagefind-title data-pagefind-weight="5">
+                {title}
+              </span>
               <slot />
             </div>
           </div>
