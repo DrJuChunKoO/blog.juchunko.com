@@ -82,11 +82,43 @@ const checks = [
       ),
   },
   {
+    name: "search results use plain excerpts for custom highlighting",
+    pass: () =>
+      readFileSync("src/pages/[lang]/search.astro", "utf8").includes(
+        "plain_excerpt",
+      ),
+  },
+  {
+    name: "search results highlight titles and excerpts from the raw query",
+    pass: () => {
+      const searchPage = readFileSync("src/pages/[lang]/search.astro", "utf8");
+      return (
+        searchPage.includes("highlightMatches(") &&
+        searchPage.includes("title.innerHTML = highlightMatches(") &&
+        searchPage.includes("excerpt.innerHTML = highlightMatches(")
+      );
+    },
+  },
+  {
     name: "article body is scoped for Pagefind",
     pass: () =>
       readFileSync("src/layouts/BlogPost.astro", "utf8").includes(
         "data-pagefind-body",
       ),
+  },
+  {
+    name: "article title is indexed as Pagefind title metadata",
+    pass: () =>
+      readFileSync("src/layouts/BlogPost.astro", "utf8").includes(
+        'data-pagefind-meta="title"',
+      ),
+  },
+  {
+    name: "article title is included in Pagefind searchable content",
+    pass: () => {
+      const layout = readFileSync("src/layouts/BlogPost.astro", "utf8");
+      return /data-pagefind-body[\s\S]*data-pagefind-title/.test(layout);
+    },
   },
   {
     name: "SearchAction points at the search page",
