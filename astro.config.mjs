@@ -23,6 +23,14 @@ export default defineConfig({
     partytown({ config: { forward: ["dataLayer.push"] } }),
   ],
   vite: {
+    server: {
+      proxy: {
+        "/api": {
+          target: "https://blog.juchunko.com",
+          changeOrigin: true,
+        },
+      },
+    },
     plugins: [
       tailwindcss(),
       Icons({
