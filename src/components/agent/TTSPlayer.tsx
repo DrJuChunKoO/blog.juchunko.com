@@ -577,20 +577,20 @@ export default function TTSPlayer({ isOpen, lang = "zh" }: TTSPlayerProps) {
     <>
       <div
         ref={mainPlayerRef}
-        className="tts-player-container mb-6 flex flex-col rounded-lg border border-gray-200 bg-gray-50 p-4 text-gray-900 dark:border-white/10 dark:bg-white/5 dark:text-gray-100"
+        className="tts-player-container mb-8 flex flex-col rounded-xl border border-black/10 bg-gray-50/40 p-4 text-gray-900 transition-all duration-300 dark:border-white/10 dark:bg-zinc-900/30 dark:text-gray-100"
       >
         {mode === "loading" && (
-          <div className="flex min-h-[160px] flex-col items-center justify-center">
-            <Loader2 className="text-muted-foreground h-6 w-6 animate-spin" />
-            <p className="text-muted-foreground mt-2 text-center text-xs">
+          <div className="flex min-h-[140px] flex-col items-center justify-center gap-3">
+            <Loader2 className="h-5 w-5 animate-spin text-gray-400 dark:text-gray-500" />
+            <p className="text-center font-mono text-[10px] font-semibold tracking-wider text-gray-400 uppercase dark:text-gray-500">
               {ui[lang]["agent.voiceReader.loading"]}
             </p>
           </div>
         )}
 
         {mode === "fallback" && (
-          <div className="flex min-h-[160px] flex-col items-center justify-center space-y-2">
-            <p className="text-muted-foreground text-center text-xs">
+          <div className="flex min-h-[140px] flex-col items-center justify-center space-y-2">
+            <p className="text-center font-mono text-[10px] font-semibold tracking-wider text-red-500 uppercase dark:text-red-400">
               {ui[lang]["agent.voiceReader.error"]}
             </p>
           </div>
@@ -598,75 +598,75 @@ export default function TTSPlayer({ isOpen, lang = "zh" }: TTSPlayerProps) {
 
         {mode === "api" && segments.length > 0 && (
           <motion.div
-            className="flex flex-col space-y-5"
+            className="flex flex-col"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}
           >
-            <div className="flex items-center justify-center gap-1">
-              <motion.button
-                whileTap={{ scale: 0.9 }}
-                onClick={() => jumpToSegment(currentIndex - 1)}
-                disabled={currentIndex === 0}
-                className="cursor-pointer rounded-lg p-2 text-gray-500 transition-all hover:bg-black/5 hover:text-inherit disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent dark:hover:bg-white/5"
-                aria-label={ui[lang]["agent.voiceReader.previous"]}
-              >
-                <StepBack className="size-4" />
-              </motion.button>
+            {/* Header: Status & Settings */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-semibold tracking-wider text-gray-500 uppercase dark:text-gray-400">
+                  {isPlaying
+                    ? ui[lang]["agent.voiceReader.playing"]
+                    : ui[lang]["agent.voiceReader.title"]}
+                </span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                {/* Text highlight button */}
+                <motion.button
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setHighlightEnabled(!highlightEnabled)}
+                  className={`flex size-8 cursor-pointer items-center justify-center rounded-full border transition-all ${
+                    highlightEnabled
+                      ? "border-black/10 bg-black/5 text-gray-900 dark:border-white/15 dark:bg-white/10 dark:text-gray-50"
+                      : "border-transparent text-gray-400 hover:bg-black/5 hover:text-gray-950 dark:text-gray-500 dark:hover:bg-white/10 dark:hover:text-gray-50"
+                  }`}
+                  title={
+                    highlightEnabled
+                      ? ui[lang]["agent.voiceReader.disableHighlight"]
+                      : ui[lang]["agent.voiceReader.enableHighlight"]
+                  }
+                >
+                  <BookAudio className="size-3.5" />
+                </motion.button>
 
-              <motion.button
-                whileTap={{ scale: 0.9 }}
-                onClick={seekBackward}
-                disabled={currentTime < 1}
-                className="cursor-pointer rounded-lg p-2 text-gray-500 transition-all hover:bg-black/5 hover:text-inherit disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent dark:hover:bg-white/5"
-                aria-label={ui[lang]["agent.voiceReader.rewind15s"]}
-              >
-                <Rewind className="size-4" />
-              </motion.button>
-
-              <motion.button
-                whileTap={{ scale: 0.9 }}
-                whileHover={{ scale: 1.05 }}
-                onClick={togglePlay}
-                className="mx-1 cursor-pointer rounded-full bg-blue-600 p-3.5 text-white shadow-md transition-all hover:bg-blue-700"
-                aria-label={
-                  isPlaying
-                    ? ui[lang]["agent.voiceReader.pause"]
-                    : ui[lang]["agent.voiceReader.play"]
-                }
-              >
-                {isPlaying ? (
-                  <Pause className="size-5" />
-                ) : (
-                  <Play className="size-5" />
-                )}
-              </motion.button>
-
-              <motion.button
-                whileTap={{ scale: 0.9 }}
-                onClick={seekForward}
-                disabled={currentTime >= totalDuration - 1}
-                className="cursor-pointer rounded-lg p-2 text-gray-500 transition-all hover:bg-black/5 hover:text-inherit disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent dark:hover:bg-white/5"
-                aria-label={ui[lang]["agent.voiceReader.forward15s"]}
-              >
-                <FastForward className="size-4" />
-              </motion.button>
-
-              <motion.button
-                whileTap={{ scale: 0.9 }}
-                onClick={() => jumpToSegment(currentIndex + 1)}
-                disabled={currentIndex === segments.length - 1}
-                className="cursor-pointer rounded-lg p-2 text-gray-500 transition-all hover:bg-black/5 hover:text-inherit disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent dark:hover:bg-white/5"
-                aria-label={ui[lang]["agent.voiceReader.next"]}
-              >
-                <StepForward className="size-4" />
-              </motion.button>
+                {/* Speed selector */}
+                <Select
+                  value={playbackRate.toString()}
+                  onValueChange={(v) => setPlaybackRate(Number(v))}
+                >
+                  <SelectTrigger
+                    className="h-8 w-auto min-w-[3.5rem] gap-1 rounded-full border border-black/10 bg-transparent px-2.5 font-mono text-xs font-semibold text-gray-500 shadow-none hover:border-black/20 hover:bg-black/5 focus:ring-0 dark:border-white/15 dark:text-gray-400 dark:hover:border-white/25 dark:hover:bg-white/10 [&>svg]:opacity-60"
+                    title={ui[lang]["agent.voiceReader.speed"]}
+                    size="sm"
+                  >
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent
+                    align="end"
+                    className="min-w-[4rem] rounded-xl border-black/10 bg-white/95 backdrop-blur-md dark:border-white/15 dark:bg-zinc-950/95"
+                  >
+                    {[0.5, 0.75, 1, 1.25, 1.5, 1.75, 2].map((rate) => (
+                      <SelectItem
+                        key={rate}
+                        value={rate.toString()}
+                        className="cursor-pointer rounded-lg font-mono text-xs tabular-nums focus:bg-black/5 focus:text-gray-950 dark:focus:bg-white/10 dark:focus:text-gray-50"
+                      >
+                        {rate}×
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
-            <div className="space-y-2">
-              <div className="relative w-full">
-                <div className="h-2 w-full overflow-hidden rounded-full bg-black/10 dark:bg-white/10">
+
+            {/* Middle: Progress timeline */}
+            <div className="mt-4 space-y-1.5">
+              <div className="group/track relative w-full">
+                <div className="h-1.5 w-full scale-y-50 overflow-hidden rounded-full bg-black/10 transition-all duration-200 group-hover/track:scale-y-100 dark:bg-white/10">
                   <motion.div
-                    className="h-full rounded-full bg-blue-600 dark:bg-blue-500"
+                    className="h-full rounded-full bg-gray-900 dark:bg-gray-100"
                     initial={{ width: 0 }}
                     animate={{ width: `${progressPercentage}%` }}
                     transition={{ duration: 0.1 }}
@@ -682,63 +682,78 @@ export default function TTSPlayer({ isOpen, lang = "zh" }: TTSPlayerProps) {
                   className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
                 />
               </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-500 tabular-nums dark:text-gray-400">
-                  {formatTime(currentTime)}
-                </span>
-                <div className="flex items-center gap-2">
-                  <motion.button
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => setHighlightEnabled(!highlightEnabled)}
-                    className={`flex size-8 cursor-pointer items-center justify-center rounded-md transition-colors ${
-                      highlightEnabled
-                        ? "bg-blue-600/10 text-blue-600 dark:text-blue-400"
-                        : "text-gray-500 hover:bg-black/5 dark:hover:bg-white/5"
-                    }`}
-                    title={
-                      highlightEnabled
-                        ? ui[lang]["agent.voiceReader.disableHighlight"]
-                        : ui[lang]["agent.voiceReader.enableHighlight"]
-                    }
-                  >
-                    <BookAudio className="size-3.5" />
-                  </motion.button>
-
-                  <Select
-                    value={playbackRate.toString()}
-                    onValueChange={(v) => setPlaybackRate(Number(v))}
-                  >
-                    <SelectTrigger
-                      className="h-8 w-auto min-w-[3rem] gap-1 border-0 bg-transparent px-2 font-mono text-xs text-gray-500 shadow-none hover:bg-black/5 focus:ring-0 dark:text-gray-400 dark:hover:bg-white/5 [&>svg]:opacity-50"
-                      title={ui[lang]["agent.voiceReader.speed"]}
-                      size="sm"
-                    >
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent align="end" className="min-w-[4rem]">
-                      {[0.5, 0.75, 1, 1.25, 1.5, 1.75, 2].map((rate) => (
-                        <SelectItem
-                          key={rate}
-                          value={rate.toString()}
-                          className="font-mono text-xs tabular-nums"
-                        >
-                          {rate}×
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <span className="text-sm text-gray-500 tabular-nums dark:text-gray-400">
-                  {formatTime(totalDuration)}
-                </span>
+              <div className="flex items-center justify-between font-mono text-[11px] font-medium text-gray-500 tabular-nums dark:text-gray-400">
+                <span>{formatTime(currentTime)}</span>
+                <span>{formatTime(totalDuration)}</span>
               </div>
+            </div>
+
+            {/* Bottom: Playback Controls */}
+            <div className="flex items-center justify-center gap-1.5">
+              <motion.button
+                whileTap={{ scale: 0.95 }}
+                onClick={() => jumpToSegment(currentIndex - 1)}
+                disabled={currentIndex === 0}
+                className="cursor-pointer rounded-full p-2.5 text-gray-500 transition-all hover:bg-black/5 hover:text-gray-900 disabled:cursor-not-allowed disabled:opacity-20 disabled:hover:bg-transparent dark:text-gray-400 dark:hover:bg-white/10 dark:hover:text-gray-50"
+                aria-label={ui[lang]["agent.voiceReader.previous"]}
+              >
+                <StepBack className="size-4" />
+              </motion.button>
+
+              <motion.button
+                whileTap={{ scale: 0.95 }}
+                onClick={seekBackward}
+                disabled={currentTime < 1}
+                className="cursor-pointer rounded-full p-2.5 text-gray-500 transition-all hover:bg-black/5 hover:text-gray-900 disabled:cursor-not-allowed disabled:opacity-20 disabled:hover:bg-transparent dark:text-gray-400 dark:hover:bg-white/10 dark:hover:text-gray-50"
+                aria-label={ui[lang]["agent.voiceReader.rewind15s"]}
+              >
+                <Rewind className="size-4" />
+              </motion.button>
+
+              <motion.button
+                whileTap={{ scale: 0.92 }}
+                whileHover={{ scale: 1.04 }}
+                onClick={togglePlay}
+                className="mx-2 flex cursor-pointer items-center justify-center rounded-full bg-gray-950 p-3.5 text-white shadow-sm transition-all duration-200 hover:bg-gray-800 dark:bg-gray-100 dark:text-gray-950 dark:hover:bg-gray-200"
+                aria-label={
+                  isPlaying
+                    ? ui[lang]["agent.voiceReader.pause"]
+                    : ui[lang]["agent.voiceReader.play"]
+                }
+              >
+                {isPlaying ? (
+                  <Pause className="size-4.5 fill-current" />
+                ) : (
+                  <Play className="ml-0.5 size-4.5 fill-current" />
+                )}
+              </motion.button>
+
+              <motion.button
+                whileTap={{ scale: 0.95 }}
+                onClick={seekForward}
+                disabled={currentTime >= totalDuration - 1}
+                className="cursor-pointer rounded-full p-2.5 text-gray-500 transition-all hover:bg-black/5 hover:text-gray-950 disabled:cursor-not-allowed disabled:opacity-20 disabled:hover:bg-transparent dark:text-gray-400 dark:hover:bg-white/10 dark:hover:text-gray-50"
+                aria-label={ui[lang]["agent.voiceReader.forward15s"]}
+              >
+                <FastForward className="size-4" />
+              </motion.button>
+
+              <motion.button
+                whileTap={{ scale: 0.95 }}
+                onClick={() => jumpToSegment(currentIndex + 1)}
+                disabled={currentIndex === segments.length - 1}
+                className="cursor-pointer rounded-full p-2.5 text-gray-500 transition-all hover:bg-black/5 hover:text-gray-950 disabled:cursor-not-allowed disabled:opacity-20 disabled:hover:bg-transparent dark:text-gray-400 dark:hover:bg-white/10 dark:hover:text-gray-50"
+                aria-label={ui[lang]["agent.voiceReader.next"]}
+              >
+                <StepForward className="size-4" />
+              </motion.button>
             </div>
           </motion.div>
         )}
 
         {(mode === "error" || (mode === "api" && segments.length === 0)) && (
-          <div className="flex min-h-[160px] items-center justify-center">
-            <p className="text-center text-xs text-red-500">
+          <div className="flex min-h-[140px] items-center justify-center">
+            <p className="text-center font-mono text-[10px] font-semibold tracking-wider text-red-500 uppercase dark:text-red-400">
               {ui[lang]["agent.voiceReader.error"]}
             </p>
           </div>
@@ -754,60 +769,60 @@ export default function TTSPlayer({ isOpen, lang = "zh" }: TTSPlayerProps) {
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
             className="tts-player-container pointer-events-none fixed top-4 right-4 left-4 z-50 flex items-center justify-center text-gray-900 dark:text-gray-100"
           >
-            <div className="group pointer-events-auto flex w-full max-w-2xl items-center gap-4 overflow-hidden rounded-2xl border border-gray-200 bg-white/80 p-2 pr-3 pl-4 shadow-2xl backdrop-blur-xl dark:border-white/10 dark:bg-black/80">
-              <div className="absolute right-0 bottom-0 left-0 h-0.5 bg-gray-200 dark:bg-white/10">
+            <div className="group pointer-events-auto flex w-full max-w-2xl items-center gap-4 overflow-hidden rounded-2xl border border-black/10 bg-white/95 p-3.5 pr-4 pl-5 shadow-[0_4px_20px_rgba(0,0,0,0.06)] backdrop-blur-md dark:border-white/15 dark:bg-zinc-950/95 dark:shadow-[0_4px_20px_rgba(0,0,0,0.3)]">
+              <div className="absolute right-0 bottom-0 left-0 h-1 bg-black/5 dark:bg-white/5">
                 <motion.div
-                  className="h-full bg-blue-600 dark:bg-blue-500"
+                  className="h-full bg-gray-950 dark:bg-gray-100"
                   initial={{ width: 0 }}
                   animate={{ width: `${progressPercentage}%` }}
                 />
               </div>
 
               <div className="flex min-w-0 flex-1 flex-col">
-                <span className="mb-0.5 text-[10px] font-medium tracking-wider text-blue-600 uppercase dark:text-blue-400">
+                <span className="mb-1 font-mono text-[9px] font-bold tracking-wider text-gray-500 uppercase dark:text-gray-400">
                   {ui[lang]["agent.voiceReader.playing"]}
                 </span>
-                <p className="truncate text-sm leading-tight font-medium dark:text-white">
+                <p className="truncate text-sm leading-tight font-semibold text-gray-950 dark:text-gray-50">
                   {segments[currentIndex]?.text}
                 </p>
               </div>
 
-              <div className="flex shrink-0 items-center gap-1">
+              <div className="z-10 flex shrink-0 items-center gap-1">
                 <button
                   onClick={() => jumpToSegment(currentIndex - 1)}
                   disabled={currentIndex === 0}
-                  className="rounded-full p-2 transition-colors hover:bg-black/5 disabled:opacity-30 dark:hover:bg-white/10"
+                  className="rounded-full p-2 text-gray-500 transition-colors hover:bg-black/5 hover:text-gray-950 disabled:opacity-20 dark:text-gray-400 dark:hover:bg-white/10 dark:hover:text-gray-50"
                 >
-                  <StepBack className="size-4 dark:text-white" />
+                  <StepBack className="size-4" />
                 </button>
 
                 <button
                   onClick={togglePlay}
-                  className="rounded-full bg-blue-600 p-2.5 text-white shadow-lg transition-transform hover:bg-blue-700 active:scale-90"
+                  className="rounded-full bg-gray-950 p-2.5 text-white shadow-sm transition-transform hover:bg-gray-800 active:scale-95 dark:bg-gray-100 dark:text-gray-950 dark:hover:bg-gray-200"
                 >
                   {isPlaying ? (
                     <Pause className="size-4 fill-current" />
                   ) : (
-                    <Play className="size-4 fill-current" />
+                    <Play className="ml-0.5 size-4 fill-current" />
                   )}
                 </button>
 
                 <button
                   onClick={() => jumpToSegment(currentIndex + 1)}
                   disabled={currentIndex === segments.length - 1}
-                  className="rounded-full p-2 transition-colors hover:bg-black/5 disabled:opacity-30 dark:hover:bg-white/10"
+                  className="rounded-full p-2 text-gray-500 transition-colors hover:bg-black/5 hover:text-gray-950 disabled:opacity-20 dark:text-gray-400 dark:hover:bg-white/10 dark:hover:text-gray-50"
                 >
-                  <StepForward className="size-4 dark:text-white" />
+                  <StepForward className="size-4" />
                 </button>
 
-                <div className="mx-1 h-4 w-px bg-gray-200 dark:bg-white/10" />
+                <div className="mx-1 h-4 w-px bg-black/10 dark:bg-white/10" />
 
                 <button
                   onClick={scrollToPlayer}
-                  className="rounded-full p-2 transition-colors group-hover:text-blue-600 hover:bg-black/5 dark:group-hover:text-blue-400 dark:hover:bg-white/10"
+                  className="rounded-full p-2 text-gray-500 transition-colors hover:bg-black/5 hover:text-gray-950 dark:text-gray-400 dark:hover:bg-white/10 dark:hover:text-gray-50"
                   title="Back to player"
                 >
-                  <Maximize2 className="size-4 dark:text-white" />
+                  <Maximize2 className="size-4" />
                 </button>
               </div>
             </div>
