@@ -376,6 +376,7 @@ const jsonLd = {
         </div>
         <div class="container">
           <div class="prose dark:prose-invert">
+            <KeySummary client:only="react" lang={currentLang} />
             {
               otherLangPost && (
                 <div class="mb-6 flex justify-center">
@@ -394,7 +395,6 @@ const jsonLd = {
                 </div>
               )
             }
-            <KeySummary client:only="react" lang={currentLang} />
             <div data-pagefind-body>
               <span
                 class="sr-only"

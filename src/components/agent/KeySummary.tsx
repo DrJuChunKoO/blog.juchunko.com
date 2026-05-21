@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { motion } from "motion/react";
 import { Sparkles, MessageSquare } from "lucide-react";
+import Markdown from "markdown-to-jsx";
 
 type SupportedLang = "en" | "zh";
 
@@ -60,15 +61,6 @@ export default function KeySummary({ lang = "zh" }: KeySummaryProps) {
     return null;
   }
 
-  // Parse markdown list points
-  const points = summary
-    ? summary
-        .split("\n")
-        .map((line) => line.trim())
-        .filter((line) => line.startsWith("-") || line.startsWith("*"))
-        .map((line) => line.substring(1).trim())
-    : [];
-
   return (
     <div className="tts-player-container mb-8 rounded-2xl border border-black/10 bg-gray-50/30 p-5 text-gray-900 transition-all duration-300 dark:border-white/10 dark:bg-zinc-900/20 dark:text-gray-100">
       <div className="flex items-center gap-2 mb-4">
@@ -86,21 +78,43 @@ export default function KeySummary({ lang = "zh" }: KeySummaryProps) {
         </div>
       ) : (
         <div className="space-y-4">
-          <ul className="space-y-2.5 text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
-            {points.length > 0 ? (
-              points.map((point, index) => (
-                <li key={index} className="flex items-start gap-2.5">
-                  <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-gray-400 dark:bg-gray-500" />
-                  <span>{point}</span>
-                </li>
-              ))
-            ) : (
-              <li className="flex items-start gap-2.5">
-                <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-gray-400 dark:bg-gray-500" />
-                <span>{summary}</span>
-              </li>
-            )}
-          </ul>
+          <Markdown
+            options={{
+              overrides: {
+                li: {
+                  component: ({ children }) => (
+                    <li className="flex items-start gap-2.5">
+                      <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-gray-400 dark:bg-gray-500" />
+                      <span className="min-w-0">{children}</span>
+                    </li>
+                  ),
+                },
+                ul: {
+                  component: ({ children }) => (
+                    <ul className="space-y-2.5 text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
+                      {children}
+                    </ul>
+                  ),
+                },
+                strong: {
+                  component: ({ children }) => (
+                    <strong className="font-bold text-gray-900 dark:text-gray-50">
+                      {children}
+                    </strong>
+                  ),
+                },
+                code: {
+                  component: ({ children }) => (
+                    <code className="px-1.5 py-0.5 rounded bg-black/5 dark:bg-white/10 font-mono text-xs text-gray-900 dark:text-gray-100 font-semibold">
+                      {children}
+                    </code>
+                  ),
+                }
+              }
+            }}
+          >
+            {summary}
+          </Markdown>
 
           <div className="flex justify-end pt-2 border-t border-black/5 dark:border-white/5">
             <motion.button
