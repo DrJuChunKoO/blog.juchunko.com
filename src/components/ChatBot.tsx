@@ -117,6 +117,20 @@ export default function ChatBot() {
     };
   }, [isOpen]);
 
+  useEffect(() => {
+    const handleOpenChatBot = (e: Event) => {
+      const customEvent = e as CustomEvent<{ prompt?: string }>;
+      setIsOpen(true);
+      if (customEvent.detail?.prompt) {
+        sendMessage({ text: customEvent.detail.prompt });
+      }
+    };
+    window.addEventListener("open-chatbot", handleOpenChatBot);
+    return () => {
+      window.removeEventListener("open-chatbot", handleOpenChatBot);
+    };
+  }, [sendMessage]);
+
   return (
     <motion.div layoutScroll>
       <AnimatePresence>
