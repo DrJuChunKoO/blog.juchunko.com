@@ -358,7 +358,10 @@ export default function TTSPlayer({ isOpen, lang = "zh" }: TTSPlayerProps) {
       {
         acceptNode: (node) => {
           const parent = node.parentElement;
-          if (parent?.closest(".tts-player-container")) {
+          if (
+            parent?.closest(".tts-player-container") ||
+            parent?.closest(".tts-ignore")
+          ) {
             return NodeFilter.FILTER_REJECT;
           }
           return NodeFilter.FILTER_ACCEPT;
@@ -383,7 +386,10 @@ export default function TTSPlayer({ isOpen, lang = "zh" }: TTSPlayerProps) {
       mainContent.querySelectorAll(
         "p, li, h1, h2, h3, h4, h5, h6, blockquote, div, time",
       ),
-    ).filter((el) => !el.closest(".tts-player-container"));
+    ).filter(
+      (el) =>
+        !el.closest(".tts-player-container") && !el.closest(".tts-ignore"),
+    );
 
     for (const el of blockElements) {
       const htmlEl = el as HTMLElement;

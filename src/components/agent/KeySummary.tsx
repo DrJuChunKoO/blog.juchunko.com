@@ -62,7 +62,7 @@ export default function KeySummary({ lang = "zh" }: KeySummaryProps) {
   }
 
   return (
-    <div className="tts-player-container mb-8 rounded-2xl border border-black/10 bg-gray-50/30 p-5 text-gray-900 transition-all duration-300 dark:border-white/10 dark:bg-zinc-900/20 dark:text-gray-100">
+    <div className="tts-ignore mb-8 rounded-2xl border border-black/10 bg-gray-50/30 p-5 text-gray-900 transition-all duration-300 dark:border-white/10 dark:bg-zinc-900/20 dark:text-gray-100">
       <div className="flex items-center gap-2 mb-4">
         <span className="text-sm font-bold tracking-wider text-gray-800 uppercase dark:text-gray-200">
           {lang === "zh" ? "重點摘要" : "Key Summary"}
