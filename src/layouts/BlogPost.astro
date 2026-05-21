@@ -259,7 +259,7 @@ const jsonLd = {
           }
         </div>
         <div class="container">
-          <div class="my-4 flex flex-col gap-4">
+          <div class="my-4 flex flex-col gap-6">
             {
               categoryEntries.length > 0 && (
                 <ul class="-mb-2 flex flex-wrap gap-2">
@@ -284,61 +284,84 @@ const jsonLd = {
             >
               {title}
             </h1>
-            {
-              authorEntries.length > 0 && (
-                <div class="flex flex-wrap items-center gap-4">
-                  {authorEntries.map(
-                    (authorData) =>
-                      authorData && (
-                        <a
-                          href={`/${currentLang}/authors/${authorData.id}`}
-                          class="flex items-center gap-2"
-                        >
-                          <img
-                            src={authorData.data.avatar}
-                            width={40}
-                            height={40}
-                            alt={authorData.data.name[currentLang]}
-                            loading="lazy"
-                            class="aspect-square rounded-full object-cover"
-                          />
-                          <span class="text-base font-semibold">
-                            {authorData.data.name[currentLang]}
-                          </span>
-                        </a>
-                      ),
-                  )}
-                </div>
-              )
-            }
-            <div class="text-sm text-gray-500 dark:text-white/50">
-              <FormattedDate date={pubDate} />
-              {
-                updatedDate && (
-                  <div class="italic">
-                    {t("blog.lastUpdatedOn")}{" "}
-                    <FormattedDate date={updatedDate} />
+            
+            <div class="flex flex-wrap items-center justify-between gap-y-4 border-y border-black/5 py-4 dark:border-white/5 my-6 text-sm">
+              <!-- Left: Author and Date -->
+              <div class="flex items-center gap-3">
+                {
+                  authorEntries.length > 0 && (
+                    <div class="flex items-center -space-x-1.5">
+                      {authorEntries.map(
+                        (authorData) =>
+                          authorData && (
+                            <img
+                              src={authorData.data.avatar}
+                              width={40}
+                              height={40}
+                              alt={authorData.data.name[currentLang]}
+                              loading="lazy"
+                              class="aspect-square rounded-full object-cover border-2 border-white dark:border-black shadow-sm"
+                            />
+                          ),
+                      )}
+                    </div>
+                  )
+                }
+                <div class="flex flex-col gap-0.5">
+                  <div class="flex flex-wrap items-center gap-x-1 text-sm font-semibold text-gray-900 dark:text-gray-100">
+                    {
+                      authorEntries.map((authorData, index) => (
+                        authorData && (
+                          <>
+                            {index > 0 && <span class="text-gray-400 font-normal mx-0.5">&</span>}
+                            <a
+                              href={`/${currentLang}/authors/${authorData.id}`}
+                              class="hover:text-black dark:hover:text-white transition-colors"
+                            >
+                              {authorData.data.name[currentLang]}
+                            </a>
+                          </>
+                        )
+                      ))
+                    }
                   </div>
-                )
-              }
+                  <div class="text-xs text-gray-500 dark:text-gray-400">
+                    <FormattedDate date={pubDate} />
+                    {
+                      updatedDate && (
+                        <span class="ml-1.5 italic">
+                          ({t("blog.lastUpdatedOn")}{" "}
+                          <FormattedDate date={updatedDate} />)
+                        </span>
+                      )
+                    }
+                  </div>
+                </div>
+              </div>
+
+              <!-- Right: Actions -->
+              <div class="flex items-center gap-4">
+                <TTSPlayer client:only="react" isOpen={true} lang={currentLang} />
+              </div>
             </div>
           </div>
         </div>
         <div class="container">
           <div class="prose dark:prose-invert">
-            <TTSPlayer client:load isOpen={true} lang={currentLang} />
-            <hr />
             {
               otherLangPost && (
-                <div class="flex justify-center">
+                <div class="mb-6 flex justify-center">
                   <a
                     href={`/${otherLangPost.id.replace(/\.(md|mdx)$/, "")}`}
-                    class="text-sm text-gray-500"
+                    class="text-sm font-medium text-gray-500 hover:text-black dark:text-gray-400 dark:hover:text-white hover:underline transition-colors flex items-center gap-1.5"
                   >
-                    {t("blog.readIn").replace(
-                      "{lang}",
-                      otherLang === "en" ? "English" : "中文",
-                    )}
+                    <span>
+                      {t("blog.readIn").replace(
+                        "{lang}",
+                        otherLang === "en" ? "English" : "中文",
+                      )}
+                    </span>
+                    <span>→</span>
                   </a>
                 </div>
               )
