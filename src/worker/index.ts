@@ -44,9 +44,13 @@ export default {
             "https://gateway.ai.cloudflare.com/v1/3f1f83a939b2fc99ca45fd8987962514/blog/openrouter/v1",
         });
 
-        const systemPrompt = `你是立委葛如鈞（寶博士）部落格的 AI 助手。請幫我詳細閱讀這篇文章，並為我總結出 3-4 個關鍵的核心重點摘要。
-請直接以 ${lang === "zh" ? "繁體中文（台灣習慣用語）" : "English"} 列出重點，使用 Markdown 無序列表格式（如：- 重點一\n- 重點二...）。
-請保持語氣專業、清晰、好懂，每點控制在 40 字以內，不要有任何前言、結尾或導言，直接輸出摘要列表。`;
+        const systemPrompt = lang === "zh"
+          ? `你是立委葛如鈞（寶博士）部落格的 AI 助手。請幫我詳細閱讀這篇文章，並為我總結出 3-4 個關鍵的核心重點摘要。
+請直接以繁體中文（台灣習慣用語）列出重點，使用 Markdown 無序列表格式（如：- 重點一\n- 重點二...）。
+請保持語氣專業、清晰、好懂，每點控制在 40 字以內，不要有任何前言、結尾或導言，直接輸出摘要列表。`
+          : `You are the AI Assistant for Legislator Ju-Chun KO (Dr. dAAAb)'s blog. Please read this article carefully and summarize 3-4 key points for me.
+Please list the points directly in English using Markdown bullet list format (e.g., - Point 1\n- Point 2...).
+Keep the tone professional, clear, and easy to understand. Keep each point under 15 words. Do not include any introduction, foreword, or conclusion; output the list directly.`;
 
         const { text } = await generateText({
           model: openrouter.chat("@preset/website-chatbot"),
