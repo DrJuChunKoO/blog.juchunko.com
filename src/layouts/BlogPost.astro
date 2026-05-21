@@ -66,8 +66,7 @@ const navText = navLabels[currentLang];
 const backFallbackUrl = `/${currentLang}/`;
 
 // Detect math content to conditionally load KaTeX CSS
-const hasKatex =
-  post.body?.includes("$$") || post.body?.includes("\\[");
+const hasKatex = post.body?.includes("$$") || post.body?.includes("\\[");
 
 // JSON-LD structured data
 const siteUrl = Astro.site ? Astro.site.href.replace(/\/$/, "") : "";
@@ -90,16 +89,15 @@ const jsonLd = {
   description: description,
   datePublished: pubDate.toISOString(),
   dateModified: (updatedDate ?? pubDate).toISOString(),
-  author: authorEntries
-    .filter(Boolean)
-    .map((authorData) => ({
-      "@type": "Person",
-      name: authorData!.data.name[currentLang],
-      url: `${siteUrl}/${currentLang}/authors/${authorData!.id}`,
-    })),
+  author: authorEntries.filter(Boolean).map((authorData) => ({
+    "@type": "Person",
+    name: authorData!.data.name[currentLang],
+    url: `${siteUrl}/${currentLang}/authors/${authorData!.id}`,
+  })),
   publisher: {
     "@type": "Organization",
-    name: currentLang === "zh" ? "科技立委葛如鈞寶博士部落格" : "JU CHUN KO's Blog",
+    name:
+      currentLang === "zh" ? "科技立委葛如鈞寶博士部落格" : "JU CHUN KO's Blog",
     url: siteUrl,
     logo: {
       "@type": "ImageObject",
@@ -123,7 +121,8 @@ const jsonLd = {
   isPartOf: {
     "@type": "Blog",
     "@id": `${siteUrl}/${currentLang}/`,
-    name: currentLang === "zh" ? "科技立委葛如鈞寶博士部落格" : "JU CHUN KO's Blog",
+    name:
+      currentLang === "zh" ? "科技立委葛如鈞寶博士部落格" : "JU CHUN KO's Blog",
     url: `${siteUrl}/${currentLang}/`,
   },
 };
@@ -143,9 +142,15 @@ const jsonLd = {
       authors={authorEntries
         .filter((a) => a != null)
         .map((a) => a.data.name[currentLang])}
-      keywords={categoryEntries.filter(Boolean).map((cat) => cat!.data.name[currentLang])}
+      keywords={categoryEntries
+        .filter(Boolean)
+        .map((cat) => cat!.data.name[currentLang])}
     />
-    <script is:inline type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+    <script
+      is:inline
+      type="application/ld+json"
+      set:html={JSON.stringify(jsonLd)}
+    />
     {
       hasKatex && (
         <link
@@ -174,8 +179,11 @@ const jsonLd = {
           backLink.href = fromParam;
         } else {
           try {
-            const referrer = document.referrer ? new URL(document.referrer) : null;
-            const isSameOrigin = referrer && referrer.origin === window.location.origin;
+            const referrer = document.referrer
+              ? new URL(document.referrer)
+              : null;
+            const isSameOrigin =
+              referrer && referrer.origin === window.location.origin;
 
             if (isSameOrigin) {
               backLink.href = `${referrer.pathname}${referrer.search}${referrer.hash}`;
@@ -211,14 +219,22 @@ const jsonLd = {
         <div class="sr-only">
           <span data-pagefind-filter={`language:${currentLang}`}></span>
           {
-            authorEntries.filter(Boolean).map((authorData) => (
-              <span data-pagefind-filter={`author:${authorData!.data.name[currentLang]}`}></span>
-            ))
+            authorEntries
+              .filter(Boolean)
+              .map((authorData) => (
+                <span
+                  data-pagefind-filter={`author:${authorData!.data.name[currentLang]}`}
+                />
+              ))
           }
           {
-            categoryEntries.filter(Boolean).map((cat) => (
-              <span data-pagefind-filter={`category:${cat!.data.name[currentLang]}`}></span>
-            ))
+            categoryEntries
+              .filter(Boolean)
+              .map((cat) => (
+                <span
+                  data-pagefind-filter={`category:${cat!.data.name[currentLang]}`}
+                />
+              ))
           }
         </div>
         <div class="container mb-4">
@@ -238,9 +254,7 @@ const jsonLd = {
                   href={`/${nextPost.id.replace(/\.(md|mdx)$/, "")}`}
                   class="inline-flex max-w-[65%] items-center justify-end rounded-full border border-black/10 px-4 py-2 text-right text-sm font-medium text-gray-700 transition hover:bg-gray-100 dark:border-white/15 dark:text-white/80 dark:hover:bg-white/10"
                 >
-                  <span class="truncate">
-                    {navText.next} →
-                  </span>
+                  <span class="truncate">{navText.next} →</span>
                 </a>
               )
             }
@@ -284,8 +298,10 @@ const jsonLd = {
             >
               {title}
             </h1>
-            
-            <div class="flex flex-wrap items-center justify-between gap-y-4 border-y border-black/5 py-4 dark:border-white/5 my-6 text-sm">
+
+            <div
+              class="mb-6 flex flex-wrap items-center justify-between gap-y-4 border-y border-black/5 py-4 text-sm dark:border-white/5"
+            >
               <!-- Left: Author and Date -->
               <div class="flex items-center gap-3">
                 {
@@ -300,7 +316,7 @@ const jsonLd = {
                               height={40}
                               alt={authorData.data.name[currentLang]}
                               loading="lazy"
-                              class="aspect-square rounded-full object-cover border-2 border-white dark:border-black shadow-sm"
+                              class="aspect-square rounded-full border-2 border-white object-cover shadow-sm dark:border-black"
                             />
                           ),
                       )}
@@ -308,21 +324,28 @@ const jsonLd = {
                   )
                 }
                 <div class="flex flex-col gap-0.5">
-                  <div class="flex flex-wrap items-center gap-x-1 text-sm font-semibold text-gray-900 dark:text-gray-100">
+                  <div
+                    class="flex flex-wrap items-center gap-x-1 text-sm font-semibold text-gray-900 dark:text-gray-100"
+                  >
                     {
-                      authorEntries.map((authorData, index) => (
-                        authorData && (
-                          <>
-                            {index > 0 && <span class="text-gray-400 font-normal mx-0.5">&</span>}
-                            <a
-                              href={`/${currentLang}/authors/${authorData.id}`}
-                              class="hover:text-black dark:hover:text-white transition-colors"
-                            >
-                              {authorData.data.name[currentLang]}
-                            </a>
-                          </>
-                        )
-                      ))
+                      authorEntries.map(
+                        (authorData, index) =>
+                          authorData && (
+                            <>
+                              {index > 0 && (
+                                <span class="mx-0.5 font-normal text-gray-400">
+                                  &
+                                </span>
+                              )}
+                              <a
+                                href={`/${currentLang}/authors/${authorData.id}`}
+                                class="transition-colors hover:text-black dark:hover:text-white"
+                              >
+                                {authorData.data.name[currentLang]}
+                              </a>
+                            </>
+                          ),
+                      )
                     }
                   </div>
                   <div class="text-xs text-gray-500 dark:text-gray-400">
@@ -341,7 +364,11 @@ const jsonLd = {
 
               <!-- Right: Actions -->
               <div class="flex items-center gap-4">
-                <TTSPlayer client:only="react" isOpen={true} lang={currentLang} />
+                <TTSPlayer
+                  client:only="react"
+                  isOpen={true}
+                  lang={currentLang}
+                />
               </div>
             </div>
           </div>
@@ -353,7 +380,7 @@ const jsonLd = {
                 <div class="mb-6 flex justify-center">
                   <a
                     href={`/${otherLangPost.id.replace(/\.(md|mdx)$/, "")}`}
-                    class="text-sm font-medium text-gray-500 hover:text-black dark:text-gray-400 dark:hover:text-white hover:underline transition-colors flex items-center gap-1.5"
+                    class="flex items-center gap-1.5 text-sm font-medium text-gray-500 transition-colors hover:text-black hover:underline dark:text-gray-400 dark:hover:text-white"
                   >
                     <span>
                       {t("blog.readIn").replace(
@@ -367,7 +394,11 @@ const jsonLd = {
               )
             }
             <div data-pagefind-body>
-              <span class="sr-only" data-pagefind-title data-pagefind-weight="5">
+              <span
+                class="sr-only"
+                data-pagefind-title
+                data-pagefind-weight="5"
+              >
                 {title}
               </span>
               <slot />
