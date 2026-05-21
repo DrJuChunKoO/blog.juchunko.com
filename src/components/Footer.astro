@@ -116,7 +116,7 @@ const t = useTranslations(lang);
       ></a
     >
   </div>
-  {t("footer.copyright")}
+  {t("footer.copyright").replace("{year}", new Date().getFullYear().toString())}
 </footer>
 <style>
   footer {
