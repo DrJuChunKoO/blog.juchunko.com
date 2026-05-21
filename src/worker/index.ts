@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { createOpenRouter } from "@openrouter/ai-sdk-provider";
-import { streamText, tool, smoothStream, convertToModelMessages } from "ai";
+import { streamText, tool, smoothStream, convertToModelMessages, generateText } from "ai";
 import z from "zod";
 import type { ExportedHandler, Fetcher } from "@cloudflare/workers-types";
 
@@ -13,10 +13,65 @@ interface Env {
 }
 
 export default {
-  async fetch(request: Request, env: Env): Promise<Response> {
+  async fetch(request: Request, env: Env, ctx: any): Promise<Response> {
     const url = new URL(request.url);
 
     // API 端點 -------------------------------------------------------------
+    if (request.method === "GET" && url.pathname === "/api/summary") {
+      const filename = url.searchParams.get("filename") || "/";
+      const lang = url.searchParams.get("lang") || "zh";
+
+      const cacheUrl = new URL(request.url);
+      const cacheKey = new Request(cacheUrl.toString(), request);
+      const cache = caches.default;
+      let cachedResponse = await cache.match(cacheKey);
+      if (cachedResponse) {
+        return cachedResponse;
+      }
+
+      try {
+        const cleanPath = filename.replace(/^\//, "").replace(/\/$/, "");
+        const fileUrl = `https://github.com/DrJuChunKoO/blog.juchunko.com/raw/refs/heads/main/src/content/blog/${cleanPath}.mdx`;
+        const fileResponse = await fetch(fileUrl);
+        if (!fileResponse.ok) {
+          return new Response("Post content not found on GitHub", { status: 404 });
+        }
+        const fileContent = await fileResponse.text();
+
+        const openrouter = createOpenRouter({
+          apiKey: env.OPENROUTER_API_KEY,
+          baseURL:
+            "https://gateway.ai.cloudflare.com/v1/3f1f83a939b2fc99ca45fd8987962514/blog/openrouter/v1",
+        });
+
+        const systemPrompt = `你是立委葛如鈞（寶博士）部落格的 AI 助手。請幫我詳細閱讀這篇文章，並為我總結出 3-4 個關鍵的核心重點摘要。
+請直接以 ${lang === "zh" ? "繁體中文（台灣習慣用語）" : "English"} 列出重點，使用 Markdown 無序列表格式（如：- 重點一\n- 重點二...）。
+請保持語氣專業、清晰、好懂，每點控制在 40 字以內，不要有任何前言、結尾或導言，直接輸出摘要列表。`;
+
+        const { text } = await generateText({
+          model: openrouter.chat("@preset/website-chatbot"),
+          system: systemPrompt,
+          prompt: fileContent,
+        });
+
+        const response = new Response(JSON.stringify({ summary: text }), {
+          headers: {
+            "Content-Type": "application/json",
+            "Cache-Control": "public, max-age=86400", // cache for 1 day
+            "Access-Control-Allow-Origin": "*",
+          },
+        });
+
+        ctx.waitUntil(cache.put(cacheKey, response.clone()));
+        return response;
+      } catch (error) {
+        return new Response(JSON.stringify({ error: error.message }), {
+          status: 500,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
+    }
+
     if (request.method === "POST" && url.pathname === "/api/chat") {
       // --------------------------------------------------------------
       // 初始化 OpenRouter provider
