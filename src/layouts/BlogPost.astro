@@ -8,6 +8,7 @@ import FormattedDate from "../components/FormattedDate.astro";
 import { useTranslations, getLangFromUrl } from "../i18n/utils";
 import ChatBot from "../components/ChatBot";
 import TTSPlayer from "../components/agent/TTSPlayer";
+import KeySummary from "../components/agent/KeySummary";
 
 type Props = { post: CollectionEntry<"blog"> };
 
@@ -393,6 +394,7 @@ const jsonLd = {
                 </div>
               )
             }
+            <KeySummary client:only="react" lang={currentLang} />
             <div data-pagefind-body>
               <span
                 class="sr-only"
