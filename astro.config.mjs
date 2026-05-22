@@ -24,18 +24,7 @@ export default defineConfig({
     }),
     partytown({ config: { forward: ["dataLayer.push"] } }),
     compress({
-      Image: {
-        sharp: {
-          webp: {
-            quality: 90,
-            effort: 6,
-          },
-          avif: {
-            quality: 80,
-            effort: 6,
-          },
-        },
-      },
+      Image: false,
     }),
   ],
   vite: {
