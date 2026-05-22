@@ -15,6 +15,11 @@ import compress from "@playform/compress";
 // https://astro.build/config
 export default defineConfig({
   site: "https://blog.juchunko.com",
+  image: {
+    service: {
+      entrypoint: "astro/assets/services/sharp",
+    },
+  },
   integrations: [
     mdx(),
     sitemap(),
