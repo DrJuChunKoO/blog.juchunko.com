@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { motion } from "motion/react";
-import { MessageSquare } from "lucide-react";
+import { Bot, Astroid } from "lucide-react";
 import Markdown from "markdown-to-jsx";
 
 type SupportedLang = "en" | "zh";
@@ -20,7 +20,7 @@ export default function KeySummary({ lang = "zh" }: KeySummaryProps) {
       try {
         const path = window.location.pathname;
         const response = await fetch(
-          `/api/summary?filename=${encodeURIComponent(path)}&lang=${lang}`
+          `/api/summary?filename=${encodeURIComponent(path)}&lang=${lang}`,
         );
         if (!response.ok) {
           throw new Error("Failed to fetch summary");
@@ -46,14 +46,15 @@ export default function KeySummary({ lang = "zh" }: KeySummaryProps) {
   }, [lang]);
 
   const handleDiscussClick = () => {
-    const prompt = lang === "zh"
-      ? "我對這篇「重點摘要」很有興趣，想跟您進一步討論這篇文章的細節！"
-      : "I am interested in the key summary. I'd like to discuss the details of this article with you!";
-    
+    const prompt =
+      lang === "zh"
+        ? "我對這篇「重點摘要」很有興趣，想跟您進一步討論這篇文章的細節！"
+        : "I am interested in the key summary. I'd like to discuss the details of this article with you!";
+
     window.dispatchEvent(
       new CustomEvent("open-chatbot", {
         detail: { prompt },
-      })
+      }),
     );
   };
 
@@ -62,68 +63,72 @@ export default function KeySummary({ lang = "zh" }: KeySummaryProps) {
   }
 
   return (
-    <div className="tts-ignore mb-8 rounded-2xl border border-black/10 bg-gray-50/30 p-5 text-gray-900 transition-all duration-300 dark:border-white/10 dark:bg-zinc-900/20 dark:text-gray-100">
-      <div className="flex items-center gap-2 mb-4">
-        <span className="text-sm font-bold tracking-wider text-gray-800 uppercase dark:text-gray-200">
+    <div className="tts-ignore not-prose mb-8 rounded-2xl border border-black/10 bg-gray-50/30 text-gray-900 transition-all duration-300 dark:border-white/10 dark:bg-zinc-900/20 dark:text-gray-100">
+      <div className="flex items-center justify-between gap-2 p-4">
+        <span className="text-base leading-none font-semibold tracking-wider text-gray-800 uppercase dark:text-gray-200">
           {lang === "zh" ? "重點摘要" : "Key Summary"}
         </span>
+        <Astroid className="size-4 text-gray-400 dark:text-gray-500" />
       </div>
 
       {loading ? (
-        <div className="space-y-3 py-1">
-          <div className="h-3.5 bg-black/5 dark:bg-white/5 rounded-full w-11/12 animate-pulse" />
-          <div className="h-3.5 bg-black/5 dark:bg-white/5 rounded-full w-5/6 animate-pulse" />
-          <div className="h-3.5 bg-black/5 dark:bg-white/5 rounded-full w-10/12 animate-pulse" />
+        <div className="space-y-3 p-4 pt-0">
+          <div className="h-3.5 w-11/12 animate-pulse rounded-full bg-black/5 dark:bg-white/5" />
+          <div className="h-3.5 w-5/6 animate-pulse rounded-full bg-black/5 dark:bg-white/5" />
+          <div className="h-3.5 w-10/12 animate-pulse rounded-full bg-black/5 dark:bg-white/5" />
         </div>
       ) : (
-        <div className="space-y-4">
-          <Markdown
-            options={{
-              overrides: {
-                li: {
-                  component: ({ children }) => (
-                    <li className="flex items-start gap-2.5">
-                      <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-gray-400 dark:bg-gray-500" />
-                      <span className="min-w-0">{children}</span>
-                    </li>
-                  ),
+        <div>
+          <div className="p-4 pt-0">
+            <Markdown
+              options={{
+                overrides: {
+                  li: {
+                    component: ({ children }) => (
+                      <li className="flex items-start gap-2.5">
+                        <span className="mt-2 size-1.5 shrink-0 rounded-full bg-gray-400 dark:bg-gray-500" />
+                        <span className="min-w-0">{children}</span>
+                      </li>
+                    ),
+                  },
+                  ul: {
+                    component: ({ children }) => (
+                      <ul className="space-y-2.5 text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+                        {children}
+                      </ul>
+                    ),
+                  },
+                  strong: {
+                    component: ({ children }) => (
+                      <strong className="font-semibold text-gray-900 dark:text-gray-50">
+                        {children}
+                      </strong>
+                    ),
+                  },
+                  code: {
+                    component: ({ children }) => (
+                      <code className="rounded bg-black/5 px-1.5 py-0.5 font-mono text-xs font-semibold text-gray-900 dark:bg-white/10 dark:text-gray-100">
+                        {children}
+                      </code>
+                    ),
+                  },
                 },
-                ul: {
-                  component: ({ children }) => (
-                    <ul className="space-y-2.5 text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
-                      {children}
-                    </ul>
-                  ),
-                },
-                strong: {
-                  component: ({ children }) => (
-                    <strong className="font-bold text-gray-900 dark:text-gray-50">
-                      {children}
-                    </strong>
-                  ),
-                },
-                code: {
-                  component: ({ children }) => (
-                    <code className="px-1.5 py-0.5 rounded bg-black/5 dark:bg-white/10 font-mono text-xs text-gray-900 dark:text-gray-100 font-semibold">
-                      {children}
-                    </code>
-                  ),
-                }
-              }
-            }}
-          >
-            {summary}
-          </Markdown>
-
-          <div className="flex justify-end pt-2 border-t border-black/5 dark:border-white/5">
+              }}
+            >
+              {summary}
+            </Markdown>
+          </div>
+          <div className="flex justify-end border-t border-black/5 p-4 dark:border-white/5">
             <motion.button
               whileTap={{ scale: 0.95 }}
               whileHover={{ scale: 1.01 }}
               onClick={handleDiscussClick}
-              className="flex items-center gap-2 rounded-full border border-black/10 bg-white px-4 py-2 text-xs font-semibold text-gray-800 shadow-sm transition-all hover:border-black/20 hover:bg-gray-50 dark:border-white/15 dark:bg-zinc-950 dark:text-gray-200 dark:hover:border-white/25 dark:hover:bg-white/5 cursor-pointer"
+              className="flex cursor-pointer items-center gap-1.5 rounded-full border border-black/10 bg-white px-4 py-2 text-xs font-semibold text-gray-800 shadow-sm transition-all hover:border-black/20 hover:bg-gray-50 dark:border-white/15 dark:bg-zinc-950 dark:text-gray-200 dark:hover:border-white/25 dark:hover:bg-white/5"
             >
-              <MessageSquare className="size-3.5" />
-              <span>{lang === "zh" ? "與 AI 繼續討論" : "Discuss with AI"}</span>
+              <Bot className="size-4" />
+              <span>
+                {lang === "zh" ? "與 AI 繼續討論" : "Discuss with AI"}
+              </span>
             </motion.button>
           </div>
         </div>
