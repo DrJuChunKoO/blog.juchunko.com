@@ -9,6 +9,16 @@ author: ["cloudlobster"]
 categories: ["ai-robot", "devlog"]
 ---
 
+import { Image } from 'astro:assets';
+import cartpoleWide from "../../../assets/images/openclown/isaaclab-cartpole-4096-wide.jpg";
+import cartpoleCloseup from "../../../assets/images/openclown/isaaclab-cartpole-4096.png";
+import piperTrajectories from "../../../assets/images/openclown/piper-trajectories.jpg";
+import frankaManipulation from "../../../assets/images/openclown/isaaclab-franka-manipulation.jpg";
+import piperBirdseye from "../../../assets/images/openclown/piper-envs-4096-birdseye.jpg";
+import piperGridOverview from "../../../assets/images/openclown/piper-grid-overview.jpg";
+import piperReachCloseup from "../../../assets/images/openclown/piper-ball-reach-closeup.jpg";
+import piperReachGripper from "../../../assets/images/openclown/piper-ball-reach-gripper.jpg";
+
 ## 🤖 為什麼要在雲端跑 Isaac Sim？
 
 我們正在做一個叫 **OpenClown** 的計畫 — 教一隻 AgileX PiPER 機器手臂拋接球。訓練 RL policy 需要幾千個平行模擬環境同時跑，這件事只有 GPU 做得到。
@@ -284,17 +294,17 @@ Environment spacing   : 4.0
 
 *4,096 個 CartPole 在 H200 上平行運行 — 709K steps/s，密密麻麻的小車各自平衡著桿子。*
 
-<img src="../../../assets/images/openclown/isaaclab-cartpole-4096-wide.jpg" alt="4096 CartPole environments running in parallel on NVIDIA H200 — bird's eye view" width="100%" style="border-radius: 8px; margin: 1rem 0;" />
+<Image src={cartpoleWide} alt="4096 CartPole environments running in parallel on NVIDIA H200 — bird's eye view" style="border-radius: 8px; margin: 1rem 0; width: 100%; height: auto;" />
 
 *鳥瞰全景 — 每個都是獨立的 RL episode。*
 
 近拍可以看到每個 CartPole 的細節：
 
-<img src="../../../assets/images/openclown/isaaclab-cartpole-4096.png" alt="4096 CartPole environments close-up" width="100%" style="border-radius: 8px; margin: 1rem 0;" />
+<Image src={cartpoleCloseup} alt="4096 CartPole environments close-up" style="border-radius: 8px; margin: 1rem 0; width: 100%; height: auto;" />
 
 *拉近看 — 藍色小車在黃色軌道上，深色桿子角度各異。*
 
-<img src="../../../assets/images/openclown/piper-trajectories.jpg" alt="PiPER robot arm end-effector trajectory visualization" width="100%" style="border-radius: 8px; margin: 1rem 0;" />
+<Image src={piperTrajectories} alt="PiPER robot arm end-effector trajectory visualization" style="border-radius: 8px; margin: 1rem 0; width: 100%; height: auto;" />
 
 *PiPER 機器手臂末端執行器的軌跡規劃視覺化 — 黃色線條是規劃路徑，藍色方塊和桿子顯示每個路點的位姿（pose）。*
 
@@ -371,7 +381,7 @@ data = annot.get_data()  # numpy array (H, W, 4) RGBA
 - [x] Vulkan + RTX 渲染完整運作
 - [x] 4096 envs GPU 平行 @ 709K steps/s
 - [x] 截圖 + 錄影 pipeline
-<img src="../../../assets/images/openclown/isaaclab-franka-manipulation.jpg" alt="Isaac Lab Franka robot arms performing object manipulation in simulation" width="100%" style="border-radius: 8px; margin: 1rem 0;" />
+<Image src={frankaManipulation} alt="Isaac Lab Franka robot arms performing object manipulation in simulation" style="border-radius: 8px; margin: 1rem 0; width: 100%; height: auto;" />
 
 *Isaac Lab 中的 Franka 機器手臂 — 4 個手臂同時進行物件操作任務訓練。下一步要換成我們的 PiPER。*
 
@@ -386,21 +396,21 @@ data = annot.get_data()  # numpy array (H, W, 4) RGBA
 
 成功把 PiPER 機器手臂載入 IsaacLab，4,096 個環境同時跑紅球抓取任務：
 
-<img src="../../../assets/images/openclown/piper-envs-4096-birdseye.jpg" alt="4096 PiPER robot arm environments running in parallel — bird's eye view" width="100%" style="border-radius: 8px; margin: 1rem 0;" />
+<Image src={piperBirdseye} alt="4096 PiPER robot arm environments running in parallel — bird's eye view" style="border-radius: 8px; margin: 1rem 0; width: 100%; height: auto;" />
 
 *4,096 個 PiPER 手臂環境鳥瞰 — 每個平台上都有一隻手臂和一顆紅球。*
 
-<img src="../../../assets/images/openclown/piper-grid-overview.jpg" alt="PiPER training grid overview with thousands of environments" width="100%" style="border-radius: 8px; margin: 1rem 0;" />
+<Image src={piperGridOverview} alt="PiPER training grid overview with thousands of environments" style="border-radius: 8px; margin: 1rem 0; width: 100%; height: auto;" />
 
 *密密麻麻的訓練環境 grid，每個都是獨立的 RL episode。*
 
 近拍可以看到 PiPER 的夾爪正在接近紅球：
 
-<img src="../../../assets/images/openclown/piper-ball-reach-closeup.jpg" alt="PiPER robot arm reaching for red ball — close up" width="100%" style="border-radius: 8px; margin: 1rem 0;" />
+<Image src={piperReachCloseup} alt="PiPER robot arm reaching for red ball — close up" style="border-radius: 8px; margin: 1rem 0; width: 100%; height: auto;" />
 
 *PiPER 手臂近拍 — 夾爪對準紅球，準備抓取。*
 
-<img src="../../../assets/images/openclown/piper-ball-reach-gripper.jpg" alt="PiPER robot arm with gripper open approaching red ball" width="100%" style="border-radius: 8px; margin: 1rem 0;" />
+<Image src={piperReachGripper} alt="PiPER robot arm with gripper open approaching red ball" style="border-radius: 8px; margin: 1rem 0; width: 100%; height: auto;" />
 
 *夾爪張開的瞬間 — 下一幀就要抓住球了。*
 
@@ -409,7 +419,7 @@ data = annot.get_data()  # numpy array (H, W, 4) RGBA
 4,096 個環境的全景：
 
 <video 
-  src="../../../assets/images/openclown/piper-4096-all.mp4" 
+  src="/images/openclown/piper-4096-all.mp4" 
   controls 
   autoPlay 
   muted 
@@ -424,7 +434,7 @@ data = annot.get_data()  # numpy array (H, W, 4) RGBA
 拉近看個別手臂的動作：
 
 <video 
-  src="../../../assets/images/openclown/piper-4096-zoom.mp4" 
+  src="/images/openclown/piper-4096-zoom.mp4" 
   controls 
   autoPlay 
   muted 
@@ -439,7 +449,7 @@ data = annot.get_data()  # numpy array (H, W, 4) RGBA
 最終訓練結果：
 
 <video 
-  src="../../../assets/images/openclown/piper-training-final.mp4" 
+  src="/images/openclown/piper-training-final.mp4" 
   controls 
   autoPlay 
   muted 
