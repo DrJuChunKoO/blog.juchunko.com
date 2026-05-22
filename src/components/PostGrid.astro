@@ -27,6 +27,8 @@ const { posts, currentLang, featuredCount = 0 } = Astro.props;
             <Image
               width={720}
               height={360}
+              densities={[1, 2]}
+              quality="high"
               src={post.data.heroImage}
               alt={post.data.heroImageAlt ?? ""}
               class="aspect-video w-full rounded-lg object-cover transition-transform"
