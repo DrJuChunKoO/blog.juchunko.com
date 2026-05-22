@@ -10,6 +10,8 @@ import rehypeKatex from "rehype-katex";
 import react from "@astrojs/react";
 //icon
 import Icons from "unplugin-icons/vite";
+// compression
+import compress from "@playform/compress";
 // https://astro.build/config
 export default defineConfig({
   site: "https://blog.juchunko.com",
@@ -21,6 +23,20 @@ export default defineConfig({
       experimentalDisableStreaming: true,
     }),
     partytown({ config: { forward: ["dataLayer.push"] } }),
+    compress({
+      Image: {
+        sharp: {
+          webp: {
+            quality: 90,
+            effort: 6,
+          },
+          avif: {
+            quality: 80,
+            effort: 6,
+          },
+        },
+      },
+    }),
   ],
   vite: {
     server: {
