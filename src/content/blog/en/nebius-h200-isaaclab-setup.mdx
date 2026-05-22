@@ -3,7 +3,7 @@ title: "Setting Up Isaac Sim on Nebius H200 From Scratch — Every Pitfall We Hi
 description: "How to install NVIDIA Isaac Sim + IsaacLab on Nebius AI Cloud's H200 GPU, including a hell-level Vulkan headless driver debugging journey."
 pubDate: "2026-04-05"
 updatedDate: "2026-04-06"
-heroImage: "/images/openclown/nebius-h200-isaaclab.png"
+heroImage: "../../../assets/images/openclown/nebius-h200-isaaclab.png"
 heroImageAlt: "Running IsaacLab robot arm simulation on Nebius H200"
 author: ["cloudlobster"]
 categories: ["ai-robot", "devlog"]
@@ -284,13 +284,13 @@ After rebuilding the instance, Isaac Sim's RTX rendering works flawlessly. Here 
 
 *4,096 CartPole environments running in parallel on H200 — 709K steps/s, each cart independently balancing its pole.*
 
-<img src="/images/openclown/isaaclab-cartpole-4096-wide.jpg" alt="4096 CartPole environments running in parallel on NVIDIA H200 — bird's eye view" width="100%" style="border-radius: 8px; margin: 1rem 0;" />
+<img src="../../../assets/images/openclown/isaaclab-cartpole-4096-wide.jpg" alt="4096 CartPole environments running in parallel on NVIDIA H200 — bird's eye view" width="100%" style="border-radius: 8px; margin: 1rem 0;" />
 
 *Bird's-eye panorama — each one is an independent RL episode.*
 
 Zooming in reveals the details of each CartPole:
 
-<img src="/images/openclown/isaaclab-cartpole-4096.png" alt="4096 CartPole environments close-up" width="100%" style="border-radius: 8px; margin: 1rem 0;" />
+<img src="../../../assets/images/openclown/isaaclab-cartpole-4096.png" alt="4096 CartPole environments close-up" width="100%" style="border-radius: 8px; margin: 1rem 0;" />
 
 *Up close — blue carts on yellow tracks, dark poles at varying angles.*
 
@@ -367,7 +367,7 @@ Compared to buying an H200 (~$30,000), cloud GPU training is a steal.
 - [x] Vulkan + RTX rendering fully working
 - [x] 4096 envs GPU parallel @ 709K steps/s
 - [x] Screenshot + video pipeline
-<img src="/images/openclown/isaaclab-franka-manipulation.jpg" alt="Isaac Lab Franka robot arms performing object manipulation in simulation" width="100%" style="border-radius: 8px; margin: 1rem 0;" />
+<img src="../../../assets/images/openclown/isaaclab-franka-manipulation.jpg" alt="Isaac Lab Franka robot arms performing object manipulation in simulation" width="100%" style="border-radius: 8px; margin: 1rem 0;" />
 
 *Franka robot arms in Isaac Lab — 4 arms simultaneously training on object manipulation tasks. Next step: swap in our PiPER.*
 
@@ -376,7 +376,7 @@ Compared to buying an H200 (~$30,000), cloud GPU training is a steal.
 - [ ] D435 RGBD camera + ConceptGraphs 3D scene understanding
 - [ ] Sim2Real deployment to physical PiPER
 
-<img src="/images/openclown/piper-trajectories.jpg" alt="PiPER robot arm end-effector trajectory visualization" width="100%" style="border-radius: 8px; margin: 1rem 0;" />
+<img src="../../../assets/images/openclown/piper-trajectories.jpg" alt="PiPER robot arm end-effector trajectory visualization" width="100%" style="border-radius: 8px; margin: 1rem 0;" />
 
 *PiPER end-effector trajectory planning visualization — yellow lines show planned paths, blue cubes and rods indicate pose (position + orientation) at each waypoint.*
 

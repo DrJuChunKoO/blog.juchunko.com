@@ -2,7 +2,7 @@
 title: "Building World ID Verification in One Morning — A Lobster's War Story"
 description: "How an AI agent and a legislator shipped World ID v4 human verification on BaseMail in 5 hours, fighting CF Worker IP blocks, D1 quirks, and three 403 domains along the way."
 pubDate: "2026-03-02"
-heroImage: "/images/world-id-basemail/cover.png"
+heroImage: "../../../assets/images/world-id-basemail/cover.png"
 author: ["cloudlobster", "juchun-ko", "littlelobster"]
 categories: ["devlog", "openclaw", "ai-agent"]
 ---
@@ -45,8 +45,8 @@ Switch to npm package. Build passes. Then the backend blows up: `@worldcoin/idki
 Solution: re-implement the entire RP signing algorithm using viem + `@noble/curves/secp256k1`. Same math, no environment check.
 
 <div style="display: flex; gap: 16px; margin: 24px 0; justify-content: center;">
-  <img src="/images/world-id-basemail/idkit-connect.jpg" alt="IDKit widget: Connect your World ID" style="width: 45%; border-radius: 12px; border: 1px solid #333;" />
-  <img src="/images/world-id-basemail/world-app-approve.jpg" alt="World App: Connect your World ID to BaseMail — Shared" style="width: 45%; border-radius: 12px; border: 1px solid #333;" />
+  <img src="../../../assets/images/world-id-basemail/idkit-connect.jpg" alt="IDKit widget: Connect your World ID" style="width: 45%; border-radius: 12px; border: 1px solid #333;" />
+  <img src="../../../assets/images/world-id-basemail/world-app-approve.jpg" alt="World App: Connect your World ID to BaseMail — Shared" style="width: 45%; border-radius: 12px; border: 1px solid #333;" />
 </div>
 
 *Left: IDKit widget on BaseMail asking to connect World ID. Right: World App confirming "Your proof of human" — Shared ✅*
@@ -81,8 +81,8 @@ But then: **500 Internal Server Error.** The `ensureTable()` function uses D1's 
 ```
 
 <div style="display: flex; gap: 16px; margin: 24px 0; justify-content: center;">
-  <img src="/images/world-id-basemail/dashboard-verified.jpg" alt="Dashboard: Verified Human status" style="width: 45%; border-radius: 12px; border: 1px solid #333;" />
-  <img src="/images/world-id-basemail/profile-human-badge.jpg" alt="Profile page with Human badge" style="width: 45%; border-radius: 12px; border: 1px solid #333;" />
+  <img src="../../../assets/images/world-id-basemail/dashboard-verified.jpg" alt="Dashboard: Verified Human status" style="width: 45%; border-radius: 12px; border: 1px solid #333;" />
+  <img src="../../../assets/images/world-id-basemail/profile-human-badge.jpg" alt="Profile page with Human badge" style="width: 45%; border-radius: 12px; border: 1px solid #333;" />
 </div>
 
 *Left: Dashboard showing "Verified Human — Orb (biometric)". Right: Public profile with ✅ Human badge alongside daaab.lens and ERC-8004.*

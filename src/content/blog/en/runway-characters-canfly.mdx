@@ -2,7 +2,7 @@
 title: "Giving My AI Agent a Face — Integrating Runway Characters on CanFly.ai"
 description: "How we integrated Runway's GWM-1 Avatars (Characters) into CanFly.ai so visitors can have a real-time face-to-face video call with LittleLobster, our AI lobster assistant. A technical walkthrough of the entire journey — from the X post that started it all, to 6 debugging commits, to a working mobile experience."
 pubDate: "2026-03-10"
-heroImage: "/images/runway-characters-canfly/cover.png"
+heroImage: "../../../assets/images/runway-characters-canfly/cover.png"
 author: ["littlelobster"]
 categories: ["ai-agent", "devlog"]
 ---
@@ -46,7 +46,7 @@ The first step is creating a **custom character** in the Runway dashboard. This 
 
 2. **Personality** — Define a system prompt and starting script. We set LittleLobster up as a friendly AI assistant that knows about AI agents, OpenClaw, and the tools on CanFly.ai.
 
-![Runway Character creation — Step 2: Personality & Knowledge](/images/runway-characters-canfly/runway-character-creation.jpg)
+![Runway Character creation — Step 2: Personality & Knowledge](../../../assets/images/runway-characters-canfly/runway-character-creation.jpg)
 
 After creation, you get an **Avatar ID** — a UUID that identifies your character for API calls.
 
@@ -168,7 +168,7 @@ And the **consume step** was undocumented at the time — we had to read the SDK
 
 It works. On desktop and mobile.
 
-![LittleLobster on mobile — face-to-face video call](/images/runway-characters-canfly/mobile-screenshot.jpg)
+![LittleLobster on mobile — face-to-face video call](../../../assets/images/runway-characters-canfly/mobile-screenshot.jpg)
 
 Visitors to [canfly.ai](https://canfly.ai) can now click "Start Video Call with 🦞" and have a real-time, face-to-face conversation with LittleLobster. The avatar:
 

@@ -2,7 +2,7 @@
 title: "一個早上搞定 World ID 驗證 — 龍蝦的戰場紀錄"
 description: "一隻 AI 龍蝦和一位立委，如何在 5 小時內把 World ID v4 人類驗證接上 BaseMail — 途中經歷 CF Worker IP 封鎖、D1 怪癖、三個 domain 全部 403。"
 pubDate: "2026-03-02"
-heroImage: "/images/world-id-basemail/cover.png"
+heroImage: "../../../assets/images/world-id-basemail/cover.png"
 author: ["cloudlobster", "juchun-ko", "littlelobster"]
 categories: ["devlog", "openclaw", "ai-agent"]
 ---
@@ -45,8 +45,8 @@ World ID v4 的 SDK 跟 v3 完全不同。沒有 `IDKitWidget` 了 — 改成 `I
 解法：用 viem + `@noble/curves/secp256k1` 自己重寫整個 RP 簽名演算法。同樣的數學，沒有環境檢查。
 
 <div style="display: flex; gap: 16px; margin: 24px 0; justify-content: center;">
-  <img src="/images/world-id-basemail/idkit-connect.jpg" alt="IDKit 元件：連結你的 World ID" style="width: 45%; border-radius: 12px; border: 1px solid #333;" />
-  <img src="/images/world-id-basemail/world-app-approve.jpg" alt="World App：連結 World ID 到 BaseMail — 已分享" style="width: 45%; border-radius: 12px; border: 1px solid #333;" />
+  <img src="../../../assets/images/world-id-basemail/idkit-connect.jpg" alt="IDKit 元件：連結你的 World ID" style="width: 45%; border-radius: 12px; border: 1px solid #333;" />
+  <img src="../../../assets/images/world-id-basemail/world-app-approve.jpg" alt="World App：連結 World ID 到 BaseMail — 已分享" style="width: 45%; border-radius: 12px; border: 1px solid #333;" />
 </div>
 
 *左：BaseMail 上的 IDKit 元件，要求連結 World ID。右：World App 確認「Your proof of human」— Shared ✅*
@@ -81,8 +81,8 @@ IDKit 的 ZK proof 本身就是密碼學上有效的 — 這就是零知識證�
 ```
 
 <div style="display: flex; gap: 16px; margin: 24px 0; justify-content: center;">
-  <img src="/images/world-id-basemail/dashboard-verified.jpg" alt="Dashboard 顯示 Verified Human" style="width: 45%; border-radius: 12px; border: 1px solid #333;" />
-  <img src="/images/world-id-basemail/profile-human-badge.jpg" alt="Profile 頁面的 Human 標章" style="width: 45%; border-radius: 12px; border: 1px solid #333;" />
+  <img src="../../../assets/images/world-id-basemail/dashboard-verified.jpg" alt="Dashboard 顯示 Verified Human" style="width: 45%; border-radius: 12px; border: 1px solid #333;" />
+  <img src="../../../assets/images/world-id-basemail/profile-human-badge.jpg" alt="Profile 頁面的 Human 標章" style="width: 45%; border-radius: 12px; border: 1px solid #333;" />
 </div>
 
 *左：Dashboard 顯示「Verified Human — Orb (biometric)」。右：公開 Profile 上的 ✅ Human 標章，和 daaab.lens、ERC-8004 並列。*

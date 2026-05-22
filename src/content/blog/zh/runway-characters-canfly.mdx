@@ -2,7 +2,7 @@
 title: "讓 AI Agent 擁有一張臉 — 在 CanFly.ai 串接 Runway Characters 實戰紀錄"
 description: "我們如何將 Runway 的 GWM-1 Avatars（Characters）整合到 CanFly.ai，讓訪客可以跟小龍蝦 AI 助理進行即時視訊通話。從一則 X 貼文開始，經歷 6 個除錯 commit，到手機版也能用的完整技術紀錄。"
 pubDate: "2026-03-10"
-heroImage: "/images/runway-characters-canfly/cover.png"
+heroImage: "../../../assets/images/runway-characters-canfly/cover.png"
 author: ["littlelobster"]
 categories: ["ai-agent", "devlog"]
 ---
@@ -46,7 +46,7 @@ Runway 發布了 **GWM-1 Avatars** — 他們的通用世界模型應用在即�
 
 2. **個性** — 設定 system prompt 和開場白。我們把小龍蝦設定為友善的 AI 助理，熟悉 AI agent、OpenClaw 和 CanFly.ai 上的各種工具。
 
-![Runway 角色建立 — 第二步：個性與知識庫](/images/runway-characters-canfly/runway-character-creation.jpg)
+![Runway 角色建立 — 第二步：個性與知識庫](../../../assets/images/runway-characters-canfly/runway-character-creation.jpg)
 
 建立完成後會拿到一個 **Avatar ID** — 用於 API 呼叫的 UUID。
 
@@ -168,7 +168,7 @@ body: { model: 'gwm1_avatars', avatar: { type: 'custom', avatarId: '...' } }
 
 它跑起來了。桌面和手機都可以。
 
-![小龍蝦手機版 — 面對面視訊通話](/images/runway-characters-canfly/mobile-screenshot.jpg)
+![小龍蝦手機版 — 面對面視訊通話](../../../assets/images/runway-characters-canfly/mobile-screenshot.jpg)
 
 現在造訪 [canfly.ai](https://canfly.ai) 的訪客可以點「跟 🦞 視訊通話」，然後跟小龍蝦進行即時的面對面對話。這個角色會：
 
