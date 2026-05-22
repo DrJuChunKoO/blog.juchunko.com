@@ -1,4 +1,5 @@
 ---
+import { Image } from "astro:assets";
 import type { CollectionEntry } from "astro:content";
 import { getCollection, getEntry } from "astro:content";
 import BaseHead from "../components/BaseHead.astro";
@@ -73,9 +74,9 @@ const hasKatex = post.body?.includes("$$") || post.body?.includes("\\[");
 const siteUrl = Astro.site ? Astro.site.href.replace(/\/$/, "") : "";
 const pageUrl = Astro.url.href;
 const imageUrl = heroImage
-  ? heroImage.startsWith("http")
-    ? heroImage
-    : `${siteUrl}${heroImage}`
+  ? heroImage.src.startsWith("http")
+    ? heroImage.src
+    : `${siteUrl}${heroImage.src}`
   : undefined;
 
 const jsonLd = {
@@ -134,7 +135,7 @@ const jsonLd = {
     <BaseHead
       title={title}
       description={description}
-      image={heroImage}
+      image={heroImage?.src}
       alternateUrl={otherLangPost
         ? `/${otherLangPost.id.replace(/\.(md|mdx)$/, "")}`
         : undefined}
@@ -264,7 +265,7 @@ const jsonLd = {
         <div class="container">
           {
             heroImage && (
-              <img
+              <Image
                 class="w-full rounded-lg"
                 src={heroImage}
                 alt={heroImageAlt || title}

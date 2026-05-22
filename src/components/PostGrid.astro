@@ -1,4 +1,5 @@
 ---
+import { Image } from "astro:assets";
 import FormattedDate from "./FormattedDate.astro";
 import type { BlogPost, Language } from "../lib/blog";
 
@@ -23,7 +24,7 @@ const { posts, currentLang, featuredCount = 0 } = Astro.props;
           class={`group rounded-xl p-2 transition-colors hover:bg-gray-200 dark:hover:bg-gray-800 ${index < featuredCount ? "md:col-span-2" : ""}`}
         >
           {post.data.heroImage && (
-            <img
+            <Image
               width={720}
               height={360}
               src={post.data.heroImage}
