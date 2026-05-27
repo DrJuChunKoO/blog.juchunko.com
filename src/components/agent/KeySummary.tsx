@@ -83,6 +83,13 @@ export default function KeySummary({ lang = "zh" }: KeySummaryProps) {
             <Markdown
               options={{
                 overrides: {
+                  p: {
+                    component: ({ children }) => (
+                      <p className="mb-2 text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+                        {children}
+                      </p>
+                    ),
+                  },
                   li: {
                     component: ({ children }) => (
                       <li className="flex items-start gap-2.5">
