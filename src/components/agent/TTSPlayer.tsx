@@ -9,8 +9,6 @@ import {
   FastForward,
   StepForward,
   StepBack,
-  Maximize2,
-  Minimize2,
   X,
 } from "lucide-react";
 import {
@@ -21,6 +19,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ui } from "@/i18n/ui";
+import {
+  getTTSTextContent,
+  isTTSTextMatch,
+  normalizeText,
+  normalizeTTSTextForMatch,
+  shouldScrollToTTSTarget,
+} from "./ttsHighlight";
 
 const ttsQueryClient = new QueryClient({
   defaultOptions: {
@@ -47,13 +52,6 @@ interface TTSPlayerProps {
 }
 
 type Mode = "loading" | "api" | "fallback" | "error";
-
-/**
- * Normalize text for matching by removing extra whitespace
- */
-const normalizeText = (text: string): string => {
-  return text.replace(/\s+/g, " ").trim();
-};
 
 async function fetchTTSAudioSegments(
   domain: string,
@@ -122,8 +120,6 @@ export default function TTSPlayer({ isOpen, lang = "zh" }: TTSPlayerProps) {
     },
     ttsQueryClient,
   );
-
-
 
   const resetAllStyles = useCallback(() => {
     originalStylesRef.current.forEach((style, el) => {
@@ -360,7 +356,9 @@ export default function TTSPlayer({ isOpen, lang = "zh" }: TTSPlayerProps) {
           const parent = node.parentElement;
           if (
             parent?.closest(".tts-player-container") ||
-            parent?.closest(".tts-ignore")
+            parent?.closest(".tts-ignore") ||
+            parent?.closest("sup") ||
+            parent?.closest("[data-footnote-ref]")
           ) {
             return NodeFilter.FILTER_REJECT;
           }
@@ -393,8 +391,11 @@ export default function TTSPlayer({ isOpen, lang = "zh" }: TTSPlayerProps) {
 
     for (const el of blockElements) {
       const htmlEl = el as HTMLElement;
-      const elText = normalizeText(htmlEl.textContent || "");
-      if (elText === targetText) {
+      const elText = getTTSTextContent(htmlEl);
+      if (
+        normalizeTTSTextForMatch(elText) ===
+        normalizeTTSTextForMatch(targetText)
+      ) {
         matchedElement = htmlEl;
         break;
       }
@@ -404,8 +405,8 @@ export default function TTSPlayer({ isOpen, lang = "zh" }: TTSPlayerProps) {
       let minLength = Infinity;
       for (const el of blockElements) {
         const htmlEl = el as HTMLElement;
-        const elText = normalizeText(htmlEl.textContent || "");
-        if (elText.includes(targetText)) {
+        const elText = getTTSTextContent(htmlEl);
+        if (isTTSTextMatch(elText, targetText)) {
           const textLength = elText.length;
           if (textLength < minLength) {
             matchedElement = htmlEl;
@@ -425,8 +426,9 @@ export default function TTSPlayer({ isOpen, lang = "zh" }: TTSPlayerProps) {
           combinedText += textNodes[j].text;
 
           if (
-            normalizeText(combinedText) === targetText ||
-            normalizeText(combinedText).includes(targetText)
+            normalizeTTSTextForMatch(combinedText) ===
+              normalizeTTSTextForMatch(targetText) ||
+            isTTSTextMatch(combinedText, targetText)
           ) {
             // Found match! Find the smallest common ancestor
             if (i === j) {
@@ -457,7 +459,9 @@ export default function TTSPlayer({ isOpen, lang = "zh" }: TTSPlayerProps) {
       }
     }
 
-    if (matchedElement) {
+    if (shouldScrollToTTSTarget(matchedElement, mainContent, targetText)) {
+      const targetElement = matchedElement as HTMLElement;
+
       mainContent.querySelectorAll("*").forEach((el) => {
         const htmlEl = el as HTMLElement;
         if (htmlEl.closest(".tts-player-container")) return;
@@ -470,12 +474,12 @@ export default function TTSPlayer({ isOpen, lang = "zh" }: TTSPlayerProps) {
         }
 
         // 1. Is matched element or inside matched element? (Highlight)
-        if (matchedElement === el || matchedElement.contains(el)) {
+        if (targetElement === el || targetElement.contains(el)) {
           htmlEl.style.color = "";
           htmlEl.style.transition = "color 0.3s ease";
         }
         // 2. Is ancestor of matched element? (Keep original color, do NOT dim)
-        else if (el.contains(matchedElement)) {
+        else if (el.contains(targetElement)) {
           htmlEl.style.color = "";
           htmlEl.style.transition = "color 0.3s ease";
         }
@@ -485,7 +489,7 @@ export default function TTSPlayer({ isOpen, lang = "zh" }: TTSPlayerProps) {
           htmlEl.style.transition = "color 0.3s ease";
         }
       });
-      matchedElement.scrollIntoView({ behavior: "smooth", block: "center" });
+      targetElement.scrollIntoView({ behavior: "smooth", block: "center" });
     }
   }, [
     mode,
@@ -585,12 +589,16 @@ export default function TTSPlayer({ isOpen, lang = "zh" }: TTSPlayerProps) {
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-gray-950 opacity-75 dark:bg-white"></span>
                 <span className="relative inline-flex h-2 w-2 rounded-full bg-gray-950 dark:bg-white"></span>
               </span>
-              <span className="font-semibold">{ui[lang]["agent.voiceReader.playing"]}</span>
+              <span className="font-semibold">
+                {ui[lang]["agent.voiceReader.playing"]}
+              </span>
             </span>
           ) : (
             <>
               <Play className="size-3.5 fill-current" />
-              <span className="font-semibold">{ui[lang]["agent.voiceReader.title"]}</span>
+              <span className="font-semibold">
+                {ui[lang]["agent.voiceReader.title"]}
+              </span>
             </>
           )}
         </motion.button>
@@ -603,13 +611,13 @@ export default function TTSPlayer({ isOpen, lang = "zh" }: TTSPlayerProps) {
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 100, opacity: 0 }}
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="tts-player-container pointer-events-none fixed bottom-6 right-4 left-4 z-50 flex items-center justify-center text-gray-900 dark:text-gray-100"
+            className="tts-player-container pointer-events-none fixed right-4 bottom-6 left-4 z-50 flex items-center justify-center text-gray-900 dark:text-gray-100"
           >
             <div className="group pointer-events-auto flex w-full max-w-2xl flex-col gap-3 overflow-hidden rounded-2xl border border-black/10 bg-white/95 p-4 shadow-[0_10px_30px_rgba(0,0,0,0.08)] backdrop-blur-md dark:border-white/15 dark:bg-zinc-950/95 dark:shadow-[0_10px_30px_rgba(0,0,0,0.4)]">
               {/* Row 1: Info & Dismiss Button */}
               <div className="flex items-start justify-between gap-3">
                 <div className="flex min-w-0 flex-1 flex-col">
-                  <span className="font-mono text-[9px] font-bold tracking-wider text-gray-400 uppercase dark:text-gray-500 flex items-center gap-1.5">
+                  <span className="flex items-center gap-1.5 font-mono text-[9px] font-bold tracking-wider text-gray-400 uppercase dark:text-gray-500">
                     {isPlaying && (
                       <span className="relative flex h-1.5 w-1.5">
                         <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-gray-900 opacity-75 dark:bg-gray-100"></span>
@@ -620,17 +628,17 @@ export default function TTSPlayer({ isOpen, lang = "zh" }: TTSPlayerProps) {
                       ? ui[lang]["agent.voiceReader.playing"]
                       : ui[lang]["agent.voiceReader.title"]}
                   </span>
-                  <p className="truncate text-xs leading-tight font-semibold text-gray-950 dark:text-gray-50 mt-0.5">
+                  <p className="mt-0.5 truncate text-xs leading-tight font-semibold text-gray-950 dark:text-gray-50">
                     {segments[currentIndex]?.text}
                   </p>
                 </div>
-                
+
                 <button
                   onClick={() => {
                     setIsPlaying(false);
                     setIsActivated(false);
                   }}
-                  className="rounded-full p-1 text-gray-400 transition-colors hover:bg-black/5 hover:text-gray-950 dark:text-gray-500 dark:hover:bg-white/10 dark:hover:text-gray-50 shrink-0"
+                  className="shrink-0 rounded-full p-1 text-gray-400 transition-colors hover:bg-black/5 hover:text-gray-950 dark:text-gray-500 dark:hover:bg-white/10 dark:hover:text-gray-50"
                   title={ui[lang]["agent.voiceReader.close"]}
                 >
                   <X className="size-4" />
@@ -665,7 +673,7 @@ export default function TTSPlayer({ isOpen, lang = "zh" }: TTSPlayerProps) {
               </div>
 
               {/* Row 3: Controls & Settings */}
-              <div className="flex items-center justify-between gap-4 border-t border-black/5 dark:border-white/5 pt-2">
+              <div className="flex items-center justify-between gap-4 border-t border-black/5 pt-2 dark:border-white/5">
                 {/* Left: Speed selector */}
                 <div className="flex items-center gap-1.5">
                   <Select
@@ -697,7 +705,7 @@ export default function TTSPlayer({ isOpen, lang = "zh" }: TTSPlayerProps) {
                 </div>
 
                 {/* Center: Playback Controls */}
-                <div className="flex items-center gap-1 shrink-0">
+                <div className="flex shrink-0 items-center gap-1">
                   <button
                     onClick={() => jumpToSegment(currentIndex - 1)}
                     disabled={currentIndex === 0}
@@ -716,7 +724,7 @@ export default function TTSPlayer({ isOpen, lang = "zh" }: TTSPlayerProps) {
 
                   <button
                     onClick={togglePlay}
-                    className="rounded-full bg-gray-950 p-2.5 text-white shadow-sm transition-transform hover:bg-gray-800 active:scale-95 dark:bg-gray-100 dark:text-gray-950 dark:hover:bg-gray-200 shrink-0"
+                    className="shrink-0 rounded-full bg-gray-950 p-2.5 text-white shadow-sm transition-transform hover:bg-gray-800 active:scale-95 dark:bg-gray-100 dark:text-gray-950 dark:hover:bg-gray-200"
                   >
                     {isPlaying ? (
                       <Pause className="size-4 fill-current" />
