@@ -1,0 +1,305 @@
+---
+title: "The Bamboo Copter, Damiao, and ROBOTIS — Taiwan's Next 50 Years: Choose 'In-Body' or 'Out-of-Body' Actuation?"
+description: "If you had hundreds, thousands, even tens of thousands of tiny drone motors, could you build Doraemon's bamboo copter — and fly? I did the physics math, and the answer is no. But that failure cracks open a much bigger taxonomy: 'in-body actuation' (muscles, robot joints, harmonic drives) vs 'out-of-body actuation' (ion thrusters, EHD propulsion, Harry-Potter-style flight). China's Damiao and Korea's ROBOTIS are already locked into the first. Taiwan is not. And the second one? Even MIT is still flying paper planes. A speculative policy essay on Taiwan's next 50 years."
+pubDate: "2026-05-31"
+heroImage: "../../../assets/images/bamboo-copter-50-years/cover.png"
+author: ["juchun-ko"]
+categories: ["policy-analysis", "ai-agent"]
+---
+
+# The Bamboo Copter, Damiao, and ROBOTIS
+
+> **The question:** "If hundreds, thousands, even tens of thousands of drone motors became small enough and powerful enough, could you, in principle, build Doraemon's bamboo copter and fly a person or a thing?"
+
+That's what a friend asked me at 2am one night in late May 2026.
+
+I was about to say "no, can't be done" — but I sat down and actually did the math.
+And the answer broke open the entire next 50 years of the robotics industry, right there in front of me.
+
+---
+
+## 🧮 First, the brutal physics: why the bamboo copter is impossible
+
+Hover power has a very simple formula (**Disc Loading / Momentum Theory**):
+
+$$ P = \frac{T^{3/2}}{\sqrt{2 \cdot \rho \cdot A}} $$
+
+- **T** = thrust (newtons)
+- **ρ** = air density ≈ 1.225 kg/m³
+- **A** = **total rotor disc area**
+
+Let's float a 70-kg human (686 N thrust). What does it take at different disc areas?
+
+| Disc area | Hover power | For comparison |
+|---|---|---|
+| 0.05 m² (**bamboo copter size**) | **70 kW** | A Porsche 911 at full output |
+| 0.5 m² (backpack eVTOL) | 22 kW | A motorcycle |
+| 2 m² (flying exoskeleton) | 11 kW | Still big |
+| 10 m² (helicopter) | 5 kW | Close to real |
+| 100 m² (huge rotor) | **1.6 kW** | Hairdryer-class |
+
+**The pattern is brutal — the smaller A gets, the more power explodes.**
+
+A bamboo-copter-sized rig needs 70 kW continuous. That's just to **fly**.
+You also need:
+
+- A battery that delivers 35 kWh (**3× heavier than you**)
+- A downwash of 270 km/h air (**bystanders get blasted away**)
+- A rotor system with zero margin for failure (**you don't want your head removed**)
+
+In other words: **shrinking and multiplying drone motors physically does not get you back to a bamboo copter**.
+
+---
+
+## 💡 But I noticed something: maybe "actuator" was the wrong category all along
+
+In my previous post ([A Robot's Elbow vs a Drone's Motor](/blog/en/harmonic-drive-actuator-101)),
+I argued that the brushless motor is the **shared core component** between drones and robot joints.
+
+But after writing it, I rethought —
+the framing had a blind spot.
+
+A friend pushed back:
+
+> "An actuator is more about **'in-body actuation'** — like muscles, like robot joints."
+> "An ion thruster is a different family — **'out-of-body actuation'** — that path may actually be the right one for future micro-flight."
+> "By the time we get there, it's not a bamboo copter anymore — it's **Harry Potter's flight magic**."
+
+That stopped me cold. It's a beautiful engineering taxonomy I had never heard before.
+
+Let me unpack it:
+
+---
+
+## 🔬 Two kinds of actuation: inside the body vs outside the body
+
+### 🦾 Path A: **In-body actuation**
+
+This solves the problem: **how does an object move itself?**
+Examples:
+- A human's **muscles** (10¹⁹ molecular motors inside your body)
+- A robot's **joints** (1 brushless motor + 1 harmonic drive per joint)
+- An octopus robot's **soft muscles** (Dielectric Elastomer Actuators)
+- A surgical robot's **end effectors**
+- Prostheses, exoskeletons
+
+Physics: **Direct contact + structural drive**.
+You transmit force into the world through mechanical contact.
+
+This path already has an industry — but Taiwan does not dominate it.
+
+### 🌪️ Path B: **Out-of-body actuation**
+
+This solves the problem: **how does an object change position in space without mechanical contact?**
+Examples:
+- **Ion thrusters**: electric fields ionize air to push it
+- **Magnetic levitation**: magnetic fields push objects
+- **Acoustic levitation**: ultrasonic pressure fields
+- **Electrohydrodynamic (EHD) propulsion**: MIT's 2018 motorless plane
+- **Theoretical field-effect propulsion**: completely contact-free drive
+
+Physics: **Force transmitted via a field**.
+You interact with the environment through fields, and the world helps you push.
+
+This path doesn't yet have an industry — but it also doesn't yet have a monopolist.
+
+---
+
+## 🥷 Path A status: who owns it?
+
+I have to be honest about three things my last post left out:
+
+### 🇯🇵 Japan's Harmonic Drive Systems (HDS) — 60–70% global share of harmonic drives
+- Founded 1970
+- Long-time supplier to the Big Four industrial robot makers (ABB, KUKA, FANUC, Yaskawa)
+- ~$5B market cap
+- Moat: 50 years of customer qualification, precision machining know-how
+
+### 🇰🇷 South Korea's ROBOTIS — dominant in **education and research**
+- Founded 1999
+- Flagship product: the **DYNAMIXEL** smart servo
+- "ROBOTIS" itself comes from the question "**Robot is...?**"
+- Customers: **MIT, CMU, KAIST, Univ. of Tokyo, Stanford, Boston Dynamics' research platforms, ToddlerBot**
+- Korea's humanoid-robot supply chain added **$68 billion in market value** this year alone (KED Global, May 2026)
+- They don't just sell parts — they sell **an entire robotics OS**
+
+### 🇨🇳 China's Shenzhen Damiao — de-facto standard in open-source / academia / early startups
+- Founded 2019 (by **ex-DJI engineers**)
+- Flagship DM-J series joint motor (**same technology line as MIT's Mini Cheetah**)
+- Price killer: DM-J4310 ≈ USD 110, **same-class Maxon / HDS ≈ USD 500–2000**
+- Customers: **OpenArm open-source robot arm ships bundled with Damiao motors**; PiperX, Seeed Studio Wiki, all use them
+- This is **"the Arduino of the robotics world"** — today's students use Damiao for their senior projects; **in 5 years their startups will still use Damiao**
+
+### 🇹🇼 Where's Taiwan?
+
+Honest answer — we're just getting started on the "precision gear → harmonic drive" path.
+A few of our precision gear makers are sampling harmonic drives.
+A few power-tool gear makers are starting to win humanoid robot customers.
+A few servo motor makers are doing drone-to-robot crossover.
+
+**But we have nothing in the ROBOTIS-style "education / academia / open-source ecosystem" tier.**
+**Nothing in the Damiao-style "high cost-performance + international open-source distribution" tier.**
+**And we are not yet an HDS-tier critical chokepoint supplier either.**
+
+We have the muscle. We just don't have a brand.
+
+---
+
+## ✨ Path B status: nobody has won yet
+
+This path is more interesting because **everyone is still in the lab**.
+
+### MIT 2018: the first motorless plane
+- Used **Electrohydrodynamic (EHD / ion wind) propulsion**
+- No rotating parts
+- 2.45 kg
+- Flew 60 meters
+- Thrust-to-weight ratio: **terrible**
+
+But this was a proof-of-concept — **it proved that "non-mechanical propulsion" is physically possible**.
+From that day onward, **"true flight magic"** entered the countdown.
+
+### Other lines pushing the frontier
+- **Miniaturized ion-wind propulsion**: MIT student teams trying to fit it into drones
+- **Magnetic levitation of humans**: Japanese researchers floated mice using 17-tesla superconducting magnets
+- **Acoustic levitation grippers**: can float small droplets, small components
+- **"Artificial anti-gravity"**: purely theoretical, **no experimental evidence yet**
+
+### How far is "**Harry-Potter-style flight**"?
+**Honest answer: 50–80 years.**
+
+But here's the thing — **that 50–80-year horizon is the same order of magnitude as TSMC's 1976 → 2026 journey**.
+
+---
+
+## 🪄 From Bamboo Copter to Harry Potter: the real paradigm shift
+
+Let's revisit that table:
+
+| Path | Physical mechanism | Stage | Key players |
+|---|---|---|---|
+| Big-rotor helicopter | Mechanical thrust | 100 years deployed | Bell, Sikorsky, Airbus |
+| eVTOL (multi-rotor air taxi) | Mechanical thrust | Commercial since 2024 | Joby, Lilium, EHang |
+| Flying exoskeleton | Mechanical + multi-rotor | 2030–2040 early | Jetpack Aviation, Gravity |
+| **Bamboo copter** (10,000 micro-rotors) | Mechanical thrust | ❌ **Physically inefficient, will never happen** | — |
+| **Ion-thruster flight coat** | Electric-field thrust | 2060–2080 early commercial | MIT, ?, ?, ? |
+| **Harry Potter flight magic** | Field effect / gravity engineering | ? Completely unknown | ? |
+
+The **"bamboo copter"** turns out to be a **dead end** —
+it can't get back to its science-fiction form because **it's still mechanical contact propulsion**.
+
+But walking down the **"ion-thruster flight coat"** path,
+it stops being a bamboo copter and becomes **real flight magic** —
+**your entire coat becomes the actuator**, lifting you via fields,
+**no downwash, no noise, no rotors, no severed heads**.
+
+That's Harry Potter.
+
+---
+
+## 🇹🇼 Taiwan's two 50-year paths
+
+If the next 50 years are the back half of the Physical AI revolution, Taiwan has two entry points:
+
+### Path A: **Catch up on the "in-body actuation" global supply chain**
+- **There's an industry, customers, capital, talent**
+- But **competitors are tough** (HDS 50 years, ROBOTIS 27, Damiao 7 but growing fast)
+- Taiwan's edges: precision-manufacturing depth, semiconductor crossover, geopolitical neutrality
+- Opportunity: **"the next harmonic drive"** — but moving from "**sampling**" to "**mass production**" will take 10–20 years
+
+### Path B: **Stake out the still-empty land of "out-of-body actuation"**
+- **The whole world is still in the lab**
+- Lead players: MIT, Caltech, University of Tokyo, KAIST, ETH Zurich
+- Taiwan's advantage: **no advantage** — but **no disadvantage either**. The starting line is flat.
+- Opportunity: **Can Taiwan be the TSMC of ion-propulsion industry?**
+  Twenty years of R&D, thirty years of manufacturing. **That's a story truly belonging to Taiwan's next generation.**
+
+---
+
+## 🎯 Five concrete policy proposals
+
+If we walk both paths simultaneously, what can government do?
+
+### Proposal 1: **National Flagship Program for "In-Body Actuation"**
+Modeled on Taiwan's old "Silicon Crystal Plan" that built the semiconductor industry —
+establish a **"National Flagship Program for Robotic Actuators"**,
+NT$30 billion over 5 years for harmonic drives, servo motors, torque sensors.
+
+### Proposal 2: **A "ROBOTIS-tier" Taiwan robotics open-source platform**
+ROBOTIS doesn't sell parts — it sells **an entire ecosystem**: hardware + SDK + textbooks + customer service + certification.
+Taiwan should build an officially-backed **"Taiwan Robotics Open-Source Platform"**.
+Start by penetrating high schools, universities, open-source communities.
+Goal: **in 10 years, every maker on Earth recognizes "Made in Taiwan" joint motors.**
+
+### Proposal 3: **Forward-Looking Research Fund for "Out-of-Body Actuation"**
+National Science and Technology Council program supporting early-stage physics research in ion propulsion, magnetic levitation, EHD, etc.
+Budget doesn't need to be big (NT$500M–1B per year),
+but **long term** — at least 30 years.
+Goal: **one or two Taiwanese labs become global top-10 in this field.**
+
+### Proposal 4: **Amend the Government Procurement Act to allow robot showcase procurement**
+Hospitals, fire stations, eldercare, agriculture, education — all should procure local robots.
+Stop selecting only "**cheapest / biggest brand / imported**".
+Germany, Japan, China, and Korea all have national robot showcase procurement programs. **Taiwan needs one too.**
+
+### Proposal 5: **A National Robotics Testing Sandbox**
+Korea has one. China has one. Japan has one. **Taiwan doesn't.**
+Pick a piece of land (an outer island, an abandoned airport, an industrial park).
+Open it freely to domestic and international robotics startups.
+Bundle with: **robot insurance, certification, liability law**.
+
+---
+
+## ⚠️ Required warning
+
+This article is about **30–80 years**.
+
+**This is not "tomorrow's stock market", nor "what to buy in the next 5 years".**
+This is a **policy essay about the next generation of Taiwanese**.
+
+Science fiction **isn't conjured from nothing** —
+1865, Jules Verne wrote *From the Earth to the Moon*. 1969, humans walked on the moon.
+1968, Arthur C. Clarke wrote about tablet computers in *2001: A Space Odyssey*. 2010, iPad shipped.
+2010, *Iron Man* gave us J.A.R.V.I.S. 2024, we have ChatGPT.
+
+**Science fiction is the 50-year spec sheet.**
+
+But equally — **nothing guarantees that what's in science fiction will arrive**.
+Anti-gravity has no experimental evidence yet.
+Time travel violates the second law of thermodynamics.
+Telepathy violates causal information theory.
+
+**So this article should be read as a "thought experiment", not as an "investment guide".**
+
+But I do believe one thing:
+
+> **A country that doesn't think about the physics of 50 years from now, will only get to fight for the leftover orders of 50 years ago.**
+
+In 30 years, TSMC went from an obscure Taiwanese company to a global sacred mountain,
+proving that **this island is very good at executing other people's spec sheets**.
+
+For the next 50 years —
+do we dare try **writing our own spec sheet?**
+
+---
+
+> Imagination, like capital,
+> **compounds when concentrated**,
+> **balances when diversified**.
+>
+> What Taiwan lacks most today isn't technology — it's the **courage to allocate a small slice of capital to 50 years from now**.
+
+— Ju-Chun KO (BaoBo) / Legislator
+
+---
+
+## 📌 Disclaimer
+
+This article is a **science policy / long-range industry speculation piece**, **NOT investment advice or financial analysis**.
+
+Concepts referenced — "out-of-body actuation", "ion propulsion", "flight magic" — are **all at lab or theoretical-physics stage**, and commercialization may be 30–80 years away. Readers should not treat any company or technology mentioned here as an investment target.
+
+Companies referenced (including Japan's Harmonic Drive Systems, South Korea's ROBOTIS, China's Shenzhen Damiao, etc.) are described purely as objective industry context, **NOT as investment recommendations or negative judgments**.
+
+Readers seeking detail should **do their own research, accept their own risk, and consult qualified financial advisors**. Views are personal and do not represent the Legislative Yuan or the author's political party.
+
