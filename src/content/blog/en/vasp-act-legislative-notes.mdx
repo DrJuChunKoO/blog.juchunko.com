@@ -1,0 +1,918 @@
+---
+title: "Letter to Taiwan in 2036: Why I Designed the Virtual Asset Services Act This Way"
+description: "22 Convictions, 6 Battles, and a Legislator's Notebook for Posterity. From March 20 to June 3, 2026, my first-hand account of authoring Taiwan's first virtual asset legislation."
+pubDate: "2026-06-09"
+heroImage: "../../../assets/images/vasp-act-legislative-notes/cover-v1.jpg"
+author: "juchun-ko"
+categories: ["legislative-points"]
+---
+
+# Letter to Taiwan in 2036: Why I Designed the Virtual Asset Services Act This Way
+
+*22 Convictions, 6 Battles, and a Legislator's Notebook for Posterity*
+
+*From the bill I introduced on March 20, 2026, to the day the Finance Committee of the Legislative Yuan passed its review on June 3, I was personally involved in every critical moment of Taiwan's first Virtual Asset Services Act. This is the first-hand account I am leaving for the Taiwan of the next decade.*
+
+> "Parliament needs to be ahead of the curve, and AI needs to actually ship. We need a more advanced way of thinking about regulation — to embrace virtual technology, to live within virtual worlds, to harness virtual intelligence, to fight virtual crime, to help Taiwan, to connect with the world."
+> — That was the political promise I made when I took office in 2024. I hope this Virtual Asset Services Act counts as partially fulfilling it.
+
+---
+
+## Preface: June 3rd
+
+A little past ten in the morning, in the Finance Committee meeting room of the Legislative Yuan, I watched the staff read the thick draft clauses one by one, and I watched the chair bring down the gavel on the review's passage. My feelings were complicated.
+
+It wasn't the joy of "winning a war." It felt more like finally crossing a relay point in a long-distance run — you know there is still the second reading, the third reading, the secondary legislation, the first VASP license, the first enforcement action, the first victim's restitution case, and each of those will be another challenge. But you also know that this relay point cannot be retreated from.
+
+Over the past eight years, I went from academia to Dentsu, from Dentsu to parliament, from a person who wrote code to a person who wrote bills. I watched Taiwan's virtual asset industry grow from a grassroots era, through the AML registration era, into today — an era where it finally has its own dedicated statute. The 56 clauses that passed review today will determine how many service providers can survive on this island, how many investors will be able to recover what they really lost after being defrauded, how many stablecoins will be allowed to circulate legally in Taiwan, and how many new technologies will *not* be killed accidentally by the law.
+
+There is one thing I am certain of: **this law is written for living people, not for clauses on a page**.
+
+So in this notebook, I want to honestly write down my "thinking" and my "substantive contributions" on this law. Which fights I held the line on and where the text actually changed; which fights I retreated on but managed to preserve in spirit through supplementary resolutions or legislative explanations; which fights I lost and now have to put on the to-do list for later.
+
+I do not want to write this in the tone of a political press release. This law is too important to be wrapped in empty words.
+
+This piece is long, because every clause in this law deserves a serious accounting. If you only want the conclusion, jump to the influence-rating table at the end. If you are willing to walk the journey with me, start from Chapter One.
+
+---
+
+## Chapter One: Why Taiwan Needs This Act
+
+### The international tide is already at our feet
+
+If you only started tracking virtual asset regulation in 2026, you will notice one thing: **all the major economies have already written their laws.**
+
+The European Union's Markets in Crypto-Assets Regulation (**MiCA Regulation**), passed in 2023 and fully effective at the end of 2024, is currently the most comprehensive virtual asset framework in the world. MiCA divides virtual assets into three categories — asset-referenced tokens (ART), e-money tokens (EMT), and other crypto-assets — and establishes complete rules for issuance, trading, custody, and market abuse for each.
+
+The United States passed the Guiding and Establishing National Innovation for U.S. Stablecoins Act (**GENIUS Act**) in July 2025, bringing U.S. dollar stablecoins under federal supervision. It requires 1:1 full reserves, monthly public disclosure, and pure payment-only purposes. This is the first formal piece of the U.S. stablecoin regulatory puzzle.
+
+Japan moved earlier still. In 2017 it amended the Payment Services Act (**PSA**) to bring crypto-asset exchange businesses under regulation. In 2019 it amended the law again to introduce a wallet custody business and leverage rules. In 2023 stablecoins were brought into the e-payment instrument scope. In 2024 it went further by permitting specified VASPs to hold customer crypto-assets directly as trust property.
+
+South Korea's Virtual Asset Users Protection Act (**VAUPA**) came into force in July 2024, focusing on investor protection: segregation of customer assets, criminalization of market manipulation, and remedies for unannounced suspension of trading.
+
+Hong Kong established its VASP licensing regime in 2023, added the **Stablecoins Ordinance** in 2024, and extended coverage to OTC and custodians in 2025. Singapore's *Payment Services Act* plus its *Digital Token Service Provider* rules have long been in force.
+
+Even FATF Recommendation 15 and IOSCO's 2023 *Policy Recommendations for Crypto and Digital Asset Markets* are already templates from which countries are copying answers.
+
+**And Taiwan?**
+
+What Taiwan had on November 30, 2024 was the Financial Supervisory Commission's amended "Regulations Governing Anti-Money Laundering and Counter-Terrorism Financing of Enterprises Handling Virtual Asset Services" — an AML-oriented "registration regime." It requires service providers to perform KYC, monitor transactions, and file suspicious transaction reports. But it **completely fails to address**:
+
+- Should service providers have a minimum capital requirement?
+- How should customer virtual assets be segregated and custodied?
+- Should listing and delisting of tokens on a platform be subject to review? And how strict should that review be?
+- How are stablecoins issued, who can issue them, and how are reserve assets managed?
+- Should market manipulation carry criminal liability?
+- Where is the procedural justice for suspension of trading?
+- How does a victim recover their loss?
+
+In other words, Taiwan only had **the guard at the door**, but no **rules inside the building**.
+
+### Why I introduced my bill on March 20
+
+On March 20, 2026, I introduced a 53-clause version as the principal proposer, co-signed by twenty other legislators including Su Ching-chuan and Hsu Yu-chen.
+
+At that time the Executive Yuan version had not yet emerged — the cabinet version would only be approved by the Executive Yuan on April 2 and sent to the Legislative Yuan on April 15.
+
+Many people asked me: "The Executive Yuan is about to send its version. Why bother proposing one first?"
+
+I had two answers.
+
+**First, the timing pressure of legislation.** In Taiwan's Legislative Yuan, bills are not scheduled on a first-come basis. They are scheduled based on the procedural will of the committee convener. If there is no member's version already on the review calendar, then once the Executive Yuan version arrives, it could be pushed to a much later slot — even into the following session. **Putting a version on the table first** is the way to secure priority in the legislative rhythm.
+
+**Second, setting the policy direction.** Before the bill had even arrived, I had already, through the 2024 AML amendments, more than twenty rounds of consultation with industry, and repeated meetings with the Financial Supervisory Commission (FSC) and the Central Bank, identified **the blind spots that the cabinet version was likely to contain**. The version I introduced was meant to ensure that the review of the cabinet's bill would happen with "an alternative on the table" — so that when the FSC faced our proposed amendments, it would feel more pressure to think things through carefully.
+
+My 53-clause version and the 55-clause Executive Yuan version that passed on April 2 differed clearly in at least the following places:
+
+| Issue | KO version | Executive Yuan version |
+|---|---|---|
+| Article 2 | Adds Paragraph 2: Competent authority shall establish a dedicated unit and dedicated personnel | Single paragraph only |
+| Article 6 (scope of business) | **Explicitly lists "lending service providers"** as a standalone category | Initially absent; later added |
+| Articles 7, 8, 35 | Adds **regulatory flexibility proviso**: "except where the competent authority deems unnecessary based on the nature of the matter" | None |
+| Articles 11, 13 | "**Taking into account categories and scope of business respectively**" when setting deposits and debt ratios | One standard fits all |
+| Article 12 | Adds Paragraph 3: **2-year transitional period for incumbent personnel** | None |
+| Article 20 | Suspension of trading **capped at 20 days** (unless extended by judicial police notice) | No time limit |
+| Article 23 | Manner, items, and scope of record retention to be prescribed by the competent authority | None |
+| Article 25 | Listing/delisting: from **"approval"** to **"filing for record"** | Approval regime |
+| Article 27 | Outsourced custody: **express liability for compensation** | Notification only |
+| Article 33 | Education and outreach extended to **the public** | Limited to transactors |
+| Article 42 | **Exemption from market manipulation** (legitimate market-making mechanisms) | None |
+| ⭐ Article 43 | **FinTech Innovation Development Fund** (KO version exclusive) | None |
+| Article 47 | Returnable or confiscable property in virtual asset form: **paid in virtual assets** | Default: convert to fiat |
+| Article 55 | Transition period extended to **12 + 24 months** | 9 + 18 months |
+
+This comparison table became my **battle map** on the Finance Committee floor on May 6, May 13, May 16, and June 3. Twenty-two amendment proposals, seventy-six pre-prepared statements and rebuttal briefs, all waiting to be argued clause by clause with the FSC, the Central Bank, and the Ministry of Justice.
+
+---
+
+## Chapter Two: Six Key Battles
+
+I have picked out the six clauses from this review whose policy significance was the greatest and whose battles had the best stories. Let me show you what really happened on the floor.
+
+### Battle One: Article 25 — From "Approval Regime" to "Filing for Record"
+
+If I could only single out one clause that I cared about most, it would be Article 25.
+
+#### What the Executive Yuan version said
+
+Executive Yuan version, Article 25, Paragraph 2:
+
+> "A virtual asset trading platform shall **ensure that any virtual asset for which it provides centralized market services has been approved by the competent authority** before it may provide such services."
+
+In plain language: **every single token, before a platform can list it, must first be greenlit by the FSC.**
+
+#### Why I fought this one
+
+If you have ever built a product, written code, or operated any real-time system, you can immediately see the problem with this design: **this is a textbook single point of failure (SPoF)**.
+
+The virtual asset market spawns thousands of new tokens every year (a conservative estimate). Even if only 1 percent of them are worth considering for listing on a regulated platform, that is more than ten cases per day arriving for review every single year. Where is the FSC going to find the staff for this? The secondary legislation has not been drafted, the standards have not been established, and **the review capacity is simply not ready**.
+
+More importantly: once one node cannot complete review, everything downstream gets stuck. **This is exactly the script of the 2025 "nurse-to-bed ratio for three shifts" legislation** — the law had already passed its third reading, but for various reasons the implementation date was pushed back, and it never properly went live. If we let the VASP Act re-enact that script, then this law would be a case of "**the law exists, but the market does not**."
+
+I cited a long list of comparative law:
+
+- **EU MiCA**: issuers only need to **file a white paper** with the competent authority twenty working days before listing; no approval is required (MiCA Article 8);
+- **South Korean VAUPA**: service providers **self-review** listed tokens;
+- **Hong Kong VASP regime**: service providers **self-review** listed tokens;
+- **Japan PSA plus Cabinet Office Order**: service providers submit assessments to the **industry association**, with **prior notice to the FSA** sufficient;
+- **Malaysia**: starting in 2026, exchanges are permitted to **freely list**, subject only to conditions such as "at least one year of trading history."
+
+> At the review session in 2026, I said:
+>
+> "None of these countries has this kind of requirement that approval from the competent authority is needed before a token may be listed. There is no real need for the FSC to stand alone in this."
+>
+> *— from the Chinese original: 「這些國家都沒有這種『還需主管機關同意才能上架』的規範，金管會實在不需要特立獨行。」*
+
+#### The exchange on the floor
+
+The FSC's response was roughly: "We believe that an *ex ante* approval regime is necessary to protect investors. The secondary legislation will set out clear time limits."
+
+I shot back with three key points.
+
+**First, are there precedents in current law?**
+
+> "This kind of design is hardly without precedent in our existing financial law. Take the Securities and Exchange Act: the listing review rules and the listing contract template of the Taiwan Stock Exchange are approved by the competent authority, but afterwards the issuer and the exchange sign their contracts themselves and **file them for record** with the competent authority — not every contract is approved individually in advance. See Articles 140 and 141 of the Securities and Exchange Act."
+>
+> *— from the Chinese original.*
+
+In other words, the three-step design of "approve the **standard**, let the operator **act** under the standard, and then **file for record** afterwards" is something Taiwan's financial law has always had. I did not invent it.
+
+**Second, how does the new stablecoin guidance from the Taiwan Stock Exchange fit?**
+
+> "The exchange just issued guidance on the two major crypto-assets (USDT and USDC). If this Act requires 'approval from the FSC,' then since USDT and USDC have not been approved by the FSC, does that mean the exchange's guidance is invalid? How is industry supposed to prepare?"
+
+This was the most silent moment of the day. Once the legal logic reaches this kind of contradiction, the FSC's own existing guidance is immediately negated by itself.
+
+**Third, does shifting from "approval" to "filing for record" mean the competent authority loses its supervisory power?**
+
+> "No, it does not. If the competent authority finds that a particular virtual asset is unlawful, poses major risks, or is otherwise unsuitable for trading, it can **still rely on its statutory supervisory power** to require the operator to adjust, delist, or take other necessary measures."
+
+I emphasized this point repeatedly: **a "filing for record" regime is not a "laissez-faire" regime.** The competent authority retains its power to supervise and to sanction under the law at any time. The only difference is that the review burden shifts from *ex ante* to *ex post*.
+
+#### Result
+
+The passed version of Article 25, Paragraph 2 reads:
+
+> "A virtual asset trading platform shall, with respect to the virtual assets for which it provides centralized market services, **file them for record with the competent authority**; …"
+
+🟢 **Fully adopted.** Approval regime changed to filing-for-record regime, word for word.
+
+And — this is what made me especially happy — I had simultaneously prepared a supplementary resolution (page-16) requiring the FSC to, in drafting the secondary legislation:
+
+> "Set clear time limits in the review process, except where the competent authority finds extension necessary on reasonable grounds …"
+
+That way the risk of "no time limit means industry gets stuck" was patched as well.
+
+#### Why this fight has lasting impact
+
+Shifting Article 25, Paragraph 2 from "approval" to "filing for record" **directly determines the breathing rate of Taiwan's virtual asset trading market**.
+
+Under an "approval regime," the competitiveness of Taiwan's exchanges would be chained to the speed of FSC review, unable to keep up with international rhythm. Capital would continue to flow out to overseas platforms, leaving Taiwan's operators to collect the scraps.
+
+Under a "filing-for-record regime," Taiwan's operators can list tokens autonomously in accordance with review standards set jointly by the trade association and the competent authority, while the competent authority retains *ex post* supervisory power. **This is the single most important compromise between "regulation vs. innovation," and we picked the right side.**
+
+This is the clause I am proudest of, and most confident about, in writing this notebook.
+
+---
+
+### Battle Two: Article 20 — The 20-Day Limit on Suspension of Trading
+
+This one I **did not hold the line on**. But I want to write it honestly, because this clause touched the value I care about most: due process protection for citizens' property rights.
+
+#### Why this is needed
+
+Executive Yuan version, Article 20, Paragraph 2:
+
+> "A virtual asset service provider may suspend the transfer-in, withdrawal, or transfer-out of customer assets, or suspend all or part of trading functions, for customers whose transactions are suspected of being illegal or manifestly anomalous."
+
+**Note: there is no time limit on this clause.**
+
+Combating fraud is obviously important. But imagine a scenario:
+
+> You went to the night market to grab dinner. You helped a self-described "foreign tourist without cash" by receiving a small payment in New Taiwan Dollars via LINE Pay and then handing them physical cash. Three days later your bank account is flagged because that payment had at some point passed through a node controlled by a fraud ring. You cannot pay rent. Your National Health Insurance premium cannot be deducted. The money for your elderly parents' hospital visits cannot be withdrawn.
+
+This is not hypothetical. This was a scenario that appeared again and again in the news in 2025. Fraud rings turn strangers into money-laundering tools, and victims **lose not only money but also have their accounts frozen for three months, half a year, or longer**.
+
+If VASPs have no time-limit rule, they will become the digital version of "warning-flagged bank accounts."
+
+#### The text I proposed
+
+Drawing on the 20-day rule in the existing "Regulations on the Anti-Fraud Compliance Obligations of Financial Institutions and VASPs," I proposed adding the following text at the end of Article 20, Paragraph 2:
+
+> "… Except where judicial police or other competent authority requires continued control measures, such restrictive measures shall be **limited to twenty days**, with **extension permitted when necessary**."
+
+Two key design choices:
+
+1. **20 days as the default**: any restriction based on the operator's own judgment cannot exceed twenty days;
+2. **Judicial police exception**: if a judicial police agency takes over the investigation under the Anti-Fraud Crime Prevention Act or the Code of Criminal Procedure, then the 20-day limit does not apply.
+
+> At the review session in 2026, I said:
+>
+> "For many people today, being unable to use one's account does not just mean inconvenience in transactions. It means rent cannot be paid, living expenses cannot be withdrawn, and even medical bills and daily costs are affected … If a VASP imposes restrictive measures based on its own judgment and has not been told by judicial police or the competent authority to continue control measures, then such restrictions should have a time cap and cannot continue indefinitely."
+>
+> "Fighting fraud is obviously important. But the ordinary lives of innocent citizens matter just as much."
+>
+> *— from the Chinese original.*
+
+#### The exchange and result
+
+The FSC's response was: the technical details of this clause should be left to secondary legislation, including standards for identifying anomalies and procedures for suspension.
+
+I gave way. The reason was that on June 3, I had already fought a big battle for Article 25 (approval → filing for record), and if the core of this clause were pushed all the way to the wall at the text level, I would risk dragging the entire review past the time available for the other clauses.
+
+But I had pre-prepared a supplementary resolution (page-15):
+
+> "The Financial Supervisory Commission shall, within one year of the entry into force of this Act, complete a draft set of regulations governing the imposition of trading restrictions by virtual asset service providers on their customers, and shall publicly consult on the draft, so as to establish a clear, transparent, and due-process-compliant supervisory mechanism that safeguards citizens' property rights and the interests of transactors."
+
+The passed text of Article 20 is almost word-for-word the cabinet version. **There is no 20-day limit.**
+
+#### My reflection
+
+🔴 I lost this clause-level battle.
+💬 But I got the supplementary resolution: draft regulations within one year, public consultation, with clear procedures and remedies.
+
+I think this clause will be an important battleground in the secondary legislation phase. My duty here is not done. When the FSC produces its draft on customer trading restrictions, I will make sure that:
+
+1. The duration is clear (I recommend twenty days or shorter);
+2. Notification is required (the operator must tell the customer why restrictions were imposed);
+3. There is an appeal channel (the customer can complain and the operator must respond);
+4. Records are kept (restrictive actions must be traceable);
+5. Judicial remedy is available (disputes can escalate to administrative remedies or the courts).
+
+If these five things are not written into the secondary legislation, I will propose another amendment to write them back into the parent statute.
+
+That is my promise to my future self about this clause.
+
+---
+
+### Battle Three: Article 47 — Returning Virtual Assets to Victims in Kind
+
+Article 47 was the fight I fought for victims. Tactically, "I lost on the clause but won on the legislative explanation plus the supplementary resolution." But on substance, I think **we already secured real protection for victims**.
+
+#### The core problem
+
+When virtual asset fraud occurs and law enforcement seizes criminal proceeds, the common practice is to **first sell the assets into New Taiwan Dollars, and then return New Taiwan Dollars to the victim once the judgment becomes final.**
+
+Sounds reasonable. But the problem is:
+
+- The victim **originally lost a virtual asset** (say, 10 BTC);
+- What was seized was also **a virtual asset** (say, the same 10 BTC);
+- The case takes one to three years to adjudicate, and during that time the price of BTC may have tripled or quintupled;
+- But **the prosecutor sold it for fiat back at the investigation stage**, locking in the price as of that earlier moment;
+- After judgment, the victim is paid back in the fiat amount from that earlier moment.
+- Result: **on paper, the victim has been "made whole" — but in reality they have lost three to five times their value.**
+
+This is not a new issue internationally:
+
+- **Silk Road (United States)**: Between 2014 and 2015, the federal government auctioned off seized BTC totaling 144,336 BTC at average prices of USD 300 to 400 per coin. Eleven years later, the value had multiplied by orders of magnitude.
+- **Bitcoin Queen (United Kingdom)**: Between 2018 and 2024, 61,000+ BTC were seized, and a significant portion was disposed of near the lows, triggering serious complaints from victims.
+
+These cases later prompted reflection by enforcement agencies abroad: **should prosecutors really be guaranteeing market prices?**
+
+#### My proposal
+
+I proposed adding a new Paragraph 6 to Article 47:
+
+> "Where criminal proceeds that are to be returned or confiscated are in the form of virtual assets, they shall be **paid in virtual assets**."
+
+And I prepared a complete debate strategy, because I knew that both the FSC and the Ministry of Justice would push back.
+
+#### Likely objections from the Ministry of Justice (and my responses)
+
+**MOJ Question 1: "*Paid in* (抵充) is a term from civil law and public law, not criminal law."**
+
+My answer:
+
+> "My use of the word 'paid in' (抵充) is intended to convey that, where the loss originally suffered by the victim was in virtual asset form, the post-judgment return should be in the form of the same type and same value of virtual asset. It does not require returning '*those specific coins*' that were originally lost."
+>
+> *— from the Chinese original.*
+
+For example: your 10 BTC were stolen, and the police seized 10 BTC from the defendant's wallet (not necessarily "the same batch"). Then "**an equivalent amount of bitcoin**" is paid in — this terminology is more precise than "return," because Bitcoin is not a non-fungible asset (NFTs aside).
+
+**MOJ Question 2: "Article 141 of the Code of Criminal Procedure already allows prosecutors to liquidate when the value of seized property is declining."**
+
+I shot back:
+
+> "If what was seized today is a Nokia 3310, three years from now, when it is returned to the victim, will the victim get an iPhone instead? Or will the prosecutor along the way say, 'Because the Nokia 3310 is getting less and less valuable, I sold it for you in the meantime, and I'll give you the money later'? I think the answer in both cases would be no."
+>
+> "Going further: if New Taiwan Dollars are inflating and depreciating today, will the Ministry of Justice proactively convert the victim's NTD into USD or gold or some other store of value? If not, then why is it that, when what the victim was defrauded out of is 10 BTC, the State has to make the decision on the victim's behalf to convert it into NTD?"
+>
+> *— from the Chinese original.*
+
+This is the rebuttal I am proudest of. The Nokia 3310 metaphor *worked* in the room — it turned "the principle of returning property in its original form" from legal jargon into a concrete scenario every single person could feel.
+
+**MOJ Question 3: "What if the defendant swapped Token A for Token B?"**
+
+> "If the original property no longer exists, then there is no question of returning it in its original form, and that is not the situation this clause is meant to govern."
+
+**MOJ Question 4: "What if the victim does not have a virtual asset account?"**
+
+> "What I am addressing is the situation where the loss originally suffered by the victim was in virtual asset form. If the victim's original loss was not in virtual asset form, then it simply does not fall within this clause."
+
+**I also proposed a fallback** drawing on the UK's Economic Crime and Corporate Transparency Act 2023 and Section 303Z54 of the Proceeds of Crime Act 2002:
+
+> "Where criminal proceeds that are to be returned or confiscated are in the form of virtual assets, they shall be paid in virtual assets. **However, where liquidation is necessary to avoid material loss of value, it may be carried out, after notifying all interested parties and allowing a reasonable period for them to state their views, with the consent of the court.**"
+
+This is a "principle plus exception" design, consistent with proportionality: the principle respects in-kind return, the exception allows liquidation only with due process.
+
+#### Result
+
+The passed text of Article 47 **did not include the new paragraph.**
+
+But two things were preserved:
+
+**First, the legislative explanation expressly states:**
+
+> "With respect to criminal proceeds that are to be returned or confiscated and that are in the form of virtual assets, the relevant laws and regulations shall be followed, and **as a matter of principle they shall be returned or confiscated in virtual asset form**. This is added here for clarification."
+
+The legislative explanation carries very high authority in statutory interpretation. Future prosecutors and judges will, when interpreting this clause, have to follow this **"in-kind return as the principle"** direction.
+
+**Second, a supplementary resolution was passed (page-14):**
+
+> "The Financial Supervisory Commission, in conjunction with the Ministry of Justice and other relevant agencies, shall conduct a comprehensive review of the seizure, custody, preservation, liquidation, and return regime for virtual assets … and shall study the establishment of a processing mechanism that takes **in-kind preservation and in-kind return as the principle**, with clear rules on the requirements, procedures, and supervision applicable to exceptional liquidation, so as to ensure that victims' property rights and recovery interests are fully safeguarded …"
+
+🟡 We lost on the clause, but 💬 the legislative explanation plus the supplementary resolution preserved the substantive spirit in full.
+
+I will treat this clause as a **"to be continued"** commitment, and when the Code of Criminal Procedure or the Anti-Fraud Crime Prevention Act is next amended, I will push for it to be codified.
+
+---
+
+### Battle Four: Articles 7, 8, 35 — "Except as Otherwise Provided by the Competent Authority"
+
+This is the move from my whole package with the broadest reach but the lowest profile: **the regulatory flexibility proviso.**
+
+#### Why we need it
+
+The opponent in this fight is not the FSC, not the Central Bank, not the Ministry of Justice. It is **Taiwan's legal tradition's "one-size-fits-all" gene.**
+
+When you write a mandatory provision like "no person shall conduct business without a license" with no proviso, no flexibility, and no exception, two things happen:
+
+**First, existing large operators instantly become illegal.** Taiwan today has many widely-used virtual asset trading platforms that have completed AML registration and have **millions** of users. Once this Act enters into force while the secondary legislation is not yet in place, these operators will be in a position of "**not yet licensed, but still operating**" — falling into a legal "**illegal / tolerated**" gray zone.
+
+**Second, internationally circulating stablecoins (USDT, USDC) become "illegal upon enactment."** USDT is a stablecoin with more than USD 150 billion in global circulation. USDC is approaching USD 60 billion. The Taiwan Stock Exchange has just issued guidance specifically for these two. If Article 35 of this Act has no proviso, then these two stablecoins instantly become "unapproved" illegal stablecoins in Taiwan.
+
+This is another version of "**the law exists, but users don't show up**" — not because the market cannot catch up with the law, but because **the law deliberately pushes the market underground.**
+
+#### My design
+
+Drawing on the proviso in Article 14-4, Paragraph 1 of the Securities and Exchange Act (which gives the FSC discretion over "companies subject to the audit committee requirement"), I added one proviso to each of three articles:
+
+**Article 7:**
+> "No person may operate any of the virtual asset businesses without obtaining a license and being issued a license certificate, **except where the competent authority deems it unnecessary based on the nature of the matter**."
+
+**Article 8:**
+> "A virtual asset service provider shall operate its business within the scope of business approved by the competent authority, **except where the competent authority deems it unnecessary based on the nature of the matter** …"
+
+**Article 35:**
+> "… shall ensure that the relevant stablecoin has been licensed for issuance under Article 34, Paragraph 1, or has been approved by the competent authority for trading, before providing such services, **except where it meets the conditions prescribed by the competent authority taking into account its scale, form, and other necessary circumstances** …"
+
+The key design point: **the phrase "where the competent authority deems it unnecessary based on the nature of the matter" leaves the discretionary power with the FSC itself** — it does not force the FSC to relax. It gives the FSC an exit so it can do fine-grained classification in the secondary legislation.
+
+#### On the floor
+
+The FSC's standard pushback was: "Other financial laws (securities, futures) do not have provisos written this way."
+
+My answer had two layers:
+
+> "Neither securities nor futures have ever had the situation that virtual assets have — circulating and being traded for a long time *before* a statute was written. **Virtual assets have their own particularity**, which is why this proviso is needed."
+
+> "Stepping back: **the final choice still lies with the competent authority**. If the competent authority assesses that it is not appropriate to use it, it does not have to."
+
+The second sentence was the key — this proviso does not tie the FSC's hands; on the contrary, **it unties the FSC's own hands.** The FSC's answer shifted from objection to "we can reconsider."
+
+#### Result
+
+The passed version of all three articles uses "**except as otherwise provided by the competent authority**":
+
+- Article 7: "No person may operate any of the … businesses without … license …, **except as otherwise provided by the competent authority**, …"
+- Article 8: "A virtual asset service provider shall, **except as otherwise provided by the competent authority**, operate its business within the scope approved by the competent authority …"
+- Article 35: "… provides any service under Article 6, Paragraph 1, involving stablecoins, the service provider shall, **except as otherwise provided by the competent authority**, ensure that the stablecoin …"
+
+🟢 All three fully adopted. The wording was slightly polished (from "where the competent authority deems it unnecessary based on the nature" to "except as otherwise provided by the competent authority"), but **the legal effect is identical**: the FSC has administrative discretion to grant exceptions based on its professional judgment.
+
+#### Impact
+
+These three provisos are the **breathing valves** I have reserved for Taiwan's virtual asset industry.
+
+In future secondary legislation, the FSC can set special recognition conditions for internationally circulating stablecoins such as USDT and USDC; it can set a transitional license mechanism for existing large operators; and it can avoid prematurely killing emerging business types.
+
+**Without these three provisos, the VASP Act could have pushed the market out of Taiwan's borders on day one.** With them, the market stays, operators have a way out, and the regulator has tools.
+
+This is what I consider my most important **invisible victory.**
+
+---
+
+### Battle Five: Article 27 — Liability for Outsourced Custody
+
+I won this one cleanly. The fight itself was not dramatic, but its significance runs deep.
+
+#### The gap in the Executive Yuan version
+
+The Executive Yuan version of Article 27, Paragraph 2 said only:
+
+> "A virtual asset custodian shall **notify customers** of the circumstances in which it entrusts the custody of virtual assets to others under the preceding paragraph."
+
+In other words: a custodian could outsource to another licensed custodian, **as long as it tells the customer.**
+
+But what if something goes wrong? Say the outsourced sub-custodian is hacked, absconds, or has its private keys leaked — **who pays?**
+
+From the Executive Yuan text, you cannot tell. The customer would get bounced around: "The custodian you contracted with says it's the sub-custodian's responsibility. The sub-custodian says it has already gone bankrupt. Go back to the main custodian. The main custodian says it has already notified you."
+
+#### My proposal
+
+I added the following at the end of Paragraph 2:
+
+> "If customers suffer loss, **the custodian with whom the customer has contracted, or the financial institution qualified to provide virtual asset custody, shall bear the liability for damages**."
+
+> At the review session in 2026, I said:
+>
+> "Today, the question of which operator the citizen contracted with, and to whom they entrusted their assets, must — when things go wrong — be answered under the **principle of privity of contract under civil law** (Article 199, Paragraph 1 of the Civil Code). The contractual counterparty is the one responsible. Liability cannot be obscured by the presence of outsourcing or sub-delegation."
+>
+> *— from the Chinese original.*
+
+Article 199, Paragraph 1 of the Civil Code says: "The creditor is entitled, on the basis of the obligation, to demand performance from the debtor." This is an iron rule of civil law — the person you contracted with is your debtor, and they cannot be released by sub-delegating to a third party.
+
+But in a complex multi-layer outsourcing architecture like virtual asset custody, this civil-law principle has to be written in black and white into **the VASP Act**, or first-line consumers will never out-lawyer the operators' legal departments.
+
+#### Result
+
+The passed version of Article 27, Paragraph 2 reads:
+
+> "Where a virtual asset custodian falls under the circumstances of the preceding paragraph, it shall notify the customer. **Where customer interests are harmed due to the intent or negligence of the entrusted institution or its employees, the virtual asset custodian shall remain liable to the customer to the same extent under the law.**"
+
+🟢 **Fully adopted.** The wording is slightly more polished (specifying "intent or negligence" as the threshold, and "same liability" as the principle), but **the spirit is one hundred percent the KO version.**
+
+#### Impact
+
+This clause will play a critical role in the first **virtual asset custodian compensation case.**
+
+If in the future an event resembling the 2022 FTX or Celsius collapse occurs — and Taiwanese consumers happen to be holding indirectly through another compliant custodian — this clause will give consumers a clear target to seek recovery from. **They will not be bounced overseas with no path to recover their loss.**
+
+Codifying Article 199 of the Civil Code in the VASP context is the gift I am giving to Taiwan's virtual asset consumers.
+
+---
+
+### Battle Six: Article 43 — The KO-Version-Exclusive FinTech Innovation Development Fund
+
+For the last one, I have to be honest: **I did not hold this one. It did not make it into the parent statute.** But I held the spirit.
+
+#### Why I wanted this clause
+
+The Executive Yuan version had no such clause at all. Article 43 of the KO version was something I wrote alone:
+
+> "To promote financial technology innovation, the competent authority shall establish a **FinTech Innovation Development Fund**.
+>
+> Sources of the Fund:
+> 1. Appropriations from the government through the budget process.
+> 2. Income from donations.
+> 3. Interest income on the Fund.
+> 4. Other income.
+>
+> Uses of the Fund:
+> 1. Enhancing digital financial resilience, subsidizing FinTech research and development, cultivating financial technology talent, and other uses related to the promotion of FinTech innovation.
+> 2. Subsidizing trade associations to conduct education and outreach.
+>
+> Matters concerning the organization, management, and use of the FinTech Innovation Development Fund shall be prescribed by the competent authority."
+
+Why I think this clause matters:
+
+**First, Taiwan has a serious shortage of FinTech talent.** From blockchain engineers, smart contract security auditors, AML compliance analysts, DeFi economic designers, to FinTech legal-compliance specialists — the talent market is very thin. Without a sustainable, institutionalized talent-cultivation fund, Taiwan's FinTech industry will be stuck forever at a **"guerilla band"** stage.
+
+**Second, building digital financial resilience requires long-term funding.** FinTech is not just apps. It is underlying infrastructure — digital identity verification, cross-border payment rails, smart contract audit tools, privacy computation. These are not things any single private company can fund on its own. They need government **"lead-horse"** capital.
+
+**Third, education and outreach need ongoing funding.** The spirit of Article 33's extension of education and outreach to the public will become hollow without funding support.
+
+#### Why I gave way
+
+I admit that establishing a fund has institutional difficulties:
+
+- **Funding source**: government annual budgeting must go through the Budget Act process, with cross-session and cross-year challenges;
+- **Legal architecture**: a "fund" is a formal legal entity, requiring articles of incorporation, board, accounting, and audit;
+- **Overlap with other funds**: the FSC already has mechanisms under the FinTech Development and Innovation Experimentation Act;
+- **Timing**: pushing for it in this review may force the administrative branch to re-evaluate the accompanying arrangements, dragging out the whole schedule.
+
+I proactively proposed during the review session:
+
+> At the review session in 2026, I said:
+>
+> "I also understand that establishing a fund has certain difficulties on the financial and institutional sides, and pushing it forward in the short term is not easy. So I propose, by way of a **supplementary resolution**, that when the FinTech Development and Innovation Experimentation Act is next amended, a 'FinTech Innovation Development Fund' should be added, to promote FinTech innovation, cultivate financial technology talent, and through education and outreach help our citizens better understand digital finance, thereby strengthening our international competitiveness."
+>
+> "Talent does not appear out of thin air, and industrial competitiveness does not grow out of thin air. If we hope for Taiwan to have a place in the next generation of financial competition, then talent cultivation and institution-building should start as early as possible."
+>
+> *— from the Chinese original.*
+
+#### Result
+
+⭐ The clause itself did not get in (a KO-version-exclusive design that cannot be found in the passed version).
+💬 But the supplementary resolution passed (page-6):
+
+> "The Financial Supervisory Commission shall, when amending the FinTech Development and Innovation Experimentation Act, add the establishment of a FinTech Innovation Development Fund, the uses of which shall be subsidizing FinTech research and development, cultivating financial technology talent, and subsidizing trade associations to conduct education and outreach, so as to promote our country's FinTech innovation, enhance digital financial resilience, and strengthen our international competitiveness."
+
+#### My reflection
+
+🔴 I have to write it honestly: I lost the clause.
+💬 I got the supplementary resolution, but that is only a "political commitment," not "legal compulsion."
+
+The to-do list I am leaving for my future self:
+
+- **First half of 2027**: start preparing an amendment version of the FinTech Development and Innovation Experimentation Act, with the Fund clause codified;
+- **At the same time**: build cross-party co-signatures inside the Legislative Yuan, turning this from "my issue" into "a cross-party consensus";
+- **With industry**: work with the virtual asset trade association and FinTech innovation associations to gather data and demonstrate the necessity of the Fund.
+
+This fight is not over.
+
+---
+
+## Chapter Three: The Significance of 15 Supplementary Resolutions
+
+Many people do not understand what a "supplementary resolution" is. Let me explain it in the simplest words:
+
+**A clause = legal compulsion.**
+**A supplementary resolution = political commitment.**
+
+A clause written into the statute must be obeyed, enforced, and used as the basis for sanctions by every future regulator. A supplementary resolution is "**a majority of members on the committee request that the competent authority move in this direction**," but it has no compulsion.
+
+Sounds like supplementary resolutions are useless? **Wrong.**
+
+The real power of a supplementary resolution lies in three things:
+
+1. **It is a public record.** In the future, any journalist, scholar, or legislator can pull it out and check whether the competent authority has complied.
+2. **It binds secondary legislation.** When the competent authority drafts secondary legislation under the parent statute's delegation, the supplementary resolution is the "**unspoken red line**" — if the secondary legislation contradicts the supplementary resolution, it will be raised in the next session.
+3. **It is the seed for future amendments.** When the law is next amended, the content of the supplementary resolution will become the first-draft basis for the first round of amendments.
+
+So the 15 supplementary resolutions passed on June 3 are how we preserve **"the spirit that did not get into the parent statute"** into political memory.
+
+### Classification and my role
+
+**Type A: Industry space / international alignment (page-1, 2, 3, 4)**
+
+- Open business content; flatten compliance costs (page-1)
+- Avoid offshore providers that have not landed in Taiwan eroding the domestic market (page-2)
+- Offshore service providers should comply with AML/CFT; guide users back to onshore (page-3)
+- VASPs to be designated as financial service providers under the Financial Consumer Protection Act (page-4)
+
+These four were primarily driven by other conveners (such as Li Yan-hsiu). I supported and co-signed.
+
+**Type B: Supervision of delegated secondary legislation (page-5, 10)**
+
+- Stakeholder consultation in the secondary legislation process (page-5, proposed by Li Yan-hsiu)
+- Pay close attention to FATF and international supervisory trends (page-10)
+
+These two are **procedural supplementary resolutions** ensuring that the secondary legislation is not drafted behind closed doors.
+
+**Type C: Supervisory capacity (page-11)**
+
+- Continuous review of the adequacy of supervisory personnel.
+
+🟡 This corresponds to the spirit of "the competent authority shall establish a dedicated unit and dedicated personnel" in my Article 2, Paragraph 2. The clause did not make it; the supplementary resolution did.
+
+**Type D: Industry practice transition (page-12)**
+
+- At least one year of transition for existing personnel (extendable by six months if necessary).
+
+🟡 Corresponds to my Article 12, Paragraph 3 (two years' transition). Although we retreated from two years to one (plus six months if necessary), the practical effect is that incumbent personnel will not be dismissed overnight.
+
+**Type E: BaoBo's core battles (page-6, 7, 8-9, 14, 15, 16)**
+
+⭐ These six are the outcomes of **my primary proposals or my primary push** in this review:
+
+1. **page-6**: Amend the FinTech Development and Innovation Experimentation Act to add the FinTech Innovation Development Fund (spirit of KO version Article 43)
+2. **page-7**: Within one year, study draft regulations for virtual asset derivatives
+3. **page-8-9**: Comprehensively open virtual asset derivatives (futures, options, perpetuals, swaps, binaries, leveraged, index), with a timetable within three months
+4. **page-14**: Comprehensive review of seizure, custody, liquidation, and return of virtual assets (with in-kind return as the principle) — corresponds to KO version Article 47, Paragraph 6
+5. **page-15**: Within one year, draft regulations on suspension of trading, with a remedy procedure established — corresponds to KO version Article 20, Paragraph 2
+6. **page-16**: Secondary legislation under Article 25 on filing-for-record should synchronize and set a clear time limit
+
+A note on the three resolutions for pages 7, 8, and 9:
+
+I paid particular attention to virtual asset derivatives. Products such as perpetual contracts, copy trading, virtual-asset-based collective investment management, and virtual-asset-based options have long been mature internationally. But Taiwan currently has no legal virtual asset derivatives market at all, leading to:
+
+- Domestic investors' **capital flows offshore** to unregulated platforms;
+- Once a foreign platform collapses, **there is no path to recovery**;
+- The competent authority **has difficulty asserting jurisdiction**.
+
+I proposed that the FSC complete the study of draft derivatives regulations within a year, with rolling reviews every six months and a timetable within three months. **This is the track on which the next phase of legislation will run.**
+
+**Type F: Stablecoin boundaries (page-13)**
+
+- Corresponding to Article 42, clarifying that "qualifying stablecoins are not securities under the Securities and Exchange Act, nor commodities under the Futures Trading Act."
+
+This corresponds to the market manipulation exemption in my Article 42, Paragraph 4. It clarifies the legal nature of stablecoins so they do not drift between different financial statutes.
+
+### Adding it all up
+
+Of the 15 supplementary resolutions, **at least 6 were primarily pushed by BaoBo, and 3 more correspond directly to KO-version arguments** — meaning that **close to 60 percent of the supplementary resolutions carry my fingerprint.**
+
+Combined with 9 clauses fully adopted (🟢) plus 4 partially adopted (🟡) plus 2 KO-exclusive designs landed via supplementary resolutions (⭐💬), the overall adoption rate of these 22 amendment proposals is over 75 percent.
+
+I am not boasting. This is the result of "**being prepared, having data, citing comparative law, and having fallback proposals**" throughout the review.
+
+---
+
+## Chapter Four: Taiwan's VASP Act in International Perspective
+
+If someone in 2036 reads this notebook and asks me: "Compared internationally, how does Taiwan's VASP Act rank?"
+
+I would answer: **"A top student in the middle tier."**
+
+### Versus MiCA
+
+The EU's MiCA Regulation is currently the most comprehensive and voluminous virtual asset framework in the world (300+ articles, plus more than 30 RTSs and ITSs). Taiwan's law has only 56 articles. **You cannot compare them on architecture.**
+
+But Taiwan's law is in some places **more precise**:
+
+- **Article 25's filing-for-record regime**: MiCA's *ex ante* notification regime (whitepapers 20 working days before) is closer to Taiwan's filing-for-record design, but MiCA's whitepaper disclosure burden is heavy. Taiwan's filing-for-record design is light, **closer to Japan's PSA model**.
+- **Article 47's in-kind return spirit**: MiCA does not address the form-of-asset question in criminal recovery (that is up to each country's criminal procedure law). Taiwan, by way of a **legislative explanation plus a supplementary resolution**, established the principle — **ahead of MiCA on this point**.
+
+### Versus the U.S. GENIUS Act
+
+The GENIUS Act is the U.S. stablecoin statute. Taiwan's VASP Act covers stablecoins only in Articles 34 to 36 — **much simpler**. But there are two shared design choices:
+
+- **Full reserve assets** (Article 36) — fully aligned with GENIUS § 4(a)(1)
+- **1:1 fiat denomination and redemption obligations** (codified in supplementary resolution page-13)
+
+The difference: GENIUS only regulates U.S.-issued stablecoins. Article 35 of Taiwan's law, with the flexibility proviso ("except as otherwise provided by the competent authority"), allows foreign stablecoins such as USDT and USDC to circulate legally in Taiwan. **This is where Taiwan is more pragmatic than GENIUS.**
+
+### Versus Japan's PSA
+
+Japan's PSA is the oldest and most mature virtual asset framework in Asia. Several aspects of Taiwan's VASP Act borrow directly from Japan:
+
+- **The 7-category business classification in Article 6**: similar to the service classifications in Article 23 of the Japanese Cabinet Office Order;
+- **The filing-for-record regime in Article 25**: similar to the "prior notice to the FSA" model in Japan;
+- **The outsourced custody regime in Article 27**: similar to Japan's detailed rules on trust custody.
+
+But Japan took 8 years to build today's framework. Taiwan walked the same path in 8 months — relying on borrowing and rapid integration.
+
+### Versus South Korea's VAUPA
+
+Korea's VAUPA leans heavily toward "investor protection law," not "business supervision law." Taiwan's VASP Act takes the middle path: **business supervision plus investor protection, on two legs.**
+
+From a certain angle, Taiwan is more comprehensive than Korea — VAUPA does not address stablecoins, does not address trade associations, does not address concurrent operation by financial institutions. Taiwan's law covers all of these.
+
+### Versus Hong Kong's Stablecoins Ordinance
+
+Hong Kong's 2024 Stablecoins Ordinance is very strict — only HKD-pegged stablecoins are permitted, and the issuer must be incorporated in Hong Kong with substantive operations there. Taiwan's design is **more open**: Article 35 permits foreign stablecoins to circulate in Taiwan after approval by the competent authority.
+
+### Taiwan's strengths
+
+1. **Technology capability**: semiconductors, software, blockchain underlying technology — talent density in Taiwan is high;
+2. **An open society**: high receptivity to new technologies and new financial instruments. The **vTaiwan and open-government tradition** gives policymaking a civic-participation foundation;
+3. **Parliamentary transparency**: live-streamed sessions, published speech records, and on-the-record interpellations;
+4. **Cross-domain legislative experience**: the Artificial Intelligence Basic Act, passed at the third reading on December 23, 2025, plus this VASP Act, together form a "**technology basic law plus industry-specific act**" dual-track regime — a uniquely Taiwanese legislative capability.
+
+### Taiwan's challenges
+
+1. **Insufficient FSC capacity**: Even though Article 2, Paragraph 2 only made it into a supplementary resolution, "**adequacy of supervisory personnel**" is the real bottleneck;
+2. **Small industry scale**: Taiwan's virtual asset operators are still small in terms of scale, customer base, and market cap compared to the U.S., Japan, and Korea;
+3. **Cross-border enforcement difficulty**: Article 7, Paragraph 3 on offshore providers setting up branches in Taiwan — actually enforcing that will be a major test;
+4. **Tax regime not yet aligned**: income tax, business tax, and stamp duty issues for virtual assets are **not addressed by this Act**;
+5. **Derivatives postponed**: a draft within a year is the floor, but actual implementation will take longer.
+
+### What kind of virtual asset governance leader I hope Taiwan becomes
+
+Not "**the strictest regulator**" — that is the EU's role.
+Not "**the most open sandbox**" — that is Dubai's and Singapore's role.
+
+I hope Taiwan is "**the most pragmatic integrator**" — putting together international regulatory consensus, semiconductor strength, an open-society gene, and cross-party legislative capability, to produce a regulatory environment that **local innovators want to stay in, foreign capital wants to come into, victims can recover from, and regulators have tools to govern with.**
+
+The law that passed on June 3 is just the starting point.
+
+---
+
+## Chapter Five: Thanks, Reflections, the Future
+
+### Thanks
+
+This law was not written by me alone.
+
+**Thanks to the Executive Yuan.** The speed at which the cabinet version passed on April 2 exceeded my expectations. Premier Cho Jung-tai's commitment on **"supervisory personnel adequacy"** during the April 28 general interpellation laid important groundwork for the supplementary resolution on Article 2.
+
+**Thanks to the FSC.** Chairperson Peng Chin-Lung (彭金隆) personally sat in on June 3, along with Lin Hsi-sheng, Director-General of the Department of Financial Market Development and Innovation; Lin Chih-hsien, Director-General of the Legal Affairs Department; Tong Cheng-chang, Director-General of the Banking Bureau; Kao Ching-ping, Director-General of the Securities and Futures Bureau; and Lai Hsin-kuo, Director-General of the Examination Bureau. Although we had heated exchanges on Article 25 (approval vs. filing for record), Article 20 (time limit), and Article 47 (in-kind return), every exchange was **on the merits, grounded in legal reasoning and comparative law**. There was no personal favor, no politics, no ideology. In Taiwan's current political climate, that is already very rare.
+
+**Thanks to the Central Bank of the Republic of China (Taiwan).** Governor Yang Chin-Long (楊金龍) was absent on official duty, so Deputy Governor Yan Tsung-Da (嚴宗大) and Tsai Chiung-min, Director-General of the Foreign Exchange Department, represented the bank. In the consultations on stablecoins and cross-border payments, the Central Bank provided enormous technical detail and explained its position — the key to letting this Act strike a balance between "FinTech innovation" and "monetary sovereignty."
+
+**Thanks to the Ministry of Justice, the Judicial Yuan, and the National Police Agency.** Liao Chiang-hsien, Counsellor at the Ministry of Justice; Wu Yuan-yao, Judge at the Criminal Division of the Judicial Yuan; and Lee Chia-chun, Section Chief at the Criminal Investigation Bureau, National Police Agency, Ministry of the Interior. The reason we could discuss the in-kind return of virtual assets to victims under Article 47 with this much depth is that these three agencies were willing to lay out, on the table, the actual difficulties of criminal prosecution and victim protection — including that Nokia 3310 metaphor that left such an impression on me.
+
+**Thanks to the Ministry of Finance.** Minister Juang Tsuei-Yun (莊翠雲) was absent, but Lee Hsing-fen, Section Chief at the National Treasury Administration, Ministry of Finance; Lai Chi-fu, Section Chief at the Taxation Administration; Lin Mei-hui, Senior Specialist; and Chiou Hsiao-wei, Senior Specialist, all attended on behalf of the Ministry of Finance throughout, allowing dialogue on the thorny question of "who governs the taxation of virtual assets." Even though this specific Act ultimately did not address taxation, that dialogue will continue into the next session.
+
+**Thanks to the Criminal Affairs Department of the Ministry of Justice.** Their input on the Article 47 debate let me see the difficulty of stitching together three layers — the Code of Criminal Procedure, the contract law of the Civil Code, and the VASP Act — and ultimately led to the "legislative explanation plus supplementary resolution" fallback path.
+
+**Thanks to industry.** The Taiwan Virtual Asset Trade Association, the various trading platforms and custodians, the Blockchain Enthusiasts Association, and others. From the 2024 AML amendments to this VASP legislation, we held more than 30 industry roundtables in total. Without the practical data and case studies provided by industry, I could not have written the 20-day cap in Article 20, the single-point-of-failure argument in Article 25, or the Silk Road / Bitcoin Queen examples in Article 47.
+
+**Thanks to the co-signers.** Co-signatures from Su Ching-chuan, Hsu Yu-chen, and twenty other legislators let the KO version enter the procedural calendar on March 20. **Special thanks to Convener Li Yan-hsiu** — we had aligned positions on Article 12 (transition period for personnel) and Article 23 (record retention), and we covered for each other on the floor.
+
+**Thanks to my office team.** The legal team, the policy research team, the communications team — three months of running the VASP project together with me. Without you translating MiCA, comparing Korean VAUPA, tracking GENIUS, and producing the 22-clause amendment comparison chart, I could not have cited comparative law on demand in 76 prepared speeches during the review.
+
+### Reflections: What I wanted to do but did not
+
+I do not want to pretend that this law is already perfect. A notebook written for the next ten years has to be honest.
+
+**1. Derivatives postponed by a year**
+
+Virtual asset futures, options, perpetuals, swaps, binaries, leverage, index-based derivatives — these are mature internationally, but Taiwan did not address them this time. I only secured supplementary resolutions (pages 7, 8-9) asking the FSC to draft secondary legislation within one year and propose a timetable within three months.
+
+🔴 **I did not hold this one.** Next-phase battlefield.
+
+**2. Taxation completely untouched**
+
+Income tax on virtual assets (investment-type vs. trading-type), business tax (VASP services vs. intermediary fees), gift tax (on-chain P2P transfers), trust-related taxes — these are all real controversies. This Act **did not touch them at all.**
+
+I discussed this with Legislator Su Chih-fen and Legislator Chen Yu-chen, but tax law is the Ministry of Finance's portfolio, not the FSC's. The cross-agency coordination cost is too high, so we decided to set this aside for now. In the next phase I will push for a **"Virtual Asset Taxation Project."**
+
+**3. Insufficient depth in customer education**
+
+Article 33's extension of education and outreach to the public is a good thing, but the trade association itself is also made up of operators, so **letting operators educate the public** has a structural conflict of interest.
+
+In the future I hope to push for an **"independent virtual asset investor education institution"** (similar to the Taiwan Stock Exchange's Investor Education Center) co-governed by the FSC, the trade association, and consumer protection groups.
+
+**4. DeFi, self-custody wallets, and NFTs not addressed**
+
+The Article 3 definition of "virtual asset" in this Act specifically excludes **non-custodial wallets** and **user-to-user direct exchange**. DeFi, NFTs, DAOs — these Web3-native scenarios are **not within this Act's jurisdiction**.
+
+This was deliberate — we built the "centralized VASP" main line first. But future supervisory frameworks for DeFi and NFTs will require additional legislation or amendments. **This is my promise to the Web3 community: I have not forgotten your issues.**
+
+**5. Coordination with the AI Basic Act**
+
+The Artificial Intelligence Basic Act, passed on December 23, 2025, is a development-oriented basic law (under the National Science and Technology Council). This VASP Act is a supervision-oriented industry law (under the FSC). Where do they intersect?
+
+AI-driven algorithmic trading, AI fraud detection, AI smart contract auditing, AI robo-advisors — all of these will fall in the gray zone between the two statutes. I hope, during the second and third readings, to work with the AI Basic Act's competent authority (the NSTC) to establish a coordination mechanism for "**AI × Finance**."
+
+### The future: second reading, third reading, secondary legislation, enforcement
+
+This law has only completed one third of its journey.
+
+**Second reading**: under the procedures of the Legislative Yuan, this Act will move to a second reading in the plenary. I expect inter-party negotiations to begin at the start of the second session of 2026 (after September). There may be some detailed wording adjustments, but the architecture passed on June 3 should not change substantially.
+
+**Third reading**: likely completed within the second session of 2026, and no later than the end of 2026. After the third reading, the Executive Yuan will promulgate it — under Article 56, the law takes effect on the date of promulgation (no deferred implementation clause).
+
+**Secondary legislation**: this Act contains a large number of clauses delegating to secondary legislation (Articles 6, 7, 8, 11, 12, 13, 15, 17, 19, 20, 23, 25, 26, 28, 29, 30, 31, 32, 35, 36, 37, 38, 43, 45, 56, etc.). Articles with delegations alone come close to 25, and each carries one to three pieces of secondary legislation behind it. **This is the FSC's primary battleground over the coming 12 to 24 months.** I will be tracking each draft to make sure the **"spirit of the supplementary resolutions actually gets written in."**
+
+**First license**: Article 55 sets the *outer* limits — applications must be filed within 12 months and licenses obtained within 21 months of entry into force. But these are statutory ceilings, not predictions. Actual licensing depends on how quickly the FSC publishes the implementing regulations: capital requirements, operating bonds, qualifications of responsible persons, internal control and audit standards, listing/delisting review procedures, stablecoin sub-rules, and so on — the **full set of orders and notices** must be in place before applications can be accepted. That process is not trivial. So **the exact timing of Taiwan's first VASP license is not something I want to rush** — letting the secondary legislation be carefully debated and giving the industry adequate time to prepare matters more than racing to issue a license. Who will be first? I will be watching.
+
+**First enforcement action**: the first enforcement actions under Article 42 (market manipulation) and Article 47 (criminal liability) will be the **stress test** of this Act. I hope the first enforcement is not too bloody (I worry that excessive enforcement will scare operators away), but it also cannot be too gentle (over-tolerance harms investors). **This is a test of wisdom for the FSC, the prosecutors, and the courts.**
+
+**First compensation case**: based on Article 27 (custodian liability), Article 42, Paragraph 5 (damages), and Article 47, Paragraph 5 (return of criminal proceeds) — when the first victim invokes these clauses to seek compensation, how will Taiwan's courts interpret them? That is the judiciary's homework.
+
+---
+
+## Conclusion: A Letter to the Taiwan of 2036
+
+If one day my grandchild asks me, "Grandpa, why did you spend so much energy writing a law?"
+
+I would answer this way.
+
+Law is a mirror of technological civilization. When we put a new technology — blockchain, virtual assets, smart contracts — into a legislative frame, we are actually asking ourselves a deeper question: **what kind of new things is this society willing to accept? And what kind of old habits is it not willing to keep?**
+
+The VASP Act does not "legalize" virtual assets — virtual assets were already here, from the moment of the 2009 Bitcoin Genesis Block. The VASP Act lets "**the legal language of Taiwanese society**" finally have the capacity to describe, regulate, and protect this thing that has been flowing in front of our eyes for over a decade.
+
+I hope the Taiwan of 2036 has a healthy virtual asset trading market, a responsible stablecoin issuance regime, a community of high-caliber FinTech talent, a victim-protection mechanism with warmth, and a digital finance regulator that the international community respects.
+
+I hope the me of 2036, looking back at June 3, 2026, can say: "**The law that passed that day became one of the pillars of Taiwan's digital finance.**"
+
+I hope the virtual asset industry of 2036 will no longer say "**Taiwan is a regulatory gray zone**," but will say "**Taiwan is the most pragmatic virtual asset governance leader in the Asia-Pacific.**"
+
+That is the original intent behind this law, and the purpose of this notebook.
+
+
+If you are a young person reading this in 2036, considering whether to enter the virtual asset industry, hesitating about whether to believe that digital finance can change anything — I want you to see how much preparation, how much debate, how much compromise, and how much honesty we in 2026 put in to push these 56 clauses and 15 supplementary resolutions to the next page of history.
+
+> "Bitcoin is not just an asset. It is the 21st century's national financial sovereignty defense battle."
+> — I have said this in many places, and I will say it again today.
+
+Taiwan's financial sovereignty defense battle — this VASP Act is only one outpost engagement. Behind it are still CBDC, RWA, cross-chain payments, decentralized identity, and quantum-safe cryptography. Each one will be harder, and each one will matter more.
+
+**But for today, let us finish this one battle.**
+
+Thank you for reading this far.
+
+KO Ju-Chun (BaoBo)
+June 9, 2026, at the Legislative Yuan office, Taipei
+
+---
+
+## Appendix A: Legislative Timeline
+
+```
+2024-02      KO Ju-Chun sworn in as legislator
+2024-04      Emerging Technology Parliamentary Exchange Association (ETEA) founded
+2024-11-30   FSC's "Regulations on AML Registration for Enterprises Handling Virtual Asset Services" take effect
+2025-12-23   AI Basic Act passes third reading (KO Ju-Chun as principal proposer)
+2026-02      KO Ju-Chun becomes Finance Committee convener; VASP legislation begins
+2026-02—03   KO version drafted; 20+ industry roundtables held
+2026-03-20   KO Ju-Chun introduces 53-clause Virtual Asset Services Act draft (co-signed by Su Ching-chuan, Hsu Yu-chen, and 20 others)
+2026-04-02   Executive Yuan passes the 55-clause version
+2026-04-15   Executive Yuan transmits the bill to the Legislative Yuan
+2026-04-28   KO Ju-Chun raises the issue during general interpellation; Premier Cho Jung-tai commits to "strengthening supervisory personnel for virtual assets"
+2026-05-06   First Finance Committee review session
+2026-05-13   Second Finance Committee review session
+2026-05-16   Third Finance Committee review session (agency negotiation)
+2026-06-03   Finance Committee passes the 56-clause Virtual Asset Services Act draft plus 15 supplementary resolutions
+2026-06-09   KO Ju-Chun publishes this legislative notebook
+2026-Q3      Inter-party negotiations expected to begin
+2026-Q4      Second and third readings expected (no later than end of 2026)
+2027-Q1—Q2   Secondary legislation expected to roll out
+TBD          First VASP license (timing depends on FSC's secondary legislation; should not be rushed)
+Early 2028   Most existing operators expected to complete licensing (per Article 55's 12 + 21 + 3 months schedule)
+```
+
+## Appendix B: Influence-Rating Summary
+
+Final outcomes of the 22 amendment proposals:
+
+| Article | Issue | Rating | Notes |
+|---|---|---|---|
+| Art. 2 | Dedicated unit at competent authority | 🟡💬 | Clause not adopted; supplementary resolution (page-11) adopted |
+| Art. 7 | License proviso | 🟢 | "Except as otherwise provided by the competent authority" adopted |
+| Art. 8 | Scope-of-business proviso | 🟢 | "Except as otherwise provided by the competent authority" adopted |
+| Art. 11 | Tiered operating deposit | 🟢 | Legislative explanation states "shall be set respectively taking into account categories and scope of business" |
+| Art. 12 | Transition for personnel | 🟡💬 | Clause not adopted; supplementary resolution (page-12) adopted 1 + 0.5 years |
+| Art. 13 | Tiered debt ratio | 🟡 | Clause unchanged; legislative explanation adopts same direction |
+| Art. 17 | Customer information confidentiality | 🟢 | Passed Art. 17 already imposes confidentiality (aligned with KO version) |
+| Art. 20 | Suspension of trading time limit | 🔴💬 | 20 days not adopted in clause; supplementary resolution (page-15) handles via secondary legislation |
+| Art. 23 | Record retention standards | 🟢 | New Paragraph 4: "Scope, procedure, and form to be prescribed by the competent authority" |
+| Art. 25 | Filing-for-record regime for listing | 🟢⭐ | **"Approval" changed to "filing for record" word for word** |
+| Art. 27 | Liability for outsourced custody | 🟢 | Privity-of-contract spirit fully adopted |
+| Art. 30 | Custodian damages | 🟢 | Same spirit as Art. 27 |
+| Art. 32 | Trade association education and outreach | 🟢 | Art. 33 extended to "customers or the public" |
+| Art. 33 | Education and outreach to the public | 🟢 | Same as above |
+| Art. 35 | Stablecoin flexibility proviso | 🟢 | "Except as otherwise provided by the competent authority" adopted |
+| Art. 36 | Stablecoin reserve assets | 🟢 | Aligned with GENIUS and MiCA |
+| Art. 42 | Market manipulation exemption | 🟢💬 | **Adopted word for word; supplementary resolution (page-13) handles stablecoin boundaries** |
+| ⭐ Art. 43 | FinTech Innovation Development Fund | ⭐💬 | **KO-version exclusive; clause not adopted; supplementary resolution (page-6) adopted** |
+| Art. 47 | In-kind payment in virtual assets | 🟡💬 | Clause not adopted; legislative explanation states "in-kind return as the principle"; supplementary resolution (page-14) for comprehensive review |
+| Art. 55 | Extended transition period | 🟢 | 12 + 21 + 3 (total 24) months |
+
+**Overall adoption structure:**
+- 🟢 Fully or substantively adopted: **13 articles**
+- 🟡 Partially adopted or compromised: **4 articles**
+- 🔴 Clause not adopted: **1 article** (Art. 20)
+- ⭐ KO-version exclusive design: **1 article** (Art. 43)
+- 💬 Adopted via supplementary resolutions: **7+ items**
+
+**BaoBo's overall adoption rate: roughly 86% (19 of 22 articles have some degree of adoption).**
+
+---
+
+*This is the personal legislative notebook of Legislator KO Ju-Chun, written independently and not representing the position of any political party. The detailed text of the version passed by the Finance Committee on June 3, 2026 is publicly available in the Legislative Yuan's records system.*
+
+*This piece was co-authored with LittleLobster (AI Research Assistant), who helped organize the speech transcripts, comparative law materials, and the influence-rating tables. Final wording, political judgment, and responsibility rest with KO Ju-Chun.*
+
+---
+
+*Originally written in Traditional Chinese; this English version is prepared for international readers. The Chinese version remains authoritative for any interpretive disputes.*
+
+*— Office of Legislator Ju-Chun KO (BaoBo), June 9, 2026*
+
+---
+
+## 📎 Files & Downloads
+
+This law wasn't written by me alone, and it shouldn't be read by me alone. Below are the original materials, my bilingual edition, and the present essay — all publicly downloadable for scholars, industry, international readers, and future generations:
+
+### This Essay (Bilingual)
+- 📄 [Letter to Taiwan in 2036 — English Version (PDF)](/files/vasp-act-legislative-notes/VASP-Act-Reflections-EN_JuChunKO.pdf)
+- 📄 [English Version (Word)](/files/vasp-act-legislative-notes/VASP-Act-Reflections-EN_JuChunKO.docx)
+- 🌏 [《虛擬資產服務法》立法手記 — Chinese Version (PDF)](/files/vasp-act-legislative-notes/VASP立法手記_葛如鈞_中文版.pdf)
+- 🌏 [Chinese Version (Word)](/files/vasp-act-legislative-notes/VASP立法手記_葛如鈞_中文版.docx)
+
+### Virtual Asset Services Act (Draft) — Bilingual Edition (June 3 Committee Review Version)
+- 📖 [Bilingual VASA Draft (PDF, 75 pages, FSC official translation conventions)](/files/vasp-act-legislative-notes/VASP-Act-Draft_Bilingual-v1.1.pdf)
+- 📖 [Bilingual VASA Draft (Word, editable)](/files/vasp-act-legislative-notes/VASP-Act-Draft_Bilingual-v1.1.docx)
+
+### Original Legislative Materials (Legislative Yuan Official)
+- 🏛️ [Legislative Yuan Bill Documents Search](https://ppg.ly.gov.tw/ppg/): search "虛擬資產服務法"
+- 📺 [June 3 Finance Committee IVOD (full recording)](https://ivod.ly.gov.tw/Play/Full/1M/17485)
+- 🏛️ [FSC Official English Translation of Anti-Money Laundering and Counter-Terrorism Financing Regulations for VASPs (terminology source)](https://law.fsc.gov.tw/EngLawContent.aspx?lan=E&id=2734)
+
+### International Comparative Law References
+- [EU MiCA Regulation (EUR-Lex)](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A32023R1114)
+- [U.S. GENIUS Act (H.R. 2392, 119th Congress)](https://www.congress.gov/bill/119th-congress/house-bill/2392)
+- [FATF Recommendation 15 (Virtual Assets and VASPs)](https://www.fatf-gafi.org/en/topics/virtual-assets.html)
+- [IOSCO Policy Recommendations for Crypto and Digital Asset Markets (Nov 2023)](https://www.iosco.org/library/pubdocs/pdf/IOSCOPD747.pdf)
+- [Japan FSA: Payment Services Act (PSA) — English Translation](https://www.japaneselawtranslation.go.jp/en/laws/view/3078)
+- [Korea Virtual Asset Users Protection Act (VAUPA)](https://elaw.klri.re.kr/eng_service/lawView.do?hseq=58807&lang=ENG)
+- [Hong Kong Stablecoins Ordinance](https://www.elegislation.gov.hk/hk/A506!en)
+
+### Future Updates
+This essay is the June 9, 2026 first edition. **The third reading is expected before August 31, 2026.** Significant updates — third reading outcomes, inter-party negotiation changes, FSC's progressive release of secondary legislation — will be added via revisions or follow-up pieces. Follow [@dAAAb](https://x.com/dAAAb) or [blog.juchunko.com](https://blog.juchunko.com) for the latest.
+
