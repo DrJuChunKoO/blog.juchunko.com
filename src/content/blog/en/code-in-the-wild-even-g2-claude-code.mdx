@@ -1,0 +1,62 @@
+---
+title: "Coding with AR Glasses: Even Realities G2 × Claude Code in the Wild"
+description: "Taking the Even Realities G2 AR glasses outdoors, remotely connecting back to my Mac via Terminal, and operating Claude Code in the wild. When green terminal text overlays lush mountain scenery, #CodeInTheWild is no longer just a hashtag—it's real life."
+pubDate: "2026-06-21"
+heroImage: "../../../assets/images/code-in-the-wild-even-g2/hero.png"
+author: "juchun-ko"
+categories: ["devlog", "hardware", "ai-agent"]
+---
+
+## When the Terminal Floats Among the Mountains
+
+Today I headed out wearing my [Even Realities G2](https://www.evenrealities.com/) AR glasses, and on a whim decided to try something—**operating Claude Code directly from my glasses, outdoors.**
+
+The result? Smoother than I ever expected.
+
+The G2's Terminal feature let me connect back to my Mac at home through a private network set up with [Tailscale](https://tailscale.com/), open Claude Code, and just like that, kick off a "wild coding" session right in front of a mountain backdrop.
+
+## How It Works
+
+The setup is actually quite straightforward:
+
+1. **Even Realities G2** has a built-in Even Terminal app that provides a full terminal interface
+2. My phone connects to the same **Tailscale** tailnet, ensuring the glasses can securely access the remote Mac
+3. **Claude Code** (Anthropic's AI coding agent) is running on the Mac, awaiting instructions
+4. From the glasses, I use voice input or touch controls to issue commands directly to Claude Code
+
+Just like that, I had Claude Code clone all my GitHub repositories from outdoors—the official website `juchunko.com`, the blog, the TransPal transcript platform series—all done in one go.
+
+## Green Terminal × Green Mountains
+
+The most magical moment was seeing Claude Code return a table—listing each repo's name, file count, and size—those green monospaced characters floating directly over the lush green mountains in the distance. The green of the terminal merged perfectly with nature's green. This is probably the most literal realization of `#CodeInTheWild` there ever was.
+
+## More Than Just a Cool Demo
+
+This isn't just a flashy demo. As a legislator, I'm constantly on the move—meetings, site visits, business trips. But inspiration and needs don't wait. With the combination of AR glasses + remote terminal + AI coding agent:
+
+- **On the high-speed rail**, I can have Claude Code analyze the technical details of a bill
+- **Between meetings**, I can quickly modify website content or blog posts
+- **Anywhere with internet**, I maintain full development capabilities
+
+This is the philosophy I've been championing: **Technology should serve people everywhere, not chain them to a desk.**
+
+## Technical Details
+
+For those who want to try this setup, here's my configuration:
+
+| Component | Description |
+|---|---|
+| Glasses | Even Realities G2 |
+| Terminal | Even Terminal (built-in G2 app) |
+| Network Tunnel | Tailscale (phone must be on the same tailnet) |
+| Remote Host | Mac (running Claude Code) |
+| AI Agent | Claude Code by Anthropic |
+| Message Bridge | OpenClaw (AI Agent, bridged via Telegram) |
+
+## Conclusion
+
+In 2026, coding no longer requires sitting stiffly in front of a screen.
+
+Put on your glasses, step outside, and let AI be your pair programmer—the world is your office.
+
+`#CodeInTheWild` 🌿
