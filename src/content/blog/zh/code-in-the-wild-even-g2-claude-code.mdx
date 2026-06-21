@@ -1,0 +1,62 @@
+---
+title: "戴著 AR 眼鏡寫程式：Even Realities G2 × Claude Code 的野外實測"
+description: "帶著 Even Realities G2 AR 眼鏡出門，透過 Terminal 功能遠端連回 Mac，直接在戶外操作 Claude Code。當綠色的終端機文字疊映在翠綠山景上，#CodeInTheWild 不再只是 hashtag，而是真實的日常。"
+pubDate: "2026-06-21"
+heroImage: "../../../assets/images/code-in-the-wild-even-g2/hero.jpg"
+author: "juchun-ko"
+categories: ["devlog", "hardware", "ai-agent"]
+---
+
+## 當終端機浮現在山林之間
+
+今天帶著 [Even Realities G2](https://www.evenrealities.com/) AR 眼鏡出門，心血來潮想試試一件事——**在戶外，用眼鏡直接操作 Claude Code**。
+
+結果？超乎預期地順暢。
+
+G2 的 Terminal 功能讓我透過 [Tailscale](https://tailscale.com/) 組成的私人網路，從眼鏡端連回家裡的 Mac，打開 Claude Code，然後就這樣在山景前面開始了一場「野外開發」。
+
+## 怎麼做到的？
+
+整個流程其實不複雜：
+
+1. **Even Realities G2** 內建的 Even Terminal app，提供了完整的終端機介面
+2. 手機透過 **Tailscale** 連入同一個 tailnet，確保眼鏡能安全存取遠端的 Mac
+3. Mac 上跑著 **Claude Code**（Anthropic 的 AI coding agent），等待指令
+4. 在眼鏡上透過語音輸入或觸控操作，直接對 Claude Code 下達指令
+
+就這樣，我在戶外讓 Claude Code 把我的 GitHub repositories 全部 clone 下來——官方網站 `juchunko.com`、部落格 `blog`、逐字稿平台 `TransPal` 系列，一口氣搞定。
+
+## 綠色終端機 × 綠色山景
+
+最魔幻的瞬間，是看到 Claude Code 回傳的表格——列出每個 repo 的名稱、檔案數、大小——那些綠色的等寬字體，直接浮現在遠方翠綠的山巒之上。終端機的綠與大自然的綠完美融合，這大概是 `#CodeInTheWild` 最字面意義的實現了。
+
+## 不只是炫技
+
+這不只是一個酷炫的 demo。身為立委，我經常需要在外奔波——拜會、勘查、出差。但很多時候，靈感和需求就是不等人。有了 AR 眼鏡 + 遠端終端 + AI coding agent 這套組合：
+
+- **在高鐵上**，可以讓 Claude Code 幫我分析法案的技術細節
+- **在會議空檔**，可以快速修改網站內容或部落格文章
+- **在任何有網路的地方**，都能維持完整的開發能力
+
+這就是我一直在推動的理念：**科技應該無所不在地服務人，而不是把人綁在辦公桌前。**
+
+## 技術細節
+
+對於也想嘗試的朋友，這裡列出我的設定：
+
+| 組件 | 說明 |
+|---|---|
+| 眼鏡 | Even Realities G2 |
+| 終端機 | Even Terminal（G2 內建 app） |
+| 網路隧道 | Tailscale（手機必須在同一個 tailnet） |
+| 遠端主機 | Mac（跑 Claude Code） |
+| AI Agent | Claude Code by Anthropic |
+| 訊息橋接 | OpenClaw（小龍蝦 AI Agent，串接 Telegram） |
+
+## 結語
+
+2026 年，寫程式不再需要正襟危坐在螢幕前。
+
+戴上眼鏡，走出去，讓 AI 當你的 pair programmer——世界就是你的辦公室。
+
+`#CodeInTheWild` 🌿
