@@ -2,6 +2,9 @@
   "name": "blog-juchunko-com",
   "type": "module",
   "version": "0.0.1",
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "dev": "astro dev",
     "dev:astro": "astro dev",
@@ -15,22 +18,22 @@
     "astro": "astro"
   },
   "dependencies": {
-    "@ai-sdk/openai": "^3.0.62",
-    "@ai-sdk/react": "^3.0.177",
+    "@ai-sdk/openai": "^4.0.0",
+    "@ai-sdk/openai-compatible": "3.0.0",
+    "@ai-sdk/react": "^4.0.2",
     "@astrojs/check": "^0.9.9",
     "@astrojs/mdx": "^5.0.4",
     "@astrojs/partytown": "^2.1.7",
     "@astrojs/react": "^5.0.4",
     "@astrojs/rss": "^4.0.18",
     "@astrojs/sitemap": "^3.7.2",
-    "@openrouter/ai-sdk-provider": "^2.9.0",
     "@radix-ui/react-select": "^2.2.6",
     "@supabase/supabase-js": "^2.105.3",
     "@tailwindcss/vite": "^4.2.4",
     "@tanstack/react-query": "^5.100.9",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
-    "ai": "^6.0.175",
+    "ai": "^7.0.2",
     "astro": "^6.2.2",
     "clsx": "^2.1.1",
     "katex": "^0.16.45",

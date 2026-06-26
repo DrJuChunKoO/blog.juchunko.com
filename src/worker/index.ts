@@ -1,6 +1,15 @@
 // @ts-nocheck
-import { createOpenRouter } from "@openrouter/ai-sdk-provider";
-import { streamText, tool, smoothStream, convertToModelMessages, generateText } from "ai";
+import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
+import {
+  createUIMessageStreamResponse,
+  streamText,
+  tool,
+  smoothStream,
+  convertToModelMessages,
+  generateText,
+  isStepCount,
+  toUIMessageStream,
+} from "ai";
 import z from "zod";
 import type { ExportedHandler, Fetcher } from "@cloudflare/workers-types";
 
@@ -38,7 +47,8 @@ export default {
         }
         const fileContent = await fileResponse.text();
 
-        const openrouter = createOpenRouter({
+        const openrouter = createOpenAICompatible({
+          name: "openrouter",
           apiKey: env.OPENROUTER_API_KEY,
           baseURL:
             "https://gateway.ai.cloudflare.com/v1/3f1f83a939b2fc99ca45fd8987962514/blog/openrouter/v1",
@@ -53,8 +63,8 @@ Please list the points directly in English using Markdown bullet list format (e.
 Keep the tone professional, clear, and easy to understand. Keep each point under 15 words. Do not include any introduction, foreword, or conclusion; output the list directly.`;
 
         const { text } = await generateText({
-          model: openrouter.chat("@preset/website-chatbot"),
-          system: systemPrompt,
+          model: openrouter.chatModel("@preset/website-chatbot"),
+          instructions: systemPrompt,
           prompt: fileContent,
         });
 
@@ -81,7 +91,8 @@ Keep the tone professional, clear, and easy to understand. Keep each point under
       // 初始化 OpenRouter provider
       // --------------------------------------------------------------
 
-      const openrouter = createOpenRouter({
+      const openrouter = createOpenAICompatible({
+        name: "openrouter",
         apiKey: env.OPENROUTER_API_KEY,
         baseURL:
           "https://gateway.ai.cloudflare.com/v1/3f1f83a939b2fc99ca45fd8987962514/blog/openrouter/v1",
@@ -118,10 +129,10 @@ current page: https://blog.juchunko.com${filename}
       // 執行 LLM，並注入各種 tool
       // --------------------------------------------------------------
       const result = streamText({
-        model: openrouter.chat("@preset/website-chatbot"),
-        system: systemPrompt,
+        model: openrouter.chatModel("@preset/website-chatbot"),
+        instructions: systemPrompt,
         messages: await convertToModelMessages(messages),
-        maxSteps: 8,
+        stopWhen: isStepCount(8),
         experimental_transform: smoothStream({
           delayInMs: 10,
           chunking: /[\u4E00-\u9FFF]|\S+\s+/, // 中英分段顯示
@@ -130,9 +141,8 @@ current page: https://blog.juchunko.com${filename}
           // ----------------- 讀取目前頁面 -----------------
           viewPage: tool({
             description: "Get the current page content",
-            parameters: z.object({}).strict(),
+            inputSchema: z.object({}).strict(),
             execute: async () => {
-              const date = new Date().toLocaleDateString();
               const fileData = await fetch(
                 // remove last slash
                 `https://github.com/DrJuChunKoO/blog.juchunko.com/raw/refs/heads/main/src/content/blog/${filename.replace(/\/$/, "")}.mdx`,
@@ -144,7 +154,9 @@ current page: https://blog.juchunko.com${filename}
         },
       });
 
-      return result.toUIMessageStreamResponse();
+      return createUIMessageStreamResponse({
+        stream: toUIMessageStream({ stream: result.stream }),
+      });
     }
 
     // ------------------------------
