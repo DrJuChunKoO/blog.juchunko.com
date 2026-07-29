@@ -216,7 +216,7 @@ const jsonLd = {
       Skip to main content
     </a>
     <Header />
-    <main id="main-content">
+    <main id="main-content" class="w-full max-w-none px-0">
       <article>
         <div class="sr-only">
           <span data-pagefind-filter={`language:${currentLang}`}></span>
@@ -377,7 +377,7 @@ const jsonLd = {
           </div>
         </div>
         <div class="container">
-          <div class="prose dark:prose-invert">
+          <div class="prose max-w-none dark:prose-invert">
             <KeySummary client:only="react" lang={currentLang} />
             {
               otherLangPost && (

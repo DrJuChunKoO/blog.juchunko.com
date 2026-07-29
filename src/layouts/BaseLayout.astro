@@ -39,13 +39,13 @@ const lang = getLangFromUrl(Astro.url);
       main {
         flex-grow: 1;
         max-width: 960px;
-        margin: auto;
-        padding: 1.5rem;
+        margin-inline: auto;
+        padding: 1.5rem 0.75rem;
         width: 100%;
       }
-      @media (max-width: 720px) {
+      @media (min-width: 768px) {
         main {
-          padding: 1rem 0.75rem;
+          padding-inline: 1.5rem;
         }
       }
     </style>
