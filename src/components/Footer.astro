@@ -5,7 +5,7 @@ const t = useTranslations(lang);
 ---
 
 <footer
-  class="border-t border-gray-200 bg-gradient-to-b from-gray-100 to-transparent px-4 py-8 text-gray-600 dark:border-white/10 dark:from-white/5 dark:text-gray-400"
+  class="border-t border-gray-200 bg-gradient-to-b from-gray-100 to-transparent px-3 py-8 text-gray-600 dark:border-white/10 dark:from-white/5 dark:text-gray-400 md:px-6"
 >
   <div
     class="mb-4 flex items-center justify-center gap-2 text-gray-900 dark:text-gray-100"
@@ -120,8 +120,14 @@ const t = useTranslations(lang);
 </footer>
 <style>
   footer {
-    padding: 2em 1em 6em 1em;
+    padding: 2em 0.75rem 6em;
     text-align: center;
+  }
+  @media (min-width: 768px) {
+    footer {
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+    }
   }
   .dark footer {
     background-color: #0a0a0a;

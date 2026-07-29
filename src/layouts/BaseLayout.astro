@@ -43,6 +43,11 @@ const lang = getLangFromUrl(Astro.url);
         padding: 1.5rem;
         width: 100%;
       }
+      @media (max-width: 720px) {
+        main {
+          padding: 1rem 0.75rem;
+        }
+      }
     </style>
   </head>
   <body class="bg-white text-gray-900 dark:bg-gray-950 dark:text-gray-100">
