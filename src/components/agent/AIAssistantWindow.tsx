@@ -419,7 +419,8 @@ export default function AIAssistantWindow({
             >
               <div className="flex items-center gap-2">
                 <Bot className="size-5" />
-                <h3 className="font-semibold">
+                {/* 站台 body 是 20px/1.7，標題必須自訂尺寸才不會被面板放大 */}
+                <h3 className="text-base font-semibold">
                   {ui[lang]["agent.assistant.title"]}
                 </h3>
               </div>
@@ -688,7 +689,8 @@ export default function AIAssistantWindow({
               expanded && "mx-auto w-full max-w-3xl pb-4",
             )}
           >
-            <div className="bg-muted/50 focus-within:bg-muted flex items-end gap-2 rounded-lg border border-black/10 transition-all focus-within:border-black/30 dark:border-white/15 dark:focus-within:border-white/40">
+            {/* 內距放在容器上，送出鍵才能和 textarea 共用同一條基線 */}
+            <div className="bg-muted/50 focus-within:bg-muted flex items-end gap-2 rounded-lg border border-black/10 p-1 transition-all focus-within:border-black/30 dark:border-white/15 dark:focus-within:border-white/40">
               <Textarea
                 ref={inputRef}
                 value={input}
@@ -704,7 +706,7 @@ export default function AIAssistantWindow({
                   type="button"
                   variant="secondary"
                   size="icon-lg"
-                  className="m-1 cursor-pointer rounded-lg"
+                  className="cursor-pointer rounded-lg"
                   onClick={() => stop()}
                   aria-label={ui[lang]["agent.assistant.stop"]}
                 >
@@ -714,7 +716,7 @@ export default function AIAssistantWindow({
                 <Button
                   type="submit"
                   size="icon-lg"
-                  className="m-1 cursor-pointer rounded-lg"
+                  className="cursor-pointer rounded-lg"
                   disabled={input.trim() === ""}
                   aria-label={ui[lang]["agent.assistant.send"]}
                 >
