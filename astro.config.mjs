@@ -5,6 +5,7 @@ import sitemap from "@astrojs/sitemap";
 import tailwindcss from "@tailwindcss/vite";
 import partytown from "@astrojs/partytown";
 // latex
+import { unified } from "@astrojs/markdown-remark";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
 import react from "@astrojs/react";
@@ -63,5 +64,10 @@ export default defineConfig({
       },
     },
   },
-  markdown: { remarkPlugins: [remarkMath], rehypePlugins: [rehypeKatex] },
+  markdown: {
+    processor: unified({
+      remarkPlugins: [remarkMath],
+      rehypePlugins: [rehypeKatex],
+    }),
+  },
 });
