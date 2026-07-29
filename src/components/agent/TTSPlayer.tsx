@@ -14,6 +14,7 @@ import {
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue,
@@ -39,6 +40,8 @@ const ttsQueryClient = new QueryClient({
 });
 
 type SupportedLang = "en" | "zh";
+
+const PLAYBACK_RATES = [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2] as const;
 
 type AudioSegment = {
   text: string;
@@ -681,25 +684,29 @@ export default function TTSPlayer({ isOpen, lang = "zh" }: TTSPlayerProps) {
                     onValueChange={(v) => setPlaybackRate(Number(v))}
                   >
                     <SelectTrigger
-                      className="h-7 w-auto min-w-[3.5rem] gap-1 rounded-full border border-black/10 bg-transparent px-2 font-mono text-[10px] font-semibold text-gray-500 shadow-none hover:border-black/20 hover:bg-black/5 focus:ring-0 dark:border-white/15 dark:text-gray-400 dark:hover:border-white/25 dark:hover:bg-white/10"
+                      className="h-7 w-auto min-w-[3.5rem] gap-1 rounded-full border border-black/10 bg-transparent px-2 font-mono text-[10px] font-semibold text-gray-500 shadow-none hover:border-black/20 hover:bg-black/5 focus-visible:ring-0 dark:border-white/15 dark:text-gray-400 dark:hover:border-white/25 dark:hover:bg-white/10"
                       title={ui[lang]["agent.voiceReader.speed"]}
                       size="sm"
                     >
-                      <SelectValue />
+                      {/* Base UI resolves the label through a render function rather than the selected node */}
+                      <SelectValue>{(rate) => `${rate}×`}</SelectValue>
                     </SelectTrigger>
                     <SelectContent
                       align="start"
-                      className="min-w-[4rem] rounded-xl border-black/10 bg-white/95 backdrop-blur-md dark:border-white/15 dark:bg-zinc-950/95"
+                      alignItemWithTrigger={false}
+                      className="w-auto min-w-[4rem] rounded-xl bg-white/95 ring-black/10 backdrop-blur-md dark:bg-zinc-950/95 dark:ring-white/15"
                     >
-                      {[0.5, 0.75, 1, 1.25, 1.5, 1.75, 2].map((rate) => (
-                        <SelectItem
-                          key={rate}
-                          value={rate.toString()}
-                          className="cursor-pointer rounded-lg font-mono text-[10px] focus:bg-black/5 focus:text-gray-950 dark:focus:bg-white/10 dark:focus:text-gray-50"
-                        >
-                          {rate}×
-                        </SelectItem>
-                      ))}
+                      <SelectGroup>
+                        {PLAYBACK_RATES.map((rate) => (
+                          <SelectItem
+                            key={rate}
+                            value={rate.toString()}
+                            className="cursor-pointer rounded-lg font-mono text-[10px] data-highlighted:bg-black/5 data-highlighted:text-gray-950 dark:data-highlighted:bg-white/10 dark:data-highlighted:text-gray-50"
+                          >
+                            {rate}×
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
                     </SelectContent>
                   </Select>
                 </div>
