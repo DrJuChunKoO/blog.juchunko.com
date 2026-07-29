@@ -30,6 +30,8 @@ export default defineConfig({
     }),
     partytown({ config: { forward: ["dataLayer.push"] } }),
     compress({
+      // csso drops Tailwind v4 range media queries like `@media (width>=48rem)`
+      CSS: false,
       Image: false,
     }),
   ],
