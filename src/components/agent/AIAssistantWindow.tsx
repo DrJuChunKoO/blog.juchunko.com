@@ -2,8 +2,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   AnimatePresence,
   motion,
-  useMotionValue,
   useReducedMotion,
+  type Transition,
 } from "motion/react";
 import {
   ArrowDown,
@@ -191,7 +191,16 @@ export default function AIAssistantWindow({
   const prefersReducedMotion = Boolean(useReducedMotion());
 
   // 以 bottom 控制與底部距離，避免覆蓋 footer（全螢幕時不需要）
-  const y = useMotionValue(16);
+  // 使用一般 state 而非 motion value，避免與 layout 投影衝突
+  const [bottomOffset, setBottomOffset] = useState(16);
+
+  const layoutTransition = useMemo<Transition>(
+    () =>
+      prefersReducedMotion
+        ? { duration: 0.15 }
+        : { type: "spring", stiffness: 420, damping: 36, mass: 0.85 },
+    [prefersReducedMotion],
+  );
 
   const transport = useMemo(
     () =>
@@ -216,23 +225,20 @@ export default function AIAssistantWindow({
   const busy = isBusyStatus(status);
 
   useEffect(() => {
-    if (!isOpen || expanded) {
-      // 全螢幕時貼齊視窗底部；`y` 由 motion 直接寫入行內樣式，必須顯式歸零
-      y.set(expanded ? 0 : 16);
-      return;
-    }
+    // 全螢幕時仍保留 bottomOffset，收合 layout 才不會從 0 跳回
+    if (!isOpen || expanded) return;
 
     function syncWindowOffset() {
       const footer = document.getElementById("footer");
       if (!footer) {
-        y.set(16);
+        setBottomOffset(16);
         return;
       }
       const rect = footer.getBoundingClientRect();
       const top = rect.y - window.innerHeight;
       const isBottom = top < 0;
 
-      y.set(isBottom ? 16 - top : 16);
+      setBottomOffset(isBottom ? 16 - top : 16);
     }
 
     syncWindowOffset();
@@ -251,7 +257,7 @@ export default function AIAssistantWindow({
       window.removeEventListener("resize", syncWindowOffset);
       observer?.disconnect();
     };
-  }, [isOpen, expanded, y]);
+  }, [isOpen, expanded]);
 
   // 全螢幕時鎖住頁面滾動，關閉後還原
   useEffect(() => {
@@ -378,6 +384,7 @@ export default function AIAssistantWindow({
       {isOpen && (
         <motion.div
           ref={windowRef}
+          layout={!prefersReducedMotion}
           initial={
             prefersReducedMotion
               ? { opacity: 0 }
@@ -396,14 +403,23 @@ export default function AIAssistantWindow({
           transition={
             prefersReducedMotion
               ? { duration: 0.15 }
-              : { type: "spring", stiffness: 300, damping: 30 }
+              : {
+                  opacity: { duration: 0.15 },
+                  scale: { type: "spring", stiffness: 300, damping: 30 },
+                  y: { type: "spring", stiffness: 300, damping: 30 },
+                  layout: layoutTransition,
+                  borderRadius: layoutTransition,
+                }
           }
-          style={{ bottom: y }}
+          style={{
+            bottom: expanded ? 0 : bottomOffset,
+            borderRadius: expanded ? 0 : 12,
+          }}
           className={cn(
             "fixed flex flex-col overflow-hidden",
             expanded
-              ? "bg-card inset-0 z-50 rounded-none"
-              : "bg-card/75 right-4 z-40 flex w-100 max-w-[calc(100vw-32px)] origin-bottom-right rounded-xl border border-black/10 shadow-[0_2px_8px_rgba(0,0,0,.06)] backdrop-blur-xl dark:border-white/15 dark:shadow-[0_2px_8px_rgba(0,0,0,.25)]",
+              ? "bg-card inset-0 z-50 border border-transparent"
+              : "bg-card/75 right-4 z-40 w-100 max-w-[calc(100vw-32px)] origin-bottom-right border border-black/10 shadow-[0_2px_8px_rgba(0,0,0,.06)] backdrop-blur-xl dark:border-white/15 dark:shadow-[0_2px_8px_rgba(0,0,0,.25)]",
           )}
           role="dialog"
           aria-modal={expanded}
@@ -411,7 +427,8 @@ export default function AIAssistantWindow({
         >
           {/* 標題欄 */}
           <div className="bg-muted text-foreground shrink-0 border-b border-black/10 dark:border-white/15">
-            <div
+            <motion.div
+              layout="position"
               className={cn(
                 "flex items-center justify-between gap-2 p-2 pl-4",
                 expanded && "mx-auto w-full max-w-3xl",
@@ -428,7 +445,7 @@ export default function AIAssistantWindow({
                 <Button
                   variant="ghost"
                   size="icon-sm"
-                  className="text-muted-foreground hover:text-foreground cursor-pointer rounded-lg"
+                  className="text-muted-foreground hover:text-foreground relative cursor-pointer rounded-lg"
                   onClick={() => setExpanded((value) => !value)}
                   aria-label={
                     expanded
@@ -436,7 +453,30 @@ export default function AIAssistantWindow({
                       : ui[lang]["agent.assistant.expand"]
                   }
                 >
-                  {expanded ? <Minimize2 /> : <Maximize2 />}
+                  <AnimatePresence mode="popLayout" initial={false}>
+                    <motion.span
+                      key={expanded ? "minimize" : "maximize"}
+                      initial={
+                        prefersReducedMotion
+                          ? { opacity: 0 }
+                          : { opacity: 0, scale: 0.6, filter: "blur(2px)" }
+                      }
+                      animate={
+                        prefersReducedMotion
+                          ? { opacity: 1 }
+                          : { opacity: 1, scale: 1, filter: "blur(0px)" }
+                      }
+                      exit={
+                        prefersReducedMotion
+                          ? { opacity: 0 }
+                          : { opacity: 0, scale: 0.6, filter: "blur(2px)" }
+                      }
+                      transition={{ duration: 0.15 }}
+                      className="flex"
+                    >
+                      {expanded ? <Minimize2 /> : <Maximize2 />}
+                    </motion.span>
+                  </AnimatePresence>
                 </Button>
                 <Button
                   variant="ghost"
@@ -448,7 +488,7 @@ export default function AIAssistantWindow({
                   <X />
                 </Button>
               </div>
-            </div>
+            </motion.div>
           </div>
 
           {/* 對話內容 */}
@@ -457,11 +497,15 @@ export default function AIAssistantWindow({
             defaultScrollPosition="last-anchor"
             scrollPreviousItemPeek={48}
           >
-            <MessageScroller
+            <motion.div
+              layout="size"
               className={cn(
-                "bg-card/50",
-                expanded ? "min-h-0 flex-1" : "h-100",
+                "flex min-h-0 flex-col",
+                expanded ? "flex-1" : "h-100",
               )}
+            >
+            <MessageScroller
+              className="bg-card/50 h-full min-h-0 flex-1"
             >
               <MessageScrollerViewport
                 aria-label={ui[lang]["agent.assistant.transcript"]}
@@ -678,10 +722,12 @@ export default function AIAssistantWindow({
                 </span>
               </MessageScrollerButton>
             </MessageScroller>
+            </motion.div>
           </MessageScrollerProvider>
 
           {/* 輸入區域 */}
-          <form
+          <motion.form
+            layout="position"
             aria-label={ui[lang]["agent.assistant.chatForm"]}
             onSubmit={handleSubmit}
             className={cn(
@@ -727,7 +773,7 @@ export default function AIAssistantWindow({
             <div id="chat-bot-instructions" className="sr-only">
               {ui[lang]["agent.assistant.instructions"]}
             </div>
-          </form>
+          </motion.form>
         </motion.div>
       )}
     </AnimatePresence>
