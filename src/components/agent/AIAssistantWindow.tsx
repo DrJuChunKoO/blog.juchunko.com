@@ -197,8 +197,8 @@ export default function AIAssistantWindow({
   const layoutTransition = useMemo<Transition>(
     () =>
       prefersReducedMotion
-        ? { duration: 0.15 }
-        : { type: "spring", stiffness: 420, damping: 36, mass: 0.85 },
+        ? { duration: 0 }
+        : { duration: 0.32, ease: [0.32, 0.72, 0, 1] },
     [prefersReducedMotion],
   );
 
@@ -385,63 +385,55 @@ export default function AIAssistantWindow({
         <motion.div
           ref={windowRef}
           layout={!prefersReducedMotion}
-          initial={
-            prefersReducedMotion
-              ? { opacity: 0 }
-              : { opacity: 0, scale: 0.5, y: 16 }
-          }
-          animate={
-            prefersReducedMotion
-              ? { opacity: 1 }
-              : { opacity: 1, scale: 1, y: 0 }
-          }
-          exit={
-            prefersReducedMotion
-              ? { opacity: 0 }
-              : { opacity: 0, scale: 0.5, y: 16 }
-          }
-          transition={
-            prefersReducedMotion
-              ? { duration: 0.15 }
-              : {
-                  opacity: { duration: 0.15 },
-                  scale: { type: "spring", stiffness: 300, damping: 30 },
-                  y: { type: "spring", stiffness: 300, damping: 30 },
-                  layout: layoutTransition,
-                  borderRadius: layoutTransition,
-                }
-          }
-          style={{
-            bottom: expanded ? 0 : bottomOffset,
-            borderRadius: expanded ? 0 : 12,
+          layoutId={prefersReducedMotion ? undefined : "ai-assistant-window"}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{
+            opacity: { duration: 0.15 },
+            layout: layoutTransition,
           }}
+          style={{ bottom: expanded ? 0 : bottomOffset }}
           className={cn(
-            "fixed flex flex-col overflow-hidden",
+            "pointer-events-auto absolute flex flex-col overflow-hidden",
             expanded
-              ? "bg-card inset-0 z-50 border border-transparent"
-              : "bg-card/75 right-4 z-40 w-100 max-w-[calc(100vw-32px)] origin-bottom-right border border-black/10 shadow-[0_2px_8px_rgba(0,0,0,.06)] backdrop-blur-xl dark:border-white/15 dark:shadow-[0_2px_8px_rgba(0,0,0,.25)]",
+              ? "bg-card inset-0 rounded-none border border-transparent"
+              : "bg-card/75 right-4 w-100 max-w-[calc(100vw-32px)] origin-bottom-right rounded-xl border border-black/10 shadow-[0_2px_8px_rgba(0,0,0,.06)] backdrop-blur-xl dark:border-white/15 dark:shadow-[0_2px_8px_rgba(0,0,0,.25)]",
           )}
           role="dialog"
           aria-modal={expanded}
           aria-label={ui[lang]["agent.assistant.title"]}
         >
           {/* 標題欄 */}
-          <div className="bg-muted text-foreground shrink-0 border-b border-black/10 dark:border-white/15">
+          <motion.div
+            layout={!prefersReducedMotion}
+            transition={{ layout: layoutTransition }}
+            className="bg-muted text-foreground shrink-0 border-b border-black/10 dark:border-white/15"
+          >
             <motion.div
-              layout="position"
+              layout={!prefersReducedMotion}
+              transition={{ layout: layoutTransition }}
               className={cn(
                 "flex items-center justify-between gap-2 p-2 pl-4",
                 expanded && "mx-auto w-full max-w-3xl",
               )}
             >
-              <div className="flex items-center gap-2">
+              <motion.div
+                layout={prefersReducedMotion ? false : "position"}
+                transition={{ layout: layoutTransition }}
+                className="flex items-center gap-2"
+              >
                 <Bot className="size-5" />
                 {/* 站台 body 是 20px/1.7，標題必須自訂尺寸才不會被面板放大 */}
                 <h3 className="text-base font-semibold">
                   {ui[lang]["agent.assistant.title"]}
                 </h3>
-              </div>
-              <div className="flex items-center gap-1">
+              </motion.div>
+              <motion.div
+                layout={prefersReducedMotion ? false : "position"}
+                transition={{ layout: layoutTransition }}
+                className="flex items-center gap-1"
+              >
                 <Button
                   variant="ghost"
                   size="icon-sm"
@@ -487,9 +479,9 @@ export default function AIAssistantWindow({
                 >
                   <X />
                 </Button>
-              </div>
+              </motion.div>
             </motion.div>
-          </div>
+          </motion.div>
 
           {/* 對話內容 */}
           <MessageScrollerProvider
@@ -498,236 +490,245 @@ export default function AIAssistantWindow({
             scrollPreviousItemPeek={48}
           >
             <motion.div
-              layout="size"
+              layout={!prefersReducedMotion}
+              transition={{ layout: layoutTransition }}
               className={cn(
                 "flex min-h-0 flex-col",
                 expanded ? "flex-1" : "h-100",
               )}
             >
-            <MessageScroller
-              className="bg-card/50 h-full min-h-0 flex-1"
-            >
-              <MessageScrollerViewport
-                aria-label={ui[lang]["agent.assistant.transcript"]}
-              >
-                <MessageScrollerContent
-                  aria-busy={busy}
-                  className={cn(
-                    "gap-4 p-4",
-                    expanded && "mx-auto w-full max-w-3xl gap-6 py-6",
-                  )}
+              <MessageScroller className="bg-card/50 h-full min-h-0 flex-1">
+                <MessageScrollerViewport
+                  aria-label={ui[lang]["agent.assistant.transcript"]}
                 >
-                  <MessageScrollerItem messageId="disclaimer">
-                    <Marker variant="separator">
-                      <MarkerContent className="text-xs">
-                        {ui[lang]["agent.assistant.disclaimer"]}
-                      </MarkerContent>
-                    </Marker>
-                  </MessageScrollerItem>
+                  <MessageScrollerContent
+                    aria-busy={busy}
+                    className={cn(
+                      "gap-4 p-4",
+                      expanded && "mx-auto w-full max-w-3xl gap-6 py-6",
+                    )}
+                  >
+                    <MessageScrollerItem messageId="disclaimer">
+                      <Marker variant="separator">
+                        <MarkerContent className="text-xs">
+                          {ui[lang]["agent.assistant.disclaimer"]}
+                        </MarkerContent>
+                      </Marker>
+                    </MessageScrollerItem>
 
-                  {messages.length === 0 ? (
-                    <MessageScrollerItem
-                      messageId="empty-state"
-                      className="flex shrink flex-col"
-                    >
-                      <Empty className="border-0 p-2">
-                        <EmptyHeader>
-                          <EmptyMedia variant="icon">
-                            <Bot />
-                          </EmptyMedia>
-                          <EmptyTitle className="text-base">
-                            {ui[lang]["agent.assistant.title"]}
-                          </EmptyTitle>
-                          <EmptyDescription>
-                            {ui[lang]["agent.assistant.greeting"]}
-                          </EmptyDescription>
-                        </EmptyHeader>
-                        <EmptyContent>
+                    {messages.length === 0 ? (
+                      <MessageScrollerItem
+                        messageId="empty-state"
+                        className="flex shrink flex-col"
+                      >
+                        <Empty className="border-0 p-2">
+                          <EmptyHeader>
+                            <EmptyMedia variant="icon">
+                              <Bot />
+                            </EmptyMedia>
+                            <EmptyTitle className="text-base">
+                              {ui[lang]["agent.assistant.title"]}
+                            </EmptyTitle>
+                            <EmptyDescription>
+                              {ui[lang]["agent.assistant.greeting"]}
+                            </EmptyDescription>
+                          </EmptyHeader>
+                          <EmptyContent>
+                            <QuickPromptList
+                              quickPrompts={quickPrompts}
+                              ariaLabelTemplate={
+                                ui[lang]["agent.assistant.quickPrompt"]
+                              }
+                              onSelect={submitPrompt}
+                              className="w-full items-start"
+                            />
+                          </EmptyContent>
+                        </Empty>
+                      </MessageScrollerItem>
+                    ) : (
+                      messages.map((message) => {
+                        const isUser = message.role === "user";
+                        const messageText = extractMessageText(message.parts);
+                        const reasoningText = extractReasoningText(
+                          message.parts,
+                        );
+                        const toolParts = collectToolParts(message.parts);
+                        const showFooter =
+                          !isUser && messageText !== "" && !busy;
+
+                        return (
+                          <MessageScrollerItem
+                            key={message.id}
+                            messageId={message.id}
+                            scrollAnchor={isUser}
+                          >
+                            <Message align={isUser ? "end" : "start"}>
+                              <MessageContent>
+                                {toolParts.map((toolPart, index) => (
+                                  <ToolMarker
+                                    key={
+                                      toolPart.toolCallId ??
+                                      `${toolPart.toolName}-${index}`
+                                    }
+                                    lang={lang}
+                                    toolPart={toolPart}
+                                  />
+                                ))}
+
+                                {reasoningText !== "" && (
+                                  <ReasoningDisclosure
+                                    label={
+                                      ui[lang]["agent.assistant.reasoning"]
+                                    }
+                                    text={reasoningText}
+                                  />
+                                )}
+
+                                {hasRenderableText(message.parts) && (
+                                  <Bubble
+                                    variant={isUser ? "default" : "muted"}
+                                    align={isUser ? "end" : "start"}
+                                    aria-label={
+                                      isUser
+                                        ? ui[lang][
+                                            "agent.assistant.userMessage"
+                                          ]
+                                        : ui[lang][
+                                            "agent.assistant.assistantMessage"
+                                          ]
+                                    }
+                                  >
+                                    <BubbleContent
+                                      className={cn(
+                                        "prose prose-sm prose-neutral max-w-none rounded-2xl",
+                                        // 在窄面板中收緊 typography 間距與標題尺寸
+                                        "prose-headings:mt-3 prose-headings:mb-1.5 prose-headings:text-[0.95em] prose-p:my-1.5 prose-ul:my-1.5 prose-ol:my-1.5 prose-li:my-0.5 prose-pre:my-2 [&>:first-child]:mt-0 [&>:last-child]:mb-0",
+                                        isUser
+                                          ? "prose-invert"
+                                          : "dark:prose-invert",
+                                      )}
+                                    >
+                                      {message.parts.map((part, index) =>
+                                        isTextUIPart(part) &&
+                                        part.text !== "" ? (
+                                          <Markdown key={index}>
+                                            {part.text}
+                                          </Markdown>
+                                        ) : null,
+                                      )}
+                                    </BubbleContent>
+                                  </Bubble>
+                                )}
+
+                                {showFooter && (
+                                  <MessageFooter className="gap-0.5 px-0">
+                                    <Button
+                                      variant="ghost"
+                                      size="icon-xs"
+                                      className="text-muted-foreground hover:text-foreground cursor-pointer rounded-md"
+                                      onClick={() =>
+                                        void handleCopy(message.id, messageText)
+                                      }
+                                      aria-label={
+                                        copiedMessageId === message.id
+                                          ? ui[lang]["agent.assistant.copied"]
+                                          : ui[lang]["agent.assistant.copy"]
+                                      }
+                                    >
+                                      {copiedMessageId === message.id ? (
+                                        <Check />
+                                      ) : (
+                                        <Copy />
+                                      )}
+                                    </Button>
+                                    {canRetry &&
+                                      message.id ===
+                                        lastAssistantMessage?.id && (
+                                        <Button
+                                          variant="ghost"
+                                          size="icon-xs"
+                                          className="text-muted-foreground hover:text-foreground cursor-pointer rounded-md"
+                                          onClick={handleRetry}
+                                          aria-label={
+                                            ui[lang]["agent.assistant.retry"]
+                                          }
+                                        >
+                                          <RefreshCw />
+                                        </Button>
+                                      )}
+                                  </MessageFooter>
+                                )}
+                              </MessageContent>
+                            </Message>
+                          </MessageScrollerItem>
+                        );
+                      })
+                    )}
+
+                    {showThinking && (
+                      <MessageScrollerItem messageId="thinking">
+                        <Marker role="status">
+                          <MarkerIcon>
+                            <Spinner />
+                          </MarkerIcon>
+                          <MarkerContent className="shimmer">
+                            {ui[lang]["agent.assistant.thinking"]}
+                          </MarkerContent>
+                        </Marker>
+                      </MessageScrollerItem>
+                    )}
+
+                    {status === "error" && (
+                      <MessageScrollerItem messageId="error">
+                        <Marker role="status" className="text-destructive">
+                          <MarkerIcon>
+                            <TriangleAlert />
+                          </MarkerIcon>
+                          <MarkerContent>
+                            {ui[lang]["agent.assistant.error"]}
+                          </MarkerContent>
+                        </Marker>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="mt-2 cursor-pointer rounded-lg"
+                          onClick={handleRetry}
+                        >
+                          <RefreshCw data-icon="inline-start" />
+                          {ui[lang]["agent.assistant.retry"]}
+                        </Button>
+                      </MessageScrollerItem>
+                    )}
+
+                    {messages.length > 0 &&
+                      status === "ready" &&
+                      quickPrompts.length > 0 && (
+                        <MessageScrollerItem messageId="quick-prompts">
                           <QuickPromptList
                             quickPrompts={quickPrompts}
                             ariaLabelTemplate={
                               ui[lang]["agent.assistant.quickPrompt"]
                             }
                             onSelect={submitPrompt}
-                            className="w-full items-start"
                           />
-                        </EmptyContent>
-                      </Empty>
-                    </MessageScrollerItem>
-                  ) : (
-                    messages.map((message) => {
-                      const isUser = message.role === "user";
-                      const messageText = extractMessageText(message.parts);
-                      const reasoningText = extractReasoningText(message.parts);
-                      const toolParts = collectToolParts(message.parts);
-                      const showFooter = !isUser && messageText !== "" && !busy;
-
-                      return (
-                        <MessageScrollerItem
-                          key={message.id}
-                          messageId={message.id}
-                          scrollAnchor={isUser}
-                        >
-                          <Message align={isUser ? "end" : "start"}>
-                            <MessageContent>
-                              {toolParts.map((toolPart, index) => (
-                                <ToolMarker
-                                  key={
-                                    toolPart.toolCallId ??
-                                    `${toolPart.toolName}-${index}`
-                                  }
-                                  lang={lang}
-                                  toolPart={toolPart}
-                                />
-                              ))}
-
-                              {reasoningText !== "" && (
-                                <ReasoningDisclosure
-                                  label={ui[lang]["agent.assistant.reasoning"]}
-                                  text={reasoningText}
-                                />
-                              )}
-
-                              {hasRenderableText(message.parts) && (
-                                <Bubble
-                                  variant={isUser ? "default" : "muted"}
-                                  align={isUser ? "end" : "start"}
-                                  aria-label={
-                                    isUser
-                                      ? ui[lang]["agent.assistant.userMessage"]
-                                      : ui[lang][
-                                          "agent.assistant.assistantMessage"
-                                        ]
-                                  }
-                                >
-                                  <BubbleContent
-                                    className={cn(
-                                      "prose prose-sm prose-neutral max-w-none rounded-2xl",
-                                      // 在窄面板中收緊 typography 間距與標題尺寸
-                                      "prose-headings:mt-3 prose-headings:mb-1.5 prose-headings:text-[0.95em] prose-p:my-1.5 prose-ul:my-1.5 prose-ol:my-1.5 prose-li:my-0.5 prose-pre:my-2 [&>:first-child]:mt-0 [&>:last-child]:mb-0",
-                                      isUser
-                                        ? "prose-invert"
-                                        : "dark:prose-invert",
-                                    )}
-                                  >
-                                    {message.parts.map((part, index) =>
-                                      isTextUIPart(part) && part.text !== "" ? (
-                                        <Markdown key={index}>
-                                          {part.text}
-                                        </Markdown>
-                                      ) : null,
-                                    )}
-                                  </BubbleContent>
-                                </Bubble>
-                              )}
-
-                              {showFooter && (
-                                <MessageFooter className="gap-0.5 px-0">
-                                  <Button
-                                    variant="ghost"
-                                    size="icon-xs"
-                                    className="text-muted-foreground hover:text-foreground cursor-pointer rounded-md"
-                                    onClick={() =>
-                                      void handleCopy(message.id, messageText)
-                                    }
-                                    aria-label={
-                                      copiedMessageId === message.id
-                                        ? ui[lang]["agent.assistant.copied"]
-                                        : ui[lang]["agent.assistant.copy"]
-                                    }
-                                  >
-                                    {copiedMessageId === message.id ? (
-                                      <Check />
-                                    ) : (
-                                      <Copy />
-                                    )}
-                                  </Button>
-                                  {canRetry &&
-                                    message.id === lastAssistantMessage?.id && (
-                                      <Button
-                                        variant="ghost"
-                                        size="icon-xs"
-                                        className="text-muted-foreground hover:text-foreground cursor-pointer rounded-md"
-                                        onClick={handleRetry}
-                                        aria-label={
-                                          ui[lang]["agent.assistant.retry"]
-                                        }
-                                      >
-                                        <RefreshCw />
-                                      </Button>
-                                    )}
-                                </MessageFooter>
-                              )}
-                            </MessageContent>
-                          </Message>
                         </MessageScrollerItem>
-                      );
-                    })
-                  )}
-
-                  {showThinking && (
-                    <MessageScrollerItem messageId="thinking">
-                      <Marker role="status">
-                        <MarkerIcon>
-                          <Spinner />
-                        </MarkerIcon>
-                        <MarkerContent className="shimmer">
-                          {ui[lang]["agent.assistant.thinking"]}
-                        </MarkerContent>
-                      </Marker>
-                    </MessageScrollerItem>
-                  )}
-
-                  {status === "error" && (
-                    <MessageScrollerItem messageId="error">
-                      <Marker role="status" className="text-destructive">
-                        <MarkerIcon>
-                          <TriangleAlert />
-                        </MarkerIcon>
-                        <MarkerContent>
-                          {ui[lang]["agent.assistant.error"]}
-                        </MarkerContent>
-                      </Marker>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="mt-2 cursor-pointer rounded-lg"
-                        onClick={handleRetry}
-                      >
-                        <RefreshCw data-icon="inline-start" />
-                        {ui[lang]["agent.assistant.retry"]}
-                      </Button>
-                    </MessageScrollerItem>
-                  )}
-
-                  {messages.length > 0 &&
-                    status === "ready" &&
-                    quickPrompts.length > 0 && (
-                      <MessageScrollerItem messageId="quick-prompts">
-                        <QuickPromptList
-                          quickPrompts={quickPrompts}
-                          ariaLabelTemplate={
-                            ui[lang]["agent.assistant.quickPrompt"]
-                          }
-                          onSelect={submitPrompt}
-                        />
-                      </MessageScrollerItem>
-                    )}
-                </MessageScrollerContent>
-              </MessageScrollerViewport>
-              <MessageScrollerButton className="rounded-full">
-                <ArrowDown />
-                <span className="sr-only">
-                  {ui[lang]["agent.assistant.scrollToLatest"]}
-                </span>
-              </MessageScrollerButton>
-            </MessageScroller>
+                      )}
+                  </MessageScrollerContent>
+                </MessageScrollerViewport>
+                <MessageScrollerButton className="rounded-full">
+                  <ArrowDown />
+                  <span className="sr-only">
+                    {ui[lang]["agent.assistant.scrollToLatest"]}
+                  </span>
+                </MessageScrollerButton>
+              </MessageScroller>
             </motion.div>
           </MessageScrollerProvider>
 
           {/* 輸入區域 */}
           <motion.form
-            layout="position"
+            layout={!prefersReducedMotion}
+            transition={{ layout: layoutTransition }}
             aria-label={ui[lang]["agent.assistant.chatForm"]}
             onSubmit={handleSubmit}
             className={cn(

@@ -1,5 +1,10 @@
 import { useCallback, useEffect, useState } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import {
+  AnimatePresence,
+  LayoutGroup,
+  motion,
+  useReducedMotion,
+} from "motion/react";
 import { Bot } from "lucide-react";
 
 import { getLangFromUrl } from "@/i18n/utils";
@@ -46,39 +51,37 @@ export default function AIAssistant({ lang: langProp }: { lang?: Lang } = {}) {
   );
 
   return (
-    <>
-      <AnimatePresence>
-        {!isOpen && (
-          <motion.button
-            type="button"
-            onClick={() => setIsOpen(true)}
-            aria-label={ui[lang]["agent.assistant.openAriaLabel"]}
-            initial={
-              prefersReducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.9 }
-            }
-            animate={
-              prefersReducedMotion ? { opacity: 1 } : { opacity: 1, scale: 1 }
-            }
-            exit={
-              prefersReducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.9 }
-            }
-            transition={{ duration: 0.15 }}
-            whileTap={prefersReducedMotion ? undefined : { scale: 0.95 }}
-            className="fixed right-4 bottom-4 z-40 flex cursor-pointer items-center gap-2 rounded-full border border-black/10 bg-white/95 px-4 py-3 text-base font-medium shadow-[0_2px_8px_rgba(0,0,0,.06)] backdrop-blur-md transition hover:border-black/20 hover:bg-gray-100 md:py-2 md:text-sm dark:border-white/15 dark:bg-zinc-950/95 dark:shadow-[0_2px_8px_rgba(0,0,0,.25)] dark:hover:border-white/25 dark:hover:bg-white/10"
-          >
-            <Bot className="size-5" />
-            {ui[lang]["agent.assistant.open"]}
-          </motion.button>
-        )}
-      </AnimatePresence>
+    <LayoutGroup id="ai-assistant">
+      <motion.div layoutRoot className="pointer-events-none fixed inset-0 z-40">
+        <AnimatePresence initial={false}>
+          {!isOpen && (
+            <motion.button
+              layoutId={
+                prefersReducedMotion ? undefined : "ai-assistant-window"
+              }
+              type="button"
+              onClick={() => setIsOpen(true)}
+              aria-label={ui[lang]["agent.assistant.openAriaLabel"]}
+              transition={{
+                layout: { duration: 0.32, ease: [0.32, 0.72, 0, 1] },
+              }}
+              whileTap={prefersReducedMotion ? undefined : { scale: 0.95 }}
+              className="pointer-events-auto absolute right-4 bottom-4 flex cursor-pointer items-center gap-2 rounded-full border border-black/10 bg-white/95 px-4 py-3 text-base font-medium shadow-[0_2px_8px_rgba(0,0,0,.06)] backdrop-blur-md transition-colors hover:border-black/20 hover:bg-gray-100 md:py-2 md:text-sm dark:border-white/15 dark:bg-zinc-950/95 dark:shadow-[0_2px_8px_rgba(0,0,0,.25)] dark:hover:border-white/25 dark:hover:bg-white/10"
+            >
+              <Bot className="size-5" />
+              {ui[lang]["agent.assistant.open"]}
+            </motion.button>
+          )}
+        </AnimatePresence>
 
-      <AIAssistantWindow
-        isOpen={isOpen}
-        onClose={handleClose}
-        lang={lang}
-        pendingPrompt={pendingPrompt}
-        onPendingPromptConsumed={handlePendingPromptConsumed}
-      />
-    </>
+        <AIAssistantWindow
+          isOpen={isOpen}
+          onClose={handleClose}
+          lang={lang}
+          pendingPrompt={pendingPrompt}
+          onPendingPromptConsumed={handlePendingPromptConsumed}
+        />
+      </motion.div>
+    </LayoutGroup>
   );
 }
