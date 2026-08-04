@@ -26,7 +26,10 @@ import {
 } from "lucide-react";
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport, isTextUIPart } from "ai";
-import Markdown from "markdown-to-jsx";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import remarkCjkFriendly from "remark-cjk-friendly";
+import remarkCjkFriendlyGfmStrikethrough from "remark-cjk-friendly-gfm-strikethrough";
 
 import { Bubble, BubbleContent } from "@/components/ui/bubble";
 import { Button } from "@/components/ui/button";
@@ -611,9 +614,16 @@ export default function AIAssistantWindow({
                                       {message.parts.map((part, index) =>
                                         isTextUIPart(part) &&
                                         part.text !== "" ? (
-                                          <Markdown key={index}>
+                                          <ReactMarkdown
+                                            key={index}
+                                            remarkPlugins={[
+                                              remarkGfm,
+                                              remarkCjkFriendly,
+                                              remarkCjkFriendlyGfmStrikethrough,
+                                            ]}
+                                          >
                                             {part.text}
-                                          </Markdown>
+                                          </ReactMarkdown>
                                         ) : null,
                                       )}
                                     </BubbleContent>

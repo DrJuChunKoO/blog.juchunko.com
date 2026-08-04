@@ -1,7 +1,10 @@
 import { useEffect, useState } from "react";
 import { motion } from "motion/react";
 import { Bot, Astroid } from "lucide-react";
-import Markdown from "markdown-to-jsx";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import remarkCjkFriendly from "remark-cjk-friendly";
+import remarkCjkFriendlyGfmStrikethrough from "remark-cjk-friendly-gfm-strikethrough";
 
 type SupportedLang = "en" | "zh";
 
@@ -80,50 +83,43 @@ export default function KeySummary({ lang = "zh" }: KeySummaryProps) {
       ) : (
         <div>
           <div className="p-4 pt-0">
-            <Markdown
-              options={{
-                overrides: {
-                  p: {
-                    component: ({ children }) => (
-                      <p className="mb-2 text-sm leading-relaxed text-gray-700 dark:text-gray-300">
-                        {children}
-                      </p>
-                    ),
-                  },
-                  li: {
-                    component: ({ children }) => (
-                      <li className="flex items-start gap-2.5">
-                        <span className="mt-2 size-1.5 shrink-0 rounded-full bg-gray-400 dark:bg-gray-500" />
-                        <span className="min-w-0">{children}</span>
-                      </li>
-                    ),
-                  },
-                  ul: {
-                    component: ({ children }) => (
-                      <ul className="space-y-2.5 text-sm leading-relaxed text-gray-700 dark:text-gray-300">
-                        {children}
-                      </ul>
-                    ),
-                  },
-                  strong: {
-                    component: ({ children }) => (
-                      <strong className="font-semibold text-gray-900 dark:text-gray-50">
-                        {children}
-                      </strong>
-                    ),
-                  },
-                  code: {
-                    component: ({ children }) => (
-                      <code className="rounded bg-black/5 px-1.5 py-0.5 font-mono text-xs font-semibold text-gray-900 dark:bg-white/10 dark:text-gray-100">
-                        {children}
-                      </code>
-                    ),
-                  },
-                },
+            <ReactMarkdown
+              remarkPlugins={[
+                remarkGfm,
+                remarkCjkFriendly,
+                remarkCjkFriendlyGfmStrikethrough,
+              ]}
+              components={{
+                p: ({ children }) => (
+                  <p className="mb-2 text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+                    {children}
+                  </p>
+                ),
+                li: ({ children }) => (
+                  <li className="flex items-start gap-2.5">
+                    <span className="mt-2 size-1.5 shrink-0 rounded-full bg-gray-400 dark:bg-gray-500" />
+                    <span className="min-w-0">{children}</span>
+                  </li>
+                ),
+                ul: ({ children }) => (
+                  <ul className="space-y-2.5 text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+                    {children}
+                  </ul>
+                ),
+                strong: ({ children }) => (
+                  <strong className="font-semibold text-gray-900 dark:text-gray-50">
+                    {children}
+                  </strong>
+                ),
+                code: ({ children }) => (
+                  <code className="rounded bg-black/5 px-1.5 py-0.5 font-mono text-xs font-semibold text-gray-900 dark:bg-white/10 dark:text-gray-100">
+                    {children}
+                  </code>
+                ),
               }}
             >
               {summary}
-            </Markdown>
+            </ReactMarkdown>
           </div>
           <div className="flex justify-end border-t border-black/5 p-4 dark:border-white/5">
             <motion.button
