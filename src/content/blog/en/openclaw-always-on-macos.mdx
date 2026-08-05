@@ -189,6 +189,55 @@ Even LittleLobster needs sleep. So does Apple Shrimp. **Amphetamine is a tool, n
 >
 > Or their wrist will give out and the laptop will hit the floor. 💔
 
+## 🔄 Update (2026-08-05): You Don't Actually Need Amphetamine — `disablesleep` Does It Built-In
+
+Six months later, Bao hit a weird symptom: **connecting back to this Mac from outside via ngrok or Codex's remote feature kept failing — but the moment he connected from any computer on the same LAN, Apple Shrimp, ngrok, and Codex all instantly came back to life.**
+
+The logs told the real story: this MacBook Pro was **running with the lid closed, and kept dozing off:**
+
+```
+DarkWake from Deep Idle [CDNPB] : ...
+```
+
+Even with all the `sleep 0` settings above in place, two blind spots remained:
+
+1. **Power Nap** runs a background `DarkWake` half-sleep cycle — Wi-Fi drops into power-save and outside reachability dies.
+2. **Closing the lid.** The earlier claim "`pmset` can't stop it, install Amphetamine" is only half true.
+
+Why does "connect from the same LAN and everything works" happen? Because this machine has **Wake on Magic Packet** enabled (`womp 1`) — a same-LAN device connecting sends a WoL magic packet that wakes the whole machine. But **packets coming in over ngrok from outside can't wake it**, creating a deadlock: it has to be awake to be reachable, but the path to reach it needs it awake first.
+
+### The Stronger Move: Built-in Amphetamine
+
+```bash
+# Never sleep even with lid closed (ignore clamshell) + kill Power Nap half-sleep
+sudo pmset -a disablesleep 1 powernap 0
+```
+
+- **`disablesleep 1`** is macOS's **built-in Amphetamine** — it ignores "force sleep when the lid closes," no app required. Every scenario in the Amphetamine section above is covered by this one `pmset` line.
+- **`powernap 0`** kills the DarkWake half-sleep cycle, removing the root cause of "ngrok can't wake it from outside."
+- Both are **persistent `pmset` settings that survive reboots** — more reliable than `caffeinate -s` (a process that's gone the moment it stops).
+
+### Verify
+
+```bash
+pmset -g | grep -iE "SleepDisabled|powernap"
+```
+
+You should see:
+
+```
+SleepDisabled        1        ← won't sleep even with lid closed
+powernap             0        ← no more half-sleep
+```
+
+### Rollback
+
+```bash
+sudo pmset -a disablesleep 0 powernap 1
+```
+
+> ⚠️ **The heat/battery risks are exactly the same.** `disablesleep 1` = running 24/7 at full speed with the lid shut. All three risks from the Amphetamine section (battery swelling, cooking in a sealed bag, hotter under heavy load) and every safety tip (80% charge limit, no sealed bags, temperature monitoring, let it rest at home) **still apply**. Built-in doesn't mean risk-free — it just means one less app to install.
+
 ## Things to Keep in Mind
 
 - **No-sleep on battery drains fast** — carry your charger. Or only change `-c` (AC power) and let battery mode sleep normally

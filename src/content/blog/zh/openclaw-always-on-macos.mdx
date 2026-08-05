@@ -189,6 +189,55 @@ Amphetamine 是 Mac App Store 上的**免費**輕量工具，它能讓 MacBook *
 >
 > 不然手很酸、筆電摔倒很心痛 💔。
 
+## 🔄 更新（2026-08-05）：其實不用 Amphetamine——`disablesleep` 內建就能蓋蓋跑
+
+半年後，寶博又遇到一個詭異症狀：**從外面用 ngrok、Codex 遠端功能連回這台 Mac，常常失敗；但只要找一台「同區網」的電腦連進去，成功後蘋果蝦、ngrok、Codex 就全部瞬間恢復。**
+
+抓 log 一看，真相是這台 MacBook Pro **蓋著蓋子在跑，而且反覆掉進半睡：**
+
+```
+DarkWake from Deep Idle [CDNPB] : ...
+```
+
+原來就算上面那套 `sleep 0` 都設好了，還有兩個死角沒堵：
+
+1. **Power Nap** 會在背景做 `DarkWake` 半睡循環，Wi-Fi 進省電、對外可達性掉線。
+2. **闔上蓋子**，前面說「`pmset` 擋不住、要裝 Amphetamine」——這句話其實只對了一半。
+
+為什麼「同區網連進去就全通」？因為這台開了 **Wake on Magic Packet**（`womp 1`），同區網電腦連入會送一個 WoL 魔術封包把整台叫醒；但**從外面走 ngrok 的封包叫不醒它**，於是變成死循環：要醒才能通、但通的路要它先醒。
+
+### 更狠一階：內建版 Amphetamine
+
+```bash
+# 蓋蓋也不睡（無視 clamshell）+ 關掉 Power Nap 半睡
+sudo pmset -a disablesleep 1 powernap 0
+```
+
+- **`disablesleep 1`** 就是 macOS **內建版的 Amphetamine**——直接無視「闔上蓋子強制休眠」，不用裝任何 app。前面 Amphetamine 那段所有情境，一行 `pmset` 就搞定。
+- **`powernap 0`** 關掉 DarkWake 半睡循環，斷掉「ngrok 從外面叫不醒」的根源。
+- 這兩個都是寫進 `pmset` 的**持久設定，重開機也留著**——比 `caffeinate -s`（一個關掉就沒的 process）可靠。
+
+### 驗證
+
+```bash
+pmset -g | grep -iE "SleepDisabled|powernap"
+```
+
+應該看到：
+
+```
+SleepDisabled        1        ← 蓋蓋也不睡
+powernap             0        ← 不再半睡
+```
+
+### 回滾
+
+```bash
+sudo pmset -a disablesleep 0 powernap 1
+```
+
+> ⚠️ **散熱／電池風險完全一樣。** `disablesleep 1` = 蓋著蓋子也 24/7 全速跑，上面 Amphetamine 那段的三個風險（電池膨脹、密閉包包悶燒、重負載更燙）與所有安全建議（電池上限 80%、別放密閉包包、溫度監控、回定點讓它休息）**照樣適用**。內建不代表沒風險，只是不用多裝一個 app。
+
 ## 注意事項
 
 - **電池模式不睡覺會很耗電**，出門記得帶充電器。或者只改 `-c`（接電源），電池模式還是讓它睡
