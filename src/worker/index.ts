@@ -120,6 +120,7 @@ Keep the tone professional, clear, and easy to understand. Keep each point under
         lang === "zh" ? "台灣中文" : "English"
       }回答
 - 葛如鈞=寶博士=Ju-Chun KO
+- 請勿輸出 LaTeX 語法（如 $...$、$$...$$、\frac{}{} 等），網站不支援渲染，請改用純文字或 Markdown 表示數學內容
 
 <viewPage>
 current page: https://blog.juchunko.com${filename}
