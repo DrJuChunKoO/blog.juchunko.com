@@ -1,0 +1,200 @@
+---
+title: "Two Frontier Models on One MacBook: Running DeepSeek V4 Flash and MiniMax H3 Locally"
+description: "A 284B-parameter language model and a 33B video+audio generator, living together on a 128GB Mac. Quantization explained, ollama pitfalls, filing an upstream bug report — and why a legislator installs AI with his own hands."
+pubDate: "2026-08-12"
+heroImage: "../../../assets/images/deepseek-v4-flash-minimax-h3-local-mac/hero.png"
+heroImageAlt: "Locally generated videos: Taipei 101 fireworks and a Pikachu cosplay clip"
+author: "juchun-ko"
+categories: ["devlog", "openclaw"]
+---
+
+I spent a weekend day squeezing two of this summer's hottest open-weight models into the office MacBook Pro (M4 Max, 128GB RAM):
+
+| | DeepSeek V4 Flash | MiniMax H3 |
+|---|---|---|
+| Purpose | Chat, coding, driving AI agents | Text-to-video with audio |
+| Parameters | 284B (MoE, 13B active) | 33.1B |
+| Local engine | llama.cpp | h3.c (pure C + Metal) |
+| Disk footprint | 97GB (2-bit quant) | 196GB |
+| Measured speed | ~29 tokens/s | 3s clip in 1–2 min |
+
+No cloud API, no subscription, no data leaving the machine. This post collects the science-explainer bits and the pitfall log in one place.
+
+In a hurry? Here's the 39-second video summary (sound on) — and fittingly, the video itself is a product of this local workflow: all three demo clips were generated locally by MiniMax H3, and the edit was written as code with the open-source [video-shotcraft](https://github.com/Vincentwei1021/video-shotcraft) shot library and Remotion:
+
+<video
+  src="/images/deepseek-v4-flash-minimax-h3-local-mac/promo.mp4"
+  controls
+  playsInline
+  style={{ maxWidth: '100%', borderRadius: '12px', margin: '1.5rem 0' }}
+>
+</video>
+
+## First, What Are These Two Models?
+
+### DeepSeek V4 Flash: A Tower Full of Experts (MoE)
+
+DeepSeek V4 Flash is a 284B-parameter **MoE (Mixture of Experts)** model. Picture an office tower housing hundreds of specialists: each question only wakes up the few relevant experts — about 13B parameters' worth — while everyone else keeps sleeping. So it carries 284B of "knowledge capacity" at a per-token compute cost of a 13B model. That's precisely why it reaches usable speed on a laptop.
+
+It natively supports a 1M-token context window, and the 0731 release (July 31) focused on agent capabilities — tool calling, multi-turn tasks — which is exactly why I wanted it driving OpenClaw.
+
+### Quantization: The Magic That Compresses a Model into a Laptop
+
+Model weights ship in FP8/BF16 precision; the full DeepSeek V4 Flash takes 160GB+. **Quantization** re-encodes each weight in fewer bits — here I used Unsloth's **UD-Q2_K_XL** (dynamic 2-bit), which squeezes it down to 96.8GB.
+
+"Doesn't 2-bit make it dumb?" Fair question. Two key facts: first, V4 Flash was natively trained in FP4 (4-bit), so going from 4-bit to 2-bit loses less than you'd think; second, "dynamic" quantization isn't a blanket squeeze — critical layers (attention, routing) keep higher precision while less important expert layers get compressed hardest. In daily use — conversation and tool calls — the difference is barely noticeable.
+
+### Why Can a Mac Run This? The Hidden Advantage of Unified Memory
+
+A top-end PC graphics card has 24–32GB of VRAM; a 97GB model simply doesn't fit. Apple Silicon's **unified memory architecture** lets CPU and GPU share one memory pool — on a 128GB machine, the GPU can address roughly 75% of it by default (raisable to 100GB+ via `sysctl iogpu.wired_limit_mb`). All 97GB of weights go straight into the GPU, and a consumer laptop chip ends up running a 284B model.
+
+### MiniMax H3: Video and Sound Born Together
+
+MiniMax H3 opened its weights on August 3. Its signature trick: **a single generation pass produces both video and 32kHz stereo audio** — dialogue, footsteps, ambience are all "imagined" together by the model, no post-dubbing. Architecturally it's a 33.1B DiT (Diffusion Transformer): all frames denoise simultaneously, with cross-attention keeping frames consistent with each other and the picture consistent with the sound.
+
+The official support matrix is all NVIDIA (RTX 4090 minimum). Mac users could only watch from the sidelines — until Redis creator antirez (Salvatore Sanfilippo), **seven days after the weights dropped**, hand-wrote a pure C + Metal inference engine: [h3.c](https://github.com/antirez/h3.c). The compiled engine is 546KB. No Python, no PyTorch. MiniMax's official account reposted it with a great line: "You can't hire this. You can only open-source and let it happen."
+
+Incidentally, antirez also wrote ds4 (DwarfStar 4), a dedicated engine for DeepSeek V4 Flash, earlier this year — Audrey Tang's pi-ds4 project packages it. One retired legend has single-handedly widened the "frontier models on a local Mac" path twice this year.
+
+## Pitfall Log #1: ollama's Triple-Disk Trap
+
+The original plan was simple: `ollama pull`, hook up OpenClaw, done. Reality:
+
+```
+Error: The specified repository contains sharded GGUF.
+Ollama does not support this yet.
+```
+
+Large models ship as multi-part GGUF shards, which ollama still can't pull directly (issue #5245, open for ages). The community workaround — download manually, merge, `ollama create` — turns out to need **three times the model size in peak disk** (source + import copy + a compatibility-rewrite temp ≈ 290GB), because ollama re-encodes the DeepSeek architecture during import.
+
+I switched to llama.cpp's `llama-server`: native sharded-GGUF support (no merging needed), zero extra copies, built-in OpenAI-compatible API and web chat UI. Conclusion up front: **if disk is tight or the model is big, skip ollama and go straight to llama-server**.
+
+```bash
+brew install llama.cpp
+llama-server -m DeepSeek-V4-Flash-UD-Q2_K_XL-merged.gguf \
+  --port 11435 -c 131072 -ngl 99 --jinja \
+  --temp 1.0 --top-p 0.95 --min-p 0.0
+```
+
+Measured on M4 Max: **~29 tokens/s decode**, 128K context, KV cache at only 3.2GB (V4 Flash's compressed KV is remarkably lean, ~24KB per token).
+
+## Pitfall Log #2: One Regex Blows Up the Whole Toolchain
+
+With OpenClaw connected, CLI tests all passed — but the GUI exploded on the second message:
+
+```
+provider rejected the request schema or tool payload
+```
+
+The detective work was fun: OpenClaw's GUI channel attaches 35 tools. Binary-searching the tool list against llama-server pinned the culprit — a regex in the `cron` tool schema: `pattern: "\S"`. When llama.cpp does grammar-constrained tool calling, it compiles JSON Schema into a formal grammar, and its converter doesn't support the `\S` escape class — unanchored, it rejects the request outright; anchored, it fails at grammar parse instead. No way through.
+
+The fix is trivial (drop the `pattern` field — it's only a validation hint), and upstream had actually already fixed it — but the fix only landed in the beta line; stable never got the backport. We wrote up the full diagnostic evidence (version diffing, the bisection, the three-stage error reproduction) and reported it to the upstream issue, asking maintainers to cherry-pick the fix back to stable.
+
+This is the part I most want to share: **giving back to open source can mean leaving your detective notes for the next person who steps in the same hole.** Not everyone can write the patch, but a clear "how we found the culprit" write-up is often worth as much to maintainers as a PR.
+
+## h3.c in Practice: 196GB of Weights and Hardlink Magic
+
+h3.c itself installs easily: `git clone`, `make -j8`, download weights, go. The only trap is disk — H3's weight repo contains two variants, FL2VA (text-to-video) and Ref2VA (reference-driven), at 144GB each.
+
+Comparing file hashes on Hugging Face revealed that only the 13 DiT shards differ between the two variants — **the text encoder and VAEs, 75 files, are byte-identical**. So: download one full set plus the other's DiT, and hardlink the shared files across. 78GB saved instantly.
+
+```bash
+# two weight sets, one shared copy
+FL2VA/text_encoder/  ←─ hardlink ─→  Ref2VA/text_encoder/
+```
+
+## Sample Outputs
+
+Every clip below was generated locally on this MacBook, audio included (sound on!):
+
+### First Test: A Fox in the Snow
+
+The first render after installing the engine, using h3.c's official validation prompt and the fastest 6-step preview preset — a few minutes from pressing Enter to watching the result. Fur texture and the sync of footsteps and wind are this model's litmus test:
+
+<video
+  src="/images/deepseek-v4-flash-minimax-h3-local-mac/fox-test.mp4"
+  controls
+  muted
+  loop
+  playsInline
+  style={{ maxWidth: '100%', borderRadius: '12px', margin: '1.5rem 0' }}
+>
+</video>
+
+### Taipei 101 Fireworks (3s, 20 denoising steps, crowd cheers + crackle)
+
+<video
+  src="/images/deepseek-v4-flash-minimax-h3-local-mac/taipei101-fireworks.mp4"
+  controls
+  muted
+  loop
+  playsInline
+  style={{ maxWidth: '100%', borderRadius: '12px', margin: '1.5rem 0' }}
+>
+</video>
+
+Fireworks erupting floor by floor from the tower itself — the model clearly "knows" Taipei 101.
+
+### The Quality Ladder: Same Prompt, 20 Steps vs 50
+
+Denoising step count is a diffusion model's most intuitive quality/time dial. The clip above is 20 steps (with 45 transformer layers and step-reuse — the "balanced preset"); below is the **same prompt, same seed**, re-rendered at the "reference" setting — 50 steps, all 50 layers, every step computed — at roughly 3× the render time:
+
+<video
+  src="/images/deepseek-v4-flash-minimax-h3-local-mac/taipei101-fireworks-hq.mp4"
+  controls
+  muted
+  loop
+  playsInline
+  style={{ maxWidth: '100%', borderRadius: '12px', margin: '1.5rem 0' }}
+>
+</video>
+
+Compare them: spark particle detail, glass reflections on the tower, the clarity of city lights in the background all step up visibly, while the composition stays nearly identical thanks to the shared seed. This is the charm of local generation — **the quality/time trade-off is entirely yours**, not a pricing tier on someone's cloud.
+
+### Ref2VA in Action: Putting Yourself into a Generated Video
+
+Finally, the Ref2VA variant: feed one portrait photo as "Picture 1" and prompt "the person in Picture 1 wearing a Pikachu onesie, waving at the camera" — facial features and glasses are carried over from the reference by the model. First, the 20-step balanced version:
+
+<video
+  src="/images/deepseek-v4-flash-minimax-h3-local-mac/dab-pikachu.mp4"
+  controls
+  muted
+  loop
+  playsInline
+  style={{ maxWidth: '100%', borderRadius: '12px', margin: '1.5rem 0' }}
+>
+</video>
+
+Then the same prompt and seed at 50-step reference quality — watch the plush fabric texture and the stability of facial details:
+
+<video
+  src="/images/deepseek-v4-flash-minimax-h3-local-mac/dab-pikachu-hq.mp4"
+  controls
+  muted
+  loop
+  playsInline
+  style={{ maxWidth: '100%', borderRadius: '12px', margin: '1.5rem 0' }}
+>
+</video>
+
+It works almost unsettlingly well — which is exactly the serious reminder I want to attach: **the same technique with a photo that isn't yours is a deepfake.** Localized generative video drops the creation barrier to zero, and the abuse barrier with it. That double edge deserves its own post.
+
+## Why Does a Legislator Install This Himself?
+
+Three reasons.
+
+**First, digital sovereignty isn't a slogan — it's the ability to do it yourself.** Open weights mean a model's capabilities are no longer defined by the vendor's API. Seven days after DeepSeek's weights opened, someone ran them in a language the vendor never considered (pure C) on hardware the vendor never supported (a Mac). Closed models can't do this — their features forever wait on the vendor's roadmap.
+
+**Second, sensitive work needs an option where data stays home.** A parliamentary office handles constituent petitions, bill research, and interpellation prep daily. If AI is going to assist that work, "ship everything to someone else's server first" should not be the only option. A 128GB Mac running a 284B model means local AI has moved from the lab to consumer hardware.
+
+**Third, you only know what policy should look like after stepping in the potholes yourself.** Every link in this chain — quantization, open-source licensing (H3's Community License has separate terms for companies above US$20M annual revenue), community reporting — is first-hand material for digital policy. Talking about open-source AI governance without ever touching a sharded GGUF is like planning bike lanes without ever riding a bike.
+
+## Appendix: Specs and the Time Bill
+
+- Hardware: MacBook Pro (M4 Max, 128GB unified memory, 300GB+ free disk required)
+- DeepSeek V4 Flash 0731, UD-Q2_K_XL 2-bit quant (Unsloth), served by llama.cpp, 128K context
+- MiniMax H3 (FL2VA + Ref2VA), h3.c engine (MIT licensed; model weights under Community License)
+- The two models **cannot be resident simultaneously**: 90GB of weights plus H3's runtime peak exceeds the GPU memory ceiling — a small switching script does the trick
+- Total cost: $0 in API fees, one weekend day, and one satisfying upstream issue report
+
+As I always say: the democratization of technology begins with the willingness to do it yourself.
