@@ -1,0 +1,192 @@
+---
+title: "一台 MacBook 裝下兩顆前沿模型：DeepSeek V4 Flash 本地推理 + MiniMax H3 影音生成實戰"
+description: "284B 參數的語言模型和 33B 的影音生成模型，同時住進一台 128GB 的 Mac。從量化科普、ollama 踩坑、到向開源社群回報 bug 的完整實錄——順便聊聊為什麼立法委員要自己動手裝 AI。"
+pubDate: "2026-08-12"
+heroImage: "../../../assets/images/deepseek-v4-flash-minimax-h3-local-mac/hero.png"
+heroImageAlt: "本地生成的台北 101 煙火與雪地狐狸影片畫面"
+author: "juchun-ko"
+categories: ["devlog", "openclaw"]
+---
+
+週末花了一天，把兩顆今年夏天最熱的開源模型裝進辦公室那台 MacBook Pro（M4 Max、128GB 記憶體）：
+
+| | DeepSeek V4 Flash | MiniMax H3 |
+|---|---|---|
+| 用途 | 聊天、寫程式、驅動 AI Agent | 文字生成影片＋音軌 |
+| 參數量 | 284B（MoE，每次啟用 13B） | 33.1B |
+| 本地引擎 | llama.cpp | h3.c（純 C + Metal） |
+| 磁碟佔用 | 97GB（2-bit 量化） | 196GB |
+| 實測速度 | ~29 token/s | 3 秒影片約 1–2 分鐘 |
+
+全程沒有雲端 API、沒有訂閱費、沒有資料出境。這篇把過程中的科普知識和踩坑實錄一次整理。
+
+## 先科普：這兩顆模型是什麼？
+
+### DeepSeek V4 Flash：一棟住滿專家的大樓（MoE）
+
+DeepSeek V4 Flash 是 284B 參數的 **MoE（Mixture of Experts，專家混合）**模型。你可以把它想像成一棟住了幾百位專家的大樓：每次回答問題只叫醒其中 13B 參數的幾位相關專家，其他人繼續睡。所以它有 284B 的「知識容量」，但每個 token 的運算成本只有 13B 等級——這正是它能在筆電上跑出可用速度的關鍵。
+
+原生支援 1M token 的上下文窗口，7 月 31 日發布的 0731 版本重點強化了 Agent 能力（工具呼叫、多輪任務），這也是我要拿它驅動 OpenClaw 的原因。
+
+### 量化（Quantization）：把模型「壓縮」進筆電的魔法
+
+模型原始權重是 FP8/BF16 精度，DeepSeek V4 Flash 完整版要 160GB 以上。**量化**就是把每個權重用更少的位元表示——這次用的是 Unsloth 做的 **UD-Q2_K_XL**（動態 2-bit 量化），壓到 96.8GB。
+
+「2-bit 不會很笨嗎？」這是好問題。兩個關鍵：一是 V4 Flash 原生就是 FP4（4-bit）訓練的模型，從 4-bit 壓到 2-bit 的損失比想像中小；二是「動態」量化不是無腦全壓——重要的層（attention、路由）保留較高精度，不重要的專家層才壓到最低。實際用起來，日常對話和工具呼叫基本無感。
+
+### 為什麼 Mac 跑得動？統一記憶體的隱藏優勢
+
+一般 PC 的顯示卡記憶體（VRAM）頂規也就 24–32GB，97GB 的模型根本塞不進去。Apple Silicon 的**統一記憶體架構**讓 CPU 和 GPU 共用同一池記憶體——128GB 的機器，GPU 理論上可以直接定址其中約 75%（可用 `sysctl iogpu.wired_limit_mb` 調高到 100GB+）。97GB 權重全部進 GPU，一塊消費級筆電晶片就這樣跑起了 284B 模型。
+
+### MiniMax H3：影片和聲音一起生出來
+
+MiniMax H3 是 8 月 3 日開放權重的影音生成模型，最大特色是**單次生成同時產出影片與 32kHz 立體聲**——對白、腳步聲、環境音都是模型一起「想像」出來的，不用事後配音。架構是 33.1B 的 DiT（Diffusion Transformer）：生成時所有影格同時去噪，靠 cross-attention 維持影格之間、畫面與聲音之間的一致性。
+
+官方支援清單全是 NVIDIA 生態（最低要 RTX 4090）。Mac 用戶原本只能圍觀——直到 Redis 之父 antirez（Salvatore Sanfilippo）在權重開放後**第七天**，用純 C + Metal 手寫出推理引擎 [h3.c](https://github.com/antirez/h3.c)。整個引擎編譯出來 546KB，沒有 Python、沒有 PyTorch。MiniMax 官方轉發時寫了一句很妙的話：「這種人才你聘不到，只能開源讓它發生。」
+
+順帶一提，antirez 今年稍早也為 DeepSeek V4 Flash 寫過專用引擎 ds4（DwarfStar 4），唐鳳的 pi-ds4 專案就是包裝它。這位退休大神今年基本上以一人之力，把「Mac 本地跑前沿模型」這條路踩寬了兩次。
+
+## 踩坑實錄一：ollama 的三倍磁碟陷阱
+
+原計畫很單純：`ollama pull` 下載、接上 OpenClaw、收工。現實是 ollama 直接回錯：
+
+```
+Error: The specified repository contains sharded GGUF.
+Ollama does not support this yet.
+```
+
+大模型的 GGUF 檔案會切成多個分片，ollama 至今不支援直接拉取（issue #5245，懸了很久）。社群的繞法是手動下載、合併、再 `ollama create` 匯入——但實測發現這條路的磁碟尖峰需求是**模型大小的三倍**（原檔＋匯入複本＋格式轉換暫存 ≈ 290GB），因為 ollama 匯入時還會對 DeepSeek 架構做一次相容性重寫。
+
+最後改用 llama.cpp 的 `llama-server`：原生支援分片 GGUF（連合併都不用）、零額外複製、自帶 OpenAI 相容 API 和網頁聊天介面。結論先講：**磁碟緊或模型大，直接用 llama-server，跳過 ollama**。
+
+```bash
+brew install llama.cpp
+llama-server -m DeepSeek-V4-Flash-UD-Q2_K_XL-merged.gguf \
+  --port 11435 -c 131072 -ngl 99 --jinja \
+  --temp 1.0 --top-p 0.95 --min-p 0.0
+```
+
+M4 Max 實測：**decode 約 29 token/s**，128K 上下文，KV cache 只吃 3.2GB（V4 Flash 的壓縮式 KV 極省，約 24KB/token）。
+
+## 踩坑實錄二：一個正規表達式炸掉整條工具鏈
+
+接上 OpenClaw 後，CLI 測試一切正常——但 GUI 一聊就炸：
+
+```
+provider rejected the request schema or tool payload
+```
+
+抓包之後的偵探過程蠻有趣的：OpenClaw 的 GUI 頻道會掛 35 個工具，把工具清單對 llama-server 做二分法測試，最後鎖定兇手是 `cron` 工具 schema 裡的一條正規表達式 `pattern: "\S"`。llama.cpp 做「文法約束式工具呼叫」時要把 JSON Schema 編譯成形式文法，而它的轉換器不支援 `\S` 這種 escape——沒錨定直接退件，錨定了改在文法解析階段炸掉，怎樣都過不了。
+
+修法很簡單（把 `pattern` 欄位拿掉就好，它只是驗證提示），上游其實也已經修了——但修復只進了 beta 版，穩定版從來沒收到 backport。我們把完整的診斷證據（版本比對、二分法過程、三段式錯誤重現）整理後回報到上游 issue，請維護者把修復 cherry-pick 回穩定線。
+
+這是我很想分享的一點：**用開源軟體的回饋方式，就是把你的偵探筆記留給下一個踩坑的人。**修 bug 的能力不是人人都有，但把「怎麼定位到兇手」寫清楚，對維護者的價值常常不亞於一個 PR。
+
+## h3.c 實戰：196GB 權重與 hardlink 魔法
+
+h3.c 的安裝反而簡單：`git clone`、`make -j8`、下載權重、開跑。唯一的坑是磁碟——H3 的權重倉庫有 FL2VA（文字生影片）和 Ref2VA（參考圖驅動）兩套，各 144GB。
+
+用 Hugging Face 的檔案雜湊比對後發現：兩套之間只有 13 個 DiT 分片不同，**text encoder 和 VAE 共 75 個檔案位元組級相同**。所以只下載一套完整版＋另一套的 DiT，重複的部分用 hardlink 指過去——瞬間省下 78GB。
+
+```bash
+# 兩套權重、一份共用檔案
+FL2VA/text_encoder/  ←─ hardlink ─→  Ref2VA/text_encoder/
+```
+
+## 產出範例
+
+以下影片都是這台 MacBook 本地生成，含音軌（開聲音聽！）：
+
+### 第一支測試：雪地狐狸
+
+裝好引擎後的第一次出片。用的是 h3.c 官方的驗證 prompt 和最快的 6 步預覽設定，從按下 Enter 到看到成品只花幾分鐘——毛髮質感和腳步聲、風聲的同步，是這顆模型能力的試金石：
+
+<video
+  src="/images/deepseek-v4-flash-minimax-h3-local-mac/fox-test.mp4"
+  controls
+  muted
+  loop
+  playsInline
+  style={{ maxWidth: '100%', borderRadius: '12px', margin: '1.5rem 0' }}
+>
+</video>
+
+### 台北 101 煙火（3 秒、20 步去噪、人群歡呼＋煙火爆裂聲）
+
+<video
+  src="/images/deepseek-v4-flash-minimax-h3-local-mac/taipei101-fireworks.mp4"
+  controls
+  muted
+  loop
+  playsInline
+  style={{ maxWidth: '100%', borderRadius: '12px', margin: '1.5rem 0' }}
+>
+</video>
+
+煙火從樓體逐層噴發的經典意象，模型是「懂」台北 101 的。
+
+### 品質階梯：同一個 prompt，20 步 vs 50 步
+
+擴散模型的「去噪步數」是最直觀的品質/時間旋鈕。上面那支是 20 步（搭配 45 層 transformer、跳步重用的「平衡預設」）；下面是**同一個 prompt、同一個種子**，用 50 步、全部 50 層、每步都算的「參考級」設定重跑的版本——渲染時間約三倍：
+
+<video
+  src="/images/deepseek-v4-flash-minimax-h3-local-mac/taipei101-fireworks-hq.mp4"
+  controls
+  muted
+  loop
+  playsInline
+  style={{ maxWidth: '100%', borderRadius: '12px', margin: '1.5rem 0' }}
+>
+</video>
+
+對照著看：火花的粒子細節、樓體玻璃的反光層次、城市背景的燈點清晰度都明顯提升，構圖則因為同種子而大致保持一致。這就是本地生成的迷人之處——**品質和時間的交換完全由你決定**，不用受雲端服務的檔位限制。
+
+### Ref2VA 實測：把自己放進生成影片
+
+最後展示 Ref2VA 那套權重的能力：丟一張人像照片當 Picture 1 參考，用文字指定「照片中的人穿上皮卡丘連身裝對鏡頭揮手」——臉部特徵、眼鏡都由模型從參考圖保留。先看 20 步平衡預設版：
+
+<video
+  src="/images/deepseek-v4-flash-minimax-h3-local-mac/dab-pikachu.mp4"
+  controls
+  muted
+  loop
+  playsInline
+  style={{ maxWidth: '100%', borderRadius: '12px', margin: '1.5rem 0' }}
+>
+</video>
+
+再看同 prompt、同種子的 50 步參考級版——注意布料絨毛的質感、臉部細節的穩定度：
+
+<video
+  src="/images/deepseek-v4-flash-minimax-h3-local-mac/dab-pikachu-hq.mp4"
+  controls
+  muted
+  loop
+  playsInline
+  style={{ maxWidth: '100%', borderRadius: '12px', margin: '1.5rem 0' }}
+>
+</video>
+
+效果好到有點嚇人——這也是我想認真提醒的：**同樣的技術換一張不是你自己的照片，就是深偽（deepfake）**。生成式影音的本地化讓創作門檻降到零，也讓濫用門檻降到零，這個雙面性值得另外寫一篇來談。
+
+
+## 為什麼立法委員要自己動手裝？
+
+三個理由。
+
+**第一，數位主權不是口號，是動手能力。**開放權重的意義在於：模型的能力不再由原廠 API 定義。DeepSeek 權重開放第七天，就有人用原廠沒想過的語言（純 C）讓它在原廠沒支援的硬體（Mac）上跑起來。封閉模型做不到這件事——功能永遠等原廠 roadmap。
+
+**第二，敏感工作需要資料不出境的選項。**國會辦公室每天處理選民陳情、法案研究、質詢準備。這些工作如果要用 AI 輔助，「所有資料先傳到別人的伺服器」不該是唯一選項。一台 128GB 的 Mac 就能跑 284B 模型，意味著「本地 AI」已經從實驗室走到消費級硬體。
+
+**第三，親手踩過坑，才知道政策該長什麼樣。**這次經驗裡的每個環節——量化技術、開源授權（H3 的 Community License 對年營收 2000 萬美元以上企業另有條款）、社群回報機制——都是數位政策的第一手素材。沒摸過 GGUF 分片的人談開源 AI 治理，就像沒騎過車的人規劃自行車道。
+
+## 附錄：規格與時間帳
+
+- 硬體：MacBook Pro（M4 Max、128GB 統一記憶體、需 300GB 以上可用磁碟）
+- DeepSeek V4 Flash 0731，UD-Q2_K_XL 2-bit 量化（Unsloth），llama.cpp 驅動，128K context
+- MiniMax H3（FL2VA + Ref2VA），h3.c 引擎（MIT 授權；模型權重為 Community License）
+- 兩套模型**不能同時駐留**：284B 的 90GB 權重＋H3 的執行峰值會超過 GPU 記憶體上限，寫個切換腳本即可
+- 全程花費：0 元 API 費、一天的週末、以及一次愉快的上游 issue 回報
+
+老話一句：科技的民主化，從願意自己動手開始。
+
