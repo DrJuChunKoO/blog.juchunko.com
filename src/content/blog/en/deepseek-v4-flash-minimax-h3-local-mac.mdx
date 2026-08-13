@@ -16,7 +16,7 @@ I spent a weekend day squeezing two of this summer's hottest open-weight models 
 | Parameters | 284B (MoE, 13B active) | 33.1B |
 | Local engine | llama.cpp | h3.c (pure C + Metal) |
 | Disk footprint | 97GB (2-bit quant) | 196GB |
-| Measured speed | ~29 tokens/s | 3s clip in 1–2 min |
+| Measured speed | ~29 tokens/s | 3s clip: 5–41 min by quality tier |
 
 No cloud API, no subscription, no data leaving the machine. This post collects the science-explainer bits and the pitfall log in one place.
 
@@ -106,7 +106,17 @@ FL2VA/text_encoder/  ←─ hardlink ─→  Ref2VA/text_encoder/
 
 ## Sample Outputs
 
-Every clip below was generated locally on this MacBook, audio included (sound on!):
+Every clip below was generated locally on this MacBook, audio included (sound on!). First, the honest time bill — each clip's length versus actual generation time (measured on M4 Max, including ~3–4 minutes of model loading per invocation; the interactive session mode avoids reloading between generations):
+
+| Clip | Length | Setting | Generation time |
+|---|---|---|---|
+| Fox in the snow | 2.3s | 6-step fast preview | 4m 54s |
+| Taipei 101 fireworks | 3s | 20-step balanced | 7m 26s |
+| Pikachu Ref2VA | 3s | 20-step balanced | 8m 43s |
+| Taipei 101 reference | 3s | 50-step full | 34m 24s |
+| Pikachu reference | 3s | 50-step full | 40m 45s |
+
+The price of the quality ladder is plain to see: 50-step reference renders cost roughly 4–5× the 20-step preset. Which is exactly why you iterate composition at low step counts and only pay for reference quality once you're happy.
 
 ### First Test: A Fox in the Snow
 
