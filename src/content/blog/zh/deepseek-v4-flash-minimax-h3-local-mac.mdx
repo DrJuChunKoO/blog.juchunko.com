@@ -24,6 +24,7 @@ categories: ["devlog", "openclaw"]
 
 <video
   src="/images/deepseek-v4-flash-minimax-h3-local-mac/promo.mp4"
+  poster="/images/deepseek-v4-flash-minimax-h3-local-mac/promo-poster.jpg"
   controls
   playsInline
   style={{ maxWidth: '100%', borderRadius: '12px', margin: '1.5rem 0' }}
@@ -199,4 +200,18 @@ FL2VA/text_encoder/  ←─ hardlink ─→  Ref2VA/text_encoder/
 - 全程花費：0 元 API 費、一天的週末、以及一次愉快的上游 issue 回報
 
 老話一句：科技的民主化，從願意自己動手開始。
+
+---
+
+## 附註：關於使用中國開源模型的提醒
+
+DeepSeek 和 MiniMax 都是中國大陸公司開發的模型，這裡以立法委員的身分補充幾點提醒。我的立場很清楚：**開放權重、開源模型無國界**——好的技術值得學習與使用，本文就是示範。但下載與使用時，請記得三件事：
+
+**一、只從可信來源下載。**權重檔案應該來自官方或知名社群的 Hugging Face repo（如本文使用的 [unsloth](https://huggingface.co/unsloth/DeepSeek-V4-Flash-0731-GGUF)、[MiniMaxAI](https://huggingface.co/MiniMaxAI/MiniMax-H3)），不要從不明網站或轉傳連結下載。模型權重跟軟體一樣有供應鏈風險，來路不明的檔案可能被動過手腳。
+
+**二、使用時要意識到模型帶著訓練方的文化與政治偏見或限制。**中國大陸模型在某些議題上可能拒答、迴避，或按照官方口徑回答。拿來寫程式、翻譯、生成影片幾乎沒有影響；但涉及歷史、政治、人權議題時，請把它當成「有立場的受訪者」，而不是中立的百科全書。
+
+**三、「思想鋼印」是可以動手術移除的——這正是開放權重的力量。**研究已證實，模型的「拒答／審查行為」集中在活化空間中的單一方向，可以像外科手術一樣精準「切除」，且幾乎不影響其他能力（[Arditi et al., 2024](https://arxiv.org/abs/2406.11717)，NeurIPS 2024），社群稱這種技術為 **abliteration（消融）**。DeepSeek V4 Flash 已有社群釋出的[消融版權重](https://huggingface.co/apetersson/DeepSeek-V4-Flash-0731-Abliterated-DS4-Headroom128)；唐鳳打包的 [pi-ds4](https://github.com/audreyt/pi-ds4) 本地工作流（引擎正是本文 h3.c 作者 antirez 為 DeepSeek 寫的姊妹作 ds4——同樣純 C＋Metal，在 Mac 上原生運行），預設下載的就是這種動過手術的版本，還支援對爭議問題的「方向性校正」。閉源模型的偏見你只能接受；開放權重的偏見，社群可以研究、量測、甚至移除——這是我主張擁抱開放權重的核心理由。
+
+最後一個誠實的註腳：消融手術移除的是「拒答與審查行為」，不等於清除了訓練資料中的深層偏見；而動過手術的權重本身也是第三方修改物——選用時，請回到第一點：確認來源可信。
 

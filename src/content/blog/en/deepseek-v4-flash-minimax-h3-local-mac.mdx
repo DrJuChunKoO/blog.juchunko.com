@@ -24,6 +24,7 @@ In a hurry? Here's the 39-second video summary (sound on) — and fittingly, the
 
 <video
   src="/images/deepseek-v4-flash-minimax-h3-local-mac/promo.mp4"
+  poster="/images/deepseek-v4-flash-minimax-h3-local-mac/promo-poster.jpg"
   controls
   playsInline
   style={{ maxWidth: '100%', borderRadius: '12px', margin: '1.5rem 0' }}
@@ -198,3 +199,17 @@ Three reasons.
 - Total cost: $0 in API fees, one weekend day, and one satisfying upstream issue report
 
 As I always say: the democratization of technology begins with the willingness to do it yourself.
+
+---
+
+## A Note on Using Open Models from China
+
+DeepSeek and MiniMax are both developed by companies in mainland China, so let me add a few reminders in my capacity as a legislator. My position is clear: **open weights and open source know no borders** — good technology deserves to be studied and used, and this post is a demonstration of exactly that. But when downloading and using them, keep three things in mind:
+
+**First, download only from trusted sources.** Weights should come from official or well-known community repos on Hugging Face (like [unsloth](https://huggingface.co/unsloth/DeepSeek-V4-Flash-0731-GGUF) and [MiniMaxAI](https://huggingface.co/MiniMaxAI/MiniMax-H3) used in this post) — never from unknown websites or forwarded links. Model weights carry supply-chain risk just like software; files of unknown provenance may have been tampered with.
+
+**Second, be aware that a model carries the cultural and political biases — and restrictions — of whoever trained it.** Models from mainland China may refuse, deflect, or answer along official lines on certain topics. For coding, translation, and video generation this barely matters; but on questions of history, politics, or human rights, treat the model as an interviewee with a stance, not a neutral encyclopedia.
+
+**Third, ideological imprints can be surgically removed — and that is precisely the power of open weights.** Research has shown that a model's refusal/censorship behavior is mediated by a single direction in its activation space, which can be excised with surgical precision while barely affecting other capabilities ([Arditi et al., 2024](https://arxiv.org/abs/2406.11717), NeurIPS 2024) — the community calls this **abliteration**. An [abliterated build of DeepSeek V4 Flash](https://huggingface.co/apetersson/DeepSeek-V4-Flash-0731-Abliterated-DS4-Headroom128) is already published; Audrey Tang's [pi-ds4](https://github.com/audreyt/pi-ds4) local workflow (powered by ds4 — the DeepSeek sibling of this post's h3.c, by the same author antirez, likewise pure C + Metal running natively on a Mac) downloads exactly such a de-censored build by default, plus optional directional steering on contested questions. With a closed model, you can only accept its biases; with open weights, the community can study them, measure them, and even remove them. That is the core reason I advocate embracing open weights.
+
+One honest footnote: abliteration removes refusal and censorship *behavior* — it does not erase deeper biases baked into the training data. And a surgically modified weight file is itself a third-party artifact, which brings us back to point one: verify your sources.
