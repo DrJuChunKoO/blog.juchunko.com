@@ -1,0 +1,183 @@
+---
+title: "Building an AI Live Stream on RTX 5090: From 248s to 35s Per Generation"
+description: "How we ported Infinite TV — an AI-generated Twitch live stream — to Windows + RTX 5090, achieved 77% speedup with torch.compile, and contributed a fix back to triton-windows."
+pubDate: "2026-09-03"
+heroImage: "../../../assets/images/infinite-tv-rtx5090-ai-livestream/hero.png"
+author: "juchun-ko"
+categories: ["devlog"]
+---
+
+Last weekend I did something fun: I took an open-source AI video generation Twitch streaming system, got it running on my RTX 5090, and pushed it from "4 minutes per video segment" down to "35 seconds."
+
+This post documents the entire journey — the pitfalls, the optimizations, and contributing a fix back to the open-source community.
+
+## What is Infinite TV?
+
+[Infinite TV](https://github.com/alex-remade/infinite-tv) is an open-source project with a simple concept:
+
+1. **Read Twitch chat** → Viewer messages get interpreted by AI
+2. **LLM generates prompts** → Based on chat and narrative context, produce the next video prompt
+3. **LTX Video 2.3 model** → A diffusion model generates short video clips (~9 frames)
+4. **RTMP push to Twitch** → Viewers see AI-generated content in real time
+
+The whole thing is an infinite loop — viewers see AI-generated visuals, react in chat, and the AI generates the next segment based on their reactions.
+
+The original was designed for Linux + FAL cloud GPUs. I wanted it running on my desktop.
+
+## Challenge 1: Windows Port
+
+The original project had zero Windows support. Here's what broke:
+
+### 🔧 Unix FIFOs → Windows Named Pipes
+
+RTMP streaming requires sending video and audio to FFmpeg simultaneously. The original used Unix `mkfifo` for named pipes — which simply doesn't exist on Windows.
+
+Rewrote using Windows Named Pipes (`CreateNamedPipeW`) via `ctypes`:
+
+```python
+import ctypes
+_kernel32 = ctypes.windll.kernel32
+
+pipe_name = r"\\.\pipe\infinite-tv-audio"
+handle = _kernel32.CreateNamedPipeW(
+    pipe_name,
+    0x00000002,  # PIPE_ACCESS_OUTBOUND
+    0x00000000,  # PIPE_TYPE_BYTE
+    1, 65536, 65536, 0, None
+)
+```
+
+### 🔧 Hardcoded Paths → Environment Variables
+
+Original had Linux-style hardcoded model paths (`/data/models/...`). Changed to env-driven:
+
+```python
+LTX23_WEIGHTS_DIR = os.getenv(
+    "LTX23_WEIGHTS_DIR",
+    os.path.join(os.getcwd(), "models", "ltx-2.3-distilled-v2"),
+)
+```
+
+### 🔧 Other Fixes
+
+- `find | xargs cat` → Python `ThreadPoolExecutor` for model file preloading
+- Added `PYTHONUTF8=1` to fix Windows console encoding issues
+- UTF-8 fallback for Twitch listener socket handling
+
+## Challenge 2: The Speed Journey
+
+Ported and running, but painfully slow — **248 seconds per segment**.
+
+Viewers on Twitch would stare at a frozen frame for 150 seconds before seeing any new content. Unacceptable.
+
+### ⚡ Step 1: Reduce Frames and Denoising Steps
+
+| Parameter | Original | Adjusted |
+|-----------|----------|----------|
+| num_frames | 17 | 9 |
+| num_inference_steps | 8 | 5 |
+
+The simplest optimization. LTX 2.3 distilled is designed for fewer steps — 5 is plenty. Halving the frame count means each segment is shorter but generates twice as fast.
+
+**Result: 248s → 150s** (40% faster)
+
+### ⚡ Step 2: torch.compile
+
+PyTorch's `torch.compile` compiles models into optimized CUDA kernels, potentially offering massive inference speedups. But on Windows, it requires Triton — a CUDA compiler originally Linux-only.
+
+The good news: the community maintains [triton-windows](https://github.com/triton-lang/triton-windows):
+
+```bash
+pip install triton-windows
+```
+
+The bad news: it didn't work out of the box.
+
+### 🐛 Bug 1: Missing triton_key
+
+PyTorch's Inductor backend does:
+
+```python
+from triton.compiler.compiler import triton_key
+```
+
+But Triton 3.x removed this function (renamed to `get_cache_key` with a different signature).
+
+**Fix:** Added a compatibility shim to `triton/compiler/compiler.py`:
+
+```python
+def triton_key() -> str:
+    """PyTorch Inductor compatibility shim."""
+    return __version__
+```
+
+### 🐛 Bug 2: max-autotune Mode Incompatible
+
+`torch.compile(mode="max-autotune")` hits a `CompiledKernel.launch_enter_hook` AttributeError because triton-windows has a different `CompiledKernel` implementation.
+
+**Fix:** Use `reduce-overhead` mode instead — same performance benefit:
+
+```python
+transformer = torch.compile(transformer, mode="reduce-overhead")
+```
+
+### 🐛 Bug 3: PyTorch codecache except Too Narrow
+
+PyTorch's `codecache.py` only caught `ModuleNotFoundError`, missing `ImportError`:
+
+```python
+except (ModuleNotFoundError, ImportError):
+    triton_version = None
+```
+
+### Three bugs fixed, torch.compile finally works
+
+**Result: 150s → 35s** 🔥
+
+First generation is slow (CUDA kernel compilation takes a few minutes), but every subsequent segment is a steady 35 seconds.
+
+## Final Results
+
+| | Original | Final | Improvement |
+|---|---|---|---|
+| Generation time | 248s | **35s** | **86% ↓** |
+| RTMP FPS | 3.8 | **8.8** | **131% ↑** |
+| Freeze time | ~150s | **0s** | 🔥 |
+
+With 9 frames @ 9 fps sustaining ~54 seconds of playback and generation taking only 35 seconds, **viewers always see fresh content** — zero freeze between segments.
+
+## Contributing Back
+
+The `triton_key` fix isn't just for us — everyone using `torch.compile` on Windows hits this. So we submitted a PR:
+
+👉 [triton-lang/triton-windows #53](https://github.com/triton-lang/triton-windows/pull/53)
+
+12 lines of code, fixing `torch.compile` for all Windows users.
+
+The entire fork is also open source:
+
+👉 [github.com/dAAAb/infinite-tv](https://github.com/dAAAb/infinite-tv)
+
+The README includes full Windows setup instructions, pitfall documentation, and performance benchmarks.
+
+## Tech Stack
+
+- **GPU**: NVIDIA RTX 5090 (Blackwell, sm120)
+- **Model**: LTX Video 2.3 Distilled (dg845/LTX-2.3-Distilled-Diffusers)
+- **Inference**: PyTorch 2.7 + torch.compile + triton-windows
+- **Streaming**: FFmpeg → RTMP → Twitch
+- **Prompts**: OpenAI GPT real-time generation
+- **Frontend**: Next.js dashboard for live monitoring
+
+## Takeaways
+
+The biggest takeaway isn't the speedup itself — it's discovering that **the AI toolchain on Windows is far more mature than expected**. triton-windows had bugs, but once fixed, `torch.compile` delivers the same dramatic speedup as on Linux.
+
+And the bug-fixing process itself is the best kind of open-source contribution — you hit a pothole, you fill it, and everyone after you drives right over it.
+
+Next steps we're exploring:
+- `max-autotune` mode (waiting for triton-windows to fix `launch_enter_hook`)
+- Scaling up to 720p resolution
+- Adding more interactivity (Twitch polls to drive plot direction)
+
+If you have a beefy GPU and want to experiment with AI live streaming, feel free to fork our repo and give it a spin 🦐⚡
