@@ -1,0 +1,183 @@
+---
+title: "用 RTX 5090 打造 AI 即時生成直播：從 248 秒到 35 秒的加速之旅"
+description: "記錄我們如何將 Infinite TV——一個 AI 即時生成影像的 Twitch 直播系統——移植到 Windows + RTX 5090 上，並透過 torch.compile 實現 77% 的加速，最終向 triton-windows 開源專案貢獻修復。"
+pubDate: "2026-09-03"
+heroImage: "../../../assets/images/infinite-tv-rtx5090-ai-livestream/hero.png"
+author: "juchun-ko"
+categories: ["devlog"]
+---
+
+上週末我做了一件好玩的事：把一個 AI 即時生成影片的 Twitch 直播系統，搬到我的 RTX 5090 上跑，然後一路把它從「每段影片要等 4 分鐘」加速到「35 秒出一段」。
+
+這篇記錄整個過程——踩過的坑、做的優化、以及最後向開源社群貢獻修復的經歷。
+
+## 什麼是 Infinite TV？
+
+[Infinite TV](https://github.com/alex-remade/infinite-tv) 是一個開源專案，概念很簡單：
+
+1. **讀 Twitch 聊天室** → 觀眾留言被 AI 解讀
+2. **LLM 生成提示詞** → 根據留言和劇情脈絡產生下一段影片的 prompt
+3. **LTX Video 2.3 模型** → 用擴散模型生成短影片（~9 幀）
+4. **RTMP 推送到 Twitch** → 觀眾即時看到 AI 生成的畫面
+
+整個流程是一個無限迴圈——觀眾看到 AI 生的畫面，留言反應，AI 再根據反應生下一段。
+
+原版設計跑在 Linux + FAL 雲端 GPU 上。我想讓它跑在我的桌機上。
+
+## 第一關：Windows 移植
+
+原專案完全沒考慮 Windows。踩到的坑：
+
+### 🔧 Unix FIFO → Windows Named Pipes
+
+RTMP 串流需要同時送 video 和 audio 給 FFmpeg。原版用 Unix 的 `mkfifo` 建立具名管道——這在 Windows 完全不存在。
+
+改寫成 Windows Named Pipes（`CreateNamedPipeW`），用 `ctypes` 直接呼叫 Win32 API：
+
+```python
+import ctypes
+_kernel32 = ctypes.windll.kernel32
+
+pipe_name = r"\\.\pipe\infinite-tv-audio"
+handle = _kernel32.CreateNamedPipeW(
+    pipe_name,
+    0x00000002,  # PIPE_ACCESS_OUTBOUND
+    0x00000000,  # PIPE_TYPE_BYTE
+    1, 65536, 65536, 0, None
+)
+```
+
+### 🔧 硬編碼路徑 → 環境變數
+
+原版把模型路徑寫死成 `/data/models/...`（Linux 風格）。改成用環境變數驅動：
+
+```python
+LTX23_WEIGHTS_DIR = os.getenv(
+    "LTX23_WEIGHTS_DIR",
+    os.path.join(os.getcwd(), "models", "ltx-2.3-distilled-v2"),
+)
+```
+
+### 🔧 其他小修
+
+- `find | xargs cat` 改成 Python `ThreadPoolExecutor`
+- 加上 `PYTHONUTF8=1` 解決 Windows 主控台的編碼問題
+- Twitch listener 的 socket 處理加上 UTF-8 fallback
+
+## 第二關：加速之旅
+
+移植完能跑了，但速度令人崩潰——**每段影片要 248 秒**。
+
+觀眾盯著 Twitch 看，畫面會凍住 150 秒再動一下。這不行。
+
+### ⚡ Step 1：減少幀數和去噪步數
+
+| 參數 | 原始 | 調整後 |
+|------|------|--------|
+| num_frames | 17 | 9 |
+| num_inference_steps | 8 | 5 |
+
+這是最簡單的改動。LTX 2.3 distilled 模型本身就是為了少步數設計的，5 步其實就夠了。幀數從 17 降到 9，每段影片短一半，但生成也快一半。
+
+**結果：248s → 150s**（快 40%）
+
+### ⚡ Step 2：torch.compile
+
+PyTorch 的 `torch.compile` 可以把模型編譯成優化過的 CUDA kernel，理論上能大幅加速推論。但在 Windows 上，它需要 Triton——一個原本只支援 Linux 的 CUDA 編譯器。
+
+好消息是社群有 [triton-windows](https://github.com/triton-lang/triton-windows)：
+
+```bash
+pip install triton-windows
+```
+
+壞消息是裝完跑不動。
+
+### 🐛 Bug 1：triton_key 不存在
+
+PyTorch 的 Inductor 後端會做：
+
+```python
+from triton.compiler.compiler import triton_key
+```
+
+但 Triton 3.x 已經把這個函數移除了（改名成 `get_cache_key`，簽名也不同）。
+
+**修法：** 在 `triton/compiler/compiler.py` 裡加一個 shim：
+
+```python
+def triton_key() -> str:
+    """PyTorch Inductor compatibility shim."""
+    return __version__
+```
+
+### 🐛 Bug 2：max-autotune 模式不相容
+
+`torch.compile(mode="max-autotune")` 會碰到 `CompiledKernel.launch_enter_hook` 屬性不存在的問題，因為 triton-windows 的 `CompiledKernel` 實作跟上游不同。
+
+**修法：** 改用 `reduce-overhead` 模式，效果一樣好：
+
+```python
+transformer = torch.compile(transformer, mode="reduce-overhead")
+```
+
+### 🐛 Bug 3：PyTorch codecache 的 except 太窄
+
+PyTorch 的 `codecache.py` 只 catch `ModuleNotFoundError`，沒 catch `ImportError`。加一層：
+
+```python
+except (ModuleNotFoundError, ImportError):
+    triton_version = None
+```
+
+### 三個 bug 修完，torch.compile 終於跑起來了
+
+**結果：150s → 35s** 🔥
+
+第一次生成會慢（CUDA kernel 編譯需要幾分鐘），之後每段穩定 35 秒。
+
+## 最終成果
+
+| | 原始 | 最終 | 提升 |
+|---|---|---|---|
+| 每段生成時間 | 248 秒 | **35 秒** | **86% ↓** |
+| RTMP FPS | 3.8 | **8.8** | **131% ↑** |
+| 畫面凍結時間 | ~150 秒 | **0 秒** | 🔥 |
+
+9 幀 @ 9 fps 可以撐大約 54 秒的播放，生成只要 35 秒——**觀眾看到的畫面永遠是新鮮的**，不會再有凍結。
+
+## 回饋開源社群
+
+`triton_key` 的修復不只我們需要——所有在 Windows 上用 `torch.compile` 的人都會碰到。所以我們把修復提了 PR：
+
+👉 [triton-lang/triton-windows #53](https://github.com/triton-lang/triton-windows/pull/53)
+
+12 行程式碼，解決所有 Windows 使用者的 `torch.compile` 問題。
+
+整個 fork 也開源了：
+
+👉 [github.com/dAAAb/infinite-tv](https://github.com/dAAAb/infinite-tv)
+
+README 裡有完整的 Windows 安裝教學、踩坑紀錄、效能數據。
+
+## 技術堆疊
+
+- **GPU**: NVIDIA RTX 5090（Blackwell, sm120）
+- **模型**: LTX Video 2.3 Distilled（dg845/LTX-2.3-Distilled-Diffusers）
+- **推論**: PyTorch 2.7 + torch.compile + triton-windows
+- **串流**: FFmpeg → RTMP → Twitch
+- **提示詞**: OpenAI GPT 即時生成
+- **前端**: Next.js 儀表板即時監控
+
+## 心得
+
+這次最大的收穫不是加速本身——是發現 **Windows 上的 AI 工具鏈已經比想像中成熟很多**。triton-windows 社群版雖然有 bug，但修完之後 `torch.compile` 的加速效果跟 Linux 一樣猛。
+
+而且修 bug 的過程本身就是對開源最好的回饋——你踩到坑，你填坑，所有後來的人都不用再踩。
+
+下一步想試的：
+- 用 `max-autotune` 模式（等 triton-windows 修好 `launch_enter_hook`）
+- 提高解析度到 720p
+- 加入更多互動機制（Twitch 投票決定劇情走向）
+
+如果你也有高算力的 GPU 想玩 AI 直播，歡迎 fork 我們的 repo 試試 🦐⚡
