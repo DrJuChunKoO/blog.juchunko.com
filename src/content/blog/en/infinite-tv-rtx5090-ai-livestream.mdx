@@ -1,183 +1,158 @@
 ---
-title: "Building an AI Live Stream on RTX 5090: From 248s to 35s Per Generation"
-description: "How we ported Infinite TV — an AI-generated Twitch live stream — to Windows + RTX 5090, achieved 77% speedup with torch.compile, and contributed a fix back to triton-windows."
+title: "Running Infinite TV on One RTX 5090: Local LTX 2.5, Continuous I2V, and Live Twitch Control"
+description: "How we turned Infinite TV into a local RTX 5090 livestream with ComfyUI + LTX 2.5, continuous Image-to-Video, bounded recovery, Twitch comment burn-in, and explicit fal.ai billing controls."
 pubDate: "2026-09-03"
+updatedDate: "2026-09-04"
 heroImage: "../../../assets/images/infinite-tv-rtx5090-ai-livestream/hero.png"
+heroImageAlt: "A local AI livestream workstation overlooking Taipei, with continuous generated video, a node workflow, and a high-end GPU"
 author: "juchun-ko"
 categories: ["devlog"]
 ---
 
-Last weekend I did something fun: I took an open-source AI video generation Twitch streaming system, got it running on my RTX 5090, and pushed it from "4 minutes per video segment" down to "35 seconds."
+import demoVideo from "../../../assets/images/infinite-tv-rtx5090-ai-livestream/local-i2v-demo.mp4?url";
 
-This post documents the entire journey — the pitfalls, the optimizations, and contributing a fix back to the open-source community.
+My first Windows + RTX 5090 port of [Infinite TV](https://github.com/alex-remade/infinite-tv) answered two questions: could it run, and could it run faster? Turning it into a stream that could survive for hours required a harder round of engineering: continuous clip boundaries, protection against autoregressive corruption, Twitch comments that actually appear to viewers on time, and proof that video generation is not silently using cloud compute.
 
-## What is Infinite TV?
+The current result is **local video generation on a single RTX 5090 through ComfyUI + LTX 2.5 NVFP4**. Every clip after the first is Image-to-Video, and the Twitch output sustains 9 FPS. Visual and narrative continuity are now usable. There is still a small motion jump at some clip boundaries; that is the next quality problem to solve.
 
-[Infinite TV](https://github.com/alex-remade/infinite-tv) is an open-source project with a simple concept:
+> **Important correction:** during development, we did test fal.ai's LTX 2.3 and H3 Max cloud video routes. The prompt/vision code also used to prefer fal's OpenRouter proxy whenever `FAL_KEY` was present. That phase incurred real fal.ai usage and should not have been described as fully local. This post now separates the cloud experiments from the final local architecture. The local launch scripts explicitly disable both fal prompt routing and fal video.
 
-1. **Read Twitch chat** → Viewer messages get interpreted by AI
-2. **LLM generates prompts** → Based on chat and narrative context, produce the next video prompt
-3. **LTX Video 2.3 model** → A diffusion model generates short video clips (~9 frames)
-4. **RTMP push to Twitch** → Viewers see AI-generated content in real time
+## What Infinite TV does
 
-The whole thing is an infinite loop — viewers see AI-generated visuals, react in chat, and the AI generates the next segment based on their reactions.
+It is an endless generative loop:
 
-The original was designed for Linux + FAL cloud GPUs. I wanted it running on my desktop.
+1. read Twitch chat;
+2. let an LLM choose the next action from the comment, current frame, and story history;
+3. generate the next video clip;
+4. burn the selected comment or prompt into stream-only frames;
+5. send those frames to Twitch through FFmpeg and RTMP;
+6. use the last frame that was actually streamed as the next Image-to-Video input.
 
-## Challenge 1: Windows Port
+Step six sounds trivial. It is where long-running video systems tend to decay.
 
-The original project had zero Windows support. Here's what broke:
+## The journey had three distinct phases
 
-### 🔧 Unix FIFOs → Windows Named Pipes
+### Phase 1: port the Linux project to Windows
 
-RTMP streaming requires sending video and audio to FFmpeg simultaneously. The original used Unix `mkfifo` for named pipes — which simply doesn't exist on Windows.
+The upstream RTMP path used Unix FIFOs for audio. Windows has no `mkfifo`, so we replaced it with Win32 Named Pipes and fixed model paths, UTF-8 console behavior, and cross-platform model preloading.
 
-Rewrote using Windows Named Pipes (`CreateNamedPipeW`) via `ctypes`:
+The first local LTX 2.3 baseline took roughly 248 seconds per segment. Fewer frames and denoising steps brought it to about 150 seconds. An earlier `torch.compile` experiment reached about 35 seconds.
 
-```python
-import ctypes
-_kernel32 = ctypes.windll.kernel32
+That 35-second number needs context. A later PyTorch / triton-windows combination failed on the complete LTX 2.3 transformer because of Triton kernel-group cache files. It remains a historical experiment, not today's recommended Windows recipe. A synthetic module compiling successfully is not proof that a real 13B or 22B workload is production-ready.
 
-pipe_name = r"\\.\pipe\infinite-tv-audio"
-handle = _kernel32.CreateNamedPipeW(
-    pipe_name,
-    0x00000002,  # PIPE_ACCESS_OUTBOUND
-    0x00000000,  # PIPE_TYPE_BYTE
-    1, 65536, 65536, 0, None
-)
-```
+### Phase 2: cloud worked, but it was not the destination
 
-### 🔧 Hardcoded Paths → Environment Variables
+To get the show moving, we tested fal.ai LTX and H3 Max. They were fast and easy to chain, but billed by generated video duration. More subtly, the prompt generator saw `FAL_KEY` and preferred fal → OpenRouter, so fal charges could continue even after video moved back to the machine.
 
-Original had Linux-style hardcoded model paths (`/data/models/...`). Changed to env-driven:
+We corrected both layers:
 
-```python
-LTX23_WEIGHTS_DIR = os.getenv(
-    "LTX23_WEIGHTS_DIR",
-    os.path.join(os.getcwd(), "models", "ltx-2.3-distilled-v2"),
-)
-```
+- `USE_FAL_OPENROUTER=false`: prompt and vision use direct OpenAI `gpt-4o-mini` by default, or a local OpenAI-compatible endpoint;
+- `ENABLE_FAL_VIDEO=false`: a `FAL_KEY` alone cannot call billable cloud video. The switch and a cloud model id must both be explicitly selected.
 
-### 🔧 Other Fixes
+The presence of a credential should never equal permission to spend. That rule is now enforced in code and tests.
 
-- `find | xargs cat` → Python `ThreadPoolExecutor` for model file preloading
-- Added `PYTHONUTF8=1` to fix Windows console encoding issues
-- UTF-8 fallback for Twitch listener socket handling
+### Phase 3: ComfyUI + LTX 2.5 NVFP4 made the 5090 practical
 
-## Challenge 2: The Speed Journey
+The breakthrough was not another tweak to the original Python pipeline. ComfyUI now owns LTX 2.5 NVFP4 on the GPU. Infinite TV sends a local workflow over HTTP, reads the generated frames, and keeps Twitch, RTMP, story state, overlays, and recovery in its Python engine.
 
-Ported and running, but painfully slow — **248 seconds per segment**.
+This split gives us several benefits:
 
-Viewers on Twitch would stare at a frozen frame for 150 seconds before seeing any new content. Unacceptable.
+- ComfyUI manages the GPU, model, and LTX nodes;
+- Infinite TV does not load a second copy of a 22B model in its own environment;
+- video data stays on `127.0.0.1` and the local filesystem;
+- the workflow can change without rewriting the Twitch and RTMP stack.
 
-### ⚡ Step 1: Reduce Frames and Denoising Steps
+## Measured performance
 
-| Parameter | Original | Adjusted |
-|-----------|----------|----------|
-| num_frames | 17 | 9 |
-| num_inference_steps | 8 | 5 |
+Test setup: RTX 5090 32 GB, Windows, LTX 2.5 distilled NVFP4, 512×288, 121 requested frames per clip.
 
-The simplest optimization. LTX 2.3 distilled is designed for fewer steps — 5 is plenty. Halving the frame count means each segment is shorter but generates twice as fast.
+| Metric | Measured result | Context |
+|---|---:|---|
+| Raw ComfyUI bridge clip | ~5.1–7.1 s | Depends on video-only vs. audio and output retrieval |
+| Complete live cycle | **13.53 s average** | 29 recent start-to-start intervals, including LLM, generation, and queue backpressure |
+| Stream payload per clip | 121 frames / 13.44 s | Dripped at 9 FPS |
+| Twitch RTMP | **8.9–9.0 / 9 FPS** | Sustained production rate |
+| One live snapshot | 90 clips, 10,948 frames | 0 dropped, 0 rejected, 9.4 s queue |
+| Automated tests | **14 / 14 passing** | Seam, padding, border, recovery, queue, and overlay checks |
 
-**Result: 248s → 150s** (40% faster)
+Denoising speed matters, but the honest livestream number is the full interval from one clip start to the next.
 
-### ⚡ Step 2: torch.compile
+<video src={demoVideo} controls muted loop playsInline preload="metadata"></video>
 
-PyTorch's `torch.compile` compiles models into optimized CUDA kernels, potentially offering massive inference speedups. But on Windows, it requires Triton — a CUDA compiler originally Linux-only.
+<small>A local LTX 2.5 Image-to-Video development sample. This is not fal.ai output.</small>
 
-The good news: the community maintains [triton-windows](https://github.com/triton-lang/triton-windows):
+![Beginning, middle, and end frames from the local I2V sample, preserving the character, black cat, and Taipei setting](../../../assets/images/infinite-tv-rtx5090-ai-livestream/local-i2v-sequence.jpg)
 
-```bash
-pip install triton-windows
-```
+## Continuous video takes more than “feed the last frame back in”
 
-The bad news: it didn't work out of the box.
+### 1. Every clip after the first is explicit I2V
 
-### 🐛 Bug 1: Missing triton_key
+Each clip starts from the last clean frame that the previous RTMP batch actually accepted. If the quality gate rejects a clip, or RTMP accepts fewer than all 121 frames, neither the visual handoff nor the story history advances.
 
-PyTorch's Inductor backend does:
+It is a transaction: if viewers did not see it, it did not happen in the story.
 
-```python
-from triton.compiler.compiler import triton_key
-```
+### 2. A 121-frame request decoded 129 frames
 
-But Triton 3.x removed this function (renamed to `get_cache_key` with a different signature).
+Our ComfyUI graph produced 129 decoded frames for a 121-frame request. The final eight are temporal padding and can collapse visually. The old loop streamed frame 129 and then fed it into the next generation, amplifying small errors into posterized lines, white or black borders, and rainbow edges.
 
-**Fix:** Added a compatibility shim to `triton/compiler/compiler.py`:
+We now stream only frames 1–121. Frames 122–129 are discarded, and only frame 121 can become the next handoff.
 
-```python
-def triton_key() -> str:
-    """PyTorch Inductor compatibility shim."""
-    return __version__
-```
+### 3. First-frame conditioning is not pixel identity
 
-### 🐛 Bug 2: max-autotune Mode Incompatible
+VAE encode/decode can still modify the conditioned first frame. The first streamed frame of a new clip is therefore replaced with the committed previous tail. That removes the hard visual cut, but it does not carry velocity or motion blur across independent denoising runs.
 
-`torch.compile(mode="max-autotune")` hits a `CompiledKernel.launch_enter_hook` AttributeError because triton-windows has a different `CompiledKernel` implementation.
+This explains the remaining small motion jump. The pixels are exact; the motion state is not. The next experiments should be overlap-aware generation, optical-flow seam scoring, or motion-state conditioning rather than a cosmetic crossfade that could create ghosting.
 
-**Fix:** Use `reduce-overhead` mode instead — same performance benefit:
+## Long-chain white, rainbow, and black borders
 
-```python
-transformer = torch.compile(transformer, mode="reduce-overhead")
-```
+Pixel-level checks showed that every handoff remained exactly 512×288. There was no extra one- or two-pixel border. The real cause was semantic: vignettes, windows, and monitor frames in the image were repeatedly treated as scene structure and enlarged by autoregressive feedback.
 
-### 🐛 Bug 3: PyTorch codecache except Too Narrow
+The current recovery sequence is:
 
-PyTorch's `codecache.py` only caught `ModuleNotFoundError`, missing `ImportError`:
+1. suppress frame, vignette, letterbox, black/white bars, and rainbow edges in the negative prompt;
+2. detect rectangular edge structure;
+3. try 12%, 16%, then 20% progressive full-bleed crops;
+4. preserve frame 1 exactly and push in only over later frames;
+5. after two failed generations, emit a locally synthesized push-in recovery segment;
+6. do not advance the story during recovery, so the next real clip keeps the same narrative intent.
 
-```python
-except (ModuleNotFoundError, ImportError):
-    triton_version = None
-```
+This keeps the upstream Infinite TV principle—**the output must never run dry**—without blindly feeding poisoned frames into the next generation.
 
-### Three bugs fixed, torch.compile finally works
+## Why a received Twitch comment was invisible
 
-**Result: 150s → 35s** 🔥
+The listener and renderer were both working. The RTMP queue had grown to 1,922 frames, or 213.6 seconds. The comment was burned into the right future clip, but that clip sat behind more than three minutes of old video.
 
-First generation is slow (CUDA kernel compilation takes a few minutes), but every subsequent segment is a steady 35 seconds.
+After the fix:
 
-## Final Results
+- queue backpressure targets 18 seconds;
+- the live queue typically stays around 8–10 seconds;
+- a selected comment remains visible for about 85% of its clip;
+- Traditional Chinese text receives pixel-level overlay verification;
+- overlays touch only stream copies, while the clean final frame continues the I2V chain.
 
-| | Original | Final | Improvement |
-|---|---|---|---|
-| Generation time | 248s | **35s** | **86% ↓** |
-| RTMP FPS | 3.8 | **8.8** | **131% ↑** |
-| Freeze time | ~150s | **0s** | 🔥 |
+A log saying “comment selected” is not proof that a viewer saw it. Interactive latency has to be measured on the viewer path.
 
-With 9 frames @ 9 fps sustaining ~54 seconds of playback and generation taking only 35 seconds, **viewers always see fresh content** — zero freeze between segments.
+## Reproducing the setup
 
-## Contributing Back
+The complete model paths, environment template, start commands, tests, and provider matrix are in the [dAAAb/infinite-tv README](https://github.com/dAAAb/infinite-tv). The short version is:
 
-The `triton_key` fix isn't just for us — everyone using `torch.compile` on Windows hits this. So we submitted a PR:
+1. install a recent ComfyUI with the required LTXV nodes;
+2. add the LTX 2.5 NVFP4 transformer, Gemma 4 text encoder, and video VAE;
+3. configure `COMFY_SERVER=127.0.0.1:8188` and `COMFYUI_DIR` in `.env`;
+4. keep `USE_FAL_OPENROUTER=false` and `ENABLE_FAL_VIDEO=false`;
+5. start ComfyUI, the Infinite TV backend, and optionally the dashboard;
+6. run `scripts/start-ltx25-stream.py --image ... --output-mode rtmp`;
+7. run `pytest -q`, then monitor generation count, RTMP FPS, and queue seconds together.
 
-👉 [triton-lang/triton-windows #53](https://github.com/triton-lang/triton-windows/pull/53)
+API keys and the Twitch stream key live only in the gitignored `.env`. Model weights, logs, frames, videos, and virtual environments are excluded from Git as well.
 
-12 lines of code, fixing `torch.compile` for all Windows users.
+## What I learned
 
-The entire fork is also open source:
+- **Local generation is only the first milestone.** Long-running state, queues, and degradation control are the real livestream problem.
+- **Visual continuity, motion continuity, and story continuity are separate.** The first and third are now usable; motion seams still deserve work.
+- **Never let an API key choose a provider automatically.** Billable services require an explicit action.
+- **Commit the frame viewers actually saw.** That one rule protects both the visual chain and the narrative.
+- **A quality gate needs recovery, not just rejection.** Bounded recovery beats perfectionism in a live system.
+- **The RTX 5090 really is formidable.** But turning compute into a product required closing every loop around it.
 
-👉 [github.com/dAAAb/infinite-tv](https://github.com/dAAAb/infinite-tv)
-
-The README includes full Windows setup instructions, pitfall documentation, and performance benchmarks.
-
-## Tech Stack
-
-- **GPU**: NVIDIA RTX 5090 (Blackwell, sm120)
-- **Model**: LTX Video 2.3 Distilled (dg845/LTX-2.3-Distilled-Diffusers)
-- **Inference**: PyTorch 2.7 + torch.compile + triton-windows
-- **Streaming**: FFmpeg → RTMP → Twitch
-- **Prompts**: OpenAI GPT real-time generation
-- **Frontend**: Next.js dashboard for live monitoring
-
-## Takeaways
-
-The biggest takeaway isn't the speedup itself — it's discovering that **the AI toolchain on Windows is far more mature than expected**. triton-windows had bugs, but once fixed, `torch.compile` delivers the same dramatic speedup as on Linux.
-
-And the bug-fixing process itself is the best kind of open-source contribution — you hit a pothole, you fill it, and everyone after you drives right over it.
-
-Next steps we're exploring:
-- `max-autotune` mode (waiting for triton-windows to fix `launch_enter_hook`)
-- Scaling up to 720p resolution
-- Adding more interactivity (Twitch polls to drive plot direction)
-
-If you have a beefy GPU and want to experiment with AI live streaming, feel free to fork our repo and give it a spin 🦐⚡
+The code is available at [github.com/dAAAb/infinite-tv](https://github.com/dAAAb/infinite-tv). There is now a reproducible route to an interactive generative livestream on one high-end consumer GPU—local-first, observable, and unable to spend on cloud video by accident. 🦐

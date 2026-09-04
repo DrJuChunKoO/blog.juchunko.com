@@ -1,183 +1,158 @@
 ---
-title: "用 RTX 5090 打造 AI 即時生成直播：從 248 秒到 35 秒的加速之旅"
-description: "記錄我們如何將 Infinite TV——一個 AI 即時生成影像的 Twitch 直播系統——移植到 Windows + RTX 5090 上，並透過 torch.compile 實現 77% 的加速，最終向 triton-windows 開源專案貢獻修復。"
+title: "一張 RTX 5090 跑起 Infinite TV：本機 LTX 2.5、連續 I2V 與 Twitch 即時互動"
+description: "把 Infinite TV 從雲端實驗改造成 RTX 5090 本機 AI 直播：LTX 2.5 + ComfyUI、逐段 Image-to-Video、無限串流修復、Twitch 留言燒錄，以及 fal.ai 費用路徑的完整校正。"
 pubDate: "2026-09-03"
+updatedDate: "2026-09-04"
 heroImage: "../../../assets/images/infinite-tv-rtx5090-ai-livestream/hero.png"
+heroImageAlt: "台北夜景中的本機 AI 直播工作站，螢幕呈現連續生成影片、節點工作流與 RTX 顯示卡"
 author: "juchun-ko"
 categories: ["devlog"]
 ---
 
-上週末我做了一件好玩的事：把一個 AI 即時生成影片的 Twitch 直播系統，搬到我的 RTX 5090 上跑，然後一路把它從「每段影片要等 4 分鐘」加速到「35 秒出一段」。
+import demoVideo from "../../../assets/images/infinite-tv-rtx5090-ai-livestream/local-i2v-demo.mp4?url";
 
-這篇記錄整個過程——踩過的坑、做的優化、以及最後向開源社群貢獻修復的經歷。
+我把 [Infinite TV](https://github.com/alex-remade/infinite-tv) 搬到 Windows + RTX 5090 的第一版，只解決了「能不能跑」與「能不能更快」。真正讓它變成一個可以長時間直播的系統，還得處理另一組更難的問題：段落怎麼無縫接續、壞畫面怎麼不污染下一段、Twitch 留言怎麼真的在觀眾端準時出現，以及怎麼確認影片運算沒有偷偷走雲端。
 
-## 什麼是 Infinite TV？
+現在的成果是：**影片由單張 RTX 5090 在本機透過 ComfyUI + LTX 2.5 NVFP4 生成**，第二段以後全部採 Image-to-Video，Twitch 串流穩定維持 9 FPS。畫面與劇情已能延續；段落交界仍偶爾有輕微動作跳動，這是下一輪要優化的地方。
 
-[Infinite TV](https://github.com/alex-remade/infinite-tv) 是一個開源專案，概念很簡單：
+> **重要校正：** 開發途中，我們確實曾測試 fal.ai 的 LTX 2.3 與 H3 Max 雲端影片路徑；prompt/vision 也曾因為機器上存在 `FAL_KEY`，被程式優先送到 fal 的 OpenRouter proxy。那段會產生 fal.ai 費用，不能稱為「全本機」。本文已把歷史測試與最終本機架構分開說明；目前本機啟動腳本會強制關閉 fal prompt 與影片路由。
 
-1. **讀 Twitch 聊天室** → 觀眾留言被 AI 解讀
-2. **LLM 生成提示詞** → 根據留言和劇情脈絡產生下一段影片的 prompt
-3. **LTX Video 2.3 模型** → 用擴散模型生成短影片（~9 幀）
-4. **RTMP 推送到 Twitch** → 觀眾即時看到 AI 生成的畫面
+## Infinite TV 在做什麼？
 
-整個流程是一個無限迴圈——觀眾看到 AI 生的畫面，留言反應，AI 再根據反應生下一段。
+它是一個永不結束的生成迴圈：
 
-原版設計跑在 Linux + FAL 雲端 GPU 上。我想讓它跑在我的桌機上。
+1. 讀取 Twitch 聊天室留言；
+2. LLM 根據留言、目前畫面與劇情歷史決定下一個動作；
+3. 影片模型生成下一段；
+4. 留言或 prompt 燒進送流用畫格；
+5. FFmpeg 經 RTMP 推到 Twitch；
+6. 把上一段實際送出的最後一格，交給下一段 Image-to-Video。
 
-## 第一關：Windows 移植
+最後一步看似簡單，卻是整個系統最容易逐段崩壞的地方。
 
-原專案完全沒考慮 Windows。踩到的坑：
+## 這段旅程，其實有三個不同階段
 
-### 🔧 Unix FIFO → Windows Named Pipes
+### 第一階段：把 Linux 專案搬到 Windows
 
-RTMP 串流需要同時送 video 和 audio 給 FFmpeg。原版用 Unix 的 `mkfifo` 建立具名管道——這在 Windows 完全不存在。
+原版用 Unix FIFO 把音訊送進 FFmpeg；Windows 沒有 `mkfifo`。我們改成 Win32 Named Pipes，並處理模型路徑、UTF-8 主控台與模型預載等跨平台問題。
 
-改寫成 Windows Named Pipes（`CreateNamedPipeW`），用 `ctypes` 直接呼叫 Win32 API：
+早期本機 LTX 2.3 基準大約是每段 248 秒。減少幀數與去噪步數後降到約 150 秒；更早的一組 `torch.compile` 實驗曾測到約 35 秒。
 
-```python
-import ctypes
-_kernel32 = ctypes.windll.kernel32
+這裡也要補一個技術校正：後續換到較新的 PyTorch / triton-windows 組合，在完整 LTX 2.3 transformer 上遇到 Triton kernel group cache 檔案錯誤。也就是說，「35 秒」是歷史實驗結果，不是現在推薦大家照抄的穩定 Windows 配方。合成小模型能 compile，不代表真實 13B/22B 工作負載也能。
 
-pipe_name = r"\\.\pipe\infinite-tv-audio"
-handle = _kernel32.CreateNamedPipeW(
-    pipe_name,
-    0x00000002,  # PIPE_ACCESS_OUTBOUND
-    0x00000000,  # PIPE_TYPE_BYTE
-    1, 65536, 65536, 0, None
-)
-```
+### 第二階段：用過雲端，但那不是最終答案
 
-### 🔧 硬編碼路徑 → 環境變數
+為了讓直播先動起來，我們測過 fal.ai 的 LTX 與 H3 Max。速度快、串接方便，但會依影片秒數計費。更麻煩的是，當時 prompt generator 看到 `FAL_KEY` 就把文字與視覺理解優先走 fal → OpenRouter，所以即使影片後來回到本機，fal 帳戶仍可能持續扣款。
 
-原版把模型路徑寫死成 `/data/models/...`（Linux 風格）。改成用環境變數驅動：
+最後做了兩層修正：
 
-```python
-LTX23_WEIGHTS_DIR = os.getenv(
-    "LTX23_WEIGHTS_DIR",
-    os.path.join(os.getcwd(), "models", "ltx-2.3-distilled-v2"),
-)
-```
+- `USE_FAL_OPENROUTER=false`：prompt/vision 預設直接走 OpenAI `gpt-4o-mini`，或自架的 OpenAI-compatible endpoint；
+- `ENABLE_FAL_VIDEO=false`：即使 `.env` 裡有 `FAL_KEY`，也不能呼叫 billable cloud video。只有同時明確開啟開關並選擇雲端 model id 才會送出請求。
 
-### 🔧 其他小修
+憑證的存在，不應該等同於允許花錢。這是這次最值得留下來的工程規則之一。
 
-- `find | xargs cat` 改成 Python `ThreadPoolExecutor`
-- 加上 `PYTHONUTF8=1` 解決 Windows 主控台的編碼問題
-- Twitch listener 的 socket 處理加上 UTF-8 fallback
+### 第三階段：ComfyUI + LTX 2.5 NVFP4 在 5090 上跑通
 
-## 第二關：加速之旅
+真正的突破不是繼續硬拚原生 Python pipeline，而是讓 ComfyUI 持有 5090 上的 LTX 2.5 NVFP4 模型，Infinite TV 透過本機 HTTP API 送出 workflow、收回畫格，再把串流、留言、劇情與容錯留在原本的 Python engine。
 
-移植完能跑了，但速度令人崩潰——**每段影片要 248 秒**。
+這樣的拆法有幾個好處：
 
-觀眾盯著 Twitch 看，畫面會凍住 150 秒再動一下。這不行。
+- ComfyUI 負責顯示卡、模型與 LTX 節點；
+- Infinite TV 不必在自己的 venv 再載一份 22B 模型；
+- 影片資料只在本機 `127.0.0.1` 與檔案系統流動；
+- 若要換 workflow，只改 bridge，不必重寫 Twitch / RTMP 系統。
 
-### ⚡ Step 1：減少幀數和去噪步數
+## 實測速度
 
-| 參數 | 原始 | 調整後 |
-|------|------|--------|
-| num_frames | 17 | 9 |
-| num_inference_steps | 8 | 5 |
+測試條件：RTX 5090 32 GB、Windows、LTX 2.5 distilled NVFP4、512×288、每段要求 121 幀。
 
-這是最簡單的改動。LTX 2.3 distilled 模型本身就是為了少步數設計的，5 步其實就夠了。幀數從 17 降到 9，每段影片短一半，但生成也快一半。
+| 指標 | 實測結果 | 說明 |
+|---|---:|---|
+| ComfyUI bridge 單段 | 約 5.1–7.1 秒 | 受是否含音訊與輸出讀取影響 |
+| 完整直播 cycle | **平均 13.53 秒** | 最近 29 段，包含 LLM、生成與 queue backpressure |
+| 每段串流內容 | 121 幀 / 13.44 秒 | 以 9 FPS 播放 |
+| Twitch RTMP | **8.9–9.0 / 9 FPS** | 長跑維持目標速率 |
+| 一次線上快照 | 90 段、10,948 幀 | 0 dropped、0 rejected、queue 9.4 秒 |
+| 自動測試 | **14 / 14 通過** | 接縫、padding、邊框、救援、queue、字幕 |
 
-**結果：248s → 150s**（快 40%）
+去噪 kernel 跑多快固然重要，但對直播來說，更誠實的數字是「從這一段開始到下一段開始」的完整週期。
 
-### ⚡ Step 2：torch.compile
+<video src={demoVideo} controls muted loop playsInline preload="metadata"></video>
 
-PyTorch 的 `torch.compile` 可以把模型編譯成優化過的 CUDA kernel，理論上能大幅加速推論。但在 Windows 上，它需要 Triton——一個原本只支援 Linux 的 CUDA 編譯器。
+<small>本機 LTX 2.5 Image-to-Video 範例。這是開發素材，不是 fal.ai 輸出。</small>
 
-好消息是社群有 [triton-windows](https://github.com/triton-lang/triton-windows)：
+![本機 I2V 短片的前、中、後畫格，角色、黑貓與台北場景維持連續](../../../assets/images/infinite-tv-rtx5090-ai-livestream/local-i2v-sequence.jpg)
 
-```bash
-pip install triton-windows
-```
+## 畫面連續：不能只做「拿最後一格接下一段」
 
-壞消息是裝完跑不動。
+### 1. 第二段開始，一律明確走 I2V
 
-### 🐛 Bug 1：triton_key 不存在
+每一段都取「上一段實際送進 RTMP 的最後一個乾淨畫格」當作下一段 `LTXVAddGuide` 的 frame 0。若影片被品質閘門拒絕，或 RTMP 沒完整收下 121 幀，畫面 handoff 與劇情歷史都不會前進。
 
-PyTorch 的 Inductor 後端會做：
+這是一個 transaction：觀眾沒看到，就不能算故事已經發生。
 
-```python
-from triton.compiler.compiler import triton_key
-```
+### 2. 121 幀要求，實際解出 129 幀
 
-但 Triton 3.x 已經把這個函數移除了（改名成 `get_cache_key`，簽名也不同）。
+ComfyUI workflow 對 121 幀要求會解碼出 129 幀；最後 8 幀是 temporal padding，尾端品質容易塌掉。舊流程把第 129 幀拿去接下一段，誤差就會自回歸放大成高飽和線條、白邊、彩虹邊或黑框。
 
-**修法：** 在 `triton/compiler/compiler.py` 裡加一個 shim：
+現在只播第 1–121 幀，第 122–129 幀一律丟棄。只有第 121 幀能成為下一段起點。
 
-```python
-def triton_key() -> str:
-    """PyTorch Inductor compatibility shim."""
-    return __version__
-```
+### 3. 首幀 conditioning 不等於首幀像素相同
 
-### 🐛 Bug 2：max-autotune 模式不相容
+VAE encode/decode 仍會微調第一格，所以新段第一個送流畫格會被強制替換成上一段已提交的尾格。這解決了畫面切點，但沒有完整傳遞「速度」與「動態模糊」。因此，目前仍可能看到輕微 motion jump——像素已經接緊，動量還沒有。
 
-`torch.compile(mode="max-autotune")` 會碰到 `CompiledKernel.launch_enter_hook` 屬性不存在的問題，因為 triton-windows 的 `CompiledKernel` 實作跟上游不同。
+下一步應該研究 overlap-aware generation、optical flow 接縫評分或 motion-state conditioning，而不是只做 crossfade；單純淡化會讓接縫看似柔和，卻可能製造殘影。
 
-**修法：** 改用 `reduce-overhead` 模式，效果一樣好：
+## 長鏈生成的白邊、彩虹框與黑框
 
-```python
-transformer = torch.compile(transformer, mode="reduce-overhead")
-```
+逐像素檢查後，所有 handoff 都是 512×288，沒有多一兩個白色或黑色 pixel。真正原因是輸入圖裡的暗角、窗框、螢幕框等「框狀語意」，被長鏈 I2V 當成場景的一部分，每一代再放大一次。
 
-### 🐛 Bug 3：PyTorch codecache 的 except 太窄
+目前的處理順序是：
 
-PyTorch 的 `codecache.py` 只 catch `ModuleNotFoundError`，沒 catch `ImportError`。加一層：
+1. negative prompt 抑制 frame、vignette、letterbox、black/white bars 與 rainbow edges；
+2. 偵測明確框體；
+3. 先嘗試 12%、16%、20% 的漸進 full-bleed crop；
+4. 第一格仍保留 exact pixels，後續畫格才平滑推近；
+5. 連續兩次仍失敗，就插入本機合成的 push-in recovery segment；
+6. recovery 不推進劇情，下一段仍執行原本的故事意圖。
 
-```python
-except (ModuleNotFoundError, ImportError):
-    triton_version = None
-```
+這保留了原版 Infinite TV 的核心精神：**輸出不能斷糧**；但不再無條件把壞畫面餵回下一代。
 
-### 三個 bug 修完，torch.compile 終於跑起來了
+## 為什麼 Twitch 留言曾經「有收到、畫面卻沒出現」？
 
-**結果：150s → 35s** 🔥
+listener 與字幕 renderer 其實都有工作。真正原因是 RTMP queue 曾累積 1,922 幀、約 213.6 秒。留言已經燒在正確片段上，只是排在三分多鐘的舊畫面後面。
 
-第一次生成會慢（CUDA kernel 編譯需要幾分鐘），之後每段穩定 35 秒。
+修正後：
 
-## 最終成果
+- queue backpressure 目標 18 秒；
+- 重啟後實際維持約 8–10 秒；
+- 選中的 Twitch 留言顯示約該段 85% 時間；
+- 繁中文字會做像素級 overlay verification；
+- 字幕只燒在送流 copy，乾淨尾格繼續餵 I2V。
 
-| | 原始 | 最終 | 提升 |
-|---|---|---|---|
-| 每段生成時間 | 248 秒 | **35 秒** | **86% ↓** |
-| RTMP FPS | 3.8 | **8.8** | **131% ↑** |
-| 畫面凍結時間 | ~150 秒 | **0 秒** | 🔥 |
+這再次提醒我：系統 log 說「留言已採用」，不代表觀眾已經看到。互動延遲要從 viewer path 量測。
 
-9 幀 @ 9 fps 可以撐大約 54 秒的播放，生成只要 35 秒——**觀眾看到的畫面永遠是新鮮的**，不會再有凍結。
+## 如何復現？
 
-## 回饋開源社群
+完整步驟與模型檔案位置已整理在 [dAAAb/infinite-tv README](https://github.com/dAAAb/infinite-tv)。核心流程是：
 
-`triton_key` 的修復不只我們需要——所有在 Windows 上用 `torch.compile` 的人都會碰到。所以我們把修復提了 PR：
+1. 安裝最新版 ComfyUI 與 LTXV 節點；
+2. 放入 LTX 2.5 NVFP4 transformer、Gemma 4 text encoder 與 video VAE；
+3. `.env` 設定 `COMFY_SERVER=127.0.0.1:8188` 與 `COMFYUI_DIR`；
+4. 保持 `USE_FAL_OPENROUTER=false`、`ENABLE_FAL_VIDEO=false`；
+5. 啟動 ComfyUI、Infinite TV backend 與 dashboard；
+6. 用 `scripts/start-ltx25-stream.py --image ... --output-mode rtmp` 開播；
+7. 執行 `pytest -q`，並同時監看 generation count、RTMP FPS 與 queue seconds。
 
-👉 [triton-lang/triton-windows #53](https://github.com/triton-lang/triton-windows/pull/53)
+API key 與 Twitch stream key 只放在 gitignored `.env`。模型、log、畫格、影片、venv 也不進 Git。
 
-12 行程式碼，解決所有 Windows 使用者的 `torch.compile` 問題。
+## 這次真正學到的事
 
-整個 fork 也開源了：
+- **本機生成只是第一步。** 無限直播真正難的是狀態、queue 與退化控制。
+- **畫面連續、動作連續、劇情連續是三件不同的事。** 現在前兩者做到「可用」，動作接縫仍要繼續做。
+- **不要讓 API key 自動決定 provider。** 選擇會計費的服務必須是明確動作。
+- **只提交觀眾真的看到的最後一格。** 這條規則同時保住畫面與劇情。
+- **品質閘門不能只有拒絕。** 對 live system 來說，bounded recovery 比完美主義更重要。
+- **5090 的確很猛。** 但真正把它變成產品的，不只是算力，而是把所有細節接成一個可長跑的 closed loop。
 
-👉 [github.com/dAAAb/infinite-tv](https://github.com/dAAAb/infinite-tv)
-
-README 裡有完整的 Windows 安裝教學、踩坑紀錄、效能數據。
-
-## 技術堆疊
-
-- **GPU**: NVIDIA RTX 5090（Blackwell, sm120）
-- **模型**: LTX Video 2.3 Distilled（dg845/LTX-2.3-Distilled-Diffusers）
-- **推論**: PyTorch 2.7 + torch.compile + triton-windows
-- **串流**: FFmpeg → RTMP → Twitch
-- **提示詞**: OpenAI GPT 即時生成
-- **前端**: Next.js 儀表板即時監控
-
-## 心得
-
-這次最大的收穫不是加速本身——是發現 **Windows 上的 AI 工具鏈已經比想像中成熟很多**。triton-windows 社群版雖然有 bug，但修完之後 `torch.compile` 的加速效果跟 Linux 一樣猛。
-
-而且修 bug 的過程本身就是對開源最好的回饋——你踩到坑，你填坑，所有後來的人都不用再踩。
-
-下一步想試的：
-- 用 `max-autotune` 模式（等 triton-windows 修好 `launch_enter_hook`）
-- 提高解析度到 720p
-- 加入更多互動機制（Twitch 投票決定劇情走向）
-
-如果你也有高算力的 GPU 想玩 AI 直播，歡迎 fork 我們的 repo 試試 🦐⚡
+程式已開源在 [github.com/dAAAb/infinite-tv](https://github.com/dAAAb/infinite-tv)。如果你也想用一張高階消費級 GPU 做互動式生成直播，現在終於有一條可重現、預設不會誤用雲端費用的路徑了。🦐
