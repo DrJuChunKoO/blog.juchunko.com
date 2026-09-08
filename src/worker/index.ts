@@ -21,6 +21,113 @@ interface Env {
   OPENROUTER_API_KEY: string;
 }
 
+function parseByteRange(rangeHeader: string, size: number) {
+  const match = /^bytes=(\d*)-(\d*)$/.exec(rangeHeader);
+  if (!match || (!match[1] && !match[2])) return null;
+
+  if (!match[1]) {
+    const suffixLength = Number(match[2]);
+    if (!Number.isSafeInteger(suffixLength) || suffixLength <= 0) return null;
+    return { start: Math.max(size - suffixLength, 0), end: size - 1 };
+  }
+
+  const start = Number(match[1]);
+  const requestedEnd = match[2] ? Number(match[2]) : size - 1;
+  if (
+    !Number.isSafeInteger(start) ||
+    !Number.isSafeInteger(requestedEnd) ||
+    start >= size ||
+    requestedEnd < start
+  ) {
+    return null;
+  }
+
+  return { start, end: Math.min(requestedEnd, size - 1) };
+}
+
+async function serveVideo(request: Request, env: Env): Promise<Response> {
+  const url = new URL(request.url);
+  const rangeHeader = request.headers.get("Range");
+  let size: number | undefined;
+  if (rangeHeader) {
+    const manifestResponse = await env.ASSETS.fetch(
+      new URL("/video-assets.json", url),
+    );
+    const manifest = manifestResponse.ok
+      ? ((await manifestResponse.json()) as Record<string, number>)
+      : {};
+    size = manifest[url.pathname];
+  }
+
+  const assetHeaders = new Headers(request.headers);
+  assetHeaders.delete("Range");
+  const assetResponse = await env.ASSETS.fetch(
+    new Request(request, { headers: assetHeaders }),
+  );
+
+  const headers = new Headers(assetResponse.headers);
+  headers.set("Accept-Ranges", "bytes");
+
+  if (
+    request.method !== "GET" ||
+    !rangeHeader ||
+    !assetResponse.ok ||
+    !assetResponse.body ||
+    !Number.isSafeInteger(size)
+  ) {
+    return new Response(assetResponse.body, {
+      status: assetResponse.status,
+      statusText: assetResponse.statusText,
+      headers,
+    });
+  }
+
+  const range = parseByteRange(rangeHeader, size);
+  if (!range) {
+    headers.set("Content-Range", `bytes */${size}`);
+    headers.set("Content-Length", "0");
+    await assetResponse.body.cancel();
+    return new Response(null, { status: 416, headers });
+  }
+
+  const reader = assetResponse.body.getReader();
+  let offset = 0;
+  const body = new ReadableStream<Uint8Array>({
+    async pull(controller) {
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) {
+          controller.close();
+          return;
+        }
+
+        const chunkStart = offset;
+        const chunkEnd = offset + value.byteLength - 1;
+        offset += value.byteLength;
+
+        if (chunkEnd < range.start) continue;
+
+        const start = Math.max(range.start - chunkStart, 0);
+        const end = Math.min(range.end - chunkStart + 1, value.byteLength);
+        controller.enqueue(value.subarray(start, end));
+
+        if (chunkEnd >= range.end) {
+          await reader.cancel();
+          controller.close();
+        }
+        return;
+      }
+    },
+    cancel(reason) {
+      return reader.cancel(reason);
+    },
+  });
+
+  headers.set("Content-Range", `bytes ${range.start}-${range.end}/${size}`);
+  headers.set("Content-Length", String(range.end - range.start + 1));
+  return new Response(body, { status: 206, headers });
+}
+
 export default {
   async fetch(request: Request, env: Env, ctx: any): Promise<Response> {
     const url = new URL(request.url);
@@ -158,6 +265,10 @@ current page: https://blog.juchunko.com${filename}
       return createUIMessageStreamResponse({
         stream: toUIMessageStream({ stream: result.stream }),
       });
+    }
+
+    if (url.pathname.endsWith(".mp4")) {
+      return serveVideo(request, env);
     }
 
     // ------------------------------

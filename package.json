@@ -8,7 +8,7 @@
   "scripts": {
     "dev": "astro dev",
     "dev:astro": "astro dev",
-    "build": "astro build && pagefind --site dist",
+    "build": "astro build && node scripts/generate-video-manifest.mjs && pagefind --site dist",
     "preview": "astro preview",
     "deploy": "wrangler deploy",
     "preview:worker": "wrangler dev",

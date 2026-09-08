@@ -13,6 +13,7 @@ The DGX Spark in the office (NVIDIA GB10, 121GB unified memory) was sitting idle
 The result first. Every pixel in this clip was computed on that machine: the face comes from a still photo, the lip sync from locally synthesized speech, the body motion from a pose signal extracted out of another video. No cloud API anywhere:
 
 <video
+  preload="metadata"
   src="/images/liveavatar-dgx-spark/fullframe-pose-cosyvoice.mp4"
   poster="/images/liveavatar-dgx-spark/fullframe-pose-cosyvoice-poster.jpg"
   controls
@@ -196,6 +197,7 @@ With the pose path working, the first result had background artifacts. And worse
 ![The same frame with an uncropped driving video versus a cropped one](../../../assets/images/liveavatar-dgx-spark/second-face.png)
 
 <video
+  preload="metadata"
   src="/images/liveavatar-dgx-spark/second-face-artifact.mp4"
   controls
   muted
@@ -273,6 +275,7 @@ The six final videos (three voices × with/without motion), with face, script, a
 All six peaked at exactly 88.3G. Here's the audio-only version, to compare against the motion-driven one at the top:
 
 <video
+  preload="metadata"
   src="/images/liveavatar-dgx-spark/fullframe-audio-only.mp4"
   poster="/images/liveavatar-dgx-spark/fullframe-audio-only-poster.jpg"
   controls
@@ -288,6 +291,7 @@ An unexpected result: **in the motion-driven clip at the top, the caption bar al
 And here's the very first clip from day one — the official sample face, 3.7 seconds, 704×384. A week separates it from the one above:
 
 <video
+  preload="metadata"
   src="/images/liveavatar-dgx-spark/first-clip.mp4"
   controls
   muted

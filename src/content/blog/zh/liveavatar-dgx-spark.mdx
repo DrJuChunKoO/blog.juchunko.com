@@ -13,6 +13,7 @@ categories: ["devlog", "hardware"]
 先看成果。這支影片的每一個畫素都是這台機器算出來的——臉來自一張靜態照片，嘴型來自一段本地合成的語音，動作來自另一段影片的姿態訊號，沒有任何雲端 API：
 
 <video
+  preload="metadata"
   src="/images/liveavatar-dgx-spark/fullframe-pose-cosyvoice.mp4"
   poster="/images/liveavatar-dgx-spark/fullframe-pose-cosyvoice-poster.jpg"
   controls
@@ -196,6 +197,7 @@ export TRITON_PTXAS_PATH=/usr/local/cuda/bin/ptxas
 ![未裁切驅動影片 vs 裁切後，同一格的比較](../../../assets/images/liveavatar-dgx-spark/second-face.png)
 
 <video
+  preload="metadata"
   src="/images/liveavatar-dgx-spark/second-face-artifact.mp4"
   controls
   muted
@@ -273,6 +275,7 @@ export TRITON_PTXAS_PATH=/usr/local/cuda/bin/ptxas
 六支的峰值記憶體都是 88.3G，一模一樣。這是純音訊驅動的版本，可以跟開頭那支有動作的對照著看：
 
 <video
+  preload="metadata"
   src="/images/liveavatar-dgx-spark/fullframe-audio-only.mp4"
   poster="/images/liveavatar-dgx-spark/fullframe-audio-only-poster.jpg"
   controls
@@ -288,6 +291,7 @@ export TRITON_PTXAS_PATH=/usr/local/cuda/bin/ptxas
 最後附上第一天跑出來的那支——官方範例的臉、3.7 秒、704×384。從這裡到上面那支，中間隔了一個禮拜：
 
 <video
+  preload="metadata"
   src="/images/liveavatar-dgx-spark/first-clip.mp4"
   controls
   muted

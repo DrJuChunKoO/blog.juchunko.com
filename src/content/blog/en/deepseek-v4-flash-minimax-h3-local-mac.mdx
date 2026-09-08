@@ -23,6 +23,7 @@ No cloud API, no subscription, no data leaving the machine. This post collects t
 In a hurry? Here's the 39-second video summary (sound on) — and fittingly, the video itself is a product of this local workflow: all three demo clips were generated locally by MiniMax H3, and the edit was written as code with the open-source [video-shotcraft](https://github.com/Vincentwei1021/video-shotcraft) shot library and Remotion:
 
 <video
+  preload="metadata"
   src="/images/deepseek-v4-flash-minimax-h3-local-mac/promo.mp4"
   poster="/images/deepseek-v4-flash-minimax-h3-local-mac/promo-poster.jpg"
   controls
@@ -123,6 +124,7 @@ The price of the quality ladder is plain to see: 50-step reference renders cost 
 The first render after installing the engine, using h3.c's official validation prompt and the fastest 6-step preview preset — a few minutes from pressing Enter to watching the result. Fur texture and the sync of footsteps and wind are this model's litmus test:
 
 <video
+  preload="metadata"
   src="/images/deepseek-v4-flash-minimax-h3-local-mac/fox-test.mp4"
   controls
   muted
@@ -135,6 +137,7 @@ The first render after installing the engine, using h3.c's official validation p
 ### Taipei 101 Fireworks (3s, 20 denoising steps, crowd cheers + crackle)
 
 <video
+  preload="metadata"
   src="/images/deepseek-v4-flash-minimax-h3-local-mac/taipei101-fireworks.mp4"
   controls
   muted
@@ -151,6 +154,7 @@ Fireworks erupting floor by floor from the tower itself — the model clearly "k
 Denoising step count is a diffusion model's most intuitive quality/time dial. The clip above is 20 steps (with 45 transformer layers and step-reuse — the "balanced preset"); below is the **same prompt, same seed**, re-rendered at the "reference" setting — 50 steps, all 50 layers, every step computed — at roughly 3× the render time:
 
 <video
+  preload="metadata"
   src="/images/deepseek-v4-flash-minimax-h3-local-mac/taipei101-fireworks-hq.mp4"
   controls
   muted
@@ -167,6 +171,7 @@ Compare them: spark particle detail, glass reflections on the tower, the clarity
 Finally, the Ref2VA variant: feed one portrait photo as "Picture 1" and prompt "the person in Picture 1 wearing a Pikachu onesie, waving at the camera" — facial features and glasses are carried over from the reference by the model. First, the 20-step balanced version:
 
 <video
+  preload="metadata"
   src="/images/deepseek-v4-flash-minimax-h3-local-mac/dab-pikachu.mp4"
   controls
   muted
@@ -179,6 +184,7 @@ Finally, the Ref2VA variant: feed one portrait photo as "Picture 1" and prompt "
 Then the same prompt and seed at 50-step reference quality — watch the plush fabric texture and the stability of facial details:
 
 <video
+  preload="metadata"
   src="/images/deepseek-v4-flash-minimax-h3-local-mac/dab-pikachu-hq.mp4"
   controls
   muted
