@@ -53,85 +53,111 @@ const labels = {
         >
       </button>
       <div class="video-player__controls">
-        <span class="video-player__time" data-elapsed>00:00</span>
-        <input
-          class="video-player__seek"
-          type="range"
-          min="0"
-          max="0"
-          step="0.1"
-          value="0"
-          aria-label={t("video.seek")}
-          disabled
-        />
-        <span class="video-player__time" data-duration>--:--</span>
-        <details class="video-player__settings">
-          <summary
+        <div class="video-player__toolbar">
+          <button
             class="video-player__button"
-            aria-label={t("video.settings")}
-            title={t("video.settings")}
+            type="button"
+            data-play
+            aria-label={t("video.play")}
+            title={t("video.play")}
           >
-            <svg viewBox="0 0 24 24" aria-hidden="true"
-              ><path d="M5 12h.01M12 12h.01M19 12h.01" stroke-width="3"
+            <svg
+              class="video-player__play-icon"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+              ><path d="m7 4 13 8-13 8Z" fill="currentColor" stroke="none"
               ></path></svg
             >
-          </summary>
-          <div class="video-player__panel">
-            <div class="video-player__sound">
-              <button
-                class="video-player__button"
-                type="button"
-                data-mute
-                aria-label={t("video.mute")}
-                title={t("video.mute")}
-              >
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="m11 5-6 4H2v6h3l6 4Z"></path>
-                  <path
-                    class="video-player__sound-on"
-                    d="M15 8a6 6 0 0 1 0 8m3-11a10 10 0 0 1 0 14"></path>
-                  <path class="video-player__sound-off" d="m16 9 6 6m0-6-6 6"
-                  ></path>
-                </svg>
-              </button>
-              <span class="video-player__volume-label">{t("video.volume")}</span
-              >
-              <input
-                class="video-player__volume"
-                type="range"
-                min="0"
-                max="1"
-                step="0.05"
-                value="1"
-                aria-label={t("video.volume")}
-              />
-            </div>
-            <label class="video-player__setting-row">
-              <span>{t("video.speed")}</span>
-              <select class="video-player__speed">
-                {
-                  [0.5, 0.75, 1, 1.25, 1.5, 2].map((rate) => (
-                    <option value={rate} selected={rate === 1}>
-                      {rate}x
-                    </option>
-                  ))
-                }
-              </select>
-            </label>
-            <button
-              class="video-player__setting-row"
-              type="button"
-              data-fullscreen
-              aria-label={t("video.fullscreen")}
-              hidden
+            <svg
+              class="video-player__pause-icon"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+              ><path d="M9 5v14M15 5v14" stroke-width="2.5"></path></svg
             >
-              <span data-fullscreen-label>{t("video.fullscreen")}</span>
+          </button>
+          <span class="video-player__time"
+            ><span data-elapsed>00:00</span> / <span data-duration>--:--</span
+            ></span
+          >
+          <input
+            class="video-player__seek"
+            type="range"
+            min="0"
+            max="0"
+            step="0.1"
+            value="0"
+            aria-label={t("video.seek")}
+            disabled
+          />
+          <details class="video-player__settings">
+            <summary
+              class="video-player__button"
+              aria-label={t("video.settings")}
+              title={t("video.settings")}
+            >
               <svg viewBox="0 0 24 24" aria-hidden="true"
-                ><path d="M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5"></path></svg
+                ><path d="M5 12h.01M12 12h.01M19 12h.01" stroke-width="3"
+                ></path></svg
               >
-            </button>
-          </div>
-        </details>
+            </summary>
+            <div class="video-player__panel">
+              <div class="video-player__sound">
+                <button
+                  class="video-player__button"
+                  type="button"
+                  data-mute
+                  aria-label={t("video.mute")}
+                  title={t("video.mute")}
+                >
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="m11 5-6 4H2v6h3l6 4Z"></path>
+                    <path
+                      class="video-player__sound-on"
+                      d="M15 8a6 6 0 0 1 0 8m3-11a10 10 0 0 1 0 14"></path>
+                    <path class="video-player__sound-off" d="m16 9 6 6m0-6-6 6"
+                    ></path>
+                  </svg>
+                </button>
+                <span class="video-player__volume-label"
+                  >{t("video.volume")}</span
+                >
+                <input
+                  class="video-player__volume"
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.05"
+                  value="1"
+                  aria-label={t("video.volume")}
+                />
+              </div>
+              <label class="video-player__setting-row">
+                <span>{t("video.speed")}</span>
+                <select class="video-player__speed">
+                  {
+                    [0.5, 0.75, 1, 1.25, 1.5, 2].map((rate) => (
+                      <option value={rate} selected={rate === 1}>
+                        {rate}x
+                      </option>
+                    ))
+                  }
+                </select>
+              </label>
+              <button
+                class="video-player__setting-row"
+                type="button"
+                data-fullscreen
+                aria-label={t("video.fullscreen")}
+                hidden
+              >
+                <span data-fullscreen-label>{t("video.fullscreen")}</span>
+                <svg viewBox="0 0 24 24" aria-hidden="true"
+                  ><path d="M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5"></path></svg
+                >
+              </button>
+            </div>
+          </details>
+        </div>
       </div>
     </div>
   </div>
@@ -246,14 +272,16 @@ const labels = {
   .video-player__controls {
     position: absolute;
     isolation: isolate;
-    inset-inline: clamp(12px, 6%, 48px);
-    bottom: clamp(12px, 4%, 24px);
+    inset-inline: 0;
+    bottom: 0;
+    padding: 2px 12px;
+    border-radius: 0 0 16px 16px;
+    transition: opacity var(--vp-controls-fade) ease-out;
+  }
+  .video-player__toolbar {
     display: flex;
     align-items: center;
-    gap: 14px;
-    padding: 6px 10px 6px 20px;
-    border-radius: 999px;
-    transition: opacity var(--vp-controls-fade) ease-out;
+    gap: 8px;
   }
   /* A separate material layer lets the settings panel blur the video, too. */
   .video-player__controls::before {
@@ -261,7 +289,7 @@ const labels = {
     position: absolute;
     inset: 0;
     z-index: -1;
-    border: 1px solid var(--vp-line);
+    border-top: 1px solid var(--vp-line);
     border-radius: inherit;
     background: var(--vp-material);
     -webkit-backdrop-filter: blur(var(--vp-blur)) saturate(140%);
@@ -292,6 +320,7 @@ const labels = {
   .video-player__settings {
     position: relative;
     flex: 0 0 44px;
+    margin-left: auto;
   }
   .video-player__settings summary {
     list-style: none;
@@ -304,8 +333,8 @@ const labels = {
   }
   .video-player__panel {
     position: absolute;
-    right: -10px;
-    bottom: calc(100% + 18px);
+    right: 0;
+    bottom: calc(100% + 10px);
     width: 220px;
     padding: 8px;
     border: 1px solid var(--vp-line);
@@ -357,10 +386,11 @@ const labels = {
     cursor: pointer;
     accent-color: var(--vp-ink);
   }
-  .video-player__seek {
+  .video-player .video-player__seek {
     flex: 1;
+    height: 44px;
     min-width: 24px;
-    width: 100%;
+    width: 0;
   }
   .video-player__volume {
     flex: 1;
@@ -479,9 +509,8 @@ const labels = {
     border-radius: 0;
   }
   .video-player:fullscreen .video-player__controls {
-    max-width: 880px;
-    margin-inline: auto;
-    bottom: max(24px, env(safe-area-inset-bottom));
+    padding-bottom: max(8px, env(safe-area-inset-bottom));
+    border-radius: 0;
   }
   .video-player[data-state="playing"][data-controls-hidden="true"]:not(
       :has(:focus-visible)
@@ -491,6 +520,8 @@ const labels = {
     pointer-events: none;
   }
   .video-player:has(details[open])
+    .video-player__center-play:not(:focus-visible),
+  .video-player[data-state="playing"]
     .video-player__center-play:not(:focus-visible) {
     opacity: 0;
     pointer-events: none;
@@ -513,17 +544,10 @@ const labels = {
       height: 34px;
     }
     .video-player__controls {
-      inset-inline: 10px;
-      bottom: 10px;
-      gap: 10px;
-      padding: 3px 6px 3px 14px;
+      padding-inline: 8px;
     }
     .video-player__time {
       font-size: 12px;
-    }
-    .video-player__panel {
-      right: -6px;
-      bottom: calc(100% + 14px);
     }
   }
   @media (pointer: coarse) {
