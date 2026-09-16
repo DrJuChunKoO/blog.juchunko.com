@@ -10,6 +10,7 @@ import { useTranslations, getLangFromUrl } from "../i18n/utils";
 import AIAssistant from "../components/agent/AIAssistant";
 import TTSPlayer from "../components/agent/TTSPlayer";
 import KeySummary from "../components/agent/KeySummary";
+import VideoPlayer from "../components/VideoPlayer.astro";
 
 type Props = { post: CollectionEntry<"blog"> };
 
@@ -427,6 +428,7 @@ const jsonLd = {
         </div>
       </article>
     </main>
+    <VideoPlayer />
     <AIAssistant lang={currentLang} client:only="react" />
     <Footer />
   </body>
