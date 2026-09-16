@@ -66,6 +66,21 @@ function initVideoPlayers() {
         "[data-fullscreen-label]",
       )!;
       let message = "";
+      let hideControlsTimer: ReturnType<typeof setTimeout> | undefined;
+      let isInteracting = false;
+
+      const showControls = () => {
+        clearTimeout(hideControlsTimer);
+        root.dataset.controlsHidden = "false";
+        if (!video.paused && !video.ended && !isInteracting) {
+          hideControlsTimer = setTimeout(() => {
+            root.dataset.controlsHidden = "true";
+          }, 2500);
+        }
+      };
+      signal.addEventListener("abort", () => clearTimeout(hideControlsTimer), {
+        once: true,
+      });
 
       // Preserve article-specific width limits while giving the controls their own box.
       const maxWidth = getComputedStyle(video).maxWidth;
@@ -101,6 +116,7 @@ function initVideoPlayers() {
           );
         }
         plays.forEach((button) => {
+          button.hidden = !!video.error;
           button.setAttribute(
             "aria-label",
             playing ? labels.pause : labels.play,
@@ -171,7 +187,74 @@ function initVideoPlayers() {
       plays.forEach((button) =>
         button.addEventListener("click", togglePlayback, { signal }),
       );
-      video.addEventListener("click", togglePlayback, { signal });
+      video.addEventListener(
+        "click",
+        (event) => {
+          // A touch on a playing video reveals its controls instead of pausing it.
+          if (
+            !video.paused &&
+            (event.pointerType === "touch" ||
+              matchMedia("(hover: none)").matches)
+          ) {
+            if (root.dataset.controlsHidden === "true") showControls();
+            else {
+              clearTimeout(hideControlsTimer);
+              root.dataset.controlsHidden = "true";
+            }
+          } else {
+            void togglePlayback();
+          }
+        },
+        { signal },
+      );
+      root.addEventListener(
+        "pointerdown",
+        (event) => {
+          if (
+            event.target instanceof Element &&
+            event.target.closest(
+              ".video-player__controls, .video-player__center-play",
+            )
+          ) {
+            isInteracting = true;
+            showControls();
+          }
+        },
+        { signal },
+      );
+      for (const event of ["pointerup", "pointercancel"]) {
+        document.addEventListener(
+          event,
+          () => {
+            if (isInteracting) {
+              isInteracting = false;
+              showControls();
+            }
+          },
+          { signal },
+        );
+      }
+      root.addEventListener(
+        "pointermove",
+        (event) => {
+          if (event.pointerType === "mouse") showControls();
+        },
+        { signal },
+      );
+      root.addEventListener(
+        "pointerleave",
+        (event) => {
+          if (event.pointerType === "mouse" && !isInteracting) {
+            clearTimeout(hideControlsTimer);
+            root.dataset.controlsHidden = "true";
+          }
+        },
+        { signal },
+      );
+      settings.addEventListener("toggle", showControls, { signal });
+      for (const event of ["play", "pause", "ended"]) {
+        video.addEventListener(event, showControls, { signal });
+      }
       mute.addEventListener(
         "click",
         () => {
@@ -211,9 +294,9 @@ function initVideoPlayers() {
         "click",
         () => {
           message = "";
-          plays[0].focus({ preventScroll: true });
           video.load();
           sync();
+          plays[0].focus({ preventScroll: true });
         },
         { signal },
       );
@@ -287,6 +370,7 @@ function initVideoPlayers() {
       }
 
       sync();
+      showControls();
       video.controls = false;
     });
 }

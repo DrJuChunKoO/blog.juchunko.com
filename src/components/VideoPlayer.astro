@@ -31,28 +31,28 @@ const labels = {
         <span role="status" data-status></span>
         <button type="button" data-retry hidden>{t("video.retry")}</button>
       </div>
-      <div class="video-player__controls">
-        <button
-          class="video-player__button"
-          type="button"
-          data-play
-          aria-label={t("video.play")}
-          title={t("video.play")}
+      <button
+        class="video-player__center-play"
+        type="button"
+        data-play
+        aria-label={t("video.play")}
+        title={t("video.play")}
+      >
+        <svg
+          class="video-player__play-icon"
+          viewBox="0 0 24 24"
+          aria-hidden="true"
+          ><path d="m7 4 13 8-13 8Z" fill="currentColor" stroke="none"
+          ></path></svg
         >
-          <svg
-            class="video-player__play-icon"
-            viewBox="0 0 24 24"
-            aria-hidden="true"
-            ><path d="m8 5 11 7-11 7Z" fill="currentColor" stroke="none"
-            ></path></svg
-          >
-          <svg
-            class="video-player__pause-icon"
-            viewBox="0 0 24 24"
-            aria-hidden="true"
-            ><path d="M9 5v14M15 5v14" stroke-width="2.5"></path></svg
-          >
-        </button>
+        <svg
+          class="video-player__pause-icon"
+          viewBox="0 0 24 24"
+          aria-hidden="true"
+          ><path d="M9 5v14M15 5v14" stroke-width="2.5"></path></svg
+        >
+      </button>
+      <div class="video-player__controls">
         <span class="video-player__time" data-elapsed>00:00</span>
         <input
           class="video-player__seek"
@@ -145,8 +145,12 @@ const labels = {
   .video-player {
     --vp-ink: #18181b;
     --vp-surface: #fff;
+    --vp-glass: rgb(255 255 255 / 70%);
+    --vp-material: var(--vp-surface);
+    --vp-center-material: #333336;
+    --vp-blur: 24px;
     --vp-line: rgb(0 0 0 / 10%);
-    --vp-hover: #f4f4f5;
+    --vp-hover: rgb(0 0 0 / 6%);
     --vp-controls-fade: 150ms;
     position: relative;
     width: 100%;
@@ -156,19 +160,17 @@ const labels = {
       calc(70vh * var(--video-ratio, 1.777778))
     );
     margin: 1.5rem auto;
-    padding: 8px;
-    border: 1px solid var(--vp-line);
-    border-radius: 12px;
-    background: var(--vp-surface);
+    border-radius: 16px;
     color: var(--vp-ink);
-    font: 400 13px/1.4 var(--font-sans);
+    font: 500 13px/1.4 var(--font-sans);
     color-scheme: light;
   }
   .dark .video-player {
     --vp-ink: #fafafa;
     --vp-surface: #18181b;
+    --vp-glass: rgb(28 28 30 / 65%);
     --vp-line: rgb(255 255 255 / 15%);
-    --vp-hover: #27272a;
+    --vp-hover: rgb(255 255 255 / 10%);
     color-scheme: dark;
   }
   .video-player [hidden] {
@@ -182,7 +184,7 @@ const labels = {
     width: 100%;
     aspect-ratio: var(--video-ratio, 1.777778);
     max-height: 70vh;
-    border-radius: 6px;
+    border-radius: inherit;
     background: #09090b;
   }
   .video-player .video-player__stage video {
@@ -207,19 +209,64 @@ const labels = {
   }
   .video-player :is(button, select, summary) {
     cursor: pointer;
+    touch-action: manipulation;
+  }
+  .video-player__center-play {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    width: 84px;
+    height: 84px;
+    margin: auto;
+    border: 1px solid rgb(255 255 255 / 15%);
+    border-radius: 50%;
+    background: var(--vp-center-material);
+    color: #fff;
+    -webkit-backdrop-filter: blur(var(--vp-blur)) saturate(140%);
+    backdrop-filter: blur(var(--vp-blur)) saturate(140%);
+    transition:
+      opacity var(--vp-controls-fade) ease-out,
+      transform 150ms ease-out;
+  }
+  .video-player__center-play svg {
+    width: 40px;
+    height: 40px;
+  }
+  .video-player__center-play .video-player__play-icon {
+    margin-left: 3px;
+  }
+  .video-player__center-play:active {
+    transform: scale(0.94);
+  }
+  .video-player__center-play:focus-visible {
+    outline-color: white !important;
+    outline-offset: 5px !important;
   }
   .video-player__controls {
     position: absolute;
+    isolation: isolate;
     inset-inline: clamp(12px, 6%, 48px);
     bottom: clamp(12px, 4%, 24px);
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 6px 10px;
-    border: 1px solid var(--vp-line);
-    border-radius: 9px;
-    background: var(--vp-surface);
+    gap: 14px;
+    padding: 6px 10px 6px 20px;
+    border-radius: 999px;
     transition: opacity var(--vp-controls-fade) ease-out;
+  }
+  /* A separate material layer lets the settings panel blur the video, too. */
+  .video-player__controls::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border: 1px solid var(--vp-line);
+    border-radius: inherit;
+    background: var(--vp-material);
+    -webkit-backdrop-filter: blur(var(--vp-blur)) saturate(140%);
+    backdrop-filter: blur(var(--vp-blur)) saturate(140%);
+    pointer-events: none;
   }
   .video-player__button {
     display: grid;
@@ -227,7 +274,7 @@ const labels = {
     flex: 0 0 44px;
     width: 44px;
     height: 44px;
-    border-radius: 6px;
+    border-radius: 50%;
     color: var(--vp-ink);
     background: transparent;
   }
@@ -240,6 +287,7 @@ const labels = {
     white-space: nowrap;
     font-size: 13px;
     font-variant-numeric: tabular-nums;
+    letter-spacing: 0.01em;
   }
   .video-player__settings {
     position: relative;
@@ -261,8 +309,10 @@ const labels = {
     width: 220px;
     padding: 8px;
     border: 1px solid var(--vp-line);
-    border-radius: 9px;
-    background: var(--vp-surface);
+    border-radius: 20px;
+    background: var(--vp-material);
+    -webkit-backdrop-filter: blur(var(--vp-blur)) saturate(140%);
+    backdrop-filter: blur(var(--vp-blur)) saturate(140%);
   }
   .video-player__sound,
   .video-player__setting-row {
@@ -433,32 +483,47 @@ const labels = {
     margin-inline: auto;
     bottom: max(24px, env(safe-area-inset-bottom));
   }
-  @media (hover: hover) and (pointer: fine) {
-    .video-player[data-state="playing"]:not(:hover):not(
-        :has(:focus-visible)
-      ):not(:has(details[open]))
-      .video-player__controls {
-      opacity: 0;
-      pointer-events: none;
+  .video-player[data-state="playing"][data-controls-hidden="true"]:not(
+      :has(:focus-visible)
+    ):not(:has(details[open]))
+    :is(.video-player__controls, .video-player__center-play) {
+    opacity: 0;
+    pointer-events: none;
+  }
+  .video-player:has(details[open])
+    .video-player__center-play:not(:focus-visible) {
+    opacity: 0;
+    pointer-events: none;
+  }
+  @supports (
+    (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))
+  ) {
+    .video-player {
+      --vp-material: var(--vp-glass);
+      --vp-center-material: rgb(28 28 30 / 55%);
     }
   }
   @media (max-width: 480px) {
-    .video-player {
-      padding: 6px;
-      border-radius: 10px;
+    .video-player__center-play {
+      width: 64px;
+      height: 64px;
+    }
+    .video-player__center-play svg {
+      width: 34px;
+      height: 34px;
     }
     .video-player__controls {
-      inset-inline: 8px;
-      bottom: 8px;
-      gap: 6px;
-      padding: 2px 4px;
+      inset-inline: 10px;
+      bottom: 10px;
+      gap: 10px;
+      padding: 3px 6px 3px 14px;
     }
     .video-player__time {
       font-size: 12px;
     }
     .video-player__panel {
-      right: -4px;
-      bottom: calc(100% + 12px);
+      right: -6px;
+      bottom: calc(100% + 14px);
     }
   }
   @media (pointer: coarse) {
@@ -470,8 +535,24 @@ const labels = {
     }
   }
   @media (prefers-reduced-motion: reduce) {
-    .video-player__controls {
+    .video-player__controls,
+    .video-player__center-play {
       transition: none;
+    }
+    .video-player__center-play:active {
+      transform: none;
+    }
+  }
+  @media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
+    .video-player {
+      --vp-material: var(--vp-surface);
+      --vp-center-material: #333336;
+      --vp-blur: 0px;
+    }
+  }
+  @media (prefers-contrast: more) {
+    .video-player {
+      --vp-line: currentColor;
     }
   }
 </style>
