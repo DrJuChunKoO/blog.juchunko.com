@@ -206,6 +206,22 @@ const jsonLd = {
       document.addEventListener("DOMContentLoaded", bindPostNavLinks);
       document.addEventListener("astro:page-load", bindPostNavLinks);
     </script>
+    <script>
+      document.addEventListener("astro:page-load", () => {
+        // Videos parsed in ClientRouter's inert document can fail the URL safety check.
+        // Retry after the swap, without resetting healthy or playing videos.
+        document
+          .querySelectorAll<HTMLVideoElement>("article video")
+          .forEach((video) => {
+            if (
+              video.error?.code === MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED &&
+              video.networkState === HTMLMediaElement.NETWORK_NO_SOURCE
+            ) {
+              video.load();
+            }
+          });
+      });
+    </script>
   </head>
 
   <body>
