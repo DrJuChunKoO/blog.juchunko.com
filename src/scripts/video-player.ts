@@ -62,17 +62,20 @@ function initVideoPlayers() {
         ".video-player__settings",
       )!;
       const settingsToggle = settings.querySelector<HTMLElement>("summary")!;
-      const fullscreenLabel = root.querySelector<HTMLElement>(
-        "[data-fullscreen-label]",
-      )!;
       let message = "";
       let hideControlsTimer: ReturnType<typeof setTimeout> | undefined;
       let isInteracting = false;
 
+      const inFullscreen = () => document.fullscreenElement === root;
       const showControls = () => {
         clearTimeout(hideControlsTimer);
         root.dataset.controlsHidden = "false";
-        if (!video.paused && !video.ended && !isInteracting) {
+        if (
+          inFullscreen() &&
+          !video.paused &&
+          !video.ended &&
+          !isInteracting
+        ) {
           hideControlsTimer = setTimeout(() => {
             root.dataset.controlsHidden = "true";
           }, 2500);
@@ -152,7 +155,6 @@ function initVideoPlayers() {
         fullscreen.title = inFullscreen
           ? labels.exitFullscreen
           : labels.fullscreen;
-        fullscreenLabel.textContent = fullscreen.title;
         const loading =
           video.readyState < HTMLMediaElement.HAVE_FUTURE_DATA &&
           video.networkState === HTMLMediaElement.NETWORK_LOADING;
@@ -190,8 +192,9 @@ function initVideoPlayers() {
       video.addEventListener(
         "click",
         (event) => {
-          // A touch on a playing video reveals its controls instead of pausing it.
+          // In fullscreen, a touch on a playing video reveals its controls instead of pausing it.
           if (
+            inFullscreen() &&
             !video.paused &&
             (event.pointerType === "touch" ||
               matchMedia("(hover: none)").matches)
@@ -244,7 +247,11 @@ function initVideoPlayers() {
       root.addEventListener(
         "pointerleave",
         (event) => {
-          if (event.pointerType === "mouse" && !isInteracting) {
+          if (
+            inFullscreen() &&
+            event.pointerType === "mouse" &&
+            !isInteracting
+          ) {
             clearTimeout(hideControlsTimer);
             root.dataset.controlsHidden = "true";
           }
@@ -319,7 +326,18 @@ function initVideoPlayers() {
         },
         { signal },
       );
-      document.addEventListener("fullscreenchange", sync, { signal });
+      document.addEventListener(
+        "fullscreenchange",
+        () => {
+          if (document.fullscreenElement === root) showControls();
+          else {
+            clearTimeout(hideControlsTimer);
+            root.dataset.controlsHidden = "false";
+          }
+          sync();
+        },
+        { signal },
+      );
       document.addEventListener(
         "pointerdown",
         (event) => {
