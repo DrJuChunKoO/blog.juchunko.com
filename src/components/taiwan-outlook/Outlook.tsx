@@ -1,0 +1,1399 @@
+import { useEffect, useId, useState, type ReactNode } from "react";
+import evidence from "../../data/taiwan-outlook/evidence.json";
+import {
+  capabilityShare,
+  countdownParts,
+  reviewDeadline,
+  yearsToThreshold,
+} from "./model";
+import "./outlook.css";
+
+const ASOF = "2026-10-04";
+const n = (x: number, digits = 2) =>
+  x.toLocaleString("en-US", {
+    minimumFractionDigits: digits,
+    maximumFractionDigits: digits,
+  });
+const source = (id: string) =>
+  evidence.sources.find((s) => s[0] === id)?.[3] || "#research-sources";
+type Point = {
+  x: number;
+  a: number | null;
+  b: number | null;
+  breakBefore?: boolean;
+};
+function Panel({
+  tag,
+  title,
+  children,
+  id,
+}: {
+  tag: string;
+  title: string;
+  children: ReactNode;
+  id?: string;
+}) {
+  const autoId = useId();
+  return (
+    <section className="to-widget not-prose" id={id} aria-labelledby={autoId}>
+      <span className="to-kicker">{tag}</span>
+      <h3 id={autoId}>{title}</h3>
+      {children}
+    </section>
+  );
+}
+function Choices({
+  label,
+  choices,
+  value,
+  onChange,
+}: {
+  label: string;
+  choices: string[];
+  value: number;
+  onChange: (v: number) => void;
+}) {
+  return (
+    <div className="to-controls" role="group" aria-label={label}>
+      {choices.map((s, i) => (
+        <button
+          key={s}
+          type="button"
+          aria-pressed={i === value}
+          onClick={() => onChange(i)}
+        >
+          {s}
+        </button>
+      ))}
+    </div>
+  );
+}
+function downloadCsv(name: string, rows: (string | number | null)[][]) {
+  const blob = new Blob(
+    [
+      "\uFEFF" +
+        rows
+          .map((r) =>
+            r
+              .map((v) => `"${String(v ?? "").replaceAll('"', '""')}"`)
+              .join(","),
+          )
+          .join("\r\n"),
+    ],
+    { type: "text/csv;charset=utf-8" },
+  );
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = name;
+  link.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+function LineChart({
+  data,
+  labels,
+  unit,
+  selected,
+  onSelect,
+  xLabel,
+  fixedRange,
+  breakAt,
+  threshold,
+  emptyAfter,
+}: {
+  data: Point[];
+  labels: [string, string];
+  unit: string;
+  selected: number;
+  onSelect: (v: number) => void;
+  xLabel?: (x: number) => string;
+  fixedRange?: [number, number];
+  breakAt?: number;
+  threshold?: number;
+  emptyAfter?: number;
+}) {
+  const W = 720,
+    H = 310,
+    L = 52,
+    R = 20,
+    T = 30,
+    B = 37;
+  const values = data
+    .flatMap((p) => [p.a, p.b])
+    .filter((v): v is number => v !== null);
+  const min = fixedRange?.[0] ?? Math.min(0, ...values);
+  const rawMax = Math.max(...values, 1);
+  const max =
+    fixedRange?.[1] ??
+    Math.ceil(rawMax / (rawMax > 100 ? 100 : rawMax > 10 ? 10 : 1)) *
+      (rawMax > 100 ? 100 : rawMax > 10 ? 10 : 1);
+  const xx = (i: number) =>
+    L + (i * (W - L - R)) / Math.max(1, data.length - 1);
+  const yy = (v: number) =>
+    H - B - ((v - min) / (max - min || 1)) * (H - T - B);
+  function path(key: "a" | "b") {
+    let open = false;
+    return data
+      .map((p, i) => {
+        const v = p[key];
+        if (v === null) {
+          open = false;
+          return "";
+        }
+        const cmd = !open || p.breakBefore ? "M" : "L";
+        open = true;
+        return `${cmd}${xx(i).toFixed(2)},${yy(v).toFixed(2)}`;
+      })
+      .join(" ");
+  }
+  const labelsAt = [
+    ...new Set([
+      0,
+      Math.round((data.length - 1) / 3),
+      Math.round(((data.length - 1) * 2) / 3),
+      data.length - 1,
+    ]),
+  ];
+  const pt = data[Math.min(selected, data.length - 1)];
+  return (
+    <>
+      <div className="to-legend">
+        <span>
+          <i className="to-swatch" />
+          {labels[0]}
+        </span>
+        <span>
+          <i className="to-swatch secondary" />
+          {labels[1]}
+        </span>
+      </div>
+      <svg
+        className="to-chart"
+        viewBox={`0 0 ${W} ${H}`}
+        role="img"
+        aria-label={`${labels.join("與")}；縱軸${unit}。可使用下方滑桿或資料表讀取每年數值。`}
+        onPointerMove={(e) => {
+          if (e.pointerType === "mouse") {
+            const rect = e.currentTarget.getBoundingClientRect();
+            onSelect(
+              Math.max(
+                0,
+                Math.min(
+                  data.length - 1,
+                  Math.round(
+                    ((((e.clientX - rect.left) / rect.width) * W - L) /
+                      (W - L - R)) *
+                      (data.length - 1),
+                  ),
+                ),
+              ),
+            );
+          }
+        }}
+        onClick={(e) => {
+          const rect = e.currentTarget.getBoundingClientRect();
+          onSelect(
+            Math.max(
+              0,
+              Math.min(
+                data.length - 1,
+                Math.round(
+                  ((((e.clientX - rect.left) / rect.width) * W - L) /
+                    (W - L - R)) *
+                    (data.length - 1),
+                ),
+              ),
+            ),
+          );
+        }}
+      >
+        <text x={L} y={15}>
+          {unit}
+        </text>
+        {emptyAfter !== undefined && (
+          <>
+            <rect
+              x={xx(emptyAfter)}
+              y={T}
+              width={W - R - xx(emptyAfter)}
+              height={H - T - B}
+              fill="currentColor"
+              opacity=".025"
+            />
+            <text x={xx(emptyAfter) + 8} y={T + 19}>
+              台灣：尚未觀察
+            </text>
+          </>
+        )}
+        {Array.from({ length: 5 }, (_, i) => min + ((max - min) * i) / 4).map(
+          (v) => (
+            <g key={v}>
+              <line
+                className="to-axis"
+                x1={L}
+                x2={W - R}
+                y1={yy(v)}
+                y2={yy(v)}
+              />
+              <text x={L - 9} y={yy(v) + 4} textAnchor="end">
+                {n(v, Math.abs(max - min) < 5 ? 1 : 0)}
+              </text>
+            </g>
+          ),
+        )}
+        {threshold !== undefined && (
+          <>
+            <line
+              x1={L}
+              x2={W - R}
+              y1={yy(threshold)}
+              y2={yy(threshold)}
+              stroke="currentColor"
+              opacity=".4"
+              strokeDasharray="2 6"
+            />
+            <text x={W - R} y={yy(threshold) - 7} textAnchor="end">
+              自選觀察線 {threshold}%
+            </text>
+          </>
+        )}
+        {breakAt !== undefined && (
+          <g>
+            <line
+              className="to-axis"
+              x1={xx(breakAt)}
+              x2={xx(breakAt)}
+              y1={T}
+              y2={H - B}
+              strokeDasharray="3 4"
+            />
+            <text
+              x={W - R}
+              y={T + (emptyAfter !== undefined ? 45 : 15)}
+              textAnchor="end"
+            >
+              1995 統計變更
+            </text>
+          </g>
+        )}
+        <path className="to-path" d={path("a")} />
+        <path className="to-path secondary" d={path("b")} />
+        <line
+          x1={xx(selected)}
+          x2={xx(selected)}
+          y1={T}
+          y2={H - B}
+          stroke="currentColor"
+          opacity=".2"
+        />
+        {(["a", "b"] as const).map(
+          (k, j) =>
+            pt[k] !== null && (
+              <circle
+                key={k}
+                className={`to-dot ${j ? "secondary" : ""}`}
+                cx={xx(selected)}
+                cy={yy(pt[k]!)}
+                r="5"
+              />
+            ),
+        )}
+        {labelsAt.map((i) => (
+          <text
+            key={i}
+            x={xx(i)}
+            y={H - 10}
+            textAnchor={i === data.length - 1 ? "end" : "middle"}
+          >
+            {xLabel ? xLabel(data[i].x) : data[i].x}
+          </text>
+        ))}
+      </svg>
+    </>
+  );
+}
+
+export function TaiwanClock() {
+  const [yearIndex, setYearIndex] = useState(0);
+  const [now, setNow] = useState<number | null>(null);
+  const year = yearIndex === 0 ? 2030 : 2035;
+  useEffect(() => {
+    setNow(Date.now());
+    const id = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, []);
+  const parts = now === null ? null : countdownParts(now, reviewDeadline(year));
+  const start = Date.UTC(2026, 9, 3, 16);
+  const elapsed =
+    now === null
+      ? 0
+      : Math.min(
+          1,
+          Math.max(0, (now - start) / (reviewDeadline(year) - start)),
+        );
+  const angle = elapsed * 360;
+  const pad = (v: number) => String(v).padStart(2, "0");
+  return (
+    <Panel
+      id="taiwan-clock"
+      tag="THE TAIWAN CLOCK / 政策行動窗口"
+      title="台灣失落倒數鐘"
+    >
+      <p className="to-clock-manifesto">時鐘提醒我們：未來還可以改變。</p>
+      <Choices
+        label="政策檢視節點"
+        choices={["2030｜近程檢視", "2035｜十年視野"]}
+        value={yearIndex}
+        onChange={setYearIndex}
+      />
+      <div className="to-clock-layout">
+        <svg
+          className="to-clock-face"
+          viewBox="0 0 240 240"
+          role="img"
+          aria-label={`距${year}年底政策檢視節點的時間；圓環顯示自2026年10月4日起經過的日曆比例`}
+        >
+          <circle className="to-ring" cx="120" cy="120" r="110" />
+          {Array.from({ length: 60 }, (_, i) => (
+            <line
+              key={i}
+              x1="120"
+              y1={i % 5 ? 17 : 12}
+              x2="120"
+              y2="24"
+              stroke="currentColor"
+              opacity={i % 5 ? 0.25 : 0.8}
+              transform={`rotate(${i * 6} 120 120)`}
+            />
+          ))}
+          <circle
+            cx="120"
+            cy="120"
+            r="91"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeDasharray={`${elapsed * 572} 572`}
+            transform="rotate(-90 120 120)"
+          />
+          <line
+            x1="120"
+            y1="120"
+            x2="120"
+            y2="43"
+            stroke="currentColor"
+            strokeWidth="2"
+            transform={`rotate(${angle} 120 120)`}
+            opacity=".4"
+          />
+          <rect x="66" y="87" width="108" height="70" fill="var(--to-bg)" />
+          <text
+            x="120"
+            y="103"
+            textAnchor="middle"
+            fontSize="10"
+            letterSpacing="2"
+          >
+            REVIEW YEAR
+          </text>
+          <text
+            x="120"
+            y="138"
+            textAnchor="middle"
+            fontSize="35"
+            fontWeight="600"
+            letterSpacing="-2"
+          >
+            {year}
+          </text>
+          <text x="120" y="172" textAnchor="middle" fontSize="10">
+            把時間用在改變上
+          </text>
+        </svg>
+        <div>
+          <span className="to-kicker">距 {year}.12.31 台北時間年底</span>
+          <div className="to-clock-digits">
+            {parts ? n(parts.days, 0) : "—"}
+            <small>天</small>
+          </div>
+          <div className="to-timecode" aria-hidden="true">
+            {parts
+              ? `${pad(parts.hours)}:${pad(parts.minutes)}:${pad(parts.seconds)}`
+              : "--:--:--"}
+          </div>
+          <p className="to-note">
+            {parts?.expired
+              ? "檢視節點已到，請更新證據與下一輪行動目標。"
+              : "每天在走的是行動窗口。改變的是我們能交出的成果。"}
+          </p>
+          <a className="to-clock-link" href="#capability-lab">
+            試著把情境中的風險往後推 ↗
+          </a>
+        </div>
+      </div>
+      <p className="to-note">
+        2030／2035
+        是本文提出的政策檢視節點，並非估計的衰退開始日。圓環只計日曆時間；這座鐘沒有宣稱台灣將在某天失落三十年，也不是末日鐘組織的評估。
+      </p>
+    </Panel>
+  );
+}
+
+const indicators = [
+  {
+    en: "MONEY",
+    name: "資金",
+    state: "流向變化已見",
+    fact: "2025 年直接投資淨流出 343.44 億美元；2023 年為 182.59 億。",
+    meaning: "資本布局值得追查；總額本身不能說明半導體外移了多少。",
+    action: "按產業、最終用途、股權／債務／再投資拆分，接上境內資本支出。",
+    sources: ["C1", "C2"],
+  },
+  {
+    en: "CAPACITY",
+    name: "產能",
+    state: "海內外同步擴張",
+    fact: "台積電擴大美國布局，也揭露在台灣規劃 13 座先進製程與封裝廠。",
+    meaning:
+      "金額與廠數都不是可直接相加的有效產能；要同時看本地絕對量和全球份額。",
+    action: "公開同節點的晶圓量、良率、先進封裝能力與投產時間。",
+    sources: ["A2"],
+  },
+  {
+    en: "CAPABILITY",
+    name: "能力",
+    state: "當地累積進行中",
+    fact: "海外製造與研發布局持續；Rapidus 的 2nm 原型來自與 IBM 的合作路徑。",
+    meaning: "台積電子公司在當地量產，與獨立競爭者能研發下一代，是不同門檻。",
+    action: "追蹤首次試產、核心人才、供應商與研發決策所在地。",
+    sources: ["A2", "A4"],
+  },
+  {
+    en: "VALUE",
+    name: "所得",
+    state: "境內分配待補",
+    fact: "台積電 2026Q2 合併毛利率 67.7%；這並不是台灣境內所得留存率。",
+    meaning:
+      "企業獲利仍強，是當前優勢；還要知道薪資、增加值與技術機會如何留在台灣。",
+    action: "建立同產品鏈的境內增加值帳，避免營收與要素所得重複計算。",
+    sources: ["A1"],
+  },
+  {
+    en: "REPLACEMENT",
+    name: "替代",
+    state: "全面替代未證",
+    fact: "已有海外生產與競爭者布局；目前資料尚未建立台灣被大規模商業替代的完整證據。",
+    meaning: "原型、量產、良率、客戶認證與重複訂單，必須逐關檢驗。",
+    action: "追查客戶能否用相近成本、品質與交期，持續轉移重要訂單。",
+    sources: ["A2", "A4"],
+  },
+  {
+    en: "MACRO",
+    name: "總體",
+    state: "長期因果待驗",
+    fact: "直接投資淨流出擴大；尚無一致證據把它接成台灣三十年停滯的因果鏈。",
+    meaning: "產業變化是否傳到薪資、生產力、信用與新企業形成，決定長期後果。",
+    action: "以非半導體業與其他經濟體作對照，納入人口、景氣與金融條件。",
+    sources: ["C1"],
+  },
+];
+export function EvidenceDashboard() {
+  const [active, setActive] = useState(0);
+  const item = indicators[active];
+  return (
+    <Panel
+      id="evidence-dashboard"
+      tag="EVIDENCE DASHBOARD / 2026.10.04 快照"
+      title="警訊在哪裡，優勢還剩什麼？"
+    >
+      <p>先看已知，再看下一個需要驗證的環節。</p>
+      <div className="to-metrics">
+        <div>
+          <span>2025 FDI 淨流出</span>
+          <strong>343.44</strong>
+          <span>億美元 · 全產業</span>
+        </div>
+        <div>
+          <span>美國多年計畫</span>
+          <strong>2,650</strong>
+          <span>億美元 · 尚未全執行</span>
+        </div>
+        <div>
+          <span>2026Q2 毛利率</span>
+          <strong>67.7%</strong>
+          <span>台積電 · 全球合併</span>
+        </div>
+      </div>
+      <div className="to-stat-grid" role="group" aria-label="六個證據面向">
+        {indicators.map((d, i) => (
+          <button
+            className="to-evidence-button"
+            key={d.en}
+            type="button"
+            aria-pressed={active === i}
+            onClick={() => setActive(i)}
+          >
+            <span className="to-kicker">{d.en}</span>
+            <strong>{d.name}</strong>
+            <span className="to-state">{d.state}</span>
+          </button>
+        ))}
+      </div>
+      <div className="to-inset to-reading" aria-live="polite">
+        <h4>
+          {item.name}｜{item.state}
+        </h4>
+        <p>{item.fact}</p>
+        <p className="to-note">判讀：{item.meaning}</p>
+        <p className="to-note">
+          <strong>下一筆該追的證據：</strong>
+          {item.action}
+        </p>
+        <p className="to-note">
+          原始來源：
+          {item.sources.map((s, i) => (
+            <span key={s}>
+              {i > 0 && " · "}
+              <a href={source(s)}>{s}</a>
+            </span>
+          ))}
+        </p>
+      </div>
+      <p className="to-note">
+        各格是證據狀態，不是國家信用評等，也不加總成衰退機率。多年美國計畫來源：
+        <a href="https://www.nist.gov/news-events/news/2026/07/trump-administration-secures-additional-100-billion-us-semiconductor">
+          NIST／美國商務部，2026-07-16
+        </a>
+        。
+      </p>
+    </Panel>
+  );
+}
+
+export function CapitalFlows() {
+  const [mode, setMode] = useState(0);
+  const [selected, setSelected] = useState(10);
+  const [basis, setBasis] = useState(0);
+  const tw = evidence.taiwan;
+  const jp = evidence.japan;
+  const compare = mode === 2;
+  const data: Point[] = compare
+    ? jp.map((d, i) => ({
+        x: i,
+        a: tw[i]
+          ? ((tw[i].outward - tw[i].inward) / (tw[0].outward - tw[0].inward)) *
+            100
+          : null,
+        b: ((d.outward - d.inward) / (jp[0].outward - jp[0].inward)) * 100,
+        breakBefore: d.breakBefore,
+      }))
+    : mode === 1
+      ? jp.map((d) => ({
+          x: d.year,
+          a: d.outward,
+          b: d.inward,
+          breakBefore: d.breakBefore,
+        }))
+      : tw.map((d) => ({
+          x: d.year,
+          a: basis === 0 ? d.outward : d.approvedOut,
+          b: basis === 0 ? d.inward : d.approvedIn,
+        }));
+  const index = Math.min(selected, data.length - 1);
+  const point = data[index];
+  const labels: [string, string] = compare
+    ? ["台灣淨流出指數", "日本淨流出指數"]
+    : mode === 0 && basis === 0
+      ? ["直接投資資產增加", "直接投資負債增加"]
+      : ["對外直接投資", "外來直接投資"];
+  const labelX = compare ? `第 ${index} 年` : `${point.x} 年`;
+  const rows = [
+    [compare ? "相對年份" : "年份", labels[0], labels[1], "單位", "口徑"],
+    ...data.map((d) => [
+      d.x,
+      d.a,
+      d.b,
+      compare ? "基期=100" : "十億美元",
+      compare
+        ? "TW2015/JP1983起點;JP1995斷點;兩國編制不同"
+        : mode === 1
+          ? "JETRO國際收支;曆年;1995統計變更"
+          : basis === 0
+            ? "CBC國際收支資產負債;曆年"
+            : "MOEA核准;不含另列對陸陸資",
+    ]),
+  ] as (string | number | null)[][];
+  return (
+    <Panel
+      id="capital-flows"
+      tag="CAPITAL FLOWS / 實際統計"
+      title="把兩條線攤開，轉折才看得見"
+    >
+      <Choices
+        label="國家與跨期比較"
+        choices={["台灣 2015–2025", "日本 1983–2000", "跨期：淨流出指數"]}
+        value={mode}
+        onChange={(v) => {
+          setMode(v);
+          setSelected(v === 1 ? 7 : 10);
+        }}
+      />
+      {mode === 0 && (
+        <Choices
+          label="投資統計口徑"
+          choices={["央行｜國際收支", "經濟部｜核准"]}
+          value={basis}
+          onChange={setBasis}
+        />
+      )}
+      <p className="to-note">
+        {compare
+          ? "各自首年=100；台灣 2015、日本 1983 是資料起點，並非相同政策衝擊。兩國編制不同，只供觀察形狀，不估計歷史重演機率。"
+          : mode === 1
+            ? "JETRO 國際收支淨流量・曆年・負的外來投資代表撤資淨額。"
+            : basis === 0
+              ? "中央銀行・全年國際收支・含盈餘再投資與關係企業債務，並非全部現金匯出。"
+              : "經濟部核准金額・全年・不含另表對中國大陸投資與陸資來台；不是實際執行額。"}
+      </p>
+      <LineChart
+        data={data}
+        labels={labels}
+        unit={compare ? "淨流出指數（首年=100）" : "十億美元"}
+        selected={index}
+        onSelect={setSelected}
+        xLabel={compare ? (v) => `第 ${v} 年` : undefined}
+        breakAt={mode > 0 ? 12 : undefined}
+        emptyAfter={compare ? 10.5 : undefined}
+      />
+      <label>
+        <span className="to-kicker">拖曳讀值 · 手機可觸碰曲線</span>
+        <input
+          aria-label="投資圖年份"
+          type="range"
+          min="0"
+          max={data.length - 1}
+          value={index}
+          onChange={(e) => setSelected(+e.target.value)}
+        />
+      </label>
+      <div className="to-scrub-result" aria-live="polite">
+        <div>
+          <small>
+            {compare ? `${1983 + index} / ${2015 + index}` : "觀察年"}
+          </small>
+          <strong>{labelX}</strong>
+        </div>
+        <div>
+          <small>{labels[0]}</small>
+          <strong>
+            {point.a === null ? "尚未觀察" : n(point.a, compare ? 1 : 3)}
+          </strong>
+        </div>
+        <div>
+          <small>{labels[1]}</small>
+          <strong>
+            {point.b === null ? "—" : n(point.b, compare ? 1 : 3)}
+          </strong>
+        </div>
+      </div>
+      {mode > 0 && (
+        <p className="to-warning-break">
+          日本 1995 年附近因定義與匯率換算變更，JETRO
+          提醒序列不嚴格連續；圖線在此斷開。跨期圖不延伸台灣的未來。
+        </p>
+      )}
+      <details>
+        <summary>展開數據與口徑</summary>
+        <div className="to-table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>年／相對年</th>
+                <th>{labels[0]}</th>
+                <th>{labels[1]}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.map((d) => (
+                <tr key={d.x}>
+                  <td>
+                    {d.x}
+                    {compare && `（台${2015 + d.x}／日${1983 + d.x}）`}
+                  </td>
+                  <td>{d.a === null ? "尚未觀察" : n(d.a, 3)}</td>
+                  <td>{d.b === null ? "缺值" : n(d.b, 3)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <p>
+          美元值為當年名目金額，沒有排除通膨、匯率或經濟體規模。基期化只改刻度，不能消除這些差異。FDI
+          資產與負債的差額也不等於全部跨境資本淨流出。
+        </p>
+      </details>
+      <div className="to-data-stamp">
+        <p className="to-note">
+          <a href={source("C1")}>央行 C1</a> ·{" "}
+          <a href={source("J1")}>JETRO J1</a> ·{" "}
+          <a href={source("M3")}>經濟部 M3</a> · {ASOF} 快照
+        </p>
+        <button
+          className="to-export"
+          type="button"
+          onClick={() =>
+            downloadCsv(`taiwan-japan-flows-${mode}-${basis}.csv`, rows)
+          }
+        >
+          下載本圖 CSV ↓
+        </button>
+      </div>
+      <p className="to-note">
+        2026 另列：1–6 月央行資產 210.54／負債 52.84 億美元；1–8 月核准對外
+        623.90／僑外來台 161.81 億美元。不同期別不畫進全年曲線、不年化。
+      </p>
+    </Panel>
+  );
+}
+
+const pledges = [
+  {
+    date: "2020.05",
+    total: 12,
+    text: "亞利桑那首座先進廠，多年建設計畫。",
+    source: "https://pr.tsmc.com/english/news/2033",
+  },
+  {
+    date: "2022.12",
+    total: 40,
+    text: "規畫第二廠，當次美國總計畫擴大。",
+    source: "https://pr.tsmc.com/english/news/2977",
+  },
+  {
+    date: "2024.04",
+    total: 65,
+    text: "總計畫超過 650 億美元；圖上以 650 億作下限顯示。",
+    source: "https://pr.tsmc.com/english/news/3122",
+  },
+  {
+    date: "2025.03",
+    total: 165,
+    text: "追加 1,000 億美元，納入新增晶圓廠、先進封裝與主要研發團隊中心。",
+    source: "https://pr.tsmc.com/english/news/3210",
+  },
+  {
+    date: "2026.07",
+    total: 265,
+    text: "再追加 1,000 億美元；美國官方公告列為合計 12 座先進製造與封裝設施的多年計畫。",
+    source:
+      "https://www.nist.gov/news-events/news/2026/07/trump-administration-secures-additional-100-billion-us-semiconductor",
+  },
+];
+export function InvestmentPipeline() {
+  const [active, setActive] = useState(4);
+  const p = pledges[active];
+  return (
+    <Panel
+      id="investment-pipeline"
+      tag="ANNOUNCED PIPELINE / 已宣布的未來布局"
+      title="從一座廠，到一個生態系"
+    >
+      <p>台積電對美國的多年投資計畫，如何一再擴大。</p>
+      <svg
+        className="to-chart"
+        viewBox="0 0 720 240"
+        role="img"
+        aria-label="五次公布的累計計畫總額：120、400、超過650、1650、2650億美元。這些金額互相包含，不可相加。"
+      >
+        <text x="20" y="17">
+          十億美元 · 當次總計畫
+        </text>
+        {pledges.map((d, i) => (
+          <g key={d.date}>
+            <rect
+              className={`to-pipeline-bar ${active !== i ? "unselected" : ""}`}
+              x={47 + 136 * i}
+              y={198 - (d.total / 265) * 151}
+              width="48"
+              height={(d.total / 265) * 151}
+            />
+            <text
+              x={71 + 136 * i}
+              y={185 - (d.total / 265) * 151}
+              textAnchor="middle"
+            >
+              {i === 2 ? ">65" : d.total}
+            </text>
+            <text x={71 + 136 * i} y="225" textAnchor="middle">
+              {d.date}
+            </text>
+          </g>
+        ))}
+      </svg>
+      <Choices
+        label="投資宣布日期"
+        choices={pledges.map((d) => d.date)}
+        value={active}
+        onChange={setActive}
+      />
+      <div className="to-inset" aria-live="polite">
+        <span className="to-kicker">{p.date} / 美國 / 多年累計計畫</span>
+        <div className="to-pipeline-total">
+          {active === 2 ? ">" : ""}
+          {n(p.total * 10, 0)}
+        </div>
+        <span className="to-kicker">億美元</span>
+        <p className="to-detail">{p.text}</p>
+        <p className="to-note">
+          <a href={p.source}>閱讀當次官方公告 ↗</a>
+        </p>
+      </div>
+      <div className="to-band" aria-label="單一投資項目需追蹤的階段">
+        <span>宣布</span>
+        <span>核准</span>
+        <span>施工</span>
+        <span>裝機</span>
+        <span>量產</span>
+        <span>良率／訂單</span>
+      </div>
+      <p className="to-note">
+        階段列是逐案查核清單，不表示整個 2,650
+        億美元計畫都已進入量產。新總額涵蓋舊承諾，不能再次加總，也不能等同當期
+        FDI 或有效產能。
+      </p>
+    </Panel>
+  );
+}
+
+const pairs = [
+  {
+    label: "美國｜市場與在地化",
+    old: "日本 ↔ 美國",
+    current: "台灣 ↔ 美國",
+    oldText:
+      "貿易摩擦、市場准入與半導體協議改變競爭條件；日本失去 DRAM 優勢，不等於美國 DRAM 全盤接收。",
+    newText:
+      "製造、封裝與研發布局指向美國。TSMC 所有權與能力所在地分開；美國有產能，不自動等於獨立美商已追上。",
+    test: "外部政策如何改變投資地點，並讓當地建立持續創新的能力？",
+    country: "美國",
+    keys: ["jpUS", "usJP"],
+  },
+  {
+    label: "韓國｜獨立競爭者",
+    old: "日本 ↔ 韓國",
+    current: "台灣 ↔ 韓國",
+    oldText:
+      "三星 1983 年開發 64Kb DRAM，1992 年取得公司排名第一；韓國全國 DRAM 首位到 1998 年才出現。技術來源包含美、日。",
+    newText:
+      "三星是獨立競爭者；韓國與台灣也有 HBM／先進封裝的互補。不能把記憶體優勢直接當成晶圓代工替代。",
+    test: "從投入與試產，走到良率、客戶認證與重複訂單，是否出現可持續替代？",
+    country: "韓國",
+    keys: ["jpKR", "krJP"],
+  },
+  {
+    label: "台／日｜能力承接者",
+    old: "日本 ↔ 台灣",
+    current: "台灣 ↔ 日本",
+    oldText:
+      "1994 年 OKI 與南亞塑膠簽約；1995 年南亞科承接。東芝 1995 年授權華邦，1996 年再延伸技術。90 年代必須納入。",
+    newText:
+      "JASM 是台積電體系的合作布局；Rapidus 則與 IBM 合作。日本的自主追趕，要另查技術、良率與客戶，不能合併成同一條移轉。",
+    test: "量產據點、人才與供應商，能否進一步形成自主研發下一代的群聚？",
+    country: "日本",
+    keys: ["jpTW", "twJP"],
+  },
+];
+export function PairComparison() {
+  const [pair, setPair] = useState(0);
+  const [era, setEra] = useState(0);
+  const [index, setIndex] = useState(20);
+  const p = pairs[pair];
+  const historical = evidence.historicalPairs.map((d) => {
+    const r = d as unknown as Record<string, number | null>;
+    return {
+      x: d.year,
+      a: r[p.keys[0]] === null ? null : r[p.keys[0]]! / 1000,
+      b: r[p.keys[1]] === null ? null : r[p.keys[1]]! / 1000,
+    };
+  });
+  const modern = evidence.modernPairs
+    .filter((d) => d[1] === p.country && String(d[0]).length === 4)
+    .map((d) => ({ x: Number(d[0]), a: Number(d[2]), b: Number(d[3]) }));
+  const data = era === 0 ? historical : modern;
+  const selected = Math.min(index, data.length - 1);
+  const pt = data[selected];
+  const pairLabels: [string, string] =
+    era === 0
+      ? [
+          `日本 → ${pair === 2 ? "台灣" : p.country}`,
+          `${pair === 2 ? "台灣" : p.country} → 日本`,
+        ]
+      : [`台灣 → ${p.country}`, `${p.country} → 台灣`];
+  const basis =
+    era === 1
+      ? "台灣核准投資，全產業，曆年"
+      : pair === 0
+        ? "BEA 金融交易，1975–79 與後期有版本差異"
+        : pair === 1
+          ? "JETRO 雙向國際收支；僅 1995–2000 具同口徑數據"
+          : "台灣記錄的雙向核准投資，曆年";
+  return (
+    <Panel
+      id="three-pairs"
+      tag="THREE RELATIONSHIPS / 兩組關係，一起檢驗"
+      title="不是只比一個對手，而是看整個局"
+    >
+      <Choices
+        label="比較關係"
+        choices={pairs.map((d) => d.label)}
+        value={pair}
+        onChange={setPair}
+      />
+      <div className="to-split">
+        <div>
+          <span className="to-kicker">歷史 · 1980–2000</span>
+          <h4>{p.old}</h4>
+          <p className="to-note">{p.oldText}</p>
+        </div>
+        <div>
+          <span className="to-kicker">當代 · 2015–2026</span>
+          <h4>{p.current}</h4>
+          <p className="to-note">{p.newText}</p>
+        </div>
+      </div>
+      <div className="to-inset">
+        <span className="to-kicker">共同待驗機制</span>
+        <p>{p.test}</p>
+      </div>
+      <Choices
+        label="雙向投資年代"
+        choices={["歷史投資", "當代投資"]}
+        value={era}
+        onChange={(v) => {
+          setEra(v);
+          setIndex(v === 0 ? 20 : 10);
+        }}
+      />
+      <p className="to-note">{basis}；不同資料口徑只並列，不合成同一指標。</p>
+      <LineChart
+        data={data}
+        labels={pairLabels}
+        unit="十億美元 · 全產業"
+        selected={selected}
+        onSelect={setIndex}
+      />
+      <label>
+        年份
+        <input
+          aria-label="雙邊圖年份"
+          type="range"
+          min="0"
+          max={data.length - 1}
+          value={selected}
+          onChange={(e) => setIndex(+e.target.value)}
+        />
+      </label>
+      <div className="to-scrub-result" aria-live="polite">
+        <div>
+          <small>觀察年</small>
+          <strong>{pt.x}</strong>
+        </div>
+        <div>
+          <small>{pairLabels[0]}</small>
+          <strong>{pt.a === null ? "缺資料" : n(pt.a, 3)}</strong>
+        </div>
+        <div>
+          <small>{pairLabels[1]}</small>
+          <strong>{pt.b === null ? "缺資料" : n(pt.b, 3)}</strong>
+        </div>
+      </div>
+      <details>
+        <summary>數據、缺值與來源</summary>
+        <div className="to-table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>年</th>
+                <th>{pairLabels[0]}</th>
+                <th>{pairLabels[1]}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.map((d) => (
+                <tr key={d.x}>
+                  <td>{d.x}</td>
+                  <td>{d.a === null ? "缺資料" : n(d.a, 4)}</td>
+                  <td>{d.b === null ? "缺資料" : n(d.b, 4)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <p>
+          日韓 1995
+          年以前：日本對韓另有韓國申報資料，韓國對日缺少可校準年表；本圖保留兩側同口徑的空白。沒有把缺值當零。日美早期版本差異、日台與當代核准口徑均見附檔研究說明。
+        </p>
+        <p>
+          <a href={source("J1")}>JETRO</a> · <a href={source("B1")}>BEA 入</a> ·{" "}
+          <a href={source("B2")}>BEA 出</a> · <a href={source("M1")}>MOEA 出</a>{" "}
+          · <a href={source("M2")}>MOEA 入</a>
+        </p>
+      </details>
+      <button
+        className="to-export"
+        type="button"
+        onClick={() =>
+          downloadCsv(`bilateral-${pair}-${era}.csv`, [
+            ["年份", pairLabels[0], pairLabels[1], "單位", "口徑"],
+            ...data.map((d) => [d.x, d.a, d.b, "十億美元", basis]),
+          ])
+        }
+      >
+        下載雙向數據 CSV ↓
+      </button>
+      <p className="to-note">
+        這是三組以日本／台灣為中心的關係；美韓、美日、IBM、Philips
+        等外部連結也影響結果。共同衝擊可能讓三組同時變動，因此不能當成三份獨立證明。FDI
+        不等於 DRAM 技術流量。
+      </p>
+    </Panel>
+  );
+}
+
+export function DramHistory() {
+  const [selected, setSelected] = useState(0);
+  const data = [
+    { year: 1986, japan: 77, korea: null },
+    { year: 1990, japan: 60, korea: 15 },
+    { year: 1995, japan: 42, korea: 35 },
+    { year: 2000, japan: 17, korea: 50 },
+  ];
+  const d = data[selected];
+  return (
+    <Panel
+      tag="HISTORICAL BENCHMARKS / 歷史參考點"
+      title="轉移，往往比衰退的標題更早開始"
+    >
+      <p className="to-note">
+        全球 DRAM
+        營收份額，按公司總部國籍。四個近似基準年；不是廠址份額，也不是完整逐年序列。
+      </p>
+      <div className="to-legend">
+        <span>
+          <i className="to-swatch" />
+          日本
+        </span>
+        <span>
+          <i className="to-swatch secondary" />
+          韓國
+        </span>
+      </div>
+      <svg
+        className="to-chart"
+        viewBox="0 0 720 240"
+        role="img"
+        aria-label="日本DRAM參考份額1986年77%、1990年60%、1995年42%、2000年17%；韓國分別小於5%、15%、35%、50%。只畫基準點，不插補缺年。"
+      >
+        {[0, 20, 40, 60, 80].map((v) => (
+          <g key={v}>
+            <line
+              className="to-axis"
+              x1="48"
+              x2="692"
+              y1={197 - v * 2}
+              y2={197 - v * 2}
+            />
+            <text x="36" y={201 - v * 2} textAnchor="end">
+              {v}%
+            </text>
+          </g>
+        ))}
+        {data.map((p, i) => {
+          const x = 67 + ((p.year - 1986) / 14) * 605;
+          return (
+            <g key={p.year} opacity={selected === i ? 1 : 0.5}>
+              <circle cx={x} cy={197 - p.japan * 2} r="6" fill="currentColor" />
+              {p.korea === null ? (
+                <text x={x} y="189" textAnchor="middle">
+                  &lt;5%
+                </text>
+              ) : (
+                <rect
+                  x={x - 5}
+                  y={192 - p.korea * 2}
+                  width="10"
+                  height="10"
+                  fill="var(--to-bg)"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                />
+              )}
+              <text x={x} y="226" textAnchor="middle">
+                {p.year}
+              </text>
+            </g>
+          );
+        })}
+      </svg>
+      <Choices
+        label="歷史基準年"
+        choices={data.map((p) => String(p.year))}
+        value={selected}
+        onChange={setSelected}
+      />
+      <div className="to-scrub-result" aria-live="polite">
+        <div>
+          <small>參考年</small>
+          <strong>{d.year}</strong>
+        </div>
+        <div>
+          <small>日本</small>
+          <strong>約 {d.japan}%</strong>
+        </div>
+        <div>
+          <small>韓國</small>
+          <strong>{d.korea === null ? "<5%" : `約 ${d.korea}%`}</strong>
+        </div>
+      </div>
+      <p className="to-note">
+        來源：<a href={source("D1")}>半導體歷史館 D1</a>{" "}
+        的產業史近似值；其他研究版本有差異。完整逐年原表仍缺，不能拿四點估計因果時滯。
+      </p>
+    </Panel>
+  );
+}
+
+export function CapabilityLab() {
+  const [s0, setS0] = useState(70),
+    [gt, setGt] = useState(5),
+    [go, setGo] = useState(15),
+    [q, setQ] = useState(50),
+    [selected, setSelected] = useState(10);
+  const horizon = yearsToThreshold(s0 / 100, gt / 100, go / 100, q / 100);
+  const data: Point[] = Array.from({ length: 31 }, (_, h) => {
+    const s = capabilityShare(s0 / 100, gt / 100, go / 100, h) * 100;
+    return { x: h, a: s, b: 100 - s };
+  });
+  const current = data[selected];
+  const defaults = () => {
+    setS0(70);
+    setGt(5);
+    setGo(15);
+    setQ(50);
+    setSelected(10);
+  };
+  const presets = [
+    [5, 15],
+    [15, 15],
+    [0, 15],
+  ];
+  const preset = presets.findIndex((v) => v[0] === gt && v[1] === go);
+  const sliders = [
+    {
+      label: "台灣起始能力份額（假設）",
+      value: s0,
+      min: 40,
+      max: 90,
+      setter: setS0,
+    },
+    { label: "台灣境內能力年成長", value: gt, min: -5, max: 25, setter: setGt },
+    { label: "海外能力年成長", value: go, min: 0, max: 25, setter: setGo },
+    { label: "自選份額觀察線", value: q, min: 30, max: 60, setter: setQ },
+  ];
+  return (
+    <Panel
+      id="capability-lab"
+      tag="SCENARIO LAB / 全部參數均為假設"
+      title="親手試一次：把鐘往回撥"
+    >
+      <p>
+        讓海外繼續成長。試著提高台灣的創新與能力增速，看看曲線和門檻時間如何改變。
+      </p>
+      <Choices
+        label="能力成長情境"
+        choices={[
+          "兩地成長，海外較快",
+          "台灣加速，兩地同速",
+          "境內停滯，海外成長",
+        ]}
+        value={preset}
+        onChange={(i) => {
+          setGt(presets[i][0]);
+          setGo(presets[i][1]);
+        }}
+      />
+      <div className="to-sliders">
+        {sliders.map((d) => (
+          <label key={d.label}>
+            <span className="to-label-row">
+              <span>{d.label}</span>
+              <strong>{d.value}%</strong>
+            </span>
+            <input
+              aria-label={d.label}
+              type="range"
+              min={d.min}
+              max={d.max}
+              value={d.value}
+              onChange={(e) => d.setter(+e.target.value)}
+            />
+          </label>
+        ))}
+      </div>
+      <div className="to-huge-result" aria-live="polite">
+        <span className="to-kicker">模型中，降至自選 {q}% 觀察線所需時間</span>
+        <strong>
+          {horizon === 0
+            ? "起點已達觀察線"
+            : !Number.isFinite(horizon)
+              ? "不會向下穿越"
+              : `${n(horizon, 1)} 年`}
+        </strong>
+        <p className="to-result-desc">
+          {horizon === 0
+            ? "調高起始份額或調低觀察線，即可觀察尚未跨線的情境。"
+            : !Number.isFinite(horizon)
+              ? "在這組固定成長率假設下，台灣份額持平或增加。"
+              : "從假設起點起算；這是份額門檻的數學結果，並非衰退日期。"}
+        </p>
+      </div>
+      <LineChart
+        data={data}
+        labels={["台灣能力份額", "海外能力份額"]}
+        unit="假設能力份額（%）"
+        fixedRange={[0, 100]}
+        selected={selected}
+        onSelect={setSelected}
+        threshold={q}
+        xLabel={(v) => `第 ${v} 年`}
+      />
+      <label>
+        觀察模擬年份
+        <input
+          aria-label="情境模擬年份"
+          type="range"
+          min="0"
+          max="30"
+          value={selected}
+          onChange={(e) => setSelected(+e.target.value)}
+        />
+      </label>
+      <div className="to-metrics" aria-live="polite">
+        <div>
+          <span>第 {selected} 年台灣份額</span>
+          <strong>{n(current.a!, 1)}%</strong>
+          <span>相對地位</span>
+        </div>
+        <div>
+          <span>台灣絕對能力</span>
+          <strong>{n(Math.pow(1 + gt / 100, selected) * 100, 0)}</strong>
+          <span>台灣起點＝100</span>
+        </div>
+        <div>
+          <span>海外絕對能力</span>
+          <strong>{n(Math.pow(1 + go / 100, selected) * 100, 0)}</strong>
+          <span>海外起點＝100</span>
+        </div>
+      </div>
+      <p className="to-note">
+        起始 70%、觀察線 50%、年增 5%／15%
+        都是教學假設，並非台灣實測值。兩地絕對能力指數各自設
+        100，不能直接相加推算份額；份額另使用上方起始權重。成長率固定、能力可比較，也是模型假設。
+      </p>
+      <div className="to-controls">
+        <button type="button" onClick={defaults}>
+          重設示範情境
+        </button>
+        <button
+          className="to-export"
+          type="button"
+          onClick={() =>
+            downloadCsv("taiwan-capability-scenario.csv", [
+              [
+                "全為假設",
+                "s0",
+                s0,
+                "gTW",
+                gt,
+                "gOverseas",
+                go,
+                "threshold",
+                q,
+              ],
+              [
+                "相對年",
+                "台灣份額%",
+                "海外份額%",
+                "台灣能力指數_起點100",
+                "海外能力指數_起點100",
+              ],
+              ...data.map((d) => [
+                d.x,
+                d.a,
+                d.b,
+                100 * Math.pow(1 + gt / 100, d.x),
+                100 * Math.pow(1 + go / 100, d.x),
+              ]),
+            ])
+          }
+        >
+          下載情境 CSV ↓
+        </button>
+      </div>
+    </Panel>
+  );
+}
+
+export function ActionAgenda() {
+  return (
+    <Panel
+      id="action-agenda"
+      tag="A COMMON AGENDA / 從今天開始的共同工作"
+      title="把每一格警訊，變成一項可以交付的成果"
+    >
+      <p>以下是本文提出的工作目標，完成與否應由公開成果驗證。</p>
+      <ul className="to-action-list">
+        <li>
+          <span className="to-kicker">90 DAYS</span>
+          <div>
+            <strong>把帳攤開：一張國家能力資產負債表</strong>
+            <p>
+              行政部門與產業共同公布境內／海外投資、有效產能、首次量產與研發所在地；每筆附來源、口徑與更新日。
+            </p>
+          </div>
+        </li>
+        <li>
+          <span className="to-kicker">1 YEAR</span>
+          <div>
+            <strong>讓下一代技術，在台灣更容易發生</strong>
+            <p>
+              將供電可靠度、園區基礎設施、研究設備與人才居留問題列出時程、責任機關及可驗收指標。
+            </p>
+          </div>
+        </li>
+        <li>
+          <span className="to-kicker">EVERY 6M</span>
+          <div>
+            <strong>讓海外的成功，持續回到台灣</strong>
+            <p>
+              公開檢視全球布局帶來的本地研發、供應商升級、青年實質所得與創業機會；好消息與壞消息一起列。
+            </p>
+          </div>
+        </li>
+        <li>
+          <span className="to-kicker">2030 / 35</span>
+          <div>
+            <strong>驗收新的成長來源</strong>
+            <p>
+              檢視 AI
+              應用、軟體、機器人及其他新產業是否形成可持續的本地生產力與所得；讓成功不只集中在一家公司。
+            </p>
+          </div>
+        </li>
+      </ul>
+      <p className="to-note">
+        政策成果不直接代入模型加分。只有當能力、所得與替代風險的實際數據改變，才更新判斷。
+      </p>
+    </Panel>
+  );
+}

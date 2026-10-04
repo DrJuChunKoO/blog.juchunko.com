@@ -34,6 +34,13 @@ export default defineConfig({
       // csso drops Tailwind v4 range media queries like `@media (width>=48rem)`
       CSS: false,
       Image: false,
+      // Preserve React's text boundaries and whitespace inside hydrated islands.
+      // HTML minification otherwise removes empty comment nodes and changes SSR text.
+      HTML: {
+        "html-minifier-terser": {
+          ignoreCustomFragments: [/<astro-island\b[\s\S]*?<\/astro-island>/g],
+        },
+      },
     }),
   ],
   vite: {
