@@ -21,6 +21,9 @@ type Point = {
   a: number | null;
   b: number | null;
   breakBefore?: boolean;
+  partialA?: boolean;
+  partialB?: boolean;
+  period?: string;
 };
 function Panel({
   tag,
@@ -35,7 +38,11 @@ function Panel({
 }) {
   const headingId = `${id}-heading`;
   return (
-    <section className="to-widget not-prose" id={id} aria-labelledby={headingId}>
+    <section
+      className="to-widget not-prose"
+      id={id}
+      aria-labelledby={headingId}
+    >
       <span className="to-kicker">{tag}</span>
       <h3 id={headingId}>{title}</h3>
       {children}
@@ -131,12 +138,30 @@ function LineChart({
     L + (i * (W - L - R)) / Math.max(1, data.length - 1);
   const yy = (v: number) =>
     H - B - ((v - min) / (max - min || 1)) * (H - T - B);
+  const partialKey = (key: "a" | "b") =>
+    key === "a" ? "partialA" : "partialB";
+  const partialPoints = data
+    .map((p, i) => ({ ...p, i }))
+    .filter((p) => p.partialA || p.partialB);
+  function partialPath(key: "a" | "b") {
+    return data
+      .map((p, i) => {
+        const previous = data[i - 1];
+        return p[partialKey(key)] &&
+          p[key] !== null &&
+          previous?.[key] != null &&
+          !p.breakBefore
+          ? `M${xx(i - 1)},${yy(previous[key]!)} L${xx(i)},${yy(p[key]!)}`
+          : "";
+      })
+      .join(" ");
+  }
   function path(key: "a" | "b") {
     let open = false;
     return data
       .map((p, i) => {
         const v = p[key];
-        if (v === null) {
+        if (v === null || p[partialKey(key)]) {
           open = false;
           return "";
         }
@@ -225,6 +250,21 @@ function LineChart({
             </text>
           </>
         )}
+        {partialPoints.map((p) => (
+          <rect
+            key={p.i}
+            className="to-partial-band"
+            x={xx(Math.max(0, p.i - 0.45))}
+            y={T}
+            width={
+              xx(Math.min(data.length - 1, p.i + 0.45)) -
+              xx(Math.max(0, p.i - 0.45))
+            }
+            height={H - T - B}
+            fill="currentColor"
+            opacity=".045"
+          />
+        ))}
         {Array.from({ length: 5 }, (_, i) => min + ((max - min) * i) / 4).map(
           (v) => (
             <g key={v}>
@@ -278,6 +318,27 @@ function LineChart({
         )}
         <path className="to-path" d={path("a")} />
         <path className="to-path secondary" d={path("b")} />
+        {(["a", "b"] as const).map((k, j) => (
+          <g key={k}>
+            <path
+              className={`to-path to-partial-path ${j ? "secondary" : ""}`}
+              d={partialPath(k)}
+            />
+            {partialPoints
+              .filter((p) => p[partialKey(k)] && p[k] !== null)
+              .map((p) => (
+                <rect
+                  key={p.i}
+                  className={`to-dot ${j ? "secondary" : ""}`}
+                  x={xx(p.i) - 5}
+                  y={yy(p[k]!) - 5}
+                  width="10"
+                  height="10"
+                  transform={`rotate(45 ${xx(p.i)} ${yy(p[k]!)})`}
+                />
+              ))}
+          </g>
+        ))}
         <line
           x1={xx(selected)}
           x2={xx(selected)}
@@ -288,7 +349,8 @@ function LineChart({
         />
         {(["a", "b"] as const).map(
           (k, j) =>
-            pt[k] !== null && (
+            pt[k] !== null &&
+            !pt[partialKey(k)] && (
               <circle
                 key={k}
                 className={`to-dot ${j ? "secondary" : ""}`}
@@ -309,6 +371,12 @@ function LineChart({
           </text>
         ))}
       </svg>
+      {partialPoints.length > 0 && (
+        <p className="to-partial-note">
+          ◇ 菱形與點線＝部分年度累計；淡底標出該期。{partialPoints[0].period}
+          ，依已公布金額繪製，未年化。
+        </p>
+      )}
     </>
   );
 }
@@ -572,48 +640,79 @@ export function EvidenceDashboard() {
 
 export function CapitalFlows() {
   const [mode, setMode] = useState(0);
-  const [selected, setSelected] = useState(10);
-  const [basis, setBasis] = useState(0);
+  const [selected, setSelected] = useState(11);
+  const [basis, setBasis] = useState(1);
   const tw = evidence.taiwan;
   const jp = evidence.japan;
+  const partial = evidence.taiwanPartial;
+  const latest = basis === 0 ? partial.bop : partial.approval;
+  const twBop = [...tw, { ...partial.bop, year: partial.year }];
   const compare = mode === 2;
   const data: Point[] = compare
     ? jp.map((d, i) => ({
         x: i,
-        a: tw[i]
-          ? ((tw[i].outward - tw[i].inward) / (tw[0].outward - tw[0].inward)) *
+        a: twBop[i]
+          ? ((twBop[i].outward - twBop[i].inward) /
+              (tw[0].outward - tw[0].inward)) *
             100
           : null,
         b: ((d.outward - d.inward) / (jp[0].outward - jp[0].inward)) * 100,
         breakBefore: d.breakBefore,
+        partialA: i === tw.length,
+        period:
+          i === tw.length
+            ? `台灣 2026 ${partial.bop.period}／日本 ${d.year} 全年`
+            : undefined,
       }))
     : mode === 1
       ? jp.map((d) => ({
           x: d.year,
-          a: d.outward,
-          b: d.inward,
+          a: d.outward * 10,
+          b: d.inward * 10,
           breakBefore: d.breakBefore,
         }))
-      : tw.map((d) => ({
-          x: d.year,
-          a: basis === 0 ? d.outward : d.approvedOut,
-          b: basis === 0 ? d.inward : d.approvedIn,
-        }));
+      : [
+          ...tw.map((d) => ({
+            x: d.year,
+            a: (basis === 0 ? d.outward : d.approvedOut) * 10,
+            b: (basis === 0 ? d.inward : d.approvedIn) * 10,
+          })),
+          {
+            x: partial.year,
+            a: latest.outward * 10,
+            b: latest.inward * 10,
+            partialA: true,
+            partialB: true,
+            period: `2026 ${latest.period}`,
+          },
+        ];
   const index = Math.min(selected, data.length - 1);
   const point = data[index];
   const labels: [string, string] = compare
     ? ["台灣淨流出指數", "日本淨流出指數"]
     : mode === 0 && basis === 0
       ? ["直接投資資產增加", "直接投資負債增加"]
-      : ["對外直接投資", "外來直接投資"];
-  const labelX = compare ? `第 ${index} 年` : `${point.x} 年`;
+      : mode === 0
+        ? ["核准對外投資", "核准僑外來台"]
+        : ["對外直接投資", "外來直接投資"];
+  const labelX = compare ? `第 ${index} 年` : point.period || `${point.x} 全年`;
+  const periodOf = (d: Point) =>
+    d.period ||
+    (compare ? `台灣 ${2015 + d.x}／日本 ${1983 + d.x} 全年` : `${d.x} 全年`);
   const rows = [
-    [compare ? "相對年份" : "年份", labels[0], labels[1], "單位", "口徑"],
+    [
+      compare ? "相對年份" : "年份",
+      labels[0],
+      labels[1],
+      "單位",
+      "口徑",
+      "資料期間",
+    ],
     ...data.map((d) => [
       d.x,
       d.a,
       d.b,
-      compare ? "基期=100" : "十億美元",
+      compare ? "基期=100" : "億美元",
       compare
         ? "TW2015/JP1983起點;JP1995斷點;兩國編制不同"
         : mode === 1
@@ -621,6 +720,7 @@ export function CapitalFlows() {
           : basis === 0
             ? "CBC國際收支資產負債;曆年"
             : "MOEA核准;不含另列對陸陸資",
+      periodOf(d),
     ]),
   ] as (string | number | null)[][];
   return (
@@ -631,11 +731,11 @@ export function CapitalFlows() {
     >
       <Choices
         label="國家與跨期比較"
-        choices={["台灣 2015–2025", "日本 1983–2000", "跨期：淨流出指數"]}
+        choices={["台灣 2015–2026", "日本 1983–2000", "跨期：淨流出指數"]}
         value={mode}
         onChange={(v) => {
           setMode(v);
-          setSelected(v === 1 ? 7 : 10);
+          setSelected(v === 1 ? 7 : 11);
         }}
       />
       {mode === 0 && (
@@ -646,24 +746,37 @@ export function CapitalFlows() {
           onChange={setBasis}
         />
       )}
+      {mode === 0 && basis === 1 && (
+        <div className="to-ytd-highlight">
+          <span className="to-kicker">2026 年 1–8 月 · 核准對外投資</span>
+          <strong>
+            {n(partial.approval.outward * 10)}
+            <small> 億美元</small>
+          </strong>
+          <p>
+            八個月累計，已超過 2024 全年 {n(tw[9].approvedOut * 10)} 億、2025
+            全年 {n(tw[10].approvedOut * 10)} 億。
+          </p>
+        </div>
+      )}
       <p className="to-note">
         {compare
-          ? "各自首年=100；台灣 2015、日本 1983 是資料起點，並非相同政策衝擊。兩國編制不同，只供觀察形狀，不估計歷史重演機率。"
+          ? "各自首年=100；台灣 2015、日本 1983 是資料起點，並非相同政策衝擊。兩國編制不同，只供觀察形狀。台灣第 11 年為 2026 上半年累計，以點線標出；日本同位置仍是全年。"
           : mode === 1
             ? "JETRO 國際收支淨流量・曆年・負的外來投資代表撤資淨額。"
             : basis === 0
-              ? "中央銀行・全年國際收支・含盈餘再投資與關係企業債務，並非全部現金匯出。"
-              : "經濟部核准金額・全年・不含另表對中國大陸投資與陸資來台；不是實際執行額。"}
+              ? "中央銀行・2015–2025 全年＋2026 年 1–6 月累計・含盈餘再投資與關係企業債務，並非全部現金匯出。"
+              : "經濟部核准金額・2015–2025 全年＋2026 年 1–8 月累計・不含另表對中國大陸投資與陸資來台；不是實際執行額。"}
       </p>
       <LineChart
         data={data}
         labels={labels}
-        unit={compare ? "淨流出指數（首年=100）" : "十億美元"}
+        unit={compare ? "淨流出指數（首年=100）" : "億美元"}
         selected={index}
         onSelect={setSelected}
         xLabel={compare ? (v) => `第 ${v} 年` : undefined}
         breakAt={mode > 0 ? 12 : undefined}
-        emptyAfter={compare ? 10.5 : undefined}
+        emptyAfter={compare ? 11.5 : undefined}
       />
       <label>
         <span className="to-kicker">拖曳讀值 · 手機可觸碰曲線</span>
@@ -679,20 +792,22 @@ export function CapitalFlows() {
       <div className="to-scrub-result" aria-live="polite">
         <div>
           <small>
-            {compare ? `${1983 + index} / ${2015 + index}` : "觀察年"}
+            {compare
+              ? point.period || `${1983 + index} / ${2015 + index}`
+              : "觀察期間"}
           </small>
           <strong>{labelX}</strong>
         </div>
         <div>
           <small>{labels[0]}</small>
           <strong>
-            {point.a === null ? "尚未觀察" : n(point.a, compare ? 1 : 3)}
+            {point.a === null ? "尚未觀察" : n(point.a, compare ? 1 : 2)}
           </strong>
         </div>
         <div>
           <small>{labels[1]}</small>
           <strong>
-            {point.b === null ? "—" : n(point.b, compare ? 1 : 3)}
+            {point.b === null ? "—" : n(point.b, compare ? 1 : 2)}
           </strong>
         </div>
       </div>
@@ -708,7 +823,7 @@ export function CapitalFlows() {
           <table>
             <thead>
               <tr>
-                <th>年／相對年</th>
+                <th>資料期間／相對年</th>
                 <th>{labels[0]}</th>
                 <th>{labels[1]}</th>
               </tr>
@@ -717,8 +832,8 @@ export function CapitalFlows() {
               {data.map((d) => (
                 <tr key={d.x}>
                   <td>
-                    {d.x}
-                    {compare && `（台${2015 + d.x}／日${1983 + d.x}）`}
+                    {compare ? d.x : periodOf(d)}
+                    {compare && `（${periodOf(d)}）`}
                   </td>
                   <td>{d.a === null ? "尚未觀察" : n(d.a, 3)}</td>
                   <td>{d.b === null ? "缺值" : n(d.b, 3)}</td>
@@ -736,7 +851,8 @@ export function CapitalFlows() {
         <p className="to-note">
           <a href={source("C1")}>央行 C1</a> ·{" "}
           <a href={source("J1")}>JETRO J1</a> ·{" "}
-          <a href={source("M3")}>經濟部 M3</a> · {ASOF} 快照
+          <a href={source("M3")}>經濟部 M3</a> ·{" "}
+          <a href={source("M4")}>2026 M4</a> · {ASOF} 資料快照
         </p>
         <button
           className="to-export"
@@ -749,8 +865,10 @@ export function CapitalFlows() {
         </button>
       </div>
       <p className="to-note">
-        2026 另列：1–6 月央行資產 210.54／負債 52.84 億美元；1–8 月核准對外
-        623.90／僑外來台 161.81 億美元。不同期別不畫進全年曲線、不年化。
+        2026 已入圖：核准 1–8 月對外 623.90／僑外來台 161.81 億美元；央行 1–6
+        月資產 210.54／負債 52.84 億美元。部分年度按原值呈現，未年化。2025
+        核准對外較 2024 全年減少 14.47%，與 2026
+        前八月已超過兩個全年，可以同時成立。
       </p>
     </Panel>
   );
@@ -908,7 +1026,7 @@ export function PairComparison() {
   const [era, setEra] = useState(0);
   const [index, setIndex] = useState(20);
   const p = pairs[pair];
-  const historical = evidence.historicalPairs.map((d) => {
+  const historical: Point[] = evidence.historicalPairs.map((d) => {
     const r = d as unknown as Record<string, number | null>;
     return {
       x: d.year,
@@ -916,9 +1034,16 @@ export function PairComparison() {
       b: r[p.keys[1]] === null ? null : r[p.keys[1]]! / 1000,
     };
   });
-  const modern = evidence.modernPairs
-    .filter((d) => d[1] === p.country && String(d[0]).length === 4)
-    .map((d) => ({ x: Number(d[0]), a: Number(d[2]), b: Number(d[3]) }));
+  const modern: Point[] = evidence.modernPairs
+    .filter((d) => d[1] === p.country)
+    .map((d) => ({
+      x: Number(String(d[0]).slice(0, 4)),
+      a: Number(d[2]),
+      b: Number(d[3]),
+      partialA: String(d[0]).length > 4,
+      partialB: String(d[0]).length > 4,
+      period: String(d[0]).length > 4 ? String(d[0]) : undefined,
+    }));
   const data = era === 0 ? historical : modern;
   const selected = Math.min(index, data.length - 1);
   const pt = data[selected];
@@ -931,7 +1056,7 @@ export function PairComparison() {
       : [`台灣 → ${p.country}`, `${p.country} → 台灣`];
   const basis =
     era === 1
-      ? "台灣核准投資，全產業，曆年"
+      ? "台灣核准投資，全產業；2015–2025 全年＋2026 年 1–8 月累計"
       : pair === 0
         ? "BEA 金融交易，1975–79 與後期有版本差異"
         : pair === 1
@@ -971,7 +1096,7 @@ export function PairComparison() {
         value={era}
         onChange={(v) => {
           setEra(v);
-          setIndex(v === 0 ? 20 : 10);
+          setIndex(v === 0 ? 20 : 11);
         }}
       />
       <p className="to-note">{basis}；不同資料口徑只並列，不合成同一指標。</p>
@@ -996,7 +1121,7 @@ export function PairComparison() {
       <div className="to-scrub-result" aria-live="polite">
         <div>
           <small>觀察年</small>
-          <strong>{pt.x}</strong>
+          <strong>{pt.period || pt.x}</strong>
         </div>
         <div>
           <small>{pairLabels[0]}</small>
@@ -1021,7 +1146,7 @@ export function PairComparison() {
             <tbody>
               {data.map((d) => (
                 <tr key={d.x}>
-                  <td>{d.x}</td>
+                  <td>{d.period || `${d.x} 全年`}</td>
                   <td>{d.a === null ? "缺資料" : n(d.a, 4)}</td>
                   <td>{d.b === null ? "缺資料" : n(d.b, 4)}</td>
                 </tr>
@@ -1045,7 +1170,13 @@ export function PairComparison() {
         onClick={() =>
           downloadCsv(`bilateral-${pair}-${era}.csv`, [
             ["年份", pairLabels[0], pairLabels[1], "單位", "口徑"],
-            ...data.map((d) => [d.x, d.a, d.b, "十億美元", basis]),
+            ...data.map((d) => [
+              d.period || `${d.x} 全年`,
+              d.a,
+              d.b,
+              "十億美元",
+              basis,
+            ]),
           ])
         }
       >

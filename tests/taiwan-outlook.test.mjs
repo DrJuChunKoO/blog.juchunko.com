@@ -58,3 +58,26 @@ test("evidence snapshot preserves audited totals, negative FDI, breaks and missi
   assert.equal(d.historicalPairs.find((x) => x.year === 1985).krJP, null);
   assert.equal(d.dram.find((x) => x[0] === 1986)[2], null);
 });
+
+test("2026 partial periods remain distinct and preserve the observed approval surge", () => {
+  const d = JSON.parse(
+    readFileSync(
+      new URL("../src/data/taiwan-outlook/evidence.json", import.meta.url),
+    ),
+  );
+  assert.equal(d.taiwanPartial.bop.months, 6);
+  assert.equal(d.taiwanPartial.approval.months, 8);
+  assert.equal(d.taiwanPartial.approval.outward, 62.3898787359);
+  assert.equal(d.taiwanPartial.approval.inward, 16.1810196617);
+  assert.equal(d.taiwanPartial.bop.outward, 21.054);
+  assert.equal(d.taiwanPartial.bop.inward, 5.284);
+  const previous = d.taiwan.slice(-2);
+  assert.ok(previous[1].approvedOut < previous[0].approvedOut);
+  for (const year of previous)
+    assert.ok(d.taiwanPartial.approval.outward > year.approvedOut);
+  for (const country of ["美國", "韓國", "日本"]) {
+    const rows = d.modernPairs.filter((row) => row[1] === country);
+    assert.equal(rows.length, 12);
+    assert.equal(rows.at(-1)[0], "2026 1–8月");
+  }
+});
