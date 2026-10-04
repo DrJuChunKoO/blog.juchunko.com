@@ -1,4 +1,4 @@
-import { useEffect, useId, useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import evidence from "../../data/taiwan-outlook/evidence.json";
 import {
   capabilityShare,
@@ -31,13 +31,13 @@ function Panel({
   tag: string;
   title: string;
   children: ReactNode;
-  id?: string;
+  id: string;
 }) {
-  const autoId = useId();
+  const headingId = `${id}-heading`;
   return (
-    <section className="to-widget not-prose" id={id} aria-labelledby={autoId}>
+    <section className="to-widget not-prose" id={id} aria-labelledby={headingId}>
       <span className="to-kicker">{tag}</span>
-      <h3 id={autoId}>{title}</h3>
+      <h3 id={headingId}>{title}</h3>
       {children}
     </section>
   );
@@ -1071,6 +1071,7 @@ export function DramHistory() {
   const d = data[selected];
   return (
     <Panel
+      id="dram-history"
       tag="HISTORICAL BENCHMARKS / 歷史參考點"
       title="轉移，往往比衰退的標題更早開始"
     >
