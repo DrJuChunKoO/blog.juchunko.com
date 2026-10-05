@@ -319,6 +319,11 @@
 .to-alignment {
   margin: 18px 0;
 }
+.to-widget .to-chart-alignment {
+  margin: 0 0 12px;
+  font-size: 13px;
+  line-height: 1.7;
+}
 .to-widget .to-period-alert {
   margin: 16px 0;
   padding: 14px 16px;

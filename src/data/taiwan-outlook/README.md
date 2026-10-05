@@ -36,6 +36,8 @@ The $265bn pipeline is the cumulative multi-year US plan announced in July 2026,
 
 ### Bilateral expansion and overlay views (2026-10-05)
 
+Both cross-era UIs now default to the explicit **Japan 1990 ↔ Taiwan 2027** hypothesis, selecting the zero point on entry. Original-start and 2026 views remain available. A caption beside the plot and the zero-axis tick show the actual aligned years so the current setting is visible even when the controls are scrolled away. This changes only the initial presentation; observations, denominators and all alignment calculations remain unchanged.
+
 The US outward overlay additionally shows `pipeline.watch` in a separate dashed **FORWARD WATCH** annotation (right on desktop, below on mobile). Its USD billions are multiplied by 10 only for the 億美元 text label. It is not a chart datum, annual peak, 2027 forecast, axis input or CSV row. Hide it for inward investment, other counterparties and non-overlay views. The Hero is unchanged.
 
 The three-pair widget defaults to the common **1980–1990** historical window. A visible switch extends all historical pairs to **1980–2000**; no pair is truncated at its own maximum. The original 1975–1979 source rows remain in `evidence.json` but are outside these UI windows. Contemporary views always retain 2015–2025 and the observed 2026 January–August partial period.

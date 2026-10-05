@@ -106,6 +106,10 @@ function downloadCsv(name: string, rows: (string | number | null)[][]) {
 const alignmentChoices = ["原始起點", "1990 ↔ 2026", "1990 ↔ 2027"];
 const anchorYear = (alignment: number) =>
   alignment === 0 ? undefined : alignment === 1 ? 2026 : 2027;
+const alignmentDescription = (alignment: number, historicalStart: number) =>
+  alignment === 0
+    ? `原始起點：日本 ${historicalStart} ↔ 台灣 2015`
+    : `目前對齊：日本 1990 ↔ 台灣 ${anchorYear(alignment)}（比較假設）`;
 const relativeYear = (x: number, alignment: number) =>
   alignment === 0
     ? `第 ${x} 年`
@@ -155,6 +159,8 @@ function LineChart({
   plotInset = 52,
   preciseTicks = false,
   anchorAt,
+  anchorLabel,
+  alignmentLabel,
   connectPartial = true,
 }: {
   data: Point[];
@@ -170,6 +176,8 @@ function LineChart({
   plotInset?: number;
   preciseTicks?: boolean;
   anchorAt?: number;
+  anchorLabel?: string;
+  alignmentLabel?: string;
   connectPartial?: boolean;
 }) {
   const W = 720,
@@ -255,6 +263,11 @@ function LineChart({
           {labels[1]}
         </span>
       </div>
+      {alignmentLabel && (
+        <p className="to-chart-alignment">
+          <strong>{alignmentLabel}</strong>
+        </p>
+      )}
       <svg
         className="to-chart"
         viewBox={`0 0 ${W} ${H}`}
@@ -451,7 +464,11 @@ function LineChart({
             y={H - 10}
             textAnchor={i === data.length - 1 ? "end" : "middle"}
           >
-            {xLabel ? xLabel(data[i].x) : data[i].x}
+            {i === anchorAt && anchorLabel
+              ? anchorLabel
+              : xLabel
+                ? xLabel(data[i].x)
+                : data[i].x}
           </text>
         ))}
       </svg>
@@ -726,7 +743,7 @@ export function EvidenceDashboard() {
 
 export function CapitalFlows() {
   const [mode, setMode] = useState(0);
-  const [alignment, setAlignment] = useState(0);
+  const [alignment, setAlignment] = useState(2);
   const [selected, setSelected] = useState(11);
   const [basis, setBasis] = useState(1);
   const tw = evidence.taiwan;
@@ -832,7 +849,15 @@ export function CapitalFlows() {
         value={mode}
         onChange={(v) => {
           setMode(v);
-          setSelected(v === 1 ? 7 : v === 2 ? overlay.latestModernIndex : 11);
+          setSelected(
+            v === 1
+              ? 7
+              : v === 2
+                ? alignment === 0
+                  ? overlay.latestModernIndex
+                  : overlay.anchorIndex
+                : 11,
+          );
         }}
       />
       {compare && (
@@ -900,6 +925,12 @@ export function CapitalFlows() {
         }
         emptyAfter={compare ? overlay.latestModernIndex + 0.5 : undefined}
         anchorAt={compare && alignment !== 0 ? overlay.anchorIndex : undefined}
+        anchorLabel={
+          alignment !== 0 ? `1990↔${anchorYear(alignment)}` : undefined
+        }
+        alignmentLabel={
+          compare ? alignmentDescription(alignment, 1983) : undefined
+        }
         connectPartial={!compare}
         plotInset={compare ? 84 : 52}
       />
@@ -1246,7 +1277,7 @@ export function PairComparison() {
   const [window, setWindow] = useState(0);
   const [direction, setDirection] = useState(0);
   const [scale, setScale] = useState(0);
-  const [alignment, setAlignment] = useState(0);
+  const [alignment, setAlignment] = useState(2);
   const [index, setIndex] = useState(10);
   const p = pairs[pair];
   const historicalEnd = window === 0 ? 1990 : 2000;
@@ -1461,6 +1492,12 @@ export function PairComparison() {
             }
             plotInset={isIndexed ? 84 : 52}
             preciseTicks={isOverlay}
+            anchorLabel={
+              alignment !== 0 ? `1990↔${anchorYear(alignment)}` : undefined
+            }
+            alignmentLabel={
+              isOverlay ? alignmentDescription(alignment, 1980) : undefined
+            }
           />
         </div>
         {isOverlay && pair === 0 && direction === 0 && (
