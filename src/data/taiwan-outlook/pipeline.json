@@ -1,0 +1,48 @@
+{
+  "asOf": "2026-10-05",
+  "unit": "USD billions",
+  "announcements": [
+    {
+      "date": "2020.05",
+      "total": 12,
+      "text": "亞利桑那首座先進廠，多年建設計畫。",
+      "source": "https://pr.tsmc.com/english/news/2033"
+    },
+    {
+      "date": "2022.12",
+      "total": 40,
+      "text": "規畫第二廠，當次美國總計畫擴大。",
+      "source": "https://pr.tsmc.com/english/news/2977"
+    },
+    {
+      "date": "2024.04",
+      "total": 65,
+      "text": "總計畫超過 650 億美元；圖上以 650 億作下限顯示。",
+      "source": "https://pr.tsmc.com/english/news/3122"
+    },
+    {
+      "date": "2025.03",
+      "total": 165,
+      "text": "追加 1,000 億美元，納入新增晶圓廠、先進封裝與主要研發團隊中心。",
+      "source": "https://pr.tsmc.com/english/news/3210"
+    },
+    {
+      "date": "2026.07",
+      "total": 265,
+      "text": "再追加 1,000 億美元；美國官方公告列為合計 12 座先進製造與封裝設施的多年計畫。",
+      "source": "https://www.nist.gov/news-events/news/2026/07/trump-administration-secures-additional-100-billion-us-semiconductor"
+    }
+  ],
+  "watch": {
+    "displayBucket": "2027+*",
+    "status": "unconfirmed-claim",
+    "total": 500,
+    "statementDate": "2026-09-28",
+    "publishedDate": "2026-10-01",
+    "confirmedCompany": null,
+    "executionYear": null,
+    "text": "川普在 TIME 訪談中稱一家台灣晶片公司將投資 5,000 億美元；原話未點名台積電，亦未交代落地時程。此處作為待確認訊號，不是台積電新增承諾。",
+    "source": "https://time.com/article/2026/10/01/donald-trump-2026-interview-transcript/",
+    "coverage": "https://www.inside.com.tw/article/42547-trump-time-interview-taiwan-chip-company-500-billion"
+  }
+}

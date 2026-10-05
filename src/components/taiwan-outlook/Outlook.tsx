@@ -1,7 +1,10 @@
 import { useEffect, useState, type ReactNode } from "react";
 import evidence from "../../data/taiwan-outlook/evidence.json";
 import approvalAudit from "../../data/taiwan-outlook/approval-audit-2025.json";
+import pipeline from "../../data/taiwan-outlook/pipeline.json";
 import {
+  benchmarkGuide,
+  dramBenchmarks,
   capabilityShare,
   countdownParts,
   reviewDeadline,
@@ -954,87 +957,96 @@ export function CapitalFlows() {
 }
 
 const pledges = [
+  ...pipeline.announcements.map((p) => ({ ...p, claim: false })),
   {
-    date: "2020.05",
-    total: 12,
-    text: "亞利桑那首座先進廠，多年建設計畫。",
-    source: "https://pr.tsmc.com/english/news/2033",
-  },
-  {
-    date: "2022.12",
-    total: 40,
-    text: "規畫第二廠，當次美國總計畫擴大。",
-    source: "https://pr.tsmc.com/english/news/2977",
-  },
-  {
-    date: "2024.04",
-    total: 65,
-    text: "總計畫超過 650 億美元；圖上以 650 億作下限顯示。",
-    source: "https://pr.tsmc.com/english/news/3122",
-  },
-  {
-    date: "2025.03",
-    total: 165,
-    text: "追加 1,000 億美元，納入新增晶圓廠、先進封裝與主要研發團隊中心。",
-    source: "https://pr.tsmc.com/english/news/3210",
-  },
-  {
-    date: "2026.07",
-    total: 265,
-    text: "再追加 1,000 億美元；美國官方公告列為合計 12 座先進製造與封裝設施的多年計畫。",
-    source:
-      "https://www.nist.gov/news-events/news/2026/07/trump-administration-secures-additional-100-billion-us-semiconductor",
+    date: pipeline.watch.displayBucket,
+    total: pipeline.watch.total,
+    text: pipeline.watch.text,
+    source: pipeline.watch.source,
+    claim: true,
   },
 ];
 export function InvestmentPipeline() {
-  const [active, setActive] = useState(4);
+  const [active, setActive] = useState(pipeline.announcements.length - 1);
   const p = pledges[active];
   return (
     <Panel
       id="investment-pipeline"
-      tag="ANNOUNCED PIPELINE / 已宣布的未來布局"
+      tag="PIPELINE & WATCH / 已公告布局與前瞻觀察"
       title="從一座廠，到一個生態系"
     >
       <p>台積電對美國的多年投資計畫，如何一再擴大。</p>
+      <div className="to-legend">
+        <span>
+          <i className="to-pipeline-key" />
+          已公告計畫
+        </span>
+        <span>
+          <i className="to-pipeline-key claim" />
+          川普說法・待確認
+        </span>
+      </div>
       <svg
         className="to-chart"
-        viewBox="0 0 720 240"
+        viewBox="0 0 720 310"
         role="img"
-        aria-label="五次公布的累計計畫總額：120、400、超過650、1650、2650億美元。這些金額互相包含，不可相加。"
+        aria-label="五次公布的累計計畫總額：120、400、超過650、1650、2650億美元，不可相加。右側虛線框為川普所稱5000億美元，未確認為台積電承諾。2027之後僅為前瞻展示區，不是宣布或執行日期。"
       >
         <text x="20" y="17">
-          十億美元 · 當次總計畫
+          十億美元 · 多年金額，非當年支出
         </text>
+        <line className="to-axis" x1="20" x2="705" y1="245" y2="245" />
+        <line
+          className="to-pipeline-divider"
+          x1="557"
+          x2="557"
+          y1="30"
+          y2="292"
+        />
         {pledges.map((d, i) => (
           <g key={d.date}>
             <rect
-              className={`to-pipeline-bar ${active !== i ? "unselected" : ""}`}
-              x={47 + 136 * i}
-              y={198 - (d.total / 265) * 151}
+              className={`to-pipeline-bar ${d.claim ? "claim" : ""} ${active !== i ? "unselected" : ""}`}
+              x={(d.claim ? 632 : 65 + 105 * i) - 24}
+              y={245 - (d.total / 500) * 200}
               width="48"
-              height={(d.total / 265) * 151}
+              height={(d.total / 500) * 200}
             />
             <text
-              x={71 + 136 * i}
-              y={185 - (d.total / 265) * 151}
+              x={d.claim ? 632 : 65 + 105 * i}
+              y={232 - (d.total / 500) * 200}
               textAnchor="middle"
             >
-              {i === 2 ? ">65" : d.total}
+              {i === 2 ? ">65" : d.claim ? "500*" : d.total}
             </text>
-            <text x={71 + 136 * i} y="225" textAnchor="middle">
+            <text x={d.claim ? 632 : 65 + 105 * i} y="269" textAnchor="middle">
               {d.date}
             </text>
+            {d.claim && (
+              <text x="632" y="290" textAnchor="middle">
+                待確認說法
+              </text>
+            )}
           </g>
         ))}
       </svg>
+      <p className="to-note">
+        * 2027+ 僅是「2027 年之後」的前瞻觀察位置，不是官方時程。 5,000 億來自
+        2026 年 9 月 28 日川普訪談（10 月 1
+        日刊出），未確認為台積電計畫，不納入已公告總額。
+      </p>
       <Choices
-        label="投資宣布日期"
-        choices={pledges.map((d) => d.date)}
+        label="投資公告與待確認說法"
+        choices={pledges.map((d) => (d.claim ? "2027+｜待確認" : d.date))}
         value={active}
         onChange={setActive}
       />
       <div className="to-inset" aria-live="polite">
-        <span className="to-kicker">{p.date} / 美國 / 多年累計計畫</span>
+        <span className="to-kicker">
+          {p.claim
+            ? "川普說法 / 待確認 / 非公司承諾"
+            : `${p.date} / 美國 / 多年累計計畫`}
+        </span>
         <div className="to-pipeline-total">
           {active === 2 ? ">" : ""}
           {n(p.total * 10, 0)}
@@ -1042,7 +1054,15 @@ export function InvestmentPipeline() {
         <span className="to-kicker">億美元</span>
         <p className="to-detail">{p.text}</p>
         <p className="to-note">
-          <a href={p.source}>閱讀當次官方公告 ↗</a>
+          <a href={p.source}>
+            {p.claim ? "閱讀 TIME 訪談原文 ↗" : "閱讀當次官方公告 ↗"}
+          </a>
+          {p.claim && (
+            <>
+              {" "}
+              · <a href={pipeline.watch.coverage}>INSIDE 報導 ↗</a>
+            </>
+          )}
         </p>
       </div>
       <div className="to-band" aria-label="單一投資項目需追蹤的階段">
@@ -1056,7 +1076,8 @@ export function InvestmentPipeline() {
       <p className="to-note">
         階段列是逐案查核清單，不表示整個 2,650
         億美元計畫都已進入量產。新總額涵蓋舊承諾，不能再次加總，也不能等同當期
-        FDI 或有效產能。
+        FDI 或有效產能。右側 5,000 億也不可與 2,650
+        億相加，或據此推算已落地產能。
       </p>
     </Panel>
   );
@@ -1272,12 +1293,15 @@ export function PairComparison() {
 
 export function DramHistory() {
   const [selected, setSelected] = useState(0);
-  const data = [
-    { year: 1986, japan: 77, korea: null },
-    { year: 1990, japan: 60, korea: 15 },
-    { year: 1995, japan: 42, korea: 35 },
-    { year: 2000, japan: 17, korea: 50 },
-  ];
+  const data = dramBenchmarks(evidence.dram);
+  const xPosition = (year: number) => 67 + ((year - 1986) / 14) * 605;
+  const guide = (country: "japan" | "korea") =>
+    benchmarkGuide(
+      data.map((p) => ({
+        x: xPosition(p.year),
+        y: p[country] === null ? null : 197 - p[country] * 2,
+      })),
+    );
   const d = data[selected];
   return (
     <Panel
@@ -1303,7 +1327,7 @@ export function DramHistory() {
         className="to-chart"
         viewBox="0 0 720 240"
         role="img"
-        aria-label="日本DRAM參考份額1986年77%、1990年60%、1995年42%、2000年17%；韓國分別小於5%、15%、35%、50%。只畫基準點，不插補缺年。"
+        aria-label="日本DRAM參考份額1986年77%、1990年60%、1995年42%、2000年17%，以實線連接；韓國分別小於5%、15%、35%、50%，虛線從1990年開始。連線僅引導視線，不插補缺年。"
       >
         {[0, 20, 40, 60, 80].map((v) => (
           <g key={v}>
@@ -1319,8 +1343,14 @@ export function DramHistory() {
             </text>
           </g>
         ))}
+        <path className="to-path" data-series="japan" d={guide("japan")} />
+        <path
+          className="to-path secondary"
+          data-series="korea"
+          d={guide("korea")}
+        />
         {data.map((p, i) => {
-          const x = 67 + ((p.year - 1986) / 14) * 605;
+          const x = xPosition(p.year);
           return (
             <g key={p.year} opacity={selected === i ? 1 : 0.5}>
               <circle cx={x} cy={197 - p.japan * 2} r="6" fill="currentColor" />
@@ -1346,6 +1376,10 @@ export function DramHistory() {
           );
         })}
       </svg>
+      <p className="to-note">
+        實線／虛線僅連接參考點以引導視線，不代表缺年估值。 韓國 1986
+        年只有「低於 5%」，未當成精確值連線；虛線從 1990 年開始。
+      </p>
       <Choices
         label="歷史基準年"
         choices={data.map((p) => String(p.year))}

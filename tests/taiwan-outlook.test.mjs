@@ -3,11 +3,64 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import sharp from "sharp";
 import {
+  benchmarkGuide,
+  dramBenchmarks,
   capabilityShare,
   yearsToThreshold,
   reviewDeadline,
   countdownParts,
 } from "../src/components/taiwan-outlook/model.ts";
+
+test("benchmark guides retain observed coordinates and never turn unknowns into zero", () => {
+  const d = JSON.parse(
+    readFileSync(
+      new URL("../src/data/taiwan-outlook/evidence.json", import.meta.url),
+    ),
+  );
+  const benchmarks = dramBenchmarks(d.dram);
+  assert.equal(benchmarks.length, 4);
+  const path = (country) =>
+    benchmarkGuide(
+      benchmarks.map((row) => ({
+        x: row.year,
+        y: row[country],
+      })),
+    );
+  assert.equal(path("japan"), "M1986,77 L1990,60 L1995,42 L2000,17");
+  assert.equal(path("korea"), "M1990,15 L1995,35 L2000,50");
+  assert.equal(
+    benchmarkGuide([
+      { x: 1, y: 10 },
+      { x: 2, y: null },
+      { x: 3, y: 0 },
+      { x: 4, y: 20 },
+    ]),
+    "M1,10 M3,0 L4,20",
+  );
+  assert.equal(benchmarkGuide([{ x: 1, y: null }]), "");
+});
+
+test("Trump's $500bn watch item is separate from five announced investment totals", () => {
+  const d = JSON.parse(
+    readFileSync(
+      new URL("../src/data/taiwan-outlook/pipeline.json", import.meta.url),
+    ),
+  );
+  assert.equal(d.unit, "USD billions");
+  assert.deepEqual(
+    d.announcements.map((row) => row.total),
+    [12, 40, 65, 165, 265],
+  );
+  assert.equal(d.watch.status, "unconfirmed-claim");
+  assert.equal(d.watch.total, 500);
+  assert.equal(d.watch.displayBucket, "2027+*");
+  assert.equal(d.watch.statementDate, "2026-09-28");
+  assert.equal(d.watch.publishedDate, "2026-10-01");
+  assert.equal(d.watch.executionYear, null);
+  assert.equal(d.watch.confirmedCompany, null);
+  assert.match(d.watch.source, /^https:\/\/time.com\//);
+  assert.match(d.watch.coverage, /^https:\/\/www.inside.com.tw\//);
+});
 
 test("the analytical crossing solves the share equation", () => {
   const h = yearsToThreshold(0.7, 0.05, 0.15, 0.5);

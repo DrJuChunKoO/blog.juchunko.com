@@ -1,3 +1,31 @@
+/** Select the four source benchmarks and convert fractional shares to percentage points. */
+export function dramBenchmarks(rows: (number | string | null)[][]) {
+  return rows
+    .filter(([year]) => [1986, 1990, 1995, 2000].includes(year as number))
+    .map(([year, japan, korea]) => ({
+      year: year as number,
+      japan: (japan as number) * 100,
+      korea: korea === null ? null : (korea as number) * 100,
+    }));
+}
+
+/** Join observed benchmark coordinates only; nulls break the guide, never become zero. */
+export function benchmarkGuide(points: { x: number; y: number | null }[]) {
+  let connected = false;
+  return points
+    .map(({ x, y }) => {
+      if (y === null) {
+        connected = false;
+        return "";
+      }
+      const command = connected ? "L" : "M";
+      connected = true;
+      return `${command}${x},${y}`;
+    })
+    .filter(Boolean)
+    .join(" ");
+}
+
 /** Illustrative two-region model. Inputs are scenarios, never observed national scores. */
 export function capabilityShare(
   initialShare: number,

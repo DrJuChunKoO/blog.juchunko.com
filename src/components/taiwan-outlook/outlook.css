@@ -441,6 +441,27 @@
 .to-widget .to-pipeline-bar.unselected {
   opacity: 0.3;
 }
+.to-widget .to-pipeline-bar.claim {
+  fill: none;
+  stroke: var(--to-ink);
+  stroke-width: 2;
+  stroke-dasharray: 6 5;
+  opacity: 1;
+}
+.to-pipeline-key {
+  display: inline-block;
+  width: 20px;
+  height: 14px;
+  background: var(--to-ink);
+}
+.to-pipeline-key.claim {
+  background: none;
+  border: 2px dashed var(--to-ink);
+}
+.to-pipeline-divider {
+  stroke: var(--to-line);
+  stroke-dasharray: 3 5;
+}
 .to-pipeline-total {
   font-size: clamp(48px, 9vw, 76px);
   font-weight: 600;
