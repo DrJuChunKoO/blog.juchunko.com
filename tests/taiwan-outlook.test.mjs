@@ -40,6 +40,104 @@ function overlayFixture(country = "美國", direction = 0) {
   ];
 }
 
+test("alignment hypotheses preserve each observation and fixed index denominators", () => {
+  for (const country of ["美國", "韓國", "日本"])
+    for (const direction of [0, 1]) {
+      const fixture = overlayFixture(country, direction);
+      const original = eraOverlay(...fixture, 2000, true);
+      for (const anchorModernYear of [2026, 2027]) {
+        const aligned = eraOverlay(...fixture, 2000, true, {
+          anchorModernYear,
+        });
+        assert.equal(aligned.baseA, original.baseA);
+        assert.equal(aligned.baseB, original.baseB);
+        for (const row of original.data) {
+          if (row.yearA !== null) {
+            const moved = aligned.data.find((d) => d.yearA === row.yearA);
+            assert.equal(moved.a, row.a);
+            assert.equal(moved.x, row.yearA - 1990);
+          }
+          if (row.yearB !== null) {
+            const moved = aligned.data.find((d) => d.yearB === row.yearB);
+            assert.equal(moved.b, row.b);
+            assert.equal(moved.rawB, row.rawB);
+            assert.equal(moved.x, row.yearB - anchorModernYear);
+            assert.equal(moved.partialB, row.partialB);
+          }
+        }
+        const zero = aligned.data[aligned.anchorIndex];
+        assert.equal(zero.x, 0);
+        assert.equal(zero.yearA, 1990);
+        if (anchorModernYear === 2027) {
+          assert.equal(zero.b, null);
+          assert.match(zero.periodB, /2027 尚無觀察值/);
+        } else assert.equal(zero.yearB, 2026);
+      }
+    }
+});
+
+test("global alignment preserves the 1995 break and the half-year observation", () => {
+  const d = JSON.parse(
+    readFileSync(
+      new URL("../src/data/taiwan-outlook/evidence.json", import.meta.url),
+    ),
+  );
+  const history = d.japan.map((p) => ({
+    year: p.year,
+    value: p.outward - p.inward,
+    breakBefore: p.breakBefore,
+  }));
+  const modern = [
+    ...d.taiwan.map((p) => ({ year: p.year, value: p.outward - p.inward })),
+    {
+      year: 2026,
+      value: d.taiwanPartial.bop.outward - d.taiwanPartial.bop.inward,
+      partial: true,
+      period: "2026 1–6月",
+    },
+  ];
+  for (const anchorModernYear of [undefined, 2026, 2027]) {
+    const result = eraOverlay(history, modern, 2000, true, {
+      historicalStart: 1983,
+      anchorModernYear,
+    });
+    assert.equal(result.data.filter((p) => p.breakBeforeA).length, 1);
+    assert.equal(result.data.find((p) => p.breakBeforeA).yearA, 1995);
+    const half = result.data[result.latestModernIndex];
+    assert.equal(half.yearB, 2026);
+    assert.equal(half.partialB, true);
+    assert.equal(half.rawB, modern.at(-1).value);
+    assert.equal(half.b, (modern.at(-1).value / modern[0].value) * 100);
+    if (anchorModernYear) assert.equal(result.data[0].yearA, null);
+  }
+});
+
+test("the future watch stays outside annual overlay data and exports", () => {
+  const watch = JSON.parse(
+    readFileSync(
+      new URL("../src/data/taiwan-outlook/pipeline.json", import.meta.url),
+    ),
+  ).watch;
+  assert.equal(watch.total * 10, 5000);
+  assert.equal(watch.confirmedCompany, null);
+  assert.equal(watch.executionYear, null);
+  for (const end of [1990, 2000]) {
+    const result = eraOverlay(...overlayFixture(), end, false);
+    assert.ok(result.data.every((row) => row.rawB !== watch.total));
+    assert.ok(
+      result.data
+        .filter((row) => row.x > 11)
+        .every((row) => row.rawB === null && row.b === null),
+    );
+  }
+  const component = readFileSync(
+    new URL("../src/components/taiwan-outlook/Outlook.tsx", import.meta.url),
+    "utf8",
+  );
+  assert.match(component, /isOverlay && pair === 0 && direction === 0 &&/);
+  assert.match(component, /獨立前瞻註記，未納入曲線、縱軸或年度合計/);
+});
+
 test("era overlay uses fixed starts, a common yearly axis and unchanged raw flows", () => {
   const result = eraOverlay(...overlayFixture(), 1990, false);
   assert.equal(result.data.length, 12);

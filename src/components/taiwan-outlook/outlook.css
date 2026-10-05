@@ -261,11 +261,73 @@
 .to-era-overlay .to-path.secondary {
   stroke-width: 3;
 }
+.to-overlay-layout {
+  display: grid;
+  gap: 20px;
+  align-items: start;
+}
+.to-overlay-plot {
+  min-width: 0;
+}
+.to-forward-watch {
+  border: 1px dashed var(--to-line);
+  padding: 16px;
+  font-size: 13px;
+  line-height: 1.75;
+}
+.to-forward-watch h4 {
+  margin-top: 10px;
+  font-size: 17px;
+}
+.to-watch-amount {
+  display: block;
+  font-size: 52px;
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: -0.05em;
+  margin: 18px 0 12px;
+}
+.to-watch-amount small {
+  display: block;
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0;
+  margin-top: 6px;
+}
+.to-watch-status {
+  font-weight: 600;
+}
+.to-watch-boundary,
+.to-watch-links {
+  color: var(--to-muted);
+}
+.to-watch-boundary {
+  border-top: 1px solid var(--to-line);
+  padding-top: 12px;
+}
+@media (min-width: 1024px) {
+  .to-overlay-layout:has(.to-forward-watch) {
+    grid-template-columns: minmax(0, 1fr) 210px;
+  }
+}
 .to-overlay-options {
   margin: 20px 0 16px;
   padding: 18px 0;
   border-top: 1px solid var(--to-line);
   border-bottom: 1px solid var(--to-line);
+}
+.to-alignment {
+  margin: 18px 0;
+}
+.to-widget .to-period-alert {
+  margin: 16px 0;
+  padding: 14px 16px;
+  border: 1px dashed var(--to-line);
+  font-size: 13px;
+  line-height: 1.8;
+}
+.to-period-alert strong {
+  display: block;
 }
 .to-widget .to-data-gap {
   margin: 14px 0;

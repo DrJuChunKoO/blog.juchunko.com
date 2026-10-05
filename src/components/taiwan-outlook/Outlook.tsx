@@ -26,6 +26,8 @@ type Point = {
   a: number | null;
   b: number | null;
   breakBefore?: boolean;
+  breakBeforeA?: boolean;
+  breakBeforeB?: boolean;
   partialA?: boolean;
   partialB?: boolean;
   period?: string;
@@ -101,6 +103,44 @@ function downloadCsv(name: string, rows: (string | number | null)[][]) {
   link.click();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
+const alignmentChoices = ["原始起點", "1990 ↔ 2026", "1990 ↔ 2027"];
+const anchorYear = (alignment: number) =>
+  alignment === 0 ? undefined : alignment === 1 ? 2026 : 2027;
+const relativeYear = (x: number, alignment: number) =>
+  alignment === 0
+    ? `第 ${x} 年`
+    : x === 0
+      ? "對齊點"
+      : x < 0
+        ? `前 ${-x} 年`
+        : `後 ${x} 年`;
+function AlignmentControls({
+  value,
+  onChange,
+  historicalStart,
+}: {
+  value: number;
+  onChange: (v: number) => void;
+  historicalStart: number;
+}) {
+  return (
+    <div className="to-alignment">
+      <span className="to-kicker">TIME ALIGNMENT / 年份對齊</span>
+      <Choices
+        label="年份對齊方式"
+        choices={alignmentChoices}
+        value={value}
+        onChange={onChange}
+      />
+      <p className="to-note" role="status">
+        {value === 0
+          ? `資料起點：日本 ${historicalStart} ↔ 台灣 2015；每格一年。`
+          : `比較假設：日本 1990 ↔ 台灣 ${anchorYear(value)}。對齊點為第 0 年，不代表台灣高峰或破裂年份。`}
+        切換只平移時間軸，金額與指數基期維持不變。
+      </p>
+    </div>
+  );
+}
 function LineChart({
   data,
   labels,
@@ -114,6 +154,8 @@ function LineChart({
   emptyAfter,
   plotInset = 52,
   preciseTicks = false,
+  anchorAt,
+  connectPartial = true,
 }: {
   data: Point[];
   labels: [string, string];
@@ -127,6 +169,8 @@ function LineChart({
   emptyAfter?: number;
   plotInset?: number;
   preciseTicks?: boolean;
+  anchorAt?: number;
+  connectPartial?: boolean;
 }) {
   const W = 720,
     H = 310,
@@ -153,13 +197,14 @@ function LineChart({
     .map((p, i) => ({ ...p, i }))
     .filter((p) => p.partialA || p.partialB);
   function partialPath(key: "a" | "b") {
+    if (!connectPartial) return "";
     return data
       .map((p, i) => {
         const previous = data[i - 1];
         return p[partialKey(key)] &&
           p[key] !== null &&
           previous?.[key] != null &&
-          !p.breakBefore
+          !(p.breakBefore || p[key === "a" ? "breakBeforeA" : "breakBeforeB"])
           ? `M${xx(i - 1)},${yy(previous[key]!)} L${xx(i)},${yy(p[key]!)}`
           : "";
       })
@@ -174,7 +219,12 @@ function LineChart({
           open = false;
           return "";
         }
-        const cmd = !open || p.breakBefore ? "M" : "L";
+        const cmd =
+          !open ||
+          p.breakBefore ||
+          p[key === "a" ? "breakBeforeA" : "breakBeforeB"]
+            ? "M"
+            : "L";
         open = true;
         return `${cmd}${xx(i).toFixed(2)},${yy(v).toFixed(2)}`;
       })
@@ -183,8 +233,12 @@ function LineChart({
   const labelsAt = [
     ...new Set([
       0,
-      Math.round((data.length - 1) / 3),
-      Math.round(((data.length - 1) * 2) / 3),
+      ...(anchorAt !== undefined
+        ? [anchorAt]
+        : [
+            Math.round((data.length - 1) / 3),
+            Math.round(((data.length - 1) * 2) / 3),
+          ]),
       data.length - 1,
     ]),
   ];
@@ -254,7 +308,7 @@ function LineChart({
               fill="currentColor"
               opacity=".025"
             />
-            <text x={xx(emptyAfter) + 8} y={T + 19}>
+            <text x={W - R} y={T + 19} textAnchor="end">
               台灣：尚未觀察
             </text>
           </>
@@ -274,6 +328,18 @@ function LineChart({
             opacity=".045"
           />
         ))}
+        {anchorAt !== undefined && (
+          <line
+            className="to-alignment-line"
+            x1={xx(anchorAt)}
+            x2={xx(anchorAt)}
+            y1={T}
+            y2={H - B}
+            stroke="currentColor"
+            opacity=".35"
+            strokeDasharray="3 5"
+          />
+        )}
         {Array.from({ length: 5 }, (_, i) => min + ((max - min) * i) / 4).map(
           (v) => (
             <g key={v}>
@@ -391,7 +457,8 @@ function LineChart({
       </svg>
       {partialPoints.length > 0 && (
         <p className="to-partial-note">
-          ◇ 菱形與點線＝部分年度累計；淡底標出該期。{partialPoints[0].period}
+          ◇ {connectPartial ? "菱形與點線" : "獨立菱形"}
+          ＝部分年度累計；淡底標出該期。{partialPoints[0].period}
           ，依已公布金額繪製，未年化。
         </p>
       )}
@@ -659,6 +726,7 @@ export function EvidenceDashboard() {
 
 export function CapitalFlows() {
   const [mode, setMode] = useState(0);
+  const [alignment, setAlignment] = useState(0);
   const [selected, setSelected] = useState(11);
   const [basis, setBasis] = useState(1);
   const tw = evidence.taiwan;
@@ -667,21 +735,31 @@ export function CapitalFlows() {
   const latest = basis === 0 ? partial.bop : partial.approval;
   const twBop = [...tw, { ...partial.bop, year: partial.year }];
   const compare = mode === 2;
+  const overlay = eraOverlay(
+    jp.map((d) => ({
+      year: d.year,
+      value: d.outward - d.inward,
+      breakBefore: d.breakBefore,
+    })),
+    twBop.map((d) => ({
+      year: d.year,
+      value: d.outward - d.inward,
+      partial: d.year === partial.year,
+      period:
+        d.year === partial.year ? `2026 ${partial.bop.period}` : undefined,
+    })),
+    2000,
+    true,
+    { historicalStart: 1983, anchorModernYear: anchorYear(alignment) },
+  );
   const data: Point[] = compare
-    ? jp.map((d, i) => ({
-        x: i,
-        a: twBop[i]
-          ? ((twBop[i].outward - twBop[i].inward) /
-              (tw[0].outward - tw[0].inward)) *
-            100
-          : null,
-        b: ((d.outward - d.inward) / (jp[0].outward - jp[0].inward)) * 100,
-        breakBefore: d.breakBefore,
-        partialA: i === tw.length,
-        period:
-          i === tw.length
-            ? `台灣 2026 ${partial.bop.period}／日本 ${d.year} 全年`
-            : undefined,
+    ? overlay.data.map((d) => ({
+        x: d.x,
+        a: d.b,
+        b: d.a,
+        breakBeforeB: d.breakBeforeA,
+        partialA: d.partialB,
+        period: `台灣 ${d.periodB}／日本 ${d.periodA}`,
       }))
     : mode === 1
       ? jp.map((d) => ({
@@ -714,10 +792,10 @@ export function CapitalFlows() {
       : mode === 0
         ? ["核准對外投資", "核准僑外來台"]
         : ["對外直接投資", "外來直接投資"];
-  const labelX = compare ? `第 ${index} 年` : point.period || `${point.x} 全年`;
-  const periodOf = (d: Point) =>
-    d.period ||
-    (compare ? `台灣 ${2015 + d.x}／日本 ${1983 + d.x} 全年` : `${d.x} 全年`);
+  const labelX = compare
+    ? relativeYear(point.x, alignment)
+    : point.period || `${point.x} 全年`;
+  const periodOf = (d: Point) => d.period || `${d.x} 全年`;
   const rows = [
     [
       compare ? "相對年份" : "年份",
@@ -733,7 +811,7 @@ export function CapitalFlows() {
       d.b,
       compare ? "基期=100" : "億美元",
       compare
-        ? "TW2015/JP1983起點;JP1995斷點;兩國編制不同"
+        ? `基期TW2015/JP1983;對齊${alignmentChoices[alignment]};JP1995斷點;兩國對全球國際收支`
         : mode === 1
           ? "JETRO國際收支;曆年;1995統計變更"
           : basis === 0
@@ -754,9 +832,28 @@ export function CapitalFlows() {
         value={mode}
         onChange={(v) => {
           setMode(v);
-          setSelected(v === 1 ? 7 : 11);
+          setSelected(v === 1 ? 7 : v === 2 ? overlay.latestModernIndex : 11);
         }}
       />
+      {compare && (
+        <>
+          <AlignmentControls
+            historicalStart={1983}
+            value={alignment}
+            onChange={(v) => {
+              setAlignment(v);
+              setSelected(v === 0 ? 11 : v === 1 ? 11 : 12);
+            }}
+          />
+          <p className="to-comparison-boundary">
+            比較範圍：兩國對全球的直接投資淨流出，非對美雙邊投資。
+          </p>
+          <p className="to-period-alert">
+            <strong>2026 僅 1–6 月，前一年為全年。</strong>
+            菱形保留已公布累計值，不與前一年連線；不能把這個落差直接讀成全年投資轉弱。未年化。
+          </p>
+        </>
+      )}
       {mode === 0 && (
         <Choices
           label="投資統計口徑"
@@ -780,7 +877,7 @@ export function CapitalFlows() {
       )}
       <p className="to-note">
         {compare
-          ? "各自首年=100；台灣 2015、日本 1983 是資料起點，並非相同政策衝擊。兩國編制不同，只供觀察形狀。台灣第 11 年為 2026 上半年累計，以點線標出；日本同位置仍是全年。"
+          ? "指數基期固定：台灣 2015＝100、日本 1983＝100。兩國編制不同；年份對齊只供檢視輪廓，不改變指數振幅。台灣 2026 上半年以獨立菱形標出，日本同位置仍是全年。"
           : mode === 1
             ? "JETRO 國際收支淨流量・曆年・負的外來投資代表撤資淨額。"
             : basis === 0
@@ -793,9 +890,18 @@ export function CapitalFlows() {
         unit={compare ? "淨流出指數（首年=100）" : "億美元"}
         selected={index}
         onSelect={setSelected}
-        xLabel={compare ? (v) => `第 ${v} 年` : undefined}
-        breakAt={mode > 0 ? 12 : undefined}
-        emptyAfter={compare ? 11.5 : undefined}
+        xLabel={compare ? (v) => relativeYear(v, alignment) : undefined}
+        breakAt={
+          compare
+            ? overlay.data.findIndex((d) => d.yearA === 1995)
+            : mode === 1
+              ? 12
+              : undefined
+        }
+        emptyAfter={compare ? overlay.latestModernIndex + 0.5 : undefined}
+        anchorAt={compare && alignment !== 0 ? overlay.anchorIndex : undefined}
+        connectPartial={!compare}
+        plotInset={compare ? 84 : 52}
       />
       <label>
         <span className="to-kicker">拖曳讀值 · 手機可觸碰曲線</span>
@@ -810,11 +916,7 @@ export function CapitalFlows() {
       </label>
       <div className="to-scrub-result" aria-live="polite">
         <div>
-          <small>
-            {compare
-              ? point.period || `${1983 + index} / ${2015 + index}`
-              : "觀察期間"}
-          </small>
+          <small>{compare ? point.period : "觀察期間"}</small>
           <strong>{labelX}</strong>
         </div>
         <div>
@@ -877,7 +979,10 @@ export function CapitalFlows() {
           className="to-export"
           type="button"
           onClick={() =>
-            downloadCsv(`taiwan-japan-flows-${mode}-${basis}.csv`, rows)
+            downloadCsv(
+              `taiwan-japan-flows-${mode}-${basis}-${alignment}.csv`,
+              rows,
+            )
           }
         >
           下載本圖 CSV ↓
@@ -1141,6 +1246,7 @@ export function PairComparison() {
   const [window, setWindow] = useState(0);
   const [direction, setDirection] = useState(0);
   const [scale, setScale] = useState(0);
+  const [alignment, setAlignment] = useState(0);
   const [index, setIndex] = useState(10);
   const p = pairs[pair];
   const historicalEnd = window === 0 ? 1990 : 2000;
@@ -1179,6 +1285,7 @@ export function PairComparison() {
     })),
     historicalEnd,
     isIndexed,
+    { anchorModernYear: anchorYear(alignment) },
   );
   const data = isOverlay ? overlay.data : era === 0 ? historicalWindow : modern;
   const selected = Math.min(index, data.length - 1);
@@ -1250,7 +1357,15 @@ export function PairComparison() {
         value={era}
         onChange={(v) => {
           setEra(v);
-          setIndex(v === 0 ? historicalWindow.length - 1 : v === 1 ? 11 : 10);
+          setIndex(
+            v === 0
+              ? historicalWindow.length - 1
+              : v === 1
+                ? 11
+                : alignment === 0
+                  ? 10
+                  : overlay.anchorIndex,
+          );
         }}
       />
       {era !== 1 && (
@@ -1260,13 +1375,29 @@ export function PairComparison() {
           value={window}
           onChange={(v) => {
             setWindow(v);
-            setIndex(isOverlay ? 10 : v === 0 ? 10 : 20);
+            setIndex(
+              isOverlay
+                ? alignment === 0
+                  ? 10
+                  : overlay.anchorIndex
+                : v === 0
+                  ? 10
+                  : 20,
+            );
           }}
         />
       )}
       {isOverlay && (
         <div className="to-overlay-options">
           <p className="to-kicker">OVERLAY / 把兩個年代，放上同一張圖</p>
+          <AlignmentControls
+            historicalStart={1980}
+            value={alignment}
+            onChange={(v) => {
+              setAlignment(v);
+              setIndex(v === 0 ? 10 : v === 1 ? 11 : 12);
+            }}
+          />
           <Choices
             label="疊圖投資方向"
             choices={["對外投資", "流入投資"]}
@@ -1280,9 +1411,9 @@ export function PairComparison() {
             onChange={setScale}
           />
           <p className="to-note">
-            第 0 年＝日本 1980／台灣 2015；每格都是一年，共用同一縱軸。
+            每格都是一年，共用同一縱軸。
             {isIndexed
-              ? `指數＝當期金額 ÷ 各自起點金額 × 100。起點：歷史 ${overlay.baseA === null ? "缺值" : n(overlay.baseA, 4)}／當代 ${overlay.baseB === null ? "缺值" : n(overlay.baseB, 4)} 十億美元。`
+              ? `指數＝當期金額 ÷ 各自基期金額 × 100。基期固定：日本 1980／台灣 2015；歷史 ${overlay.baseA === null ? "缺值" : n(overlay.baseA, 4)}／當代 ${overlay.baseB === null ? "缺值" : n(overlay.baseB, 4)} 十億美元。`
               : "原始金額不縮放貼合，不調整物價、匯率或經濟規模。"}
           </p>
           {isIndexed && (!overlay.canIndexA || !overlay.canIndexB) && (
@@ -1301,7 +1432,7 @@ export function PairComparison() {
             type="button"
             onClick={() => {
               setWindow(1);
-              setIndex(15);
+              setIndex(alignment === 0 ? 15 : overlay.anchorIndex + 5);
               setScale(0);
             }}
           >
@@ -1309,24 +1440,59 @@ export function PairComparison() {
           </button>
         </p>
       )}
-      <div className={isOverlay ? "to-era-overlay" : undefined}>
-        <LineChart
-          data={data}
-          labels={pairLabels}
-          unit={unit}
-          selected={selected}
-          onSelect={setIndex}
-          xLabel={isOverlay ? (x) => `第 ${x} 年` : undefined}
-          emptyAfter={isOverlay && window === 1 ? 11.5 : undefined}
-          plotInset={isIndexed ? 84 : 52}
-          preciseTicks={isOverlay}
-        />
+      <div
+        className={isOverlay ? "to-era-overlay to-overlay-layout" : undefined}
+      >
+        <div className="to-overlay-plot">
+          <LineChart
+            data={data}
+            labels={pairLabels}
+            unit={unit}
+            selected={selected}
+            onSelect={setIndex}
+            xLabel={isOverlay ? (x) => relativeYear(x, alignment) : undefined}
+            emptyAfter={
+              isOverlay && overlay.latestModernIndex < data.length - 1
+                ? overlay.latestModernIndex + 0.5
+                : undefined
+            }
+            anchorAt={
+              isOverlay && alignment !== 0 ? overlay.anchorIndex : undefined
+            }
+            plotInset={isIndexed ? 84 : 52}
+            preciseTicks={isOverlay}
+          />
+        </div>
+        {isOverlay && pair === 0 && direction === 0 && (
+          <aside className="to-forward-watch" aria-label="對美投資前瞻註記">
+            <span className="to-kicker">FORWARD WATCH</span>
+            <h4>下一波，有多大？</h4>
+            <strong className="to-watch-amount">
+              {n(pipeline.watch.total * 10, 0)}
+              <small>億美元</small>
+            </strong>
+            <p className="to-watch-status">川普說法 · 非年度金額</p>
+            <p>
+              台灣晶片公司赴美投資：公司、範圍、時程待確認，不是 2027
+              年的已知高峰。
+            </p>
+            <p className="to-watch-boundary">
+              獨立前瞻註記，未納入曲線、縱軸或年度合計。
+            </p>
+            <p className="to-watch-links">
+              <a href={pipeline.watch.source}>原文</a> ·{" "}
+              <a href={pipeline.watch.coverage}>報導</a> ·{" "}
+              <a href="#investment-pipeline">布局說明 →</a>
+            </p>
+          </aside>
+        )}
       </div>
       {isOverlay && (
         <p className="to-note">
-          實線＝歷史日本；虛線＝當代台灣。台灣 2026 年 1–8 月保留在第 11 年；
+          實線＝歷史日本；虛線＝當代台灣。菱形＝台灣 2026 年 1–8
+          月累計，未年化；
           {window === 0
-            ? "歷史線依所選區間止於第 10 年（1990），切換「看後來」可顯示後續。"
+            ? "歷史線依所選區間止於 1990，切換「看後來」可顯示後續。"
             : "台灣尚未觀察到的後續年份留白，不以日本走勢代填。"}
         </p>
       )}
@@ -1343,8 +1509,12 @@ export function PairComparison() {
       </label>
       <div className="to-scrub-result" aria-live="polite">
         <div>
-          <small>{isOverlay ? "距起點" : "觀察年"}</small>
-          <strong>{isOverlay ? `第 ${pt.x} 年` : pt.period || pt.x}</strong>
+          <small>
+            {isOverlay ? (alignment === 0 ? "距起點" : "距對齊點") : "觀察年"}
+          </small>
+          <strong>
+            {isOverlay ? relativeYear(pt.x, alignment) : pt.period || pt.x}
+          </strong>
         </div>
         <div>
           <small>{pairLabels[0]}</small>
@@ -1368,8 +1538,7 @@ export function PairComparison() {
       <p className="to-note">讀值單位：{unit}。</p>
       {era !== 1 && (
         <p className="to-comparison-boundary">
-          比較擴張階段，不預測破裂年份。1980／2015
-          是固定展示起點，不是經估計的相同景氣位置；各組不另找高峰對齊。2027、2030
+          年份對齊是比較假設，不是經估計的相同景氣位置；各組共用所選對齊方式，不另找高峰。2026、2027、2030
           不是由疊圖推算的危機日期。
         </p>
       )}
@@ -1391,15 +1560,17 @@ export function PairComparison() {
               </tr>
             </thead>
             <tbody>
-              {data.map((d) => (
+              {data.map((d, i) => (
                 <tr key={d.x}>
                   <td>
-                    {isOverlay ? `第 ${d.x} 年` : d.period || `${d.x} 全年`}
+                    {isOverlay
+                      ? relativeYear(d.x, alignment)
+                      : d.period || `${d.x} 全年`}
                   </td>
                   {isOverlay && (
                     <>
-                      <td>{overlay.data[d.x].periodA}</td>
-                      <td>{overlay.data[d.x].periodB}</td>
+                      <td>{overlay.data[i].periodA}</td>
+                      <td>{overlay.data[i].periodB}</td>
                     </>
                   )}
                   <td>{readValue(d.a)}</td>
@@ -1425,7 +1596,7 @@ export function PairComparison() {
         onClick={() =>
           isOverlay
             ? downloadCsv(
-                `bilateral-overlay-${pair}-${direction}-${scale}-${historicalEnd}.csv`,
+                `bilateral-overlay-${pair}-${direction}-${scale}-${historicalEnd}-${alignment}.csv`,
                 [
                   [
                     "相對年",
@@ -1437,6 +1608,7 @@ export function PairComparison() {
                     "歷史原始值（十億美元）",
                     "當代原始值（十億美元）",
                     "口徑",
+                    "年份對齊（比較假設）",
                   ],
                   ...overlay.data.map((d) => [
                     d.x,
@@ -1448,6 +1620,7 @@ export function PairComparison() {
                     d.rawA,
                     d.rawB,
                     basis,
+                    alignmentChoices[alignment],
                   ]),
                 ],
               )

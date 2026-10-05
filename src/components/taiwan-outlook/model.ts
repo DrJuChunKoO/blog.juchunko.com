@@ -3,25 +3,31 @@ export type EraObservation = {
   value: number | null;
   partial?: boolean;
   period?: string;
+  breakBefore?: boolean;
 };
 
-/** Fixed calendar starts, one year per step; no peak fitting, interpolation or annualization. */
+/** One year per step; alignment moves time only, never index bases or observed values. */
 export function eraOverlay(
   historical: EraObservation[],
   modern: EraObservation[],
   historicalEnd: number,
   indexed: boolean,
+  options: { historicalStart?: number; anchorModernYear?: number } = {},
 ) {
-  const historicalStart = 1980;
+  const historicalStart = options.historicalStart ?? 1980;
   const modernStart = 2015;
+  const anchorA = options.anchorModernYear ? 1990 : historicalStart;
+  const anchorB = options.anchorModernYear ?? modernStart;
+  const start = Math.min(historicalStart - anchorA, modernStart - anchorB);
   const baseA =
     historical.find((p) => p.year === historicalStart)?.value ?? null;
   const baseB = modern.find((p) => p.year === modernStart)?.value ?? null;
   const canIndexA = baseA !== null && baseA > 0;
   const canIndexB = baseB !== null && baseB > 0;
   const end = Math.max(
-    historicalEnd - historicalStart,
-    ...modern.map((p) => p.year - modernStart),
+    0,
+    historicalEnd - anchorA,
+    ...modern.map((p) => p.year - anchorB),
   );
   const normalize = (value: number | null, base: number | null) =>
     !indexed
@@ -29,13 +35,13 @@ export function eraOverlay(
       : value === null || base === null || base <= 0
         ? null
         : (value / base) * 100;
-  const data = Array.from({ length: end + 1 }, (_, x) => {
-    const yearA = historicalStart + x;
-    const a =
-      yearA <= historicalEnd
-        ? historical.find((p) => p.year === yearA)
-        : undefined;
-    const b = modern.find((p) => p.year === modernStart + x);
+  const data = Array.from({ length: end - start + 1 }, (_, i) => {
+    const x = start + i;
+    const yearA = anchorA + x;
+    const yearB = anchorB + x;
+    const inWindow = yearA >= historicalStart && yearA <= historicalEnd;
+    const a = inWindow ? historical.find((p) => p.year === yearA) : undefined;
+    const b = modern.find((p) => p.year === yearB);
     const rawA = a?.value ?? null;
     const rawB = b?.value ?? null;
     return {
@@ -44,15 +50,29 @@ export function eraOverlay(
       b: normalize(rawB, baseB),
       rawA,
       rawB,
-      yearA: yearA <= historicalEnd ? yearA : null,
+      yearA: inWindow ? yearA : null,
       yearB: b?.year ?? null,
-      periodA: yearA <= historicalEnd ? `${yearA} 全年` : "超出所選歷史區間",
-      periodB: b ? b.period || `${b.year} 全年` : "尚無觀察值",
+      periodA: inWindow ? `${yearA} 全年` : "超出所選歷史區間",
+      periodB: b
+        ? b.period || `${b.year} 全年`
+        : options.anchorModernYear
+          ? `${yearB} 尚無觀察值`
+          : "尚無觀察值",
+      breakBeforeA: a?.breakBefore ?? false,
       partialB: b?.partial ?? false,
       period: b?.partial ? b.period : undefined,
     };
   });
-  return { data, baseA, baseB, canIndexA, canIndexB };
+  const latestModernIndex = data.findLastIndex((d) => d.yearB !== null);
+  return {
+    data,
+    baseA,
+    baseB,
+    canIndexA,
+    canIndexB,
+    anchorIndex: -start,
+    latestModernIndex,
+  };
 }
 
 /** Select the four source benchmarks and convert fractional shares to percentage points. */
