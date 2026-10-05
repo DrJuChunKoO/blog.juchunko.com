@@ -1,0 +1,151 @@
+---
+title: "When We Say \"China's AI Is Fake,\" What Are We Actually Saying?"
+description: "After mainland platforms published thousand-word broadsides denouncing me by name, here is the full argument in one place: what exactly is fake — the \"fully self-reliant\" narrative, the myth of compute self-sufficiency, and the theater of intimidation. Also: what we are NOT saying, why the strongest rebuttals fail, and why I test and even recommend Chinese models while criticizing them."
+pubDate: "2026-10-05"
+author: "juchun-ko"
+categories: ["policy-analysis"]
+heroImage: "../../../assets/images/when-we-say-china-ai-is-fake/cover.png"
+heroImageAlt: "A tiger folded entirely out of paper printed with circuit-board patterns, standing under a single spotlight on a dark stage; a peeling seam on its flank reveals it is hollow inside, with server racks and a silicon wafer glowing faintly in the background."
+---
+
+On September 17, I wrote on Facebook that "China's AI is fake — it's a paper tiger," and got flamed for two weeks. During my visit to the United States, I gathered more concrete material and published a longer piece [laying out the evidence](https://www.facebook.com/share/p/1DwZWyfNtn/). Then several thousand-word broadsides appeared on mainland Chinese content platforms — complete with ten-minute audio narration — denouncing me by name for "slandering mainland AI achievements," and demanding that my party, the KMT, disavow me or be exposed as "saying one thing and doing another."
+
+Good. Being attacked has never been the problem. Leaving the argument half-stated is the problem. This essay states the whole thing at once: when we say "China's AI is fake," what exactly are we saying — and, just as important, what are we **not** saying?
+
+## Start with what I actually wrote
+
+From my post during the U.S. visit:
+
+> China's AI is fake. Over these days in America I have obtained a great deal of concrete intelligence, and it confirms the judgment I have held all along.
+>
+> Just last week, the American AI company Anthropic publicly named seven Chinese AI companies — including Alibaba, DeepSeek, Moonshot (Kimi), Zhipu, Xiaomi, SenseTime, and MiniMax — for "industrial-scale" misappropriation and distillation of their Claude models. Kimi was even caught quietly forwarding its own users' questions to America's Claude — 23 million times in three months.
+
+And this passage — which the mainland broadsides quoted in full while pretending not to understand it:
+
+> Let me be clear: as members of the same ethnic heritage, we of course hope, from the bottom of our hearts, that every land where Chinese culture lives can become genuinely prosperous and strong in industry, economy, and technology. But reality is brutal — much of mainland China's so-called lead in robotics, drones, and AI today is a beautifully packaged illusion.
+
+The key words are "**so-called lead**" and "**illusion**." From the beginning, my target has been the **narrative** — never the engineers.
+
+## What we are NOT saying
+
+Let's first rule out three deliberate misreadings.
+
+**First, we are not saying China has no excellent engineers.** DeepSeek's architectural innovations are real. Its open weights are real. The engineering is solid. I don't just concede this verbally — I personally got DeepSeek V4 Flash running on a Mac and published a complete deployment tutorial for anyone to follow (see the appendix below). Underestimating your counterpart's technical capability is unprofessional.
+
+**Second, we are not saying Chinese models should never be used.** Open weights have no borders, and good tools deserve to be used. I have tested them, written about them, even recommended them for specific use cases — again, see the appendix, where I lay this out completely, so nobody has to "dig it up" and act shocked.
+
+**Third, we are not saying Taiwan can relax.** Quite the opposite. The conclusion of this argument has always been: "No need to fear — but we must do the work." Taiwan's own three exams come later in this essay.
+
+With those excluded: where exactly is the fake? Three places.
+
+## Fake №1: the "fully self-reliant" narrative
+
+For the past year, the main melody from Chinese official media and self-media has been: Chinese AI has "caught up with and surpassed" the West, achieved "full self-reliance," made the "overtake on the curve."
+
+Then came these past few weeks:
+
+- **Anthropic named seven Chinese AI companies** — Alibaba (Qwen), DeepSeek, Moonshot (Kimi), Zhipu, Xiaomi, SenseTime, MiniMax — for "industrial-scale" misappropriation and distillation of Claude ([Economic Daily News report](https://money.udn.com/money/story/5599/9782831)).
+- The **U.S. Cybersecurity and Infrastructure Security Agency (CISA)** stated that Chinese AI companies are running an "industrial-scale knowledge-distillation operation" in violation of American companies' terms of service.
+- **U.S. Treasury Secretary Bessent** said publicly that so-called "industry distillation" is just a polite phrase for stealing results from American models — and noted that Kimi at times sent queries involving PLA weapons programs straight back to Anthropic ([Economic Daily News report](https://money.udn.com/money/story/5599/9794758)).
+- **The New York Times** ran a feature asking "Is China Really Stealing A.I. From American Companies?" ([NYT](https://www.nytimes.com/2026/09/25/science/china-ai-distillation-copying.html)), and the issue made it onto the agenda of leaders' talks in Washington.
+
+Note the nature of the Kimi case: **forwarding your own users' questions to an American model in real time, then returning the answer under your own brand.** Engineering has a colloquial name for this: a reskin — a shell swap. Twenty-three million times in three months is not a lab accident; it is a production pipeline.
+
+The point is not that "using American technology is shameful." **Dependence is not shameful. Lying about it is.** Being deeply dependent on American frontier models while telling 1.4 billion people "we have comprehensively surpassed them" — that gap is what I call fake.
+
+## Fake №2: the myth of compute self-sufficiency
+
+Training frontier AI models is built on advanced chips. That is not an opinion; it is physics.
+
+Under export controls, China cannot obtain the most advanced process nodes, the most advanced HBM memory, or the most advanced interconnects. People in the industry know the distance between domestic substitutes' actual yields and capacity and the official narrative. Without the foundation of compute, the most beautiful model is a tower built on sand — and the starting point of the world's most advanced compute is Taiwan.
+
+So when the propaganda machine says "compute can't choke us," apply a simple fact-check: whose GPUs did the training run on? Whose process made the memory? If those answers cannot stand daylight, then "self-sufficiency" is rhetoric, not reality.
+
+"But DeepSeek is open source — you can download it and run it offline." True. I run it myself. But **inference is not training.** The fact that your computer can execute a model offline does not mean the model's birth was independent of someone else's chips and someone else's models. "It runs" proves the engineering is good; it does not answer "where did it come from."
+
+## Fake №3: the theater of intimidation
+
+The term "paper tiger" was coined by Mao Zedong — he used it to describe imperialism: despise the enemy strategically, take it seriously tactically. I am merely handing that structure back, intact, to today's Beijing.
+
+Taiwan has been hearing military intimidation for seventy years. Every year we are told "do not say you were not warned" — while the intensity of the intimidation is dialed up and down according to Beijing's own needs. Everyone saw the recent APEC arrangements. **Anything that gets adjusted by cost-benefit calculation is a policy instrument, not destiny.** The real purpose of intimidation was never to attack — it is to get you to frighten yourself.
+
+So here are my three sentences, all at once: **Take the opponent's capability seriously. Know that its compute foundation has a soft underbelly. Treat its intimidation as paper.** Respect its strength, discount its threats — no need to fear, but we must do the work.
+
+## Meeting the three strongest rebuttals head-on
+
+The mainland broadsides, and some good-faith skeptics, have raised three rebuttals. I won't pick the soft ones — here are the three hardest, answered directly.
+
+**Rebuttal 1: "Distillation is industry practice — even Jensen Huang says it's competition, not theft."**
+
+Huang did say that ([Economic Daily News report](https://money.udn.com/money/story/5599/9782831)), and the part he's right about, I agree with: distillation as a technique is neutral, common, and used worldwide. But three layers must be kept apart:
+
+1. **Scale and terms.** An individual developer referencing outputs is not the same thing as named, "industrial-scale," terms-of-service-violating systematic distillation.
+2. **Distillation is not reskinning.** What Kimi was caught doing was not "training its own model on outputs" — it was **forwarding user queries to Claude in real time and answering under its own brand.** That is no longer inside the "is distillation legitimate" debate at all.
+3. **Learning is not shameful; claiming you never learned is.** A student consulting the textbook is perfectly proper. Consulting the textbook and then announcing you independently invented calculus — the problem was never the consulting. It's the announcing.
+
+**Rebuttal 2: "DeepSeek is open source and engineers worldwide run it locally — how can that be 'piping from America'?"**
+
+The core answer is above: inference autonomy is not training autonomy. I'll add one line: I am probably the only member of Taiwan's legislature who has personally compiled and run it. Precisely because I run it, I know better than most of my critics what is genuinely good about it — and I know equally well that "it runs on my Mac" answers nothing about what chips trained it or whose models it learned from.
+
+**Rebuttal 3: "Anthropic's report is commercially motivated — don't take it seriously."**
+
+Perhaps Anthropic has defensive commercial motives — corporate statements always deserve a discount. But first, within the same week CISA and the U.S. Treasury Secretary spoke in the same direction; that is no longer one company's claim. Second, the allegations are specific enough to verify: named companies, forwarding counts, time windows. Third, and most important: **if the allegations are false, the seven named companies are the best-positioned actors on Earth to prove their innocence** — publish the training compute sources, publish the data pipelines, let Kimi publish its routing logs. To this day, not one of them has produced that transparency. The way to rebut a specific allegation is more specific evidence — not a thousand-word broadside barrage against a Taiwanese legislator.
+
+## Same heritage — which is exactly why I tell the truth
+
+The mainland article quoted my "same ethnic heritage" passage and concluded that I "insult China." Precisely backwards.
+
+The people who truly look down on Chinese engineers are not me. **They are the people who take those engineers' solid work and feed it to a propaganda machine that shouts "comprehensive supremacy."** Engineers build a real thing worth 80 points; propaganda inflates it to 120 — and the extra 40 points are borrowed against the credibility of the entire community. DeepSeek's papers deserve to be read and respected. The trending headline "China's AI now leads the world across the board" is the greatest insult those papers will ever receive.
+
+Love deeply, criticize honestly. Only someone who genuinely hopes every land of Chinese culture becomes *truly* prosperous cares about the word "truly."
+
+## Taiwan's three exams
+
+Criticizing others is easy; Taiwan must do its own homework. "We must do the work" is not a slogan — it is three exams:
+
+- **Compute.** The AI Basic Act passed its third reading, but the implementing regulations and compute buildout must keep pace. The White House can settle a governance framework over one lunch; we cannot spend ten years holding hearings.
+- **Power.** The opponent's grid doubles every decade while our energy debate still argues from ideology instead of computing from data. Fear generates not a single kilowatt-hour.
+- **People.** Cultivating, retaining, and attracting AI talent should be debated with data, not mobilized with fear.
+
+And one more sentence, addressed to Taipei: democracy is not our weakness — it is our methodology. As I wrote on September 17: one world can accommodate many strong nations, but in the long run it accommodates only one form of state — democracy. This essay is itself the demonstration: I can publicly criticize Beijing's propaganda and have publicly criticized our own Ministry of Digital Affairs; I can say the Chinese AI narrative is fake and personally teach people how to use Chinese models safely. **A society that can hold both of those at once — that is the side that is "real."**
+
+As for the broadside's demand that the KMT leadership "cut me loose" — no need to trouble anyone. This is my professional judgment. I bear the responsibility alone. If you must attack someone, attack me.
+
+## Closing: refute me with facts — please
+
+I would welcome being refuted — with facts. Three ways to end this debate immediately:
+
+1. The seven named companies publish the chips and compute sources used for training.
+2. Kimi publishes its query-routing logs for the past year, proving the 23 million figure false.
+3. Publish the complete data pipelines and let third parties verify the words "fully self-reliant."
+
+Do any one of these and I will apologize publicly. Fail to do any, and please accept the conclusion:
+
+**Real gold fears no fire. Only paper tigers fear sunlight.**
+
+---
+
+## Appendix I: Why do I criticize Chinese AI while testing — even recommending — Chinese models?
+
+Anyone browsing this blog will notice: the person who says "China's AI is fake" has written several articles testing Chinese models, some quite favorable. Let me save you the digging:
+
+- [*DeepSeek V4 Flash + MiniMax H3, Deployed Locally on a Mac*](/en/deepseek-v4-flash-minimax-h3-local-mac) (Aug 2026) — running a 284B open-weights model on a single Mac, full tutorial, ending with "three reminders for using Chinese open-source models."
+- [*AI Lies: Our Taiwan-Sovereignty Benchmark Is Now on arXiv*](/en/taiwan-sovereignty-benchmark-arxiv) (Feb 2026) — we tested 17 large language models (including several Chinese ones) on Taiwan-sovereignty questions and found 15 exhibit a Chinese-vs-English "language bias."
+- [*How to Out-Compete AI Without Being Out-Competed by It*](/zh/how-to-win-with-ai) (Jan 2025, Chinese) — analysis with Audrey Tang when DeepSeek first broke out.
+
+If you think this is "cursing with the left hand while playing with the right," my answer is: **it is the exact opposite — this is called inspecting the goods.**
+
+**First, if you haven't tested it, you haven't earned the right to criticize it.** When I say "inference is not training" and "running is not self-reliance," my confidence comes from having compiled and run these models with my own hands. Attacking something you've never used — that would be rumor-mongering. Criticizing something after using it is professional judgment. Science has one rule: understand a thing before you claim to know what's wrong with it.
+
+**Second, my criticism was never aimed at the models — it is aimed at the narrative.** DeepSeek is useful; I say it's useful. "Chinese AI has achieved fully self-reliant world leadership" is false; I say it's false. These two statements don't merely coexist — they *must* both be said, because distinguishing a useful tool from untruthful propaganda is the entire point of technical professionalism. People who can't make that distinction end up worshiping tools as totems.
+
+**Third, testing is itself a defense.** The sovereignty benchmark is the proof: without hands-on testing, you would never know these models systematically switch answers on Taiwan-sovereignty questions when asked in Chinese. The only credible way to warn citizens that "models carry their trainers' positions" is to produce test data. And I consistently add the safety rules: download only from trusted sources, stay conscious of built-in bias, keep sensitive data off-device — the full checklist is in the appendix of the deployment tutorial.
+
+**Fourth, this is the difference between democracy and a propaganda machine.** Our method: public tests, public data, publicly stated conditions under which we would change our minds. Their method: thousand-word broadsides with audio narration. Which side sounds more confident of its own case — judge for yourself.
+
+## Appendix II: Primary sources
+
+- Anthropic names seven Chinese companies for "industrial-scale" distillation; Jensen Huang responds "distillation is competition, not theft" — [Economic Daily News, 2026/09/29](https://money.udn.com/money/story/5599/9782831)
+- U.S. Treasury Secretary Bessent on Kimi and PLA-weapons-related queries — [Economic Daily News, 2026/10/05](https://money.udn.com/money/story/5599/9794758)
+- Is China Really Stealing A.I. From American Companies? — [The New York Times, 2026/09/25](https://www.nytimes.com/2026/09/25/science/china-ai-distillation-copying.html)
+- My original post from the U.S. visit — [Facebook, 2026/10](https://www.facebook.com/share/p/1DwZWyfNtn/)
