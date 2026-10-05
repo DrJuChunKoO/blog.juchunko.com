@@ -1,5 +1,9 @@
-"""Render the data-based cover: python scripts/render-taiwan-outlook-cover.py /path/to/NotoSansTC.ttf
-Requires Pillow. Values are read from the same evidence snapshot as the React charts.
+"""Update only the original cover's chart, not its editorial layout or copy.
+
+Run: python scripts/render-taiwan-outlook-cover.py /path/to/NotoSansTC.ttf
+Requires Pillow. Exact values come from the same snapshot as the React charts.
+The original cover.png is an immutable template; outside CHART_BOX pixels must
+remain identical, including the title, subtitle, legend and original footer.
 """
 from pathlib import Path
 import json, math, sys
@@ -8,7 +12,11 @@ root = Path(__file__).resolve().parents[1]
 data = json.loads((root / 'src/data/taiwan-outlook/evidence.json').read_text())
 font_path = sys.argv[1]
 S = 2
-im = Image.new('RGB', (1600*S, 840*S), '#f8f8f8')
+original = Image.open(root / 'src/assets/images/taiwan-japan-warning/cover.png').convert('RGB')
+assert original.size == (1200, 630), 'Inspect template before changing its dimensions'
+CHART_BOX = (60, 320, 1175, 593)
+background = original.getpixel((0, 0))
+im = Image.new('RGB', (1200*S, 630*S), background)
 d = ImageDraw.Draw(im)
 ink, muted, grid = '#18181b', '#6b6b73', '#dedee2'
 def font(size, weight=450):
@@ -28,41 +36,32 @@ def dashed(a,b,fill,width=3,dash=7,gap=7):
   line([(a[0]+dx*start/length,a[1]+dy*start/length),(a[0]+dx*end/length,a[1]+dy*end/length)],fill,width)
 def diamond(x,y,fill):
  pts=[((x+a)*S,(y+b)*S) for a,b in [(0,-7),(7,0),(0,7),(-7,0)]]
- d.polygon(pts,fill='#f8f8f8',outline=fill,width=3*S)
+ d.polygon(pts,fill=background,outline=fill,width=2*S)
 latest=data['taiwanPartial']['approval']
-annual=data['taiwan']
-values=[(r['year'],r['approvedOut']*10,r['approvedIn']*10) for r in annual]+[(2026,latest['outward']*10,latest['inward']*10)]
-txt(72,40,'THE TAIWAN CLOCK  /  2026.10',22,muted)
-txt(72,92,'八個月，已超過前兩年各自全年',64,weight=650)
-txt(74,190,'2026 年 1–8 月 · 核准對外投資',27,muted)
-txt(70,234,f"{latest['outward']*10:.2f}",72,weight=650)
-txt(333,275,'億美元',28)
-txt(980,194,f"2024 全年   {annual[-2]['approvedOut']*10:.2f} 億",26,muted)
-txt(980,241,f"2025 全年   {annual[-1]['approvedOut']*10:.2f} 億",26,muted)
-L,R,T,B=98,1416,353,674
+annual=[row for row in data['taiwan'] if row['year'] >= 2016]
+# Preserve the original chart's USD billions unit and 2016 starting year.
+values=[(r['year'],r['approvedOut'],r['approvedIn']) for r in annual]+[(2026,latest['outward'],latest['inward'])]
+L,R,T,B=100,1091,330,530
 xx=lambda i:L+i*(R-L)/(len(values)-1)
-yy=lambda v:B-v/700*(B-T)
-d.rectangle((xx(10.55)*S,T*S,1530*S,B*S),fill='#ededf0')
-txt(L,317,'億美元',21,muted)
-line([(748,327),(790,327)],ink,4);txt(803,313,'核准對外投資',22)
-dashed((1086,327),(1128,327),muted,3);txt(1141,313,'核准僑外來台',22,muted)
-for v in [0,200,400,600]:
- line([(L,yy(v)),(1530,yy(v))],grid,1)
- txt(L-18,yy(v),str(v),22,muted,anchor='rm')
-for col,color in [(1,ink),(2,muted)]:
+yy=lambda v:B-v/75*(B-T)
+d.rectangle((xx(9.5)*S,T*S,1168*S,B*S),fill='#ededf0')
+for v in [0,25,50,75]:
+ line([(L,yy(v)),(1168,yy(v))],grid,1)
+ txt(64,yy(v),str(v),16,muted,anchor='lm')
+for col,color in [(1,ink),(2,'#9f9fa9')]:
  pts=[(xx(i),yy(v[col])) for i,v in enumerate(values)]
- if col==1: line(pts[:-1],color,4)
- else:
-  for a,b in zip(pts[:-2],pts[1:-1]): dashed(a,b,color,3,8,6)
- dashed(pts[-2],pts[-1],color,4 if col==1 else 3,3,7)
+ line(pts[:-1],color,3 if col==1 else 2)
+ dashed(pts[-2],pts[-1],color,3 if col==1 else 2,3,5)
  for x,y in pts[:-1]:d.ellipse(((x-3)*S,(y-3)*S,(x+3)*S,(y+3)*S),fill=color)
  diamond(*pts[-1],color)
- txt(R+18,pts[-1][1]-1,f'{values[-1][col]:.2f}',25,color,650,anchor='lm')
-for year in [2015,2018,2021,2024,2025,2026]:
- txt(xx(year-2015),693,str(year),23,ink if year==2026 else muted,anchor='mt')
-txt(R,726,'1–8 月',23,ink,550,anchor='mt')
-txt(72,765,'◇ 2026 為已公布的累計金額，未年化；點線區分部分年度。',22,muted)
-txt(72,801,'來源：經濟部投審司。2015–2025 為全年；不含另列對中國大陸投資與陸資來台。',21,muted)
+ txt(R+15,pts[-1][1],f'{values[-1][col]:.2f}',17,color,550,anchor='lm')
+txt(L,548,'2016',16,muted)
+for year in [2024,2025,2026]:
+ txt(xx(year-2016),548,str(year),16,ink if year==2026 else muted,anchor='mt')
+txt(R,570,'1–8 月',15,ink,500,anchor='mt')
+txt(L,575,'◇ 2026 為 1–8 月累計，未年化；核准金額不等於產能。',15,muted)
 output=root/'src/assets/images/taiwan-japan-warning/cover-2026-ytd.png'
-im.resize((1600,840),Image.Resampling.LANCZOS).save(output,optimize=True)
+chart = im.resize(original.size,Image.Resampling.LANCZOS)
+original.paste(chart.crop(CHART_BOX), CHART_BOX)
+original.save(output,optimize=True)
 print(output)

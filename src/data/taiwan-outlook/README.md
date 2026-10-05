@@ -16,6 +16,12 @@ Snapshot: 2026-10-04. Post: `src/content/blog/zh/taiwan-japan-capability-warning
 
 The annual comparison uses net outward FDI divided by its own first-year value ×100. Taiwan 2015 / Japan 1983 alignment is descriptive, not event identification. It does not adjust for prices, exchange rates, economic size, or differences in BOP compilation. Taiwan includes the observed 2026 January–June partial value at relative year 11, marked only on its own series; Japan at the same position remains a full-year observation. The unobserved later Taiwan years remain blank.
 
+## 2025 approval-purpose audit (reviewed 2026-10-05)
+
+`approval-audit-2025.json` retains all twelve monthly outward approvals from the 2026-01-15 MOEA release, workbook `對外總表`, in the original **USD thousands**. Their sum must reconcile to `evidence.json`'s unchanged 2025 annual approval figure. The UI divides by 100,000 to display 億美元.
+
+The 2025-03-26 and 2025-08-27 MOEA meeting PDFs each identify a USD 10bn TSMC Global capitalization for FX-hedging costs and deposit/bond income. These two cases total USD 20bn, about 52% of annual approvals. They are not factory-construction approvals. The audit only identifies these two cases, not all financial-purpose investment; do not interpret other months' dashes as zero financial investment, or the residual as physical investment. Approval months are neither decision nor execution dates. PMI evidence supports contemporaneous uncertainty, not a quantified causal attribution of the annual decline. Annual totals, BOP series, partial periods and clock formulas remain unchanged.
+
 ## Clock and scenarios
 
 The calendar clock counts to the **end of the chosen Taipei year**, using UTC December 31 16:00. 2030 and 2035 are author-selected policy-review horizons, not estimated crisis dates. The ring measures elapsed calendar time from Taipei 2026-10-04, not an economic risk score. At expiry it stops at zero and requests a new review.
@@ -30,4 +36,4 @@ Update both directions and keep annual/partial periods separate. Record the snap
 
 ## Cover generation
 
-`python scripts/render-taiwan-outlook-cover.py /path/to/NotoSansTC.ttf` regenerates `cover-2026-ytd.png` using Pillow. The cover reads the same annual and partial-period evidence as the interactive charts; no annualization or trend smoothing is applied. The font is Noto Sans TC (Google Fonts / SIL Open Font License).
+`python scripts/render-taiwan-outlook-cover.py /path/to/NotoSansTC.ttf` regenerates `cover-2026-ytd.png` using Pillow. It updates only the plot region of the original 1200×630 `cover.png`: title, subtitle, editorial copy, legend, footer and all pixels outside that region remain identical. The cover reads the same annual and partial-period evidence as the interactive charts, retaining the original USD billions unit and 2016 starting year. The 2025 decline stays; the 2026 January–August observation is added with a dotted segment, diamond and period label. No annualization or smoothing is applied. The font is Noto Sans TC (Google Fonts / SIL Open Font License). Regression tests protect the original layout against unintended redesign.

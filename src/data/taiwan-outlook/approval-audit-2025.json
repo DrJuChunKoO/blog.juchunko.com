@@ -1,0 +1,45 @@
+{
+  "reviewedAt": "2026-10-05",
+  "unit": "USD thousands",
+  "basis": "MOEA approved/notified outward investment; excludes separately reported mainland China investment",
+  "releaseDate": "2026-01-15",
+  "sourceUrl": "https://mnscdn.moea.gov.tw/Mns/populace/news/EpaperDetail.aspx?volume=20260115",
+  "worksheet": "對外總表",
+  "monthly": [
+    { "month": 1, "amount": 422312.512 },
+    { "month": 2, "amount": 742315.0449 },
+    { "month": 3, "amount": 11068166.4499 },
+    { "month": 4, "amount": 1247683.88 },
+    { "month": 5, "amount": 1741601.2277 },
+    { "month": 6, "amount": 3089068.2374 },
+    { "month": 7, "amount": 1549583.1418 },
+    { "month": 8, "amount": 11590022.3261 },
+    { "month": 9, "amount": 1130044.7573 },
+    { "month": 10, "amount": 1502206.0656 },
+    { "month": 11, "amount": 2214170.0306 },
+    { "month": 12, "amount": 2135089.5962 }
+  ],
+  "identifiedCases": [
+    {
+      "date": "2025-03-26",
+      "month": 3,
+      "amount": 10000000,
+      "investor": "台積電",
+      "recipient": "TSMC GLOBAL LTD.",
+      "jurisdiction": "英屬維京群島",
+      "purpose": "降低外匯避險成本；銀行定存及債券投資孳息",
+      "sourceUrl": "https://www.moea.gov.tw/mns/populace/news/wHandNews_File.ashx?file_id=118298"
+    },
+    {
+      "date": "2025-08-27",
+      "month": 8,
+      "amount": 10000000,
+      "investor": "台積電",
+      "recipient": "TSMC GLOBAL LTD.",
+      "jurisdiction": "英屬維京群島",
+      "purpose": "降低外匯避險成本；銀行定存及債券投資孳息",
+      "sourceUrl": "https://www.moea.gov.tw/MNS/populace/news/wHandNews_File.ashx?file_id=121078"
+    }
+  ],
+  "limitations": "Only these two identified cases are decomposed. Other amounts may also include financial purposes, holding-company investment and acquisitions. The remainder is not a measure of factory construction, cash outflow or transferred capacity. Approval timing is not the investment decision or execution date."
+}

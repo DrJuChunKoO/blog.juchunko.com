@@ -1,5 +1,6 @@
 import { useEffect, useState, type ReactNode } from "react";
 import evidence from "../../data/taiwan-outlook/evidence.json";
+import approvalAudit from "../../data/taiwan-outlook/approval-audit-2025.json";
 import {
   capabilityShare,
   countdownParts,
@@ -513,8 +514,9 @@ const indicators = [
     name: "資金",
     state: "流向變化已見",
     fact: "2025 年直接投資淨流出 343.44 億美元；2023 年為 182.59 億。",
-    meaning: "資本布局值得追查；總額本身不能說明半導體外移了多少。",
-    action: "按產業、最終用途、股權／債務／再投資拆分，接上境內資本支出。",
+    meaning: "總額不能量出產能外移；另列的核准統計還含大額財務避險增資。",
+    action:
+      "先分開核准與實際交易，再按最終用途拆分財務配置、併購與建廠，接上境內資本支出。",
     sources: ["C1", "C2"],
   },
   {
@@ -766,7 +768,7 @@ export function CapitalFlows() {
             ? "JETRO 國際收支淨流量・曆年・負的外來投資代表撤資淨額。"
             : basis === 0
               ? "中央銀行・2015–2025 全年＋2026 年 1–6 月累計・含盈餘再投資與關係企業債務，並非全部現金匯出。"
-              : "經濟部核准金額・2015–2025 全年＋2026 年 1–8 月累計・不含另表對中國大陸投資與陸資來台；不是實際執行額。"}
+              : "經濟部核准金額・2015–2025 全年＋2026 年 1–8 月累計・不含另表對中國大陸投資與陸資來台。包含財務避險、控股與併購等用途；不是實際執行額，也不是產能移轉量。"}
       </p>
       <LineChart
         data={data}
@@ -870,6 +872,83 @@ export function CapitalFlows() {
         核准對外較 2024 全年減少 14.47%，與 2026
         前八月已超過兩個全年，可以同時成立。
       </p>
+      {mode === 0 && basis === 1 && (
+        <>
+          <p className="to-note">
+            2025 年包含台積電兩筆 TSMC Global 增資，合計 200 億美元，約占全年
+            52%；官方用途為外匯避險與定存、債券孳息，不能視為海外建廠。
+            年度下降也不能單憑時間先後歸因於關稅觀望。
+          </p>
+          <details id="approval-audit-2025">
+            <summary>拆開 2025：每月核准額與兩筆已識別的財務用途增資</summary>
+            <p className="to-note">
+              單位：億美元。第三欄只列本次查明的兩筆 TSMC Global
+              增資；「—」不是該月沒有其他財務用途投資。核准月份不等於決策或執行月份。
+            </p>
+            <div className="to-table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>2025 月份</th>
+                    <th>核准總額</th>
+                    <th>其中兩筆增資</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {approvalAudit.monthly.map((row) => {
+                    const known = approvalAudit.identifiedCases.find(
+                      (item) => item.month === row.month,
+                    );
+                    return (
+                      <tr key={row.month}>
+                        <td>{row.month} 月</td>
+                        <td>{n(row.amount / 100000)}</td>
+                        <td>
+                          {known ? (
+                            <a href={known.sourceUrl}>
+                              {n(known.amount / 100000)}
+                            </a>
+                          ) : (
+                            "—"
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+                <tfoot>
+                  <tr>
+                    <th>全年</th>
+                    <td>
+                      {n(
+                        approvalAudit.monthly.reduce(
+                          (sum, row) => sum + row.amount,
+                          0,
+                        ) / 100000,
+                      )}
+                    </td>
+                    <td>
+                      {n(
+                        approvalAudit.identifiedCases.reduce(
+                          (sum, row) => sum + row.amount,
+                          0,
+                        ) / 100000,
+                      )}
+                    </td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+            <p className="to-note">
+              3 月 110.68 億扣除該筆 100 億後為 10.68 億，4 月總額則為 12.48
+              億。
+              這只說明大案會改變曲線形狀；其餘金額仍可能包含其他財務用途，不能直接稱為實體投資。
+              <a href={approvalAudit.sourceUrl}>經濟部 2025 年 12 月統計速報</a>
+              （2026-01-15 發布；對外總表）。
+            </p>
+          </details>
+        </>
+      )}
     </Panel>
   );
 }

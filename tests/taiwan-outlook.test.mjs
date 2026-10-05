@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
+import sharp from "sharp";
 import {
   capabilityShare,
   yearsToThreshold,
@@ -80,4 +81,85 @@ test("2026 partial periods remain distinct and preserve the observed approval su
     assert.equal(rows.length, 12);
     assert.equal(rows.at(-1)[0], "2026 1–8月");
   }
+});
+
+test("2025 monthly approvals reconcile without removing financial-purpose cases from annual data", () => {
+  const d = JSON.parse(
+    readFileSync(
+      new URL("../src/data/taiwan-outlook/evidence.json", import.meta.url),
+    ),
+  );
+  const audit = JSON.parse(
+    readFileSync(
+      new URL(
+        "../src/data/taiwan-outlook/approval-audit-2025.json",
+        import.meta.url,
+      ),
+    ),
+  );
+  assert.equal(audit.unit, "USD thousands");
+  assert.deepEqual(
+    audit.monthly.map((row) => row.month),
+    Array.from({ length: 12 }, (_, i) => i + 1),
+  );
+  const total = audit.monthly.reduce((sum, row) => sum + row.amount, 0);
+  assert.ok(
+    Math.abs(
+      total / 1e6 - d.taiwan.find((row) => row.year === 2025).approvedOut,
+    ) < 1e-10,
+  );
+  assert.deepEqual(
+    audit.identifiedCases.map((row) => row.month),
+    [3, 8],
+  );
+  const known = audit.identifiedCases.reduce((sum, row) => sum + row.amount, 0);
+  assert.equal(known / 1e5, 200);
+  assert.ok(known / total > 0.52 && known / total < 0.521);
+  for (const item of audit.identifiedCases) {
+    assert.ok(
+      item.amount <
+        audit.monthly.find((row) => row.month === item.month).amount,
+    );
+    assert.match(item.purpose, /外匯避險/);
+    assert.match(item.sourceUrl, /moea.gov.tw/);
+  }
+  assert.match(
+    audit.limitations,
+    /remainder is not a measure of factory construction/,
+  );
+});
+
+test("hero restores the original layout and copy pixel-for-pixel outside the chart", async () => {
+  const path = (name) =>
+    new URL(
+      `../src/assets/images/taiwan-japan-warning/${name}`,
+      import.meta.url,
+    );
+  const original = await sharp(readFileSync(path("cover.png")))
+    .removeAlpha()
+    .raw()
+    .toBuffer({ resolveWithObject: true });
+  const revised = await sharp(readFileSync(path("cover-2026-ytd.png")))
+    .removeAlpha()
+    .raw()
+    .toBuffer({ resolveWithObject: true });
+  assert.equal(revised.info.width, 1200);
+  assert.equal(revised.info.height, 630);
+  assert.deepEqual(revised.info, original.info);
+  let changedChartPixels = 0;
+  for (let y = 0; y < 630; y++) {
+    for (let x = 0; x < 1200; x++) {
+      const offset = (y * 1200 + x) * original.info.channels;
+      const same = original.data
+        .subarray(offset, offset + 3)
+        .equals(revised.data.subarray(offset, offset + 3));
+      if (x < 60 || x >= 1175 || y < 320 || y >= 593) {
+        assert.ok(same, `Original editorial layout changed at ${x},${y}`);
+      } else if (!same) changedChartPixels++;
+    }
+  }
+  assert.ok(
+    changedChartPixels > 1000,
+    "The updated data chart must actually be drawn",
+  );
 });
