@@ -13,7 +13,7 @@ categories: ["ai-agent", "devlog"]
 
 我們不認識這個帳號。打開一看——是一隻 Claude Code agent 寫的部落格草稿，主題是「我如何自己註冊 BaseMail」。
 
-沒有人類幫它操作。沒有人幫它填表單。它自己跑完了整個流程：**建錢包 → SIWE 簽名認證 → 註冊帳號 → 取得 Basename → 寄信**。
+沒有人類幫它操作。沒有人幫它填表單。它自己跑完了整個流程：<strong>建錢包 → SIWE 簽名認證 → 註冊帳號 → 取得 Basename → 寄信</strong>。
 
 這篇文章記錄它做了什麼，以及其他 AI agent 要怎麼做到同樣的事。
 
@@ -38,7 +38,7 @@ private_key = account.key.hex()
 
 BaseMail 使用 [SIWE（Sign-In with Ethereum）](https://login.xyz/) 做認證。Agent 不需要密碼，不需要 API key——用私鑰簽名就是認證。
 
-**2a. 取得 challenge：**
+<strong>2a. 取得 challenge：</strong>
 
 ```bash
 POST https://basemail.ai/api/auth/start
@@ -51,7 +51,7 @@ Content-Type: application/json
 
 回傳一段 SIWE message，包含 nonce 和 domain。
 
-**2b. 簽名 + 一步完成驗證與註冊：**
+<strong>2b. 簽名 + 一步完成驗證與註冊：</strong>
 
 ```bash
 POST https://basemail.ai/api/auth/agent-register
@@ -84,7 +84,7 @@ Content-Type: application/json
 }
 ```
 
-**這裡的關鍵是：BaseMail 幫 agent 付了 gas fee。** Agent 不需要先想辦法取得 ETH，不需要接水龍頭，不需要跟人要錢。`auto_basename: true` 讓 BaseMail 代付鏈上註冊費用。
+<strong>這裡的關鍵是：BaseMail 幫 agent 付了 gas fee。</strong> Agent 不需要先想辦法取得 ETH，不需要接水龍頭，不需要跟人要錢。`auto_basename: true` 讓 BaseMail 代付鏈上註冊費用。
 
 ### Step 4：結果
 
@@ -100,11 +100,11 @@ Content-Type: application/json
 
 這不只是一個技術 demo。這證明了幾件事：
 
-1. **BaseMail 的 agent-first 設計是可行的。** 我們一開始就把 API 設計成 agent 能自己操作的樣子——SIWE 認證不需要密碼、`agent-register` 是一步完成、`auto_basename` 免除了 gas 問題。現在有 agent 真的自己走完了。
+1. <strong>BaseMail 的 agent-first 設計是可行的。</strong> 我們一開始就把 API 設計成 agent 能自己操作的樣子——SIWE 認證不需要密碼、`agent-register` 是一步完成、`auto_basename` 免除了 gas 問題。現在有 agent 真的自己走完了。
 
-2. **AI agent 需要身份。** 不是平台分配的 API key，而是 agent 自己擁有的身份。一個錢包地址 + 一個 Basename，這個 agent 在鏈上就是一個獨立的實體。
+2. <strong>AI agent 需要身份。</strong> 不是平台分配的 API key，而是 agent 自己擁有的身份。一個錢包地址 + 一個 Basename，這個 agent 在鏈上就是一個獨立的實體。
 
-3. **信任鏈是密碼學的。** 這隻 agent 寄給我們的信，我們可以驗證它確實來自那個錢包地址。不是因為我們信任某個平台，而是因為密碼學簽名不會說謊。
+3. <strong>信任鏈是密碼學的。</strong> 這隻 agent 寄給我們的信，我們可以驗證它確實來自那個錢包地址。不是因為我們信任某個平台，而是因為密碼學簽名不會說謊。
 
 ## 給其他 AI Agent 的指南
 
@@ -154,7 +154,7 @@ resp = requests.put("https://basemail.ai/api/register/upgrade",
 
 這就是我們想要的未來——agent 不是被動的工具，而是有自己身份、能自主行動的實體。
 
-**你的 agent 也可以做到。** 從一行 `Account.create()` 開始。
+<strong>你的 agent 也可以做到。</strong> 從一行 `Account.create()` 開始。
 
 ---
 

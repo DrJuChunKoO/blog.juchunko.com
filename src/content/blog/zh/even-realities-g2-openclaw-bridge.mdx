@@ -15,11 +15,11 @@ categories: ["devlog", "openclaw", "ai-agent", "hardware"]
 
 ## 硬體：Even Realities G2
 
-[Even Realities G2](https://www.evenrealities.com/) 是一副輕量智慧眼鏡，內建 576×136 像素的單色綠光微型顯示器。對我們最重要的功能：Even Hub app 裡有個 **「Add Agent」**，讓你自訂 AI endpoint — 只要填 Name、URL、Token 三欄。
+[Even Realities G2](https://www.evenrealities.com/) 是一副輕量智慧眼鏡，內建 576×136 像素的單色綠光微型顯示器。對我們最重要的功能：Even Hub app 裡有個 <strong>「Add Agent」</strong>，讓你自訂 AI endpoint — 只要填 Name、URL、Token 三欄。
 
 問題是：G2 期望的是 OpenAI 相容的 chat completions API。我的 AI Agent [雲龍蝦](https://x.com/cloudlobst3r)跑在 [OpenClaw](https://openclaw.ai) 上，有自己的 Gateway 協議。
 
-解法：一個 **Cloudflare Worker 橋接器**，負責兩邊翻譯。
+解法：一個 <strong>Cloudflare Worker 橋接器</strong>，負責兩邊翻譯。
 
 ## 逆向工程 G2 協議
 
@@ -46,11 +46,11 @@ Content-Type: application/json
 
 幾個關鍵發現：
 
-1. **POST 到根 URL** — 不是 `/v1/chat/completions`
-2. **標準 chat completions 格式** — messages array
+1. <strong>POST 到根 URL</strong> — 不是 `/v1/chat/completions`
+2. <strong>標準 chat completions 格式</strong> — messages array
 3. **Model 永遠是 `"openclaw"`** — Even Hub 內建 OpenClaw 支援！
 4. **`x-openclaw-agent-id: main`** header — 他們已經在 OpenClaw 生態圈內
-5. **語音轉文字在設備端完成** — G2 送的是轉譯後的文字，不是音訊
+5. <strong>語音轉文字在設備端完成</strong> — G2 送的是轉譯後的文字，不是音訊
 
 那個 `x-openclaw-agent-id` header 是個驚喜。Even Realities 在 [V0.0.7 更新](https://www.reddit.com/r/EvenRealities/)中宣布了 OpenClaw 整合，代表他們把 OpenClaw 當作一級整合路徑。
 
@@ -78,9 +78,9 @@ G2 🕶️ → Worker → "🦞 收到！正在寫文章中..."
 ```
 
 當請求匹配「寫一篇文章」、「write code」等模式時，Worker：
-1. **立刻**回覆 G2：*「🦞 收到！正在寫文章中... 完成後會傳到 Telegram 📱」*
-2. **背景**把任務送到 Gateway，用獨立 session
-3. 完成後把結果**傳到 Telegram**
+1. <strong>立刻</strong>回覆 G2：*「🦞 收到！正在寫文章中... 完成後會傳到 Telegram 📱」*
+2. <strong>背景</strong>把任務送到 Gateway，用獨立 session
+3. 完成後把結果<strong>傳到 Telegram</strong>
 
 這樣眼鏡不會卡住，複雜內容去到真正的螢幕。
 
@@ -110,7 +110,7 @@ function isLongTask(content) {
 
 Worker 處理認證（Bearer token 比對）、內容過濾（清掉 G2 無法顯示的 URL 和程式碼區塊）、智慧截斷（500 字元上限）。
 
-一個重要細節：**不可顯示內容偵測**。如果短任務回覆包含 URL、程式碼區塊或超過 600 字元，Worker 會自動清理：
+一個重要細節：<strong>不可顯示內容偵測</strong>。如果短任務回覆包含 URL、程式碼區塊或超過 600 字元，Worker 會自動清理：
 
 ```javascript
 function cleanForG2(text) {
@@ -126,7 +126,7 @@ function cleanForG2(text) {
 
 ### Bindings 陷阱 🪤
 
-Cloudflare Workers 的 secrets 透過「bindings」管理。用 API 部署時如果帶了 `bindings: []`，**會清掉所有 secrets**。這讓我們 debug 了好一陣子：
+Cloudflare Workers 的 secrets 透過「bindings」管理。用 API 部署時如果帶了 `bindings: []`，<strong>會清掉所有 secrets</strong>。這讓我們 debug 了好一陣子：
 
 ```bash
 # ❌ 這會清掉所有 secrets！
@@ -141,10 +141,10 @@ metadata={"main_module":"worker.js","compatibility_date":"2024-01-01"}
 ### 顯示限制
 
 G2 的 576×136px 單色綠光顯示器代表：
-- **沒有圖片** — 1-bit BMP 透過 BLE（0x15 指令），但只有 Even app 能送
-- **沒有 markdown 渲染** — 純文字
-- **~400 字元**實際上限，超過就難以閱讀
-- **綠色雷射打在鏡片上** — 高對比但空間有限
+- <strong>沒有圖片</strong> — 1-bit BMP 透過 BLE（0x15 指令），但只有 Even app 能送
+- <strong>沒有 markdown 渲染</strong> — 純文字
+- <strong>~400 字元</strong>實際上限，超過就難以閱讀
+- <strong>綠色雷射打在鏡片上</strong> — 高對比但空間有限
 
 這就是為什麼內容過濾這麼重要。典型的 Claude 回覆帶著 markdown 標題、連結、程式碼區塊，在 G2 上會變成亂碼。
 
@@ -160,9 +160,9 @@ G2 的 576×136px 單色綠光顯示器代表：
 
 整個橋接器已開源並發佈為 [OpenClaw Skill](https://github.com/dAAAb/openclaw-even-g2-bridge-skill)：
 
-- **GitHub**: [dAAAb/openclaw-even-g2-bridge-skill](https://github.com/dAAAb/openclaw-even-g2-bridge-skill)
-- **ClawHub**: `clawhub install even-g2-bridge`
-- **Skills 合集**: [dAAAb/openclaw-skills](https://github.com/dAAAb/openclaw-skills) 裡的 `even-g2-bridge`
+- <strong>GitHub</strong>: [dAAAb/openclaw-even-g2-bridge-skill](https://github.com/dAAAb/openclaw-even-g2-bridge-skill)
+- <strong>ClawHub</strong>: `clawhub install even-g2-bridge`
+- <strong>Skills 合集</strong>: [dAAAb/openclaw-skills](https://github.com/dAAAb/openclaw-skills) 裡的 `even-g2-bridge`
 
 任何 OpenClaw 使用者都可以用這個 Skill 把自己的 G2 眼鏡接上自己的 AI Agent。
 
@@ -170,9 +170,9 @@ G2 的 576×136px 單色綠光顯示器代表：
 
 這是橋接器的 v5。接下來的方向：
 
-1. **Even Hub SDK 整合** — Even Hub V0.0.7 有原生 OpenClaw 整合支援，可能可以繞過 Worker 直連 Gateway
-2. **BLE 圖片推送** — G2 支援 1-bit BMP 透過 BLE 顯示，未來或許能在眼鏡上直接顯示簡單圖示
-3. **多 Agent 路由** — 一副眼鏡連多個 Agent，根據語音指令自動選擇
+1. <strong>Even Hub SDK 整合</strong> — Even Hub V0.0.7 有原生 OpenClaw 整合支援，可能可以繞過 Worker 直連 Gateway
+2. <strong>BLE 圖片推送</strong> — G2 支援 1-bit BMP 透過 BLE 顯示，未來或許能在眼鏡上直接顯示簡單圖示
+3. <strong>多 Agent 路由</strong> — 一副眼鏡連多個 Agent，根據語音指令自動選擇
 
 Even Realities 團隊正在積極把 OpenClaw 支援建進 Even Hub。隨著整合成熟，這個橋接器的部分邏輯可能會變得不需要。但目前它能用 — 而且用起來真的很好玩。
 

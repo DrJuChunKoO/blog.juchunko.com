@@ -45,10 +45,10 @@ categories: ["devlog"]
 
 製作短影片內容時，我需要：
 
-1. **AI 數位人**：不用每次都拍攝，用 HeyGen 生成
-2. **自動字幕**：短影片必備，手動加太慢
-3. **正確的中文辨識**：特別是人名，AI 常常辨識錯誤
-4. **動態特效**：Hormozi 風格的 highlight + emoji 字幕
+1. <strong>AI 數位人</strong>：不用每次都拍攝，用 HeyGen 生成
+2. <strong>自動字幕</strong>：短影片必備，手動加太慢
+3. <strong>正確的中文辨識</strong>：特別是人名，AI 常常辨識錯誤
+4. <strong>動態特效</strong>：Hormozi 風格的 highlight + emoji 字幕
 
 單一工具都做不到完美，但組合起來就很強大。
 
@@ -138,8 +138,8 @@ curl "https://api.zapcap.ai/videos/{videoId}/task/{taskId}" \
 
 | 模板名稱 | Template ID | 風格 |
 |---------|-------------|------|
-| **Hormozi 1** | `a51c5222-47a7-4c37-b052-7b9853d66bf6` | animated + highlighted |
-| **Beast** | `46d20d67-255c-4c6a-b971-31fddcfea7f0` | animated + highlighted |
+| <strong>Hormozi 1</strong> | `a51c5222-47a7-4c37-b052-7b9853d66bf6` | animated + highlighted |
+| <strong>Beast</strong> | `46d20d67-255c-4c6a-b971-31fddcfea7f0` | animated + highlighted |
 
 ---
 
@@ -168,7 +168,7 @@ curl "https://api.zapcap.ai/videos/{videoId}/task/{taskId}" \
 |------|------|----------|
 | 30-40 | 上方 | 人物在下半部 |
 | 50 | 中間 | 預設 |
-| **70-80** | 下方 | **直式影片推薦** |
+| <strong>70-80</strong> | 下方 | <strong>直式影片推薦</strong> |
 
 ---
 
@@ -178,7 +178,7 @@ ZapCap 把「葛如鈞」辨識成「葛如君」。這在中文很常見，同�
 
 ### 嘗試一：直接修改 transcript？
 
-ZapCap API 文檔沒有提到編輯 transcript 的方法... 但實測發現有個**隱藏 API**：
+ZapCap API 文檔沒有提到編輯 transcript 的方法... 但實測發現有個<strong>隱藏 API</strong>：
 
 ```bash
 # PUT 更新 transcript（文檔沒寫！）
@@ -220,7 +220,7 @@ ZapCap 的 transcript 有 `emoji` 和 `important` 欄位：
 
 ## 終極解法：Whisper + ZapCap 組合技
 
-**核心思路**：保留 ZapCap 的 emoji 和特效，只修正錯字。
+<strong>核心思路</strong>：保留 ZapCap 的 emoji 和特效，只修正錯字。
 
 ### 完整流程
 
@@ -352,9 +352,9 @@ echo "✅ 完成！"
 
 ### Q1: HeyGen 影片有浮水印？
 
-- **免費帳號**：一定有浮水印
-- **付費帳號（Creator+）**：API 生成應該沒有浮水印
-- **如果還是有**：聯繫 HeyGen 客服確認 API 權限
+- <strong>免費帳號</strong>：一定有浮水印
+- <strong>付費帳號（Creator+）</strong>：API 生成應該沒有浮水印
+- <strong>如果還是有</strong>：聯繫 HeyGen 客服確認 API 權限
 
 ### Q2: ZapCap 轉錄品質不好？
 

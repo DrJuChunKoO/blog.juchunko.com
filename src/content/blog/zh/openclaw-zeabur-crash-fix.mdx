@@ -9,7 +9,7 @@ categories: ["devlog", "openclaw"]
 
 # 修復：OpenClaw 更新到 2026.2.23+ 在 Zeabur 崩潰的問題
 
-我們在 [Zeabur](https://zeabur.com/) 上跑 OpenClaw，最近從 **2026.2.21** 更新到 **2026.2.25**，Gateway 立刻進入崩潰重啟迴圈。以下是問題原因和解法，分享給遇到一樣狀況的人。
+我們在 [Zeabur](https://zeabur.com/) 上跑 OpenClaw，最近從 <strong>2026.2.21</strong> 更新到 <strong>2026.2.25</strong>，Gateway 立刻進入崩潰重啟迴圈。以下是問題原因和解法，分享給遇到一樣狀況的人。
 
 ## 症狀
 
@@ -26,21 +26,21 @@ to use Host-header origin fallback mode
 
 ## 原因
 
-從 **2026.2.23** 開始，OpenClaw 加入了一個**破壞性安全更新**：所有非 localhost 的部署必須在 config 裡設定 `allowedOrigins`，防止 CSRF 攻擊。
+從 <strong>2026.2.23</strong> 開始，OpenClaw 加入了一個<strong>破壞性安全更新</strong>：所有非 localhost 的部署必須在 config 裡設定 `allowedOrigins`，防止 CSRF 攻擊。
 
 如果你的 config 是 2026.2.23 之前建立的，裡面不會有這個欄位。新版啟動 → 找不到 `allowedOrigins` → 拒絕啟動 → 崩潰迴圈。
 
-這影響**所有雲端部署**：Zeabur、Railway、Fly.io、VPS 上的 Docker⋯⋯只要不是 `localhost` 都會中。
+這影響<strong>所有雲端部署</strong>：Zeabur、Railway、Fly.io、VPS 上的 Docker⋯⋯只要不是 `localhost` 都會中。
 
 ## 解法
 
 ### 最佳做法：更新前先 patch config
 
-如果你有掛載 **persistent volume**（Zeabur 預設掛載 `/home/node`），可以在舊版還在跑的時候就 patch。舊版會忽略這個新欄位，完全不受影響。
+如果你有掛載 <strong>persistent volume</strong>（Zeabur 預設掛載 `/home/node`），可以在舊版還在跑的時候就 patch。舊版會忽略這個新欄位，完全不受影響。
 
-**第一步：** 打開 Zeabur Dashboard → OpenClaw 服務 → **Web Terminal**
+<strong>第一步：</strong> 打開 Zeabur Dashboard → OpenClaw 服務 → <strong>Web Terminal</strong>
 
-**第二步：** 跑這行指令（把 `YOUR_DOMAIN` 換成你的網址）：
+<strong>第二步：</strong> 跑這行指令（把 `YOUR_DOMAIN` 換成你的網址）：
 
 ```bash
 node -e "
@@ -61,13 +61,13 @@ node -e "
 node -e "const fs=require('fs'),f='/home/node/.openclaw/openclaw.json',c=JSON.parse(fs.readFileSync(f));c.gateway=c.gateway||{};c.gateway.controlUi=c.gateway.controlUi||{};c.gateway.controlUi.allowedOrigins=['https://myagent.zeabur.app'];fs.writeFileSync(f,JSON.stringify(c,null,2));console.log('Done')"
 ```
 
-**第三步：** 更新容器映像檔。Gateway 正常啟動。✅
+<strong>第三步：</strong> 更新容器映像檔。Gateway 正常啟動。✅
 
 ### 已經在崩潰迴圈中？
 
 Volume 在崩潰之間不會被清掉。趁重啟的空檔開 Web Terminal 跑上面的指令就好。
 
-如果 Web Terminal 也進不去，**先回滾到舊版**（例如 2026.2.21），patch 完再更新。
+如果 Web Terminal 也進不去，<strong>先回滾到舊版</strong>（例如 2026.2.21），patch 完再更新。
 
 ### 沒有 Persistent Volume？
 

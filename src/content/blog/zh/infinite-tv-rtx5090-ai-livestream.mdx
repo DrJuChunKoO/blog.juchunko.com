@@ -13,9 +13,9 @@ import demoVideo from "../../../assets/images/infinite-tv-rtx5090-ai-livestream/
 
 我把 [Infinite TV](https://github.com/alex-remade/infinite-tv) 搬到 Windows + RTX 5090 的第一版，只解決了「能不能跑」與「能不能更快」。真正讓它變成一個可以長時間直播的系統，還得處理另一組更難的問題：段落怎麼無縫接續、壞畫面怎麼不污染下一段、Twitch 留言怎麼真的在觀眾端準時出現，以及怎麼確認影片運算沒有偷偷走雲端。
 
-現在的成果是：**影片由單張 RTX 5090 在本機透過 ComfyUI + LTX 2.5 NVFP4 生成**，第二段以後全部採 Image-to-Video，Twitch 串流穩定維持 9 FPS。畫面與劇情已能延續；段落交界仍偶爾有輕微動作跳動，這是下一輪要優化的地方。
+現在的成果是：<strong>影片由單張 RTX 5090 在本機透過 ComfyUI + LTX 2.5 NVFP4 生成</strong>，第二段以後全部採 Image-to-Video，Twitch 串流穩定維持 9 FPS。畫面與劇情已能延續；段落交界仍偶爾有輕微動作跳動，這是下一輪要優化的地方。
 
-> **重要校正：** 開發途中，我們確實曾測試 fal.ai 的 LTX 2.3 與 H3 Max 雲端影片路徑；prompt/vision 也曾因為機器上存在 `FAL_KEY`，被程式優先送到 fal 的 OpenRouter proxy。那段會產生 fal.ai 費用，不能稱為「全本機」。本文已把歷史測試與最終本機架構分開說明；目前本機啟動腳本會強制關閉 fal prompt 與影片路由。
+> <strong>重要校正：</strong> 開發途中，我們確實曾測試 fal.ai 的 LTX 2.3 與 H3 Max 雲端影片路徑；prompt/vision 也曾因為機器上存在 `FAL_KEY`，被程式優先送到 fal 的 OpenRouter proxy。那段會產生 fal.ai 費用，不能稱為「全本機」。本文已把歷史測試與最終本機架構分開說明；目前本機啟動腳本會強制關閉 fal prompt 與影片路由。
 
 ## Infinite TV 在做什麼？
 
@@ -69,11 +69,11 @@ import demoVideo from "../../../assets/images/infinite-tv-rtx5090-ai-livestream/
 | 指標 | 實測結果 | 說明 |
 |---|---:|---|
 | ComfyUI bridge 單段 | 約 5.1–7.1 秒 | 受是否含音訊與輸出讀取影響 |
-| 完整直播 cycle | **平均 13.53 秒** | 最近 29 段，包含 LLM、生成與 queue backpressure |
+| 完整直播 cycle | <strong>平均 13.53 秒</strong> | 最近 29 段，包含 LLM、生成與 queue backpressure |
 | 每段串流內容 | 121 幀 / 13.44 秒 | 以 9 FPS 播放 |
-| Twitch RTMP | **8.9–9.0 / 9 FPS** | 長跑維持目標速率 |
+| Twitch RTMP | <strong>8.9–9.0 / 9 FPS</strong> | 長跑維持目標速率 |
 | 一次線上快照 | 90 段、10,948 幀 | 0 dropped、0 rejected、queue 9.4 秒 |
-| 自動測試 | **14 / 14 通過** | 接縫、padding、邊框、救援、queue、字幕 |
+| 自動測試 | <strong>14 / 14 通過</strong> | 接縫、padding、邊框、救援、queue、字幕 |
 
 去噪 kernel 跑多快固然重要，但對直播來說，更誠實的數字是「從這一段開始到下一段開始」的完整週期。
 
@@ -116,7 +116,7 @@ VAE encode/decode 仍會微調第一格，所以新段第一個送流畫格會�
 5. 連續兩次仍失敗，就插入本機合成的 push-in recovery segment；
 6. recovery 不推進劇情，下一段仍執行原本的故事意圖。
 
-這保留了原版 Infinite TV 的核心精神：**輸出不能斷糧**；但不再無條件把壞畫面餵回下一代。
+這保留了原版 Infinite TV 的核心精神：<strong>輸出不能斷糧</strong>；但不再無條件把壞畫面餵回下一代。
 
 ## 為什麼 Twitch 留言曾經「有收到、畫面卻沒出現」？
 
@@ -148,11 +148,11 @@ API key 與 Twitch stream key 只放在 gitignored `.env`。模型、log、畫�
 
 ## 這次真正學到的事
 
-- **本機生成只是第一步。** 無限直播真正難的是狀態、queue 與退化控制。
-- **畫面連續、動作連續、劇情連續是三件不同的事。** 現在前兩者做到「可用」，動作接縫仍要繼續做。
-- **不要讓 API key 自動決定 provider。** 選擇會計費的服務必須是明確動作。
-- **只提交觀眾真的看到的最後一格。** 這條規則同時保住畫面與劇情。
-- **品質閘門不能只有拒絕。** 對 live system 來說，bounded recovery 比完美主義更重要。
-- **5090 的確很猛。** 但真正把它變成產品的，不只是算力，而是把所有細節接成一個可長跑的 closed loop。
+- <strong>本機生成只是第一步。</strong> 無限直播真正難的是狀態、queue 與退化控制。
+- <strong>畫面連續、動作連續、劇情連續是三件不同的事。</strong> 現在前兩者做到「可用」，動作接縫仍要繼續做。
+- <strong>不要讓 API key 自動決定 provider。</strong> 選擇會計費的服務必須是明確動作。
+- <strong>只提交觀眾真的看到的最後一格。</strong> 這條規則同時保住畫面與劇情。
+- <strong>品質閘門不能只有拒絕。</strong> 對 live system 來說，bounded recovery 比完美主義更重要。
+- <strong>5090 的確很猛。</strong> 但真正把它變成產品的，不只是算力，而是把所有細節接成一個可長跑的 closed loop。
 
 程式已開源在 [github.com/dAAAb/infinite-tv](https://github.com/dAAAb/infinite-tv)。如果你也想用一張高階消費級 GPU 做互動式生成直播，現在終於有一條可重現、預設不會誤用雲端費用的路徑了。🦐

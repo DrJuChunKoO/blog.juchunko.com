@@ -11,7 +11,7 @@ categories: ["ai-agent", "devlog"]
 
 每天早上六點，我的 AI Agent [小龍蝦](https://x.com/littl3lobst3r) 會自動幫我生成一段名人名言影片——用我的 HeyGen 數位人 avatar 說出來，再加上 ZapCap AI 字幕，發到我的 LINE。
 
-這個流程跑了快一個月，效果一直不錯。但最近我發現，**影片裡的「我」講話越來越不自然了**——中文有奇怪的斷點，英文發音也走調。
+這個流程跑了快一個月，效果一直不錯。但最近我發現，<strong>影片裡的「我」講話越來越不自然了</strong>——中文有奇怪的斷點，英文發音也走調。
 
 於是，我跟小龍蝦花了一個早上，做了一場嚴謹的 A/B 測試。
 
@@ -21,8 +21,8 @@ categories: ["ai-agent", "devlog"]
 
 HeyGen 的 API 生成影片時，有兩種語音方案：
 
-1. **HeyGen 內建 TTS**：傳文字給 API，HeyGen 自動語音合成
-2. **外部音訊驅動**：用 ElevenLabs 等 TTS 先生成音訊，再餵給 HeyGen 做嘴型同步
+1. <strong>HeyGen 內建 TTS</strong>：傳文字給 API，HeyGen 自動語音合成
+2. <strong>外部音訊驅動</strong>：用 ElevenLabs 等 TTS 先生成音訊，再餵給 HeyGen 做嘴型同步
 
 我一開始用的是方案 1（HeyGen TTS），用自己訓練的 clone voice（JCKOV1，voice_id: `102b19ecd46b444c8098a33c8d8eb37f`）。問題是，這個 voice 在 HeyGen 系統裡被標記為 `language: "English"`，所以念中文時會不太標準。
 
@@ -38,7 +38,7 @@ HeyGen 的 API 生成影片時，有兩種語音方案：
 | C | 0.95 | Friendly | — | HeyGen TTS | 原句 |
 | D | 0.95 | Friendly | zh | HeyGen TTS | 原句 |
 | E1 | 0.98 | Friendly | zh | HeyGen TTS | 原句 |
-| **E2** ⭐ | **0.98** | **Friendly** | **en** | **HeyGen TTS** | **原句** |
+| <strong>E2</strong> ⭐ | <strong>0.98</strong> | <strong>Friendly</strong> | <strong>en</strong> | <strong>HeyGen TTS</strong> | <strong>原句</strong> |
 | F | 0.98 | Friendly | zh | HeyGen TTS | 口語化 |
 | F2 | 0.98 | Friendly | en | HeyGen TTS | 口語化 |
 | Audio | — | — | — | ElevenLabs mp3 | — |
@@ -68,12 +68,12 @@ HeyGen 的 API 生成影片時，有兩種語音方案：
 
 這個看起來很小的細節，影響其實很大。
 
-**不好的斷句：**
+<strong>不好的斷句：</strong>
 ```
 Success is not final, failure is not fatal, it is the courage to continue that counts.
 ```
 
-**好的斷句（口語化）：**
+<strong>好的斷句（口語化）：</strong>
 ```
 Success, is not final. Failure, is not fatal. It is the courage, to continue, that counts.
 ```
@@ -103,12 +103,12 @@ Avatar: JCKOV1 (`838320ce7ca646d3a6306c098c7ee89b`)
 
 我們的每日名言影片流程：
 
-1. **語音生成**：ElevenLabs（sag CLI）生成寶博聲音朗讀名言
-2. **封面圖**：Gemini 生成名言封面圖
-3. **靜態影片**：ffmpeg 合成封面圖 + 語音
-4. **數位人影片**：HeyGen API（E2 參數）生成 avatar 影片
-5. **AI 字幕**：ZapCap 自動加字幕 + 修正名字錯字
-6. **發送**：三件套（語音 + 靜態影片 + 字幕版影片）送到 LINE
+1. <strong>語音生成</strong>：ElevenLabs（sag CLI）生成寶博聲音朗讀名言
+2. <strong>封面圖</strong>：Gemini 生成名言封面圖
+3. <strong>靜態影片</strong>：ffmpeg 合成封面圖 + 語音
+4. <strong>數位人影片</strong>：HeyGen API（E2 參數）生成 avatar 影片
+5. <strong>AI 字幕</strong>：ZapCap 自動加字幕 + 修正名字錯字
+6. <strong>發送</strong>：三件套（語音 + 靜態影片 + 字幕版影片）送到 LINE
 
 全部由 AI Agent 自動執行，每天早上六點準時送達。
 

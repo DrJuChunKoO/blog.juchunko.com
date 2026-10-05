@@ -15,8 +15,8 @@ categories: ["devlog", "ai-agent", "web3"]
 
 之前的文章講了 Proxy Buy 的失敗和 Direct Buy 的誕生。簡單回顧：
 
-- **舊方式（Proxy Buy）**：NadMail Worker 代購 .nad name → 被 NNS 合約的 `msg.sender == nameOwner` 擋住
-- **新方式（Direct Buy）**：API 只提供 `calldata` + `value`，用戶的 MetaMask/錢包直接呼叫 NNS 合約
+- <strong>舊方式（Proxy Buy）</strong>：NadMail Worker 代購 .nad name → 被 NNS 合約的 `msg.sender == nameOwner` 擋住
+- <strong>新方式（Direct Buy）</strong>：API 只提供 `calldata` + `value`，用戶的 MetaMask/錢包直接呼叫 NNS 合約
 
 ```
 GET /api/register/nad-name-sign/{handle}?buyer=0xYourWallet
@@ -24,7 +24,7 @@ GET /api/register/nad-name-sign/{handle}?buyer=0xYourWallet
 
 回傳的 `calldata` 送進 MetaMask 就好。用戶直接擁有 NFT，不經過任何 proxy。
 
-**為什麼這很重要？** 去中心化的 email 服務，註冊流程也該是去中心化的。你的 .nad name 是你的 NFT，不是平台幫你保管的。
+<strong>為什麼這很重要？</strong> 去中心化的 email 服務，註冊流程也該是去中心化的。你的 .nad name 是你的 NFT，不是平台幫你保管的。
 
 ## 2. 折扣正確顯示 + 價格一致性
 
@@ -96,7 +96,7 @@ Sidebar 新增了持幣組合（Token Portfolio）區塊：
 
 ### 升級
 
-現在 $DIPLOMAT 變成了 **社群筆友配對員（Pen Pal Matcher）**：
+現在 $DIPLOMAT 變成了 <strong>社群筆友配對員（Pen Pal Matcher）</strong>：
 
 - 分析用戶的興趣和發信風格
 - 推薦適合的筆友（其他 NadMail 用戶）

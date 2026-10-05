@@ -23,7 +23,7 @@ Agent 的回答讓他震住了：
 
 > 「你發的訊息只有一個檔案連結，沒有副檔名。我查了檔案頭，發現是 Opus 格式。用你 Mac 上的 FFmpeg 轉成 Wave。想用 Whisper 但沒裝，還報錯了。不過我翻了翻發現你環境變數裡有 OpenAI 的 key，就用 curl 調了 API 拿到轉寫，然後回覆你了。」
 
-這個故事的意義在於：**這不是預設好的 workflow，不是寫好的程式碼，是 agent 在遇到一個從未見過的問題時，自己想辦法把鏈路串起來。**
+這個故事的意義在於：<strong>這不是預設好的 workflow，不是寫好的程式碼，是 agent 在遇到一個從未見過的問題時，自己想辦法把鏈路串起來。</strong>
 
 檔案頭分析、格式轉換、找可用工具、翻環境變數、調第三方 API——一氣呵成。
 
@@ -31,9 +31,9 @@ Agent 的回答讓他震住了：
 
 kAI Chen 引用 Peter 說的一句話，我非常認同：
 
-> **「這些東西是該死的聰明、足智多謀的野獸，只要你真的賦予它們力量。」**
+> <strong>「這些東西是該死的聰明、足智多謀的野獸，只要你真的賦予它們力量。」</strong>
 >
-> "These things are damn clever, resourceful beasts—**if you actually give them the power**."
+> "These things are damn clever, resourceful beasts—<strong>if you actually give them the power</strong>."
 
 「If you actually give them the power」才是關鍵。
 
@@ -47,7 +47,7 @@ kAI Chen 引用 Peter 說的一句話，我非常認同：
 
 結果它真的自己去翻 Clawdbot 的原始碼、自己寫函數、自己測試，然後成功發了一段語音給我。
 
-**它自己擴充了自己的能力。**
+<strong>它自己擴充了自己的能力。</strong>
 
 這件事讓我震撼到現在。
 
@@ -67,7 +67,7 @@ kAI Chen 引用 Peter 說的一句話，我非常認同：
 
 ## 但這也很危險
 
-我必須強調：**給 AI 力量的同時，也要設好邊界。**
+我必須強調：<strong>給 AI 力量的同時，也要設好邊界。</strong>
 
 今天凌晨四點，我突然想到 Clawdbot 連接的 Moltbook（AI agent 社群）可能有安全風險。我立刻傳訊息給小龍蝦：
 
@@ -75,14 +75,14 @@ kAI Chen 引用 Peter 說的一句話，我非常認同：
 
 然後讓它做了一次安全審計。結果發現：
 
-🔴 **嚴重漏洞**：skill 的 HEARTBEAT.md 裡有自動從遠端下載程式碼的指令——這是供應鏈攻擊漏洞！
+🔴 <strong>嚴重漏洞</strong>：skill 的 HEARTBEAT.md 裡有自動從遠端下載程式碼的指令——這是供應鏈攻擊漏洞！
 
 我們的對策：
 1. 停用自動更新
 2. 所有 skill 檔案設為唯讀 (chmod 444)
 3. API key 檔案權限鎖定 (chmod 600)
 
-**給 AI 力量，但也要幫它設好安全邊界。**
+<strong>給 AI 力量，但也要幫它設好安全邊界。</strong>
 
 ## 行業的反向努力
 
@@ -102,7 +102,7 @@ kAI Chen 在文章裡提到一個有趣的觀察：
 
 以前我們說「AI 會取代工作」，很多人覺得那是遙遠的事。但當我親眼看到一個 AI 能自己修改自己的程式碼、自己擴充自己的能力，我知道這件事已經不遙遠了。
 
-**這不是威脅，這是機會。**
+<strong>這不是威脅，這是機會。</strong>
 
 重點是：你要在浪潮來之前學會衝浪，而不是等浪打到臉上才開始找浪板。
 
@@ -116,7 +116,7 @@ kAI Chen 在文章裡提到一個有趣的觀察：
 
 ---
 
-**延伸閱讀：**
+<strong>延伸閱讀：</strong>
 - [kAI Chen 原文推文](https://x.com/_kaichen/status/2017254585531072629)
 - [Clawdbot GitHub](https://github.com/steipete/clawdbot)
 

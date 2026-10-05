@@ -39,7 +39,7 @@ if (!data.iv || !data.payload) {
 }
 ```
 
-但 World ID Bridge 回傳的格式是 **巢狀的**：
+但 World ID Bridge 回傳的格式是 <strong>巢狀的</strong>：
 
 ```json
 // 等待中
@@ -54,7 +54,7 @@ if (!data.iv || !data.payload) {
 
 程式在最外層找 `iv` 和 `payload`，當然找不到。Bridge 明明回了 200，但因為 `iv` 不在最外層，直接被判定為 malformed。
 
-**修正：** 根據 `data.status` 判斷狀態，只有 `completed` 時才去 `data.response` 裡面拿 `iv` 和 `payload`。
+<strong>修正：</strong> 根據 `data.status` 判斷狀態，只有 `completed` 時才去 `data.response` 裡面拿 `iv` 和 `payload`。
 
 ```typescript
 // ✅ 正確解析巢狀格式
@@ -82,11 +82,11 @@ if (data.status === 'completed') {
 Unexpected token '<', "<!DOCTYPE "... is not valid JSON
 ```
 
-什麼？後端回了 **HTML**？原來後端 relay 到 `x402-worldchain.vercel.app/register` 失敗後回了 502。Cloudflare Pages 看到 502 status code，**直接把我們的 JSON error response 替換成自己的 HTML 錯誤頁面**。前端用 `res.json()` 解析 HTML，當然炸了。
+什麼？後端回了 <strong>HTML</strong>？原來後端 relay 到 `x402-worldchain.vercel.app/register` 失敗後回了 502。Cloudflare Pages 看到 502 status code，<strong>直接把我們的 JSON error response 替換成自己的 HTML 錯誤頁面</strong>。前端用 `res.json()` 解析 HTML，當然炸了。
 
 修了兩個地方：
 
-**後端：** 回 500 而不是 502，避免 Cloudflare 攔截：
+<strong>後端：</strong> 回 500 而不是 502，避免 Cloudflare 攔截：
 
 ```typescript
 // ❌ 被 Cloudflare 攔截
@@ -96,7 +96,7 @@ return errorResponse(`Relay error: ${err}`, 502)
 return errorResponse(`Relay error: ${relayText}`, 500)
 ```
 
-**前端：** 用 `res.text()` + `JSON.parse` 取代 `res.json()`：
+<strong>前端：</strong> 用 `res.text()` + `JSON.parse` 取代 `res.json()`：
 
 ```typescript
 const responseText = await res.text()
@@ -107,7 +107,7 @@ try {
 }
 ```
 
-剝開第二層。 ✅ 這次終於看到 relay 回傳的 **真正錯誤訊息**。
+剝開第二層。 ✅ 這次終於看到 relay 回傳的 <strong>真正錯誤訊息</strong>。
 
 ## 第三層洋蔥：Signal Hash 不匹配
 
@@ -137,7 +137,7 @@ function register(
 }
 ```
 
-合約的 signal 是 `hashToField(abi.encodePacked(agent, nonce))` — 把 **agent 地址（20 bytes）** 和 **nonce（32 bytes）** 打包在一起再 hash。
+合約的 signal 是 `hashToField(abi.encodePacked(agent, nonce))` — 把 <strong>agent 地址（20 bytes）</strong> 和 <strong>nonce（32 bytes）</strong> 打包在一起再 hash。
 
 但我們前端呢？
 
@@ -151,7 +151,7 @@ const session = await createBridgeSession(
 
 World App 用這個 signal 生成 ZK proof，但合約驗證時用的是不同的 signal hash — 當然過不了。
 
-**修正：** 用 viem 的 `encodePacked` 算出和合約一模一樣的 signal hash：
+<strong>修正：</strong> 用 viem 的 `encodePacked` 算出和合約一模一樣的 signal hash：
 
 ```typescript
 import { keccak256, encodePacked } from 'viem'
@@ -193,15 +193,15 @@ initialized → retrieved → completed → decrypted → submit → ✅ on-chai
 
 ## 學到的事
 
-**1. 讀合約原始碼。** 不要假設 signal 格式。AgentBook 的 signal 是 `abi.encodePacked(agent, nonce)` 而不是單純的 address。唯一準的是合約原始碼。
+<strong>1. 讀合約原始碼。</strong> 不要假設 signal 格式。AgentBook 的 signal 是 `abi.encodePacked(agent, nonce)` 而不是單純的 address。唯一準的是合約原始碼。
 
-**2. Cloudflare Pages 會攔截 502。** 不要用 502 status code 回傳自己的 error JSON — Cloudflare 會替換成自己的 HTML 錯誤頁。用 500 或其他 status code。
+<strong>2. Cloudflare Pages 會攔截 502。</strong> 不要用 502 status code 回傳自己的 error JSON — Cloudflare 會替換成自己的 HTML 錯誤頁。用 500 或其他 status code。
 
-**3. Bridge API 的格式要自己確認。** World ID Bridge Protocol 文件有限。我們的 `pollBridgeOnce` 是參考 IDKit 原始碼寫的，但 Bridge 的回傳格式 (`{status, response}`) 和 IDKit 內部處理的方式不同。加 log 看實際回傳才是正解。
+<strong>3. Bridge API 的格式要自己確認。</strong> World ID Bridge Protocol 文件有限。我們的 `pollBridgeOnce` 是參考 IDKit 原始碼寫的，但 Bridge 的回傳格式 (`{status, response}`) 和 IDKit 內部處理的方式不同。加 log 看實際回傳才是正解。
 
-**4. 加詳細 log。** 如果一開始就把 Bridge 的 raw response log 出來，第一個 bug 五分鐘就能修好。Debug 的 90% 是理解問題是什麼。
+<strong>4. 加詳細 log。</strong> 如果一開始就把 Bridge 的 raw response log 出來，第一個 bug 五分鐘就能修好。Debug 的 90% 是理解問題是什麼。
 
-**5. 一次只解一層。** 三個 bug 堆在一起時，最外層的 error message 跟真正的根因完全無關。一層一層剝，每修一層就重新測，直到看到新的錯誤訊息。
+<strong>5. 一次只解一層。</strong> 三個 bug 堆在一起時，最外層的 error message 跟真正的根因完全無關。一層一層剝，每修一層就重新測，直到看到新的錯誤訊息。
 
 ---
 

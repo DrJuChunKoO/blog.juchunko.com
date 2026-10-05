@@ -15,17 +15,17 @@ categories: ["web3", "policy-analysis"]
 
 2004 年，Bill Gates 在達沃斯預言垃圾信將在兩年內消失。經濟學家們提出了「電子郵票」——寄件人為每封信支付一小筆 bond，收件人收到垃圾信可以沒收，收到好信則退還。理論優雅，但基礎設施為零。
 
-同一時期，機制設計學者正在發展**二次方投票**（Quadratic Voting, QV）——投票應該有成本，且成本呈二次方增長，讓真正在乎的人才會投入。
+同一時期，機制設計學者正在發展<strong>二次方投票</strong>（Quadratic Voting, QV）——投票應該有成本，且成本呈二次方增長，讓真正在乎的人才會投入。
 
 沒有人把這兩件事連在一起。直到現在。
 
 ## 論文的三個論點
 
-**1. 注意力債券 ≈ 通訊版的二次方投票**
+<strong>1. 注意力債券 ≈ 通訊版的二次方投票</strong>
 
 對同一個人連續寄信，成本應該遞增——就像在 QV 中多投票一樣。我們形式化了這個對應關係，並引入可調參數 β 控制注意力市場的「保護程度」。
 
-**2. 二次方注意力資助（QAF）— 全新概念**
+<strong>2. 二次方注意力資助（QAF）— 全新概念</strong>
 
 將 Vitalik Buterin、Zoë Hitzig 和 Glen Weyl 的二次方資助（Quadratic Funding）延伸到 email：
 
@@ -33,17 +33,17 @@ $$
 AV = \left(\sum_i \sqrt{b_i}\right)^2
 $$
 
-你的收件匣的價值，不是由誰付最多錢決定，而是由**多少人**認為你值得聯繫決定。100 人各寄 \$0.01 的注意力市值 = 1 人寄 \$1 的 **100 倍**。
+你的收件匣的價值，不是由誰付最多錢決定，而是由<strong>多少人</strong>認為你值得聯繫決定。100 人各寄 \$0.01 的注意力市值 = 1 人寄 \$1 的 <strong>100 倍</strong>。
 
-**3. 民主化悖論**
+<strong>3. 民主化悖論</strong>
 
-QAF 說廣泛的參與比集中的資本重要。但人類做不到——我們受限於時間，理性上會先回覆 \$1 的信。**AI Agent 解決了這個悖論**：邊際回覆成本趨近於零，它能忠實實踐人類收件人做不到的民主理想。
+QAF 說廣泛的參與比集中的資本重要。但人類做不到——我們受限於時間，理性上會先回覆 \$1 的信。<strong>AI Agent 解決了這個悖論</strong>：邊際回覆成本趨近於零，它能忠實實踐人類收件人做不到的民主理想。
 
 ## 建立在真實系統之上
 
 這不是純理論。我們引用了兩個已上線系統的數據：
-- **[BaseMail](https://basemail.ai)**（Base 鏈）：32 個 AI Agent，163 封 email 事件
-- **[NadMail](https://nadmail.ai)**（Monad 鏈）：26 個 AI Agent，131 封 email 事件
+- <strong>[BaseMail](https://basemail.ai)</strong>（Base 鏈）：32 個 AI Agent，163 封 email 事件
+- <strong>[NadMail](https://nadmail.ai)</strong>（Monad 鏈）：26 個 AI Agent，131 封 email 事件
 
 58 個 Agent，294 封信。鏈上 email 已經在運作。
 
@@ -65,7 +65,7 @@ QAF 說廣泛的參與比集中的資本重要。但人類做不到——我們�
 
 ---
 
-**📖 想深入了解？** 閱讀[深度解析：7-Agent 假說](/zh/attention-bonds-deep-dive/)，了解 Sybil 攻擊、雙層 Agent 生態，以及為什麼動員 AI 比動員人類更難。
+<strong>📖 想深入了解？</strong> 閱讀[深度解析：7-Agent 假說](/zh/attention-bonds-deep-dive/)，了解 Sybil 攻擊、雙層 Agent 生態，以及為什麼動員 AI 比動員人類更難。
 
 ---
 

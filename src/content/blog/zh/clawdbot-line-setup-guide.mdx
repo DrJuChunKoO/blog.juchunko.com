@@ -38,8 +38,8 @@ categories: ["devlog"]
 
 在 [LINE Developers Console](https://developers.line.biz/) 中取得：
 
-- **Channel Access Token**（長效令牌）
-- **Channel Secret**
+- <strong>Channel Access Token</strong>（長效令牌）
+- <strong>Channel Secret</strong>
 
 ### 3. Clawdbot 設定
 
@@ -85,10 +85,10 @@ ngrok http 18789
 
 LINE Messaging API 需要一個公開可訪問的 HTTPS webhook URL。設定過程中常見問題：
 
-1. **URL 驗證失敗**：LINE 會發送驗證請求，如果沒有正確回應會失敗
-2. **ngrok URL 變動**：免費版 ngrok 每次重啟 URL 都會改變
-3. **SSL 憑證問題**：LINE 要求有效的 SSL 憑證
-4. **Port 設定錯誤**：Clawdbot Gateway 預設跑在 18789 port
+1. <strong>URL 驗證失敗</strong>：LINE 會發送驗證請求，如果沒有正確回應會失敗
+2. <strong>ngrok URL 變動</strong>：免費版 ngrok 每次重啟 URL 都會改變
+3. <strong>SSL 憑證問題</strong>：LINE 要求有效的 SSL 憑證
+4. <strong>Port 設定錯誤</strong>：Clawdbot Gateway 預設跑在 18789 port
 
 ### 錯誤現象
 
@@ -98,7 +98,7 @@ LINE Messaging API 需要一個公開可訪問的 HTTPS webhook URL。設定過�
 
 ### 解決方案
 
-**Step 1：確認 Clawdbot Gateway 運行中**
+<strong>Step 1：確認 Clawdbot Gateway 運行中</strong>
 
 ```bash
 # 檢查 Gateway 狀態
@@ -108,7 +108,7 @@ clawdbot gateway status
 clawdbot gateway start
 ```
 
-**Step 2：設定 ngrok（建議使用固定網域）**
+<strong>Step 2：設定 ngrok（建議使用固定網域）</strong>
 
 ```bash
 # 免費版（URL 會變動）
@@ -118,9 +118,9 @@ ngrok http 18789
 ngrok http 18789 --domain=你的固定網域.ngrok.app
 ```
 
-> 💡 **強烈建議**使用 ngrok 付費方案取得固定網域（約 $8 USD/月），否則每次重啟都要重新設定 LINE webhook URL。
+> 💡 <strong>強烈建議</strong>使用 ngrok 付費方案取得固定網域（約 $8 USD/月），否則每次重啟都要重新設定 LINE webhook URL。
 
-**Step 3：設定 LINE Webhook URL**
+<strong>Step 3：設定 LINE Webhook URL</strong>
 
 1. 進入 [LINE Developers Console](https://developers.line.biz/)
 2. 選擇你的 Channel
@@ -129,7 +129,7 @@ ngrok http 18789 --domain=你的固定網域.ngrok.app
 5. 點擊「Verify」驗證
 6. 開啟「Use webhook」
 
-**Step 4：驗證設定**
+<strong>Step 4：驗證設定</strong>
 
 ```bash
 # 檢查 ngrok 狀態
@@ -170,7 +170,7 @@ curl -X POST https://你的網域.ngrok.app/line/webhook \
 
 ### 解決方案
 
-**方案一：防止 Mac 睡眠（適合 Mac mini / Mac Studio）**
+<strong>方案一：防止 Mac 睡眠（適合 Mac mini / Mac Studio）</strong>
 
 ```bash
 # 使用 caffeinate 防止睡眠（只要終端機開著就不睡）
@@ -180,7 +180,7 @@ caffeinate -d -i -s &
 # 系統設定 > 電池 > 電源轉接器 > 防止電腦自動睡眠
 ```
 
-**方案二：使用 pmset 設定（永久生效）**
+<strong>方案二：使用 pmset 設定（永久生效）</strong>
 
 ```bash
 # 查看目前設定
@@ -196,7 +196,7 @@ sudo pmset -c sleep 0
 sudo pmset -c displaysleep 0
 ```
 
-**方案三：設定 launchd 開機自動啟動**
+<strong>方案三：設定 launchd 開機自動啟動</strong>
 
 建立 `~/Library/LaunchAgents/com.clawdbot.gateway.plist`：
 
@@ -227,7 +227,7 @@ sudo pmset -c displaysleep 0
 launchctl load ~/Library/LaunchAgents/com.clawdbot.gateway.plist
 ```
 
-**方案四：ngrok 自動重連腳本**
+<strong>方案四：ngrok 自動重連腳本</strong>
 
 建立 `~/scripts/ngrok-keepalive.sh`：
 
@@ -246,10 +246,10 @@ done
 
 對於需要 24/7 運行的服務，建議：
 
-1. **使用專用設備**：Mac mini 插電並設定不睡眠
-2. **使用固定網域**：避免 URL 變動問題
-3. **設定自動啟動**：launchd 確保重開機後自動恢復
-4. **監控服務狀態**：定期檢查 ngrok 和 Gateway 狀態
+1. <strong>使用專用設備</strong>：Mac mini 插電並設定不睡眠
+2. <strong>使用固定網域</strong>：避免 URL 變動問題
+3. <strong>設定自動啟動</strong>：launchd 確保重開機後自動恢復
+4. <strong>監控服務狀態</strong>：定期檢查 ngrok 和 Gateway 狀態
 
 ---
 
@@ -257,7 +257,7 @@ done
 
 ### 問題描述
 
-LINE API 發送圖片或音訊時，需要提供**公開可訪問的 HTTPS URL**。本地檔案路徑（如 `/tmp/image.png`）無法直接使用。
+LINE API 發送圖片或音訊時，需要提供<strong>公開可訪問的 HTTPS URL</strong>。本地檔案路徑（如 `/tmp/image.png`）無法直接使用。
 
 ### 錯誤訊息
 
@@ -265,14 +265,14 @@ LINE API 發送圖片或音訊時，需要提供**公開可訪問的 HTTPS URL**
 
 ### 解決方案：ngrok 檔案伺服器
 
-**Step 1：啟動本地檔案伺服器**
+<strong>Step 1：啟動本地檔案伺服器</strong>
 
 ```bash
 cd /tmp
 python3 -m http.server 8888
 ```
 
-**Step 2：用 ngrok 公開**
+<strong>Step 2：用 ngrok 公開</strong>
 
 ```bash
 ngrok http 8888 --domain=你的固定網域.ngrok.app
@@ -280,7 +280,7 @@ ngrok http 8888 --domain=你的固定網域.ngrok.app
 
 > 💡 建議使用 ngrok 付費方案取得固定網域，避免每次重啟都要更新 URL。
 
-**Step 3：使用方式**
+<strong>Step 3：使用方式</strong>
 
 1. 將檔案放到 `/tmp/` 目錄
 2. 透過 `https://你的網域.ngrok.app/檔案名稱` 存取
@@ -298,7 +298,7 @@ curl -I https://你的網域.ngrok.app/test.png
 
 ### 問題描述
 
-LINE 語音訊息**不支援 MP3 格式**，必須使用 **M4A (AAC)** 格式。
+LINE 語音訊息<strong>不支援 MP3 格式</strong>，必須使用 <strong>M4A (AAC)</strong> 格式。
 
 ### 錯誤現象
 
@@ -380,9 +380,9 @@ curl -s -X GET https://api.line.me/v2/bot/message/quota \
 
 ### 解決方案
 
-1. **升級方案**：到 LINE Official Account Manager 升級
-2. **善用 Reply Message**：在收到訊息時立即回覆（30 秒內）
-3. **等待重置**：每月 1 日額度重置
+1. <strong>升級方案</strong>：到 LINE Official Account Manager 升級
+2. <strong>善用 Reply Message</strong>：在收到訊息時立即回覆（30 秒內）
+3. <strong>等待重置</strong>：每月 1 日額度重置
 
 ---
 
@@ -402,11 +402,11 @@ curl -s -X GET https://api.line.me/v2/bot/message/quota \
 |------|------|------|------|
 | message tool | ✅ | ⚠️ 不穩定 | 圖片用 |
 | MEDIA: directive | ✅ | ❌ 不支援 | 圖片用 |
-| curl + LINE API | ✅ | ✅ | **語音推薦** |
+| curl + LINE API | ✅ | ✅ | <strong>語音推薦</strong> |
 
 ### 語音訊息的正確做法
 
-**必須用 curl 直接呼叫 LINE API：**
+<strong>必須用 curl 直接呼叫 LINE API：</strong>
 
 ```bash
 curl -s -X POST https://api.line.me/v2/bot/message/push \
@@ -427,7 +427,7 @@ curl -s -X POST https://api.line.me/v2/bot/message/push \
 - `to`：接收者 ID（用戶 ID 以 U 開頭，群組 ID 以 C 開頭）
 - `type`：必須是 `audio`
 - `originalContentUrl`：M4A 檔案的公開 URL
-- `duration`：音訊長度（毫秒），**必填**
+- `duration`：音訊長度（毫秒），<strong>必填</strong>
 
 ---
 
@@ -528,12 +528,12 @@ curl -s -X POST https://api.line.me/v2/bot/message/push \
 
 ### Q1: 語音訊息無法播放
 
-**可能原因：**
+<strong>可能原因：</strong>
 - 檔案格式不是 M4A
 - URL 無法公開存取
 - duration 參數錯誤或缺失
 
-**排解步驟：**
+<strong>排解步驟：</strong>
 ```bash
 # 確認檔案存在且格式正確
 file /tmp/voice.m4a
@@ -546,31 +546,31 @@ curl -I https://your-domain.ngrok.app/voice.m4a
 
 ### Q2: 429 Too Many Requests
 
-**解決方案：**
+<strong>解決方案：</strong>
 1. 查詢目前額度使用狀況
 2. 升級 LINE 方案
 3. 等待下月額度重置
 
 ### Q3: 群組收不到訊息
 
-**可能原因：**
+<strong>可能原因：</strong>
 - Bot 沒有在群組中
 - 群組 ID 錯誤（注意大小寫）
 - 群組設定不允許 Bot 發言
 
-**排解步驟：**
+<strong>排解步驟：</strong>
 1. 確認 Bot 在群組成員列表中
 2. 確認群組 ID 格式正確（C + 32 字元）
 3. 檢查群組管理設定
 
 ### Q4: ngrok URL 無法存取
 
-**可能原因：**
+<strong>可能原因：</strong>
 - ngrok 服務未啟動
 - 本地檔案伺服器未啟動
 - 檔案不在正確目錄
 
-**排解步驟：**
+<strong>排解步驟：</strong>
 ```bash
 # 確認 ngrok 運行中
 curl -s localhost:4040/api/tunnels | jq
@@ -588,11 +588,11 @@ ls -la /tmp/voice.m4a
 
 設定 Clawdbot LINE 通道的關鍵要點：
 
-1. **媒體檔案**：需要公開 HTTPS URL，用 ngrok 解決
-2. **語音格式**：必須是 M4A，用 ffmpeg 轉換
-3. **發送方式**：語音訊息用 curl 直接呼叫 LINE API
-4. **額度管理**：注意 Push Message 月限制，善用 Reply Message
-5. **群組功能**：透過 session 取得群組 ID，記錄在 TOOLS.md
+1. <strong>媒體檔案</strong>：需要公開 HTTPS URL，用 ngrok 解決
+2. <strong>語音格式</strong>：必須是 M4A，用 ffmpeg 轉換
+3. <strong>發送方式</strong>：語音訊息用 curl 直接呼叫 LINE API
+4. <strong>額度管理</strong>：注意 Push Message 月限制，善用 Reply Message
+5. <strong>群組功能</strong>：透過 session 取得群組 ID，記錄在 TOOLS.md
 
 ---
 

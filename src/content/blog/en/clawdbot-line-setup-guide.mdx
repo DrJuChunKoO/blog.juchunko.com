@@ -38,8 +38,8 @@ This tutorial documents the various challenges and solutions encountered when se
 
 Get the following from the [LINE Developers Console](https://developers.line.biz/):
 
-- **Channel Access Token** (long-lived token)
-- **Channel Secret**
+- <strong>Channel Access Token</strong> (long-lived token)
+- <strong>Channel Secret</strong>
 
 ### 3. Clawdbot Configuration
 
@@ -85,10 +85,10 @@ Enter the generated URL (e.g., `https://xxxx.ngrok.app/line/webhook`) in the LIN
 
 LINE Messaging API requires a publicly accessible HTTPS webhook URL. Common issues during setup:
 
-1. **URL verification failure**: LINE sends verification requests that fail without proper responses
-2. **ngrok URL changes**: Free ngrok URLs change with every restart
-3. **SSL certificate issues**: LINE requires valid SSL certificates
-4. **Port configuration errors**: Clawdbot Gateway runs on port 18789 by default
+1. <strong>URL verification failure</strong>: LINE sends verification requests that fail without proper responses
+2. <strong>ngrok URL changes</strong>: Free ngrok URLs change with every restart
+3. <strong>SSL certificate issues</strong>: LINE requires valid SSL certificates
+4. <strong>Port configuration errors</strong>: Clawdbot Gateway runs on port 18789 by default
 
 ### Error Symptoms
 
@@ -98,7 +98,7 @@ LINE Messaging API requires a publicly accessible HTTPS webhook URL. Common issu
 
 ### Solution
 
-**Step 1: Confirm Clawdbot Gateway is Running**
+<strong>Step 1: Confirm Clawdbot Gateway is Running</strong>
 
 ```bash
 # Check Gateway status
@@ -108,7 +108,7 @@ clawdbot gateway status
 clawdbot gateway start
 ```
 
-**Step 2: Configure ngrok (Fixed Domain Recommended)**
+<strong>Step 2: Configure ngrok (Fixed Domain Recommended)</strong>
 
 ```bash
 # Free version (URL changes)
@@ -118,9 +118,9 @@ ngrok http 18789
 ngrok http 18789 --domain=your-fixed-domain.ngrok.app
 ```
 
-> 💡 **Highly recommended** to use ngrok's paid plan for a fixed domain (~$8 USD/month), otherwise you'll need to reconfigure the LINE webhook URL every restart.
+> 💡 <strong>Highly recommended</strong> to use ngrok's paid plan for a fixed domain (~$8 USD/month), otherwise you'll need to reconfigure the LINE webhook URL every restart.
 
-**Step 3: Set LINE Webhook URL**
+<strong>Step 3: Set LINE Webhook URL</strong>
 
 1. Go to [LINE Developers Console](https://developers.line.biz/)
 2. Select your Channel
@@ -129,7 +129,7 @@ ngrok http 18789 --domain=your-fixed-domain.ngrok.app
 5. Click "Verify" to validate
 6. Enable "Use webhook"
 
-**Step 4: Verify Configuration**
+<strong>Step 4: Verify Configuration</strong>
 
 ```bash
 # Check ngrok status
@@ -170,7 +170,7 @@ If Clawdbot runs on a personal computer (like Mac mini), when the computer enter
 
 ### Solutions
 
-**Option 1: Prevent Mac Sleep (Suitable for Mac mini / Mac Studio)**
+<strong>Option 1: Prevent Mac Sleep (Suitable for Mac mini / Mac Studio)</strong>
 
 ```bash
 # Use caffeinate to prevent sleep (stays awake while terminal is open)
@@ -180,7 +180,7 @@ caffeinate -d -i -s &
 # System Settings > Battery > Power Adapter > Prevent automatic sleeping
 ```
 
-**Option 2: Use pmset Settings (Permanent)**
+<strong>Option 2: Use pmset Settings (Permanent)</strong>
 
 ```bash
 # View current settings
@@ -196,7 +196,7 @@ sudo pmset -c sleep 0
 sudo pmset -c displaysleep 0
 ```
 
-**Option 3: Set Up launchd for Auto-Start on Boot**
+<strong>Option 3: Set Up launchd for Auto-Start on Boot</strong>
 
 Create `~/Library/LaunchAgents/com.clawdbot.gateway.plist`:
 
@@ -227,7 +227,7 @@ Load it:
 launchctl load ~/Library/LaunchAgents/com.clawdbot.gateway.plist
 ```
 
-**Option 4: ngrok Auto-Reconnect Script**
+<strong>Option 4: ngrok Auto-Reconnect Script</strong>
 
 Create `~/scripts/ngrok-keepalive.sh`:
 
@@ -246,10 +246,10 @@ done
 
 For services that need to run 24/7, we recommend:
 
-1. **Use dedicated hardware**: Mac mini plugged in with sleep disabled
-2. **Use a fixed domain**: Avoid URL change issues
-3. **Set up auto-start**: launchd ensures recovery after reboot
-4. **Monitor service status**: Regularly check ngrok and Gateway status
+1. <strong>Use dedicated hardware</strong>: Mac mini plugged in with sleep disabled
+2. <strong>Use a fixed domain</strong>: Avoid URL change issues
+3. <strong>Set up auto-start</strong>: launchd ensures recovery after reboot
+4. <strong>Monitor service status</strong>: Regularly check ngrok and Gateway status
 
 ---
 
@@ -257,7 +257,7 @@ For services that need to run 24/7, we recommend:
 
 ### Problem Description
 
-When sending images or audio via LINE API, you need to provide a **publicly accessible HTTPS URL**. Local file paths (like `/tmp/image.png`) cannot be used directly.
+When sending images or audio via LINE API, you need to provide a <strong>publicly accessible HTTPS URL</strong>. Local file paths (like `/tmp/image.png`) cannot be used directly.
 
 ### Error Message
 
@@ -265,14 +265,14 @@ Using local paths results in LINE API errors or messages not displaying.
 
 ### Solution: ngrok File Server
 
-**Step 1: Start Local File Server**
+<strong>Step 1: Start Local File Server</strong>
 
 ```bash
 cd /tmp
 python3 -m http.server 8888
 ```
 
-**Step 2: Expose via ngrok**
+<strong>Step 2: Expose via ngrok</strong>
 
 ```bash
 ngrok http 8888 --domain=your-fixed-domain.ngrok.app
@@ -280,7 +280,7 @@ ngrok http 8888 --domain=your-fixed-domain.ngrok.app
 
 > 💡 Recommended to use ngrok's paid plan for a fixed domain to avoid updating URLs every restart.
 
-**Step 3: Usage**
+<strong>Step 3: Usage</strong>
 
 1. Place files in the `/tmp/` directory
 2. Access via `https://your-domain.ngrok.app/filename`
@@ -298,7 +298,7 @@ curl -I https://your-domain.ngrok.app/test.png
 
 ### Problem Description
 
-LINE voice messages **do not support MP3 format**; you must use **M4A (AAC)** format.
+LINE voice messages <strong>do not support MP3 format</strong>; you must use <strong>M4A (AAC)</strong> format.
 
 ### Error Symptoms
 
@@ -380,9 +380,9 @@ Response example:
 
 ### Solutions
 
-1. **Upgrade plan**: Go to LINE Official Account Manager to upgrade
-2. **Use Reply Message**: Reply immediately when receiving messages (within 30 seconds)
-3. **Wait for reset**: Quota resets on the 1st of each month
+1. <strong>Upgrade plan</strong>: Go to LINE Official Account Manager to upgrade
+2. <strong>Use Reply Message</strong>: Reply immediately when receiving messages (within 30 seconds)
+3. <strong>Wait for reset</strong>: Quota resets on the 1st of each month
 
 ---
 
@@ -402,11 +402,11 @@ When sending LINE voice messages in Clawdbot, there are multiple options:
 |--------|--------|-------|----------------|
 | message tool | ✅ | ⚠️ Unstable | Use for images |
 | MEDIA: directive | ✅ | ❌ Not supported | Use for images |
-| curl + LINE API | ✅ | ✅ | **Recommended for voice** |
+| curl + LINE API | ✅ | ✅ | <strong>Recommended for voice</strong> |
 
 ### The Correct Approach for Voice Messages
 
-**Must use curl to directly call LINE API:**
+<strong>Must use curl to directly call LINE API:</strong>
 
 ```bash
 curl -s -X POST https://api.line.me/v2/bot/message/push \
@@ -427,7 +427,7 @@ curl -s -X POST https://api.line.me/v2/bot/message/push \
 - `to`: Recipient ID (User IDs start with U, Group IDs start with C)
 - `type`: Must be `audio`
 - `originalContentUrl`: Public URL of M4A file
-- `duration`: Audio length in milliseconds, **required**
+- `duration`: Audio length in milliseconds, <strong>required</strong>
 
 ---
 
@@ -528,12 +528,12 @@ curl -s -X POST https://api.line.me/v2/bot/message/push \
 
 ### Q1: Voice Messages Won't Play
 
-**Possible causes:**
+<strong>Possible causes:</strong>
 - File format is not M4A
 - URL is not publicly accessible
 - duration parameter is wrong or missing
 
-**Troubleshooting steps:**
+<strong>Troubleshooting steps:</strong>
 ```bash
 # Confirm file exists and format is correct
 file /tmp/voice.m4a
@@ -546,31 +546,31 @@ curl -I https://your-domain.ngrok.app/voice.m4a
 
 ### Q2: 429 Too Many Requests
 
-**Solutions:**
+<strong>Solutions:</strong>
 1. Check current quota usage
 2. Upgrade LINE plan
 3. Wait for next month's quota reset
 
 ### Q3: Group Not Receiving Messages
 
-**Possible causes:**
+<strong>Possible causes:</strong>
 - Bot is not in the group
 - Group ID is wrong (case-sensitive)
 - Group settings don't allow Bot to speak
 
-**Troubleshooting steps:**
+<strong>Troubleshooting steps:</strong>
 1. Confirm Bot is in the group member list
 2. Confirm group ID format is correct (C + 32 characters)
 3. Check group management settings
 
 ### Q4: ngrok URL Not Accessible
 
-**Possible causes:**
+<strong>Possible causes:</strong>
 - ngrok service not started
 - Local file server not started
 - File not in correct directory
 
-**Troubleshooting steps:**
+<strong>Troubleshooting steps:</strong>
 ```bash
 # Confirm ngrok is running
 curl -s localhost:4040/api/tunnels | jq
@@ -588,11 +588,11 @@ ls -la /tmp/voice.m4a
 
 Key points for setting up Clawdbot LINE channel:
 
-1. **Media files**: Require public HTTPS URLs, solve with ngrok
-2. **Voice format**: Must be M4A, convert with ffmpeg
-3. **Sending method**: Use curl to directly call LINE API for voice messages
-4. **Quota management**: Mind the Push Message monthly limit, use Reply Message when possible
-5. **Group features**: Get group ID through sessions, record in TOOLS.md
+1. <strong>Media files</strong>: Require public HTTPS URLs, solve with ngrok
+2. <strong>Voice format</strong>: Must be M4A, convert with ffmpeg
+3. <strong>Sending method</strong>: Use curl to directly call LINE API for voice messages
+4. <strong>Quota management</strong>: Mind the Push Message monthly limit, use Reply Message when possible
+5. <strong>Group features</strong>: Get group ID through sessions, record in TOOLS.md
 
 ---
 

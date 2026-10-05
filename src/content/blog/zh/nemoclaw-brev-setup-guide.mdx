@@ -15,7 +15,7 @@ categories: ["devlog", "openclaw", "ai-agent"]
 
 [NemoClaw](https://github.com/NVIDIA/NemoClaw) 是 NVIDIA 在 2026 年 3 月開源的安全 AI Agent 運行環境。它把 [OpenClaw](https://openclaw.ai) 的 AI agent 放進 [OpenShell](https://github.com/NVIDIA/OpenShell) 沙盒裡運行，加上網路白名單、檔案系統隔離、程序限制等安全層。
 
-簡單來說：**NemoClaw = OpenClaw Agent + OpenShell 沙盒 + NVIDIA 推論路由**。
+簡單來說：<strong>NemoClaw = OpenClaw Agent + OpenShell 沙盒 + NVIDIA 推論路由</strong>。
 
 ### 架構概覽
 
@@ -46,10 +46,10 @@ categories: ["devlog", "openclaw", "ai-agent"]
 
 ### 你需要的
 
-- **NVIDIA Brev 帳號** — [brev.nvidia.com](https://brev.nvidia.com)
-- **NVIDIA API Key** — 到 [build.nvidia.com/settings/api-keys](https://build.nvidia.com/settings/api-keys) 產生（`nvapi-` 開頭）
-- **Telegram Bot Token** — 跟 [@BotFather](https://t.me/BotFather) 建立
-- **Brev CLI**（本機安裝）
+- <strong>NVIDIA Brev 帳號</strong> — [brev.nvidia.com](https://brev.nvidia.com)
+- <strong>NVIDIA API Key</strong> — 到 [build.nvidia.com/settings/api-keys](https://build.nvidia.com/settings/api-keys) 產生（`nvapi-` 開頭）
+- <strong>Telegram Bot Token</strong> — 跟 [@BotFather](https://t.me/BotFather) 建立
+- <strong>Brev CLI</strong>（本機安裝）
 
 ```bash
 # macOS
@@ -86,7 +86,7 @@ curl -fsSL https://nvidia.com/nemoclaw.sh | bash
 2. 安裝 NemoClaw CLI
 3. 啟動互動式 onboard wizard（設定 API key、建立 gateway、sandbox 等）
 
-**如果 wizard 順利完成，你可以直接跳到「啟動 Telegram Bridge」。**
+<strong>如果 wizard 順利完成，你可以直接跳到「啟動 Telegram Bridge」。</strong>
 
 ## 非互動式安裝（給 AI Agent 的指南）
 
@@ -135,9 +135,9 @@ RunContainerError: /usr/bin/nvidia-container-runtime
   did not terminate successfully: exit status 2
 ```
 
-**原因：** k3s 容器內的 `nvidia-container-runtime` 預設用 `auto` mode，會嘗試載入 `nvsandboxutils` 但在 Docker-in-Docker 環境裡會 crash。
+<strong>原因：</strong> k3s 容器內的 `nvidia-container-runtime` 預設用 `auto` mode，會嘗試載入 `nvsandboxutils` 但在 Docker-in-Docker 環境裡會 crash。
 
-**修復方法：**
+<strong>修復方法：</strong>
 
 ```bash
 # 進入 gateway 容器，改 nvidia runtime 為 legacy mode
@@ -202,7 +202,7 @@ Sandbox 內的 OpenClaw 需要知道怎麼連 NVIDIA API。有兩個 HOME 路徑
 - `kubectl exec` 進入時 HOME 是 `/root`
 - SSH 進入時 HOME 是 `/sandbox`（sandbox user）
 
-**兩邊都要設定：**
+<strong>兩邊都要設定：</strong>
 
 ```bash
 # 用 openclaw 內建的 non-interactive onboard
@@ -268,7 +268,7 @@ echo "NemoClaw ready."' | \
 
 ### Step 10: 修復 Network Policy（非常重要！）
 
-OpenShell 的 network policy 透過 proxy 控制 sandbox 的網路存取。預設只允許特定 binary 連特定 endpoint。**Node.js（OpenClaw 的 runtime）不在白名單裡**，會導致 LLM 請求 timeout。
+OpenShell 的 network policy 透過 proxy 控制 sandbox 的網路存取。預設只允許特定 binary 連特定 endpoint。<strong>Node.js（OpenClaw 的 runtime）不在白名單裡</strong>，會導致 LLM 請求 timeout。
 
 ```bash
 # 修改 policy，把 /usr/bin/node 加到 nvidia endpoint 的 binaries
@@ -309,9 +309,9 @@ nohup node <nemoclaw-path>/scripts/telegram-bridge.js \
 原版的 telegram-bridge.js 只處理文字。我們修改了腳本，加入圖片支援：
 
 - **偵測 `message.photo`** → 用 Telegram API 下載最大尺寸的圖片
-- **轉 base64** → 呼叫 `meta/llama-3.2-90b-vision-instruct` 判讀
-- **有 caption** → Vision 描述 + 原文一起轉交 Nemotron agent 回答
-- **無 caption** → 直接回傳 Vision 描述
+- <strong>轉 base64</strong> → 呼叫 `meta/llama-3.2-90b-vision-instruct` 判讀
+- <strong>有 caption</strong> → Vision 描述 + 原文一起轉交 Nemotron agent 回答
+- <strong>無 caption</strong> → 直接回傳 Vision 描述
 
 核心程式碼：
 
@@ -348,16 +348,16 @@ Vision API 呼叫使用 NVIDIA 的 OpenAI-compatible endpoint，和 Nemotron 用
 ## 給未來 AI Agent 的建議
 
 1. **能用 `brev shell` 互動式操作就用** — `brev exec` 沒有 stdin，互動式 wizard 會卡死
-2. **永遠記住雙 HOME 問題** — sandbox 裡 root 和 sandbox user 的 HOME 不同
+2. <strong>永遠記住雙 HOME 問題</strong> — sandbox 裡 root 和 sandbox user 的 HOME 不同
 3. **改完 policy 要用 `openshell policy set` 正式套用** — 直接改 YAML 不會生效
-4. **GPU passthrough 用 legacy mode** — Docker-in-Docker 環境裡 auto mode 不 work
-5. **NemoClaw 是 alpha 軟體** — 有 174+ open issues，要有心理準備踩坑
+4. <strong>GPU passthrough 用 legacy mode</strong> — Docker-in-Docker 環境裡 auto mode 不 work
+5. <strong>NemoClaw 是 alpha 軟體</strong> — 有 174+ open issues，要有心理準備踩坑
 
 ## 最終成果
 
 - 🤖 Telegram Bot 運行在 OpenShell 安全沙盒裡
-- 💬 文字對話由 **Nemotron 3 Super 120B** 驅動
-- 📷 圖片辨識由 **Llama 3.2 90B Vision** 處理
+- 💬 文字對話由 <strong>Nemotron 3 Super 120B</strong> 驅動
+- 📷 圖片辨識由 <strong>Llama 3.2 90B Vision</strong> 處理
 - 🔒 所有推論受 NemoClaw 安全策略保護
 - 🎮 L40S 48GB GPU 可用於未來的機器人訓練
 

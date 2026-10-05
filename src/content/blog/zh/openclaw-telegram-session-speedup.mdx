@@ -15,7 +15,7 @@ categories: ["devlog"]
 
 上篇我們解決了 Telegram 圖片收不到的問題（Node.js 22 的 undici IPv6 bug，更新到 OpenClaw 2026.2.26 搞定）。但修完之後，寶博還是覺得：
 
-**「為什麼我從 TG 發訊息，蘋果蝦都不理我？」**
+<strong>「為什麼我從 TG 發訊息，蘋果蝦都不理我？」</strong>
 
 ## 以為修好了，其實沒有
 
@@ -52,7 +52,7 @@ categories: ["devlog"]
 }
 ```
 
-**只有一個 session。** webchat 和 Telegram 全部擠在 `agent:main:main` 裡面。
+<strong>只有一個 session。</strong> webchat 和 Telegram 全部擠在 `agent:main:main` 裡面。
 
 ## 為什麼小龍蝦沒這個問題？
 
@@ -80,7 +80,7 @@ Gateway 收到，放進 queue
 寶博在 TG 那邊：「蘋果蝦又不理我 😭」
 ```
 
-這完全不是網路問題，是 **session 架構**的問題。
+這完全不是網路問題，是 <strong>session 架構</strong>的問題。
 
 ## 一行修復
 
@@ -138,7 +138,7 @@ openclaw config set session.dmScope "per-channel-peer"
 openclaw gateway restart
 ```
 
-> **💡 新版用戶不用擔心：** 如果你是用 OpenClaw 2026.2.25+ 跑 onboarding 的，預設已經是 `per-channel-peer`，不需要手動改。
+> <strong>💡 新版用戶不用擔心：</strong> 如果你是用 OpenClaw 2026.2.25+ 跑 onboarding 的，預設已經是 `per-channel-peer`，不需要手動改。
 
 ## 小結
 

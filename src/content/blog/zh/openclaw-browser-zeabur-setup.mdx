@@ -9,7 +9,7 @@ categories: ["devlog", "openclaw"]
 
 ## 前言
 
-如果你在 [Zeabur](https://zeabur.com) 上用 [OpenClaw Zeabur Template](https://zeabur.com/zh-TW/templates/H8L4G1) 部署 AI Agent，並且搭配了 Headless Chrome 容器，升級到 **2026.2.26** 之後你可能會看到這個錯誤：
+如果你在 [Zeabur](https://zeabur.com) 上用 [OpenClaw Zeabur Template](https://zeabur.com/zh-TW/templates/H8L4G1) 部署 AI Agent，並且搭配了 Headless Chrome 容器，升級到 <strong>2026.2.26</strong> 之後你可能會看到這個錯誤：
 
 ```
 Invalid config at ~/.openclaw/openclaw.json:
@@ -22,7 +22,7 @@ Invalid config at ~/.openclaw/openclaw.json:
 
 ## 發生了什麼事？
 
-OpenClaw 在 **2026.1.10** 引入了全新的 Browser Profile 架構，把瀏覽器設定從 sandbox 層級搬到了頂層 `browser` 物件。**2026.2.23** 進一步調整了 SSRF 政策預設值。
+OpenClaw 在 <strong>2026.1.10</strong> 引入了全新的 Browser Profile 架構，把瀏覽器設定從 sandbox 層級搬到了頂層 `browser` 物件。<strong>2026.2.23</strong> 進一步調整了 SSRF 政策預設值。
 
 舊版 Zeabur template 建議的設定是這樣的：
 
@@ -40,7 +40,7 @@ OpenClaw 在 **2026.1.10** 引入了全新的 Browser Profile 架構，把瀏覽
 }
 ```
 
-**新版不再接受這個寫法。** `agents.defaults.sandbox.browser` 現在只接受容器層級的設定（如 `enabled`、`allowHostControl`），不再接受 `cdpUrl`。
+<strong>新版不再接受這個寫法。</strong> `agents.defaults.sandbox.browser` 現在只接受容器層級的設定（如 `enabled`、`allowHostControl`），不再接受 `cdpUrl`。
 
 ---
 
@@ -66,7 +66,7 @@ env | grep -i CDP
 # SERVICE_..._SERVICE_PORT_CDP=9222
 ```
 
-Template 裡寫的 `openclaw-sandbox-browser` 只是個 DNS alias，**Zeabur 實際分配的 hostname 是環境變數裡的那個**。
+Template 裡寫的 `openclaw-sandbox-browser` 只是個 DNS alias，<strong>Zeabur 實際分配的 hostname 是環境變數裡的那個</strong>。
 
 先驗證連通性：
 
@@ -112,7 +112,7 @@ Zeabur 容器裡沒有 `systemd`，所以 `openclaw gateway restart` 會報錯�
 Gateway service check failed: Error: systemctl --user unavailable: spawn systemctl ENOENT
 ```
 
-**直接在 Zeabur Dashboard 按 Restart** 就好。
+<strong>直接在 Zeabur Dashboard 按 Restart</strong> 就好。
 
 ---
 
@@ -178,9 +178,9 @@ rm /home/node/.openclaw/agents/main/sessions/xxx.jsonl.lock
 ## 結論
 
 1. **`cdpUrl` 不能放在 `agents.defaults.sandbox.browser`** → 放到頂層 `browser` 或 `browser.profiles`
-2. **用 Zeabur 環境變數裡的 hostname**，不要用 template 文件裡的建議名稱
-3. **容器內重啟**用 Zeabur Dashboard，不是 `openclaw gateway restart`
-4. **Sandbox session** 需要 `allowHostControl: true` 或確保容器網路互通
+2. <strong>用 Zeabur 環境變數裡的 hostname</strong>，不要用 template 文件裡的建議名稱
+3. <strong>容器內重啟</strong>用 Zeabur Dashboard，不是 `openclaw gateway restart`
+4. <strong>Sandbox session</strong> 需要 `allowHostControl: true` 或確保容器網路互通
 
 希望這篇能幫到其他在 Zeabur 上部署 OpenClaw 的朋友！🦞
 

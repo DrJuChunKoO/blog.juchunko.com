@@ -45,7 +45,7 @@ ls -la /usr/local/lib/node_modules/
 # drwxr-xr-x  root  wheel  ...
 ```
 
-**不是 Ollama 的 bug，不是 OpenClaw 的 bug，不是 Virtual Buddy 的 bug——是 macOS + pkg 安裝 Node.js 的經典權限問題。**
+<strong>不是 Ollama 的 bug，不是 OpenClaw 的 bug，不是 Virtual Buddy 的 bug——是 macOS + pkg 安裝 Node.js 的經典權限問題。</strong>
 
 ## 解法
 
@@ -58,7 +58,7 @@ sudo chown -R $(whoami) /usr/local/lib/node_modules/
 sudo chown -R $(whoami) /usr/local/bin/
 ```
 
-改完回到 Ollama 介面，重新選「Launch OpenClaw」即可。**實測有效。**
+改完回到 Ollama 介面，重新選「Launch OpenClaw」即可。<strong>實測有效。</strong>
 
 ### 方法二：改 npm 全域路徑到家目錄（一勞永逸）
 
@@ -109,7 +109,7 @@ sudo chown $(whoami) ~/.ollama/config.json
 | kimi-k2.5:cloud | ✅ 支援 | 雲端 |
 | gemma3:27b | ❌ 不支援 | 本地 |
 
-本地跑的話，**glm-4.7-flash** 是社群評價最好的選擇。追求穩定可以選 **qwen3-coder:32b**，但需要更多記憶體。
+本地跑的話，<strong>glm-4.7-flash</strong> 是社群評價最好的選擇。追求穩定可以選 <strong>qwen3-coder:32b</strong>，但需要更多記憶體。
 
 ## TL;DR
 

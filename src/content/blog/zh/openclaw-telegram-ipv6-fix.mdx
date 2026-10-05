@@ -9,7 +9,7 @@ categories: ["devlog"]
 
 昨晚我跟我的蘋果蝦（對，就是我的 OpenClaw agent 🍎🦐）搏鬥了一整晚，就為了搞清楚一件事：
 
-**為什麼從 Telegram 發圖片給它，它死活收不到？**
+<strong>為什麼從 Telegram 發圖片給它，它死活收不到？</strong>
 
 文字訊息沒問題，偶爾圖片也會通，但大多數時候就是靜悄悄的。Log 裡一堆 `Network request for 'getUpdates' failed!` 和 `MediaFetchError: Failed to fetch media`。
 
@@ -17,21 +17,21 @@ categories: ["devlog"]
 
 ## 症狀
 
-- Telegram bot 文字訊息**偶爾**正常，但經常 timeout
-- 圖片、檔案**幾乎都收不到**
+- Telegram bot 文字訊息<strong>偶爾</strong>正常，但經常 timeout
+- 圖片、檔案<strong>幾乎都收不到</strong>
 - Log 裡滿滿的：
   ```
   Request to 'getUpdates' timed out after 500 seconds
   MediaFetchError: Failed to fetch media from https://api.telegram.org/file/bot.../photos/file_1.jpg: TypeError: fetch failed
   Network request for 'sendMessage' failed!
   ```
-- 重啟 Gateway 之後**暫時**恢復，過一陣子又掛
+- 重啟 Gateway 之後<strong>暫時</strong>恢復，過一陣子又掛
 
 ## 根因
 
 這個問題的根源在 **Node.js 22 的 `undici` HTTP client**。
 
-Node.js 22 內建的 `fetch` 使用 `undici`，而 `undici` 實作了 [Happy Eyeballs](https://en.wikipedia.org/wiki/Happy_Eyeballs)（RFC 6555），會**優先嘗試 IPv6 連線**。
+Node.js 22 內建的 `fetch` 使用 `undici`，而 `undici` 實作了 [Happy Eyeballs](https://en.wikipedia.org/wiki/Happy_Eyeballs)（RFC 6555），會<strong>優先嘗試 IPv6 連線</strong>。
 
 問題來了：如果你的 ISP（比如台灣的中華電信）到 `api.telegram.org` 的 IPv6 路由不穩定，`undici` 會先嘗試 IPv6 → timeout → 才 fallback 到 IPv4。但在某些情況下，這個 fallback 並不會正確發生，整個 fetch 就直接 fail 了。
 
@@ -43,9 +43,9 @@ Node.js 22 內建的 `fetch` 使用 `undici`，而 `undici` 實作了 [Happy Eye
 
 OpenClaw [2026.2.26 的 changelog](https://github.com/openclaw/openclaw/blob/main/CHANGELOG.md) 裡有這麼一條：
 
-> **Telegram/Outbound API**: replaces Node 22's global `undici` dispatcher. This ensures that outbound `fetch` calls inherit IPv4 fallback when Telegram `autoSelectFamily` decisions are applied, preventing them from being pinned to stale dispatcher settings.
+> <strong>Telegram/Outbound API</strong>: replaces Node 22's global `undici` dispatcher. This ensures that outbound `fetch` calls inherit IPv4 fallback when Telegram `autoSelectFamily` decisions are applied, preventing them from being pinned to stale dispatcher settings.
 
-白話文：**他們換掉了 Node 22 的全域 undici dispatcher**，確保所有 outbound fetch（包括下載 Telegram 圖片）都能正確走 IPv4 fallback。
+白話文：<strong>他們換掉了 Node 22 的全域 undici dispatcher</strong>，確保所有 outbound fetch（包括下載 Telegram 圖片）都能正確走 IPv4 fallback。
 
 ```bash
 openclaw update
@@ -57,7 +57,7 @@ openclaw update
 
 如果暫時不能更新，有幾個 workaround：
 
-**方案 A：LaunchAgent 加環境變數**
+<strong>方案 A：LaunchAgent 加環境變數</strong>
 
 在 `~/Library/LaunchAgents/ai.openclaw.gateway.plist` 的 `EnvironmentVariables` 裡加：
 
@@ -68,7 +68,7 @@ openclaw update
 
 然後重啟 Gateway。這對 polling 有效，但圖片下載可能還是會 fail（因為 undici dispatcher 的 bug）。
 
-**方案 B：macOS 關閉 IPv6**
+<strong>方案 B：macOS 關閉 IPv6</strong>
 
 ```bash
 # 完全關閉（最穩但影響最大）
@@ -104,18 +104,18 @@ curl -4 --max-time 10 https://api.telegram.org/
 
 ## ⚠️ 用 Claude Code 調校的人注意：先別急著加 Proxy
 
-如果你是用 **Claude Code**（或類似的 AI coding agent）來幫你調校 OpenClaw，你的 Agent 很可能在看到 Telegram API 回覆慢的時候，**自作聰明幫你加了 Proxy**。
+如果你是用 <strong>Claude Code</strong>（或類似的 AI coding agent）來幫你調校 OpenClaw，你的 Agent 很可能在看到 Telegram API 回覆慢的時候，<strong>自作聰明幫你加了 Proxy</strong>。
 
 這其實是本末倒置。
 
 真正的問題大概率是 IPv6，不是網路被牆。你的 AI 助手看到 timeout 就直覺想到「加 proxy 繞過去」，但實際上 Telegram API 在台灣是通的，只是 IPv6 路由有問題。
 
-**建議處理順序：**
+<strong>建議處理順序：</strong>
 
-1. **先移除 proxy**（如果已經被加了的話）
-2. **用這篇的方法測試** — `curl -6` 和 `curl -4` 確認是不是 IPv6 的鍋
-3. **更新到 2026.2.26** — 一行 `openclaw update` 解決
-4. **如果以上都沒用**，才來考慮是不是真的需要 proxy
+1. <strong>先移除 proxy</strong>（如果已經被加了的話）
+2. <strong>用這篇的方法測試</strong> — `curl -6` 和 `curl -4` 確認是不是 IPv6 的鍋
+3. <strong>更新到 2026.2.26</strong> — 一行 `openclaw update` 解決
+4. <strong>如果以上都沒用</strong>，才來考慮是不是真的需要 proxy
 
 Proxy 不是萬靈丹，多一層轉發反而多一個故障點。能直連就直連。
 

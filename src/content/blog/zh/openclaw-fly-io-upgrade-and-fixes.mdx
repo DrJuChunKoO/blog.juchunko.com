@@ -36,7 +36,7 @@ RUN pnpm ui:build
 
 意思是，當初部署的時候，必須在 OpenClaw 的原始碼目錄裡跑 flyctl deploy，把整個 repo 作為 build context 傳上去。但現在我手邊沒有原始碼，想直接從 npm 安裝，這個 Dockerfile 就沒用了。
 
-**解法：改成從 GitHub clone 原始碼再 build**
+<strong>解法：改成從 GitHub clone 原始碼再 build</strong>
 
 ```
 FROM node:22-bookworm
@@ -111,7 +111,7 @@ OpenClaw 的依賴樹裡有 @discordjs/opus，npm 預設會嘗試編譯 native m
 
 @discordjs/opus 不在清單裡，所以 pnpm 會直接跳過它的 native build。但 npm 不吃這個設定，就一路硬跑然後炸掉。
 
-**結論：** npm 不是不行，但要搞定 Python、build-essential 一堆依賴才行，遠不如直接用 pnpm 從原始碼 build 來得乾淨。
+<strong>結論：</strong> npm 不是不行，但要搞定 Python、build-essential 一堆依賴才行，遠不如直接用 pnpm 從原始碼 build 來得乾淨。
 
 ## 升版成功，但 config 壞了
 

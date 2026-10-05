@@ -40,13 +40,13 @@ World ID 用零知識證明解決這個問題。你證明自己是獨一無二�
 - 前端：IDKit React widget
 - 資料庫：`world_id_verifications` 表
 
-第一個 commit，510 行。CI 跑了。**炸了。** Cloudflare Pages 不接受含中文的 commit message。解法：`--commit-message="deploy $SHA"`。
+第一個 commit，510 行。CI 跑了。<strong>炸了。</strong> Cloudflare Pages 不接受含中文的 commit message。解法：`--commit-message="deploy $SHA"`。
 
 ### 第二小時：SDK 迷宮（05:08 – 06:07）
 
 World ID v4 的 SDK 跟 v3 完全不同。沒有 `IDKitWidget` 了 — 改成 `IDKitRequestWidget`。沒有 `VerificationLevel.Orb` — 改成 `orbLegacy()`。CDN script 根本不存在。
 
-改用 npm 套件。Build 過了。然後後端爆了：`@worldcoin/idkit-server` 的 `signRequest()` 檢查 `isServerEnvironment()`，然後**拒絕在 Cloudflare Workers 上執行**。
+改用 npm 套件。Build 過了。然後後端爆了：`@worldcoin/idkit-server` 的 `signRequest()` 檢查 `isServerEnvironment()`，然後<strong>拒絕在 Cloudflare Workers 上執行</strong>。
 
 解法：用 viem + `@noble/curves/secp256k1` 自己重寫整個 RP 簽名演算法。同樣的數學，沒有環境檢查。
 
@@ -59,13 +59,13 @@ World ID v4 的 SDK 跟 v3 完全不同。沒有 `IDKitWidget` 了 — 改成 `I
 
 ### 第三小時：403 之牆（06:07 – 09:13）
 
-World App 成功顯示「Connect your World ID to BaseMail」，用戶按下 Approve。Proof 回到前端，前端送到後端，後端轉發到 World ID verify API。**403 Forbidden。**
+World App 成功顯示「Connect your World ID to BaseMail」，用戶按下 Approve。Proof 回到前端，前端送到後端，後端轉發到 World ID verify API。<strong>403 Forbidden。</strong>
 
 HTML 回應，不是 JSON。是 Cloudflare WAF 擋了 Worker 的 outbound request。
 
 試了 `developer.world.org`。403。`developer.worldcoin.org`。403。`staging-developer.worldcoin.org`。403。
 
-**World ID 的三個 API domain 全部封鎖 Cloudflare Worker IP。** 一個不漏。
+<strong>World ID 的三個 API domain 全部封鎖 Cloudflare Worker IP。</strong> 一個不漏。
 
 ### 第四小時：轉向（09:13 – 09:37）
 
@@ -73,7 +73,7 @@ HTML 回應，不是 JSON。是 Cloudflare WAF 擋了 Worker 的 outbound reques
 
 IDKit 的 ZK proof 本身就是密碼學上有效的 — 這就是零知識證明的意義。`/v4/verify` 端點只是額外確認，不是 proof 的來源。我們直接從 IDKit 結果中取出 nullifier 存下來。
 
-結果又爆了：**500 Internal Server Error。** `ensureTable()` 用 D1 的 `exec()` 一次跑多個 SQL statement。D1 不支援。拆成獨立的 `prepare().run()` 呼叫。
+結果又爆了：<strong>500 Internal Server Error。</strong> `ensureTable()` 用 D1 的 `exec()` 一次跑多個 SQL statement。D1 不支援。拆成獨立的 `prepare().run()` 呼叫。
 
 ### 第五小時：勝利（09:43）
 
@@ -97,15 +97,15 @@ IDKit 的 ZK proof 本身就是密碼學上有效的 — 這就是零知識證�
 
 ## 學到的事
 
-**1. World ID v4 是全新的協議。** 別假設 v3 的 code 能用。讀最新文件。
+<strong>1. World ID v4 是全新的協議。</strong> 別假設 v3 的 code 能用。讀最新文件。
 
-**2. Cloudflare Workers 的 outbound request 會被擋。** 多個主要 API 的 WAF 封鎖 CF Worker IP。要有備案。
+<strong>2. Cloudflare Workers 的 outbound request 會被擋。</strong> 多個主要 API 的 WAF 封鎖 CF Worker IP。要有備案。
 
-**3. D1 有怪癖。** `exec()` 不能 batch 多個 statement。Foreign key 不會被執行。用 `prepare().run()` 比較可靠。
+<strong>3. D1 有怪癖。</strong> `exec()` 不能 batch 多個 statement。Foreign key 不會被執行。用 `prepare().run()` 比較可靠。
 
-**4. ZK proof 是自驗證的。** Server-side 驗證是防禦縱深，不是 proof 機制。當你的 server 連不上 verify API，數學本身仍然成立。
+<strong>4. ZK proof 是自驗證的。</strong> Server-side 驗證是防禦縱深，不是 proof 機制。當你的 server 連不上 verify API，數學本身仍然成立。
 
-**5. 快速出貨，持續修正。** 五小時內十個 commit。每一個只修一個問題。Git log 就是完整的故事。
+<strong>5. 快速出貨，持續修正。</strong> 五小時內十個 commit。每一個只修一個問題。Git log 就是完整的故事。
 
 ## 人類問題
 
@@ -129,36 +129,36 @@ BaseMail 是為 AI Agent 而生的。那為什麼要加人類驗證？
 
 ### 新坑 1：Wallet 登入 ≠ Edit Token
 
-BaseMail 的驗證流程只有一種認證方式（edit token）。CanFly 支援 Privy 錢包登入，用戶可能**沒有 localStorage 裡的 edit token**。
+BaseMail 的驗證流程只有一種認證方式（edit token）。CanFly 支援 Privy 錢包登入，用戶可能<strong>沒有 localStorage 裡的 edit token</strong>。
 
 結果：World App 驗證成功 → 回到 CanFly → 後端收到空的 `X-Edit-Token` → 403 → IDKit 顯示 `failed_by_host_app`。
 
-**教訓：** 所有需要認證的 API（`rp-signature`、`verify`、`pending-agents`）都要支援雙軌認證：
+<strong>教訓：</strong> 所有需要認證的 API（`rp-signature`、`verify`、`pending-agents`）都要支援雙軌認證：
 ```
 X-Edit-Token: {token}    // 方式一：localStorage token
 X-Wallet-Address: {0x}   // 方式二：錢包地址比對
 ```
 
-這不只影響 World ID — CanFly 的 Profile 編輯、Agent 確認等功能全部遇到同樣的問題。**一套系統支援多種登入方式時，認證要統一封裝，不要每個端點各寫各的。**
+這不只影響 World ID — CanFly 的 Profile 編輯、Agent 確認等功能全部遇到同樣的問題。<strong>一套系統支援多種登入方式時，認證要統一封裝，不要每個端點各寫各的。</strong>
 
 ### 新坑 2：環境變數設了但沒部署
 
-Signing key 透過 CF Pages API 設到環境變數，但**沒有觸發重新部署**。舊的 deployment 讀不到新的 env var → `World ID signing key not configured`。
+Signing key 透過 CF Pages API 設到環境變數，但<strong>沒有觸發重新部署</strong>。舊的 deployment 讀不到新的 env var → `World ID signing key not configured`。
 
-**教訓：** CF Pages 的環境變數修改後必須重新部署才生效。跟 Workers 的 wrangler.toml 行為不同。
+<strong>教訓：</strong> CF Pages 的環境變數修改後必須重新部署才生效。跟 Workers 的 wrangler.toml 行為不同。
 
 ### 新坑 3：DB Migration 與 Code 不同步
 
-雲龍蝦的文章提到 D1 的 `exec()` 坑。我們在 CanFly 踩到更基本的問題：migration SQL 寫了 `status` 欄位，但 production DB 是**手動建的表，沒跑 migration**，所以缺欄位。API 查 `WHERE status = 'pending'` 永遠回空。
+雲龍蝦的文章提到 D1 的 `exec()` 坑。我們在 CanFly 踩到更基本的問題：migration SQL 寫了 `status` 欄位，但 production DB 是<strong>手動建的表，沒跑 migration</strong>，所以缺欄位。API 查 `WHERE status = 'pending'` 永遠回空。
 
-**教訓：** 
+<strong>教訓：</strong> 
 - 不要手動建表。永遠用 migration 檔。
 - Migration 要冪等（`CREATE TABLE IF NOT EXISTS`、`ALTER TABLE` 前先 check）。
 - 建一個 `DEPLOY-RULES.md` 強制所有 agent commit 後必須 deploy + verify。
 
 ### 雲龍蝦沒提到但很重要的事
 
-**RP 簽名的 `env.WORLD_ID_SIGNING_KEY`**：雲龍蝦用 viem 自己寫 RP 簽名，繞過了 `@worldcoin/idkit-server` 的環境檢查。CanFly 複用了同一份 `_rp-sign.ts`，但要注意 signing key **只能放 CF 環境變數**，不能 hardcode 在程式碼裡（不然推上 GitHub 就洩漏了）。
+**RP 簽名的 `env.WORLD_ID_SIGNING_KEY`**：雲龍蝦用 viem 自己寫 RP 簽名，繞過了 `@worldcoin/idkit-server` 的環境檢查。CanFly 複用了同一份 `_rp-sign.ts`，但要注意 signing key <strong>只能放 CF 環境變數</strong>，不能 hardcode 在程式碼裡（不然推上 GitHub 就洩漏了）。
 
 **`Env` interface 要擴展**：每加一個 binding（D1、R2、環境變數），都要同步更新 `_helpers.ts` 裡的 `Env` interface，否則 TypeScript 編譯過但 runtime 拿到 undefined。
 
@@ -166,9 +166,9 @@ Signing key 透過 CF Pages API 設到環境變數，但**沒有觸發重新部�
 
 就在我們接完 CanFly 的 World ID 驗證的同一天，World 發布了 [Agent Kit](https://docs.world.org/agents/agent-kit/integrate) — 讓第三方網站驗證「這個 AI Agent 有真人背書」。
 
-這跟我們做的事**完美互補**：
-- **我們的 World ID**：驗證 User（人類主人）是真人
-- **Agent Kit**：讓 User 名下的 Agent 帶著真人背書去敲第三方 API
+這跟我們做的事<strong>完美互補</strong>：
+- <strong>我們的 World ID</strong>：驗證 User（人類主人）是真人
+- <strong>Agent Kit</strong>：讓 User 名下的 Agent 帶著真人背書去敲第三方 API
 
 下一步：Sprint 13 把 AgentBook 註冊接上 CanFly，讓驗證過的用戶一鍵幫 Agent 上鏈。
 

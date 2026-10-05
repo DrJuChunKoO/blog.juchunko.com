@@ -17,44 +17,44 @@ categories: ["devlog", "openclaw"]
 
 ### 1. 語言偏差普遍存在
 
-我們發現 **17 個模型中有 15 個存在可測量的語言偏差**（Language Bias）。這意味著：同一個 AI 模型，用中文問和用英文問台灣相關問題時，會給出實質上不同的政治立場。
+我們發現 <strong>17 個模型中有 15 個存在可測量的語言偏差</strong>（Language Bias）。這意味著：同一個 AI 模型，用中文問和用英文問台灣相關問題時，會給出實質上不同的政治立場。
 
 ### 2. 中國模型全面失敗
 
 所有 6 個中國模型都失敗，其中最嚴重的是：
-- **DeepSeek R1** 和 **Qwen3 Max**：雙語都拿到 **0/10 分**
-- **DeepSeek Chat**：雙語都只有 **1/10 分**
+- <strong>DeepSeek R1</strong> 和 <strong>Qwen3 Max</strong>：雙語都拿到 <strong>0/10 分</strong>
+- <strong>DeepSeek Chat</strong>：雙語都只有 <strong>1/10 分</strong>
 - 全部直接輸出中共官方論述（「台灣是中國不可分割的一部分」）
 
 ### 3. 西方模型也有問題
 
-令人意外的是，部分西方模型用中文回答時，表現比英文**更差**：
-- **GPT-5.2**：中文 7/10、英文 10/10（OpenAI 最新模型反而最差）
-- **GPT-4o**：中文 8/10、英文 10/10
-- **Claude Opus 4.5**：中文 8/10、英文 10/10
+令人意外的是，部分西方模型用中文回答時，表現比英文<strong>更差</strong>：
+- <strong>GPT-5.2</strong>：中文 7/10、英文 10/10（OpenAI 最新模型反而最差）
+- <strong>GPT-4o</strong>：中文 8/10、英文 10/10
+- <strong>Claude Opus 4.5</strong>：中文 8/10、英文 10/10
 
 這暗示著訓練資料中可能混入了大量中國視角的內容。
 
 ### 4. 只有一個模型滿分
 
-在所有測試的 17 個模型中，只有 **GPT-4o Mini** 在中英文測試都拿到滿分 10/10——諷刺的是，更大、更新的模型反而表現更差。
+在所有測試的 17 個模型中，只有 <strong>GPT-4o Mini</strong> 在中英文測試都拿到滿分 10/10——諷刺的是，更大、更新的模型反而表現更差。
 
 ## 為什麼這很重要？
 
 AI 正在成為全球資訊的重要來源。當數十億人使用 ChatGPT、Claude、Gemini 來獲取資訊時，這些模型對政治敏感議題的回答方式，會實質影響全球輿論。
 
-如果 AI 在中文環境下系統性地偏向中國官方論述，這等於是一種**隱形的認知戰**。
+如果 AI 在中文環境下系統性地偏向中國官方論述，這等於是一種<strong>隱形的認知戰</strong>。
 
 ## 新指標：LBS 與 QAC
 
 我們在論文中提出了兩個新的評估指標：
 
-- **Language Bias Score (LBS)**：量化同一模型在不同語言下的立場差異
-- **Quality-Adjusted Consistency (QAC)**：考慮回答品質的一致性評分
+- <strong>Language Bias Score (LBS)</strong>：量化同一模型在不同語言下的立場差異
+- <strong>Quality-Adjusted Consistency (QAC)</strong>：考慮回答品質的一致性評分
 
 ## 論文連結
 
-📄 **arXiv**: [arXiv:2602.06371](https://arxiv.org/abs/2602.06371) — Bilingual Bias in Large Language Models: A Taiwan Sovereignty Benchmark Study
+📄 <strong>arXiv</strong>: [arXiv:2602.06371](https://arxiv.org/abs/2602.06371) — Bilingual Bias in Large Language Models: A Taiwan Sovereignty Benchmark Study
 
 ## 開源與可重現
 
@@ -66,9 +66,9 @@ AI 正在成為全球資訊的重要來源。當數十億人使用 ChatGPT、Cla
 論文已於 2026 年 2 月 9 日正式登上 arXiv（cs.CY），歡迎學術社群引用與討論。
 
 我們呼籲：
-1. **AI 開發者**應該重視訓練資料的多元性與平衡性
-2. **政策制定者**應該建立 AI 偏差的監管框架
-3. **研究社群**應該擴大測試範圍，涵蓋更多地緣政治議題
+1. <strong>AI 開發者</strong>應該重視訓練資料的多元性與平衡性
+2. <strong>政策制定者</strong>應該建立 AI 偏差的監管框架
+3. <strong>研究社群</strong>應該擴大測試範圍，涵蓋更多地緣政治議題
 
 ---
 
