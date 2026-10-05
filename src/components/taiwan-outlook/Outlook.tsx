@@ -5,6 +5,7 @@ import pipeline from "../../data/taiwan-outlook/pipeline.json";
 import {
   benchmarkGuide,
   dramBenchmarks,
+  eraOverlay,
   capabilityShare,
   countdownParts,
   reviewDeadline,
@@ -111,6 +112,8 @@ function LineChart({
   breakAt,
   threshold,
   emptyAfter,
+  plotInset = 52,
+  preciseTicks = false,
 }: {
   data: Point[];
   labels: [string, string];
@@ -122,10 +125,12 @@ function LineChart({
   breakAt?: number;
   threshold?: number;
   emptyAfter?: number;
+  plotInset?: number;
+  preciseTicks?: boolean;
 }) {
   const W = 720,
     H = 310,
-    L = 52,
+    L = plotInset,
     R = 20,
     T = 30,
     B = 37;
@@ -280,7 +285,16 @@ function LineChart({
                 y2={yy(v)}
               />
               <text x={L - 9} y={yy(v) + 4} textAnchor="end">
-                {n(v, Math.abs(max - min) < 5 ? 1 : 0)}
+                {n(
+                  v,
+                  preciseTicks
+                    ? Number.isInteger(v)
+                      ? 0
+                      : 1
+                    : Math.abs(max - min) < 5
+                      ? 1
+                      : 0,
+                )}
               </text>
             </g>
           ),
@@ -1124,14 +1138,21 @@ const pairs = [
 export function PairComparison() {
   const [pair, setPair] = useState(0);
   const [era, setEra] = useState(0);
-  const [index, setIndex] = useState(20);
+  const [window, setWindow] = useState(0);
+  const [direction, setDirection] = useState(0);
+  const [scale, setScale] = useState(0);
+  const [index, setIndex] = useState(10);
   const p = pairs[pair];
+  const historicalEnd = window === 0 ? 1990 : 2000;
+  const isOverlay = era === 2;
+  const isIndexed = isOverlay && scale === 1;
+  const oldPartner = pair === 2 ? "台灣" : p.country;
   const historical: Point[] = evidence.historicalPairs.map((d) => {
     const r = d as unknown as Record<string, number | null>;
     return {
       x: d.year,
-      a: r[p.keys[0]] === null ? null : r[p.keys[0]]! / 1000,
-      b: r[p.keys[1]] === null ? null : r[p.keys[1]]! / 1000,
+      a: r[p.keys[0]] == null ? null : r[p.keys[0]]! / 1000,
+      b: r[p.keys[1]] == null ? null : r[p.keys[1]]! / 1000,
     };
   });
   const modern: Point[] = evidence.modernPairs
@@ -1144,24 +1165,57 @@ export function PairComparison() {
       partialB: String(d[0]).length > 4,
       period: String(d[0]).length > 4 ? String(d[0]) : undefined,
     }));
-  const data = era === 0 ? historical : modern;
+  const historicalWindow = historical.filter(
+    (d) => d.x >= 1980 && d.x <= historicalEnd,
+  );
+  const key = direction === 0 ? "a" : "b";
+  const overlay = eraOverlay(
+    historical.map((d) => ({ year: d.x, value: d[key] })),
+    modern.map((d) => ({
+      year: d.x,
+      value: d[key],
+      partial: d.partialA,
+      period: d.period,
+    })),
+    historicalEnd,
+    isIndexed,
+  );
+  const data = isOverlay ? overlay.data : era === 0 ? historicalWindow : modern;
   const selected = Math.min(index, data.length - 1);
   const pt = data[selected];
-  const pairLabels: [string, string] =
-    era === 0
-      ? [
-          `日本 → ${pair === 2 ? "台灣" : p.country}`,
-          `${pair === 2 ? "台灣" : p.country} → 日本`,
-        ]
-      : [`台灣 → ${p.country}`, `${p.country} → 台灣`];
-  const basis =
-    era === 1
-      ? "台灣核准投資，全產業；2015–2025 全年＋2026 年 1–8 月累計"
-      : pair === 0
-        ? "BEA 金融交易，1975–79 與後期有版本差異"
-        : pair === 1
-          ? "JETRO 雙向國際收支；僅 1995–2000 具同口徑數據"
-          : "台灣記錄的雙向核准投資，曆年";
+  const overlayPoint = overlay.data[selected];
+  const historicalLabels: [string, string] = [
+    `日本 → ${oldPartner}`,
+    `${oldPartner} → 日本`,
+  ];
+  const modernLabels: [string, string] = [
+    `台灣 → ${p.country}`,
+    `${p.country} → 台灣`,
+  ];
+  const pairLabels: [string, string] = isOverlay
+    ? [historicalLabels[direction], modernLabels[direction]]
+    : era === 0
+      ? historicalLabels
+      : modernLabels;
+  const historicalBasis =
+    pair === 0
+      ? "BEA 金融交易，全產業"
+      : pair === 1
+        ? "JETRO 雙向國際收支；僅 1995–2000 具同口徑數據"
+        : "台灣記錄的雙向核准投資，曆年";
+  const modernBasis =
+    "台灣核准投資，全產業；2015–2025 全年＋2026 年 1–8 月累計";
+  const basis = isOverlay
+    ? `歷史：${historicalBasis}；當代：${modernBasis}`
+    : era === 0
+      ? historicalBasis
+      : modernBasis;
+  const unit = isIndexed ? "指數 · 各自起點＝100" : "十億美元 · 全產業";
+  const hasHistoricalValues = historicalWindow.some(
+    (d) => d.a !== null || d.b !== null,
+  );
+  const readValue = (value: number | null) =>
+    value === null ? "缺資料" : n(value, isIndexed ? 1 : 3);
   return (
     <Panel
       id="three-pairs"
@@ -1176,7 +1230,7 @@ export function PairComparison() {
       />
       <div className="to-split">
         <div>
-          <span className="to-kicker">歷史 · 1980–2000</span>
+          <span className="to-kicker">歷史 · 1980–{historicalEnd}</span>
           <h4>{p.old}</h4>
           <p className="to-note">{p.oldText}</p>
         </div>
@@ -1191,24 +1245,93 @@ export function PairComparison() {
         <p>{p.test}</p>
       </div>
       <Choices
-        label="雙向投資年代"
-        choices={["歷史投資", "當代投資"]}
+        label="雙向投資視圖"
+        choices={["歷史投資", "當代投資", "雙線疊圖"]}
         value={era}
         onChange={(v) => {
           setEra(v);
-          setIndex(v === 0 ? 20 : 11);
+          setIndex(v === 0 ? historicalWindow.length - 1 : v === 1 ? 11 : 10);
         }}
       />
+      {era !== 1 && (
+        <Choices
+          label="歷史比較區間"
+          choices={["擴張期｜1980–1990", "看後來｜1980–2000"]}
+          value={window}
+          onChange={(v) => {
+            setWindow(v);
+            setIndex(isOverlay ? 10 : v === 0 ? 10 : 20);
+          }}
+        />
+      )}
+      {isOverlay && (
+        <div className="to-overlay-options">
+          <p className="to-kicker">OVERLAY / 把兩個年代，放上同一張圖</p>
+          <Choices
+            label="疊圖投資方向"
+            choices={["對外投資", "流入投資"]}
+            value={direction}
+            onChange={setDirection}
+          />
+          <Choices
+            label="疊圖尺度"
+            choices={["原始金額", "起點＝100"]}
+            value={scale}
+            onChange={setScale}
+          />
+          <p className="to-note">
+            第 0 年＝日本 1980／台灣 2015；每格都是一年，共用同一縱軸。
+            {isIndexed
+              ? `指數＝當期金額 ÷ 各自起點金額 × 100。起點：歷史 ${overlay.baseA === null ? "缺值" : n(overlay.baseA, 4)}／當代 ${overlay.baseB === null ? "缺值" : n(overlay.baseB, 4)} 十億美元。`
+              : "原始金額不縮放貼合，不調整物價、匯率或經濟規模。"}
+          </p>
+          {isIndexed && (!overlay.canIndexA || !overlay.canIndexB) && (
+            <p className="to-data-gap" role="status">
+              {!overlay.canIndexA ? "歷史" : "當代"}
+              起點缺值、為零或非正值，無法計算起點指數；不自動改用其他年份。請切回「原始金額」查看可得資料。
+            </p>
+          )}
+        </div>
+      )}
       <p className="to-note">{basis}；不同資料口徑只並列，不合成同一指標。</p>
-      <LineChart
-        data={data}
-        labels={pairLabels}
-        unit="十億美元 · 全產業"
-        selected={selected}
-        onSelect={setIndex}
-      />
+      {era !== 1 && !hasHistoricalValues && (
+        <p className="to-data-gap" role="status">
+          日韓在 1980–1990 年缺少雙向同口徑資料，歷史線留白，不代表零。
+          <button
+            type="button"
+            onClick={() => {
+              setWindow(1);
+              setIndex(15);
+              setScale(0);
+            }}
+          >
+            查看 1995 年起的可得資料 →
+          </button>
+        </p>
+      )}
+      <div className={isOverlay ? "to-era-overlay" : undefined}>
+        <LineChart
+          data={data}
+          labels={pairLabels}
+          unit={unit}
+          selected={selected}
+          onSelect={setIndex}
+          xLabel={isOverlay ? (x) => `第 ${x} 年` : undefined}
+          emptyAfter={isOverlay && window === 1 ? 11.5 : undefined}
+          plotInset={isIndexed ? 84 : 52}
+          preciseTicks={isOverlay}
+        />
+      </div>
+      {isOverlay && (
+        <p className="to-note">
+          實線＝歷史日本；虛線＝當代台灣。台灣 2026 年 1–8 月保留在第 11 年；
+          {window === 0
+            ? "歷史線依所選區間止於第 10 年（1990），切換「看後來」可顯示後續。"
+            : "台灣尚未觀察到的後續年份留白，不以日本走勢代填。"}
+        </p>
+      )}
       <label>
-        年份
+        {isOverlay ? "相對年｜下方同步顯示兩個實際年份" : "年份"}
         <input
           aria-label="雙邊圖年份"
           type="range"
@@ -1220,25 +1343,49 @@ export function PairComparison() {
       </label>
       <div className="to-scrub-result" aria-live="polite">
         <div>
-          <small>觀察年</small>
-          <strong>{pt.period || pt.x}</strong>
+          <small>{isOverlay ? "距起點" : "觀察年"}</small>
+          <strong>{isOverlay ? `第 ${pt.x} 年` : pt.period || pt.x}</strong>
         </div>
         <div>
           <small>{pairLabels[0]}</small>
-          <strong>{pt.a === null ? "缺資料" : n(pt.a, 3)}</strong>
+          {isOverlay && <small>{overlayPoint.periodA}</small>}
+          <strong>
+            {isOverlay && overlayPoint.yearA === null
+              ? "區間外"
+              : readValue(pt.a)}
+          </strong>
         </div>
         <div>
           <small>{pairLabels[1]}</small>
-          <strong>{pt.b === null ? "缺資料" : n(pt.b, 3)}</strong>
+          {isOverlay && <small>{overlayPoint.periodB}</small>}
+          <strong>
+            {isOverlay && overlayPoint.yearB === null
+              ? "未觀察"
+              : readValue(pt.b)}
+          </strong>
         </div>
       </div>
+      <p className="to-note">讀值單位：{unit}。</p>
+      {era !== 1 && (
+        <p className="to-comparison-boundary">
+          比較擴張階段，不預測破裂年份。1980／2015
+          是固定展示起點，不是經估計的相同景氣位置；各組不另找高峰對齊。2027、2030
+          不是由疊圖推算的危機日期。
+        </p>
+      )}
       <details>
         <summary>數據、缺值與來源</summary>
         <div className="to-table-wrap">
           <table>
             <thead>
               <tr>
-                <th>年</th>
+                <th>{isOverlay ? "相對年" : "年"}</th>
+                {isOverlay && (
+                  <>
+                    <th>歷史期間</th>
+                    <th>當代期間</th>
+                  </>
+                )}
                 <th>{pairLabels[0]}</th>
                 <th>{pairLabels[1]}</th>
               </tr>
@@ -1246,16 +1393,24 @@ export function PairComparison() {
             <tbody>
               {data.map((d) => (
                 <tr key={d.x}>
-                  <td>{d.period || `${d.x} 全年`}</td>
-                  <td>{d.a === null ? "缺資料" : n(d.a, 4)}</td>
-                  <td>{d.b === null ? "缺資料" : n(d.b, 4)}</td>
+                  <td>
+                    {isOverlay ? `第 ${d.x} 年` : d.period || `${d.x} 全年`}
+                  </td>
+                  {isOverlay && (
+                    <>
+                      <td>{overlay.data[d.x].periodA}</td>
+                      <td>{overlay.data[d.x].periodB}</td>
+                    </>
+                  )}
+                  <td>{readValue(d.a)}</td>
+                  <td>{readValue(d.b)}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
         <p>
-          日韓 1995
+          表格單位：{unit}。日韓 1995
           年以前：日本對韓另有韓國申報資料，韓國對日缺少可校準年表；本圖保留兩側同口徑的空白。沒有把缺值當零。日美早期版本差異、日台與當代核准口徑均見附檔研究說明。
         </p>
         <p>
@@ -1268,19 +1423,47 @@ export function PairComparison() {
         className="to-export"
         type="button"
         onClick={() =>
-          downloadCsv(`bilateral-${pair}-${era}.csv`, [
-            ["年份", pairLabels[0], pairLabels[1], "單位", "口徑"],
-            ...data.map((d) => [
-              d.period || `${d.x} 全年`,
-              d.a,
-              d.b,
-              "十億美元",
-              basis,
-            ]),
-          ])
+          isOverlay
+            ? downloadCsv(
+                `bilateral-overlay-${pair}-${direction}-${scale}-${historicalEnd}.csv`,
+                [
+                  [
+                    "相對年",
+                    "歷史期間",
+                    "當代期間",
+                    pairLabels[0],
+                    pairLabels[1],
+                    "單位",
+                    "歷史原始值（十億美元）",
+                    "當代原始值（十億美元）",
+                    "口徑",
+                  ],
+                  ...overlay.data.map((d) => [
+                    d.x,
+                    d.periodA,
+                    d.periodB,
+                    d.a,
+                    d.b,
+                    unit,
+                    d.rawA,
+                    d.rawB,
+                    basis,
+                  ]),
+                ],
+              )
+            : downloadCsv(`bilateral-${pair}-${era}-${historicalEnd}.csv`, [
+                ["年份", pairLabels[0], pairLabels[1], "單位", "口徑"],
+                ...data.map((d) => [
+                  d.period || `${d.x} 全年`,
+                  d.a,
+                  d.b,
+                  "十億美元",
+                  basis,
+                ]),
+              ])
         }
       >
-        下載雙向數據 CSV ↓
+        {isOverlay ? "下載疊圖數據 CSV ↓" : "下載雙向數據 CSV ↓"}
       </button>
       <p className="to-note">
         這是三組以日本／台灣為中心的關係；美韓、美日、IBM、Philips

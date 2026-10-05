@@ -255,6 +255,35 @@
   stroke-dasharray: 7 5;
   stroke-width: 2.5;
 }
+.to-era-overlay .to-path {
+  stroke-width: 3.5;
+}
+.to-era-overlay .to-path.secondary {
+  stroke-width: 3;
+}
+.to-overlay-options {
+  margin: 20px 0 16px;
+  padding: 18px 0;
+  border-top: 1px solid var(--to-line);
+  border-bottom: 1px solid var(--to-line);
+}
+.to-widget .to-data-gap {
+  margin: 14px 0;
+  padding: 14px 16px;
+  border: 1px solid var(--to-line);
+  font-size: 13px;
+}
+.to-data-gap button {
+  display: block;
+  margin-top: 12px;
+}
+.to-widget .to-comparison-boundary {
+  margin: 18px 0;
+  padding-left: 14px;
+  border-left: 1px solid var(--to-line);
+  font-size: 12px;
+  color: var(--to-muted);
+}
 .to-chart .to-dot {
   fill: var(--to-bg);
   stroke: var(--to-ink);

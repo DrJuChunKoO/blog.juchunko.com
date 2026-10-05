@@ -34,6 +34,14 @@ The $265bn pipeline is the cumulative multi-year US plan announced in July 2026,
 
 ## Maintenance
 
+### Bilateral expansion and overlay views (2026-10-05)
+
+The three-pair widget defaults to the common **1980–1990** historical window. A visible switch extends all historical pairs to **1980–2000**; no pair is truncated at its own maximum. The original 1975–1979 source rows remain in `evidence.json` but are outside these UI windows. Contemporary views always retain 2015–2025 and the observed 2026 January–August partial period.
+
+The overlay compares the same direction (outward or inward) across eras, not outward against inward. `eraOverlay` fixes Japan 1980 and Taiwan 2015 as relative year zero and uses one calendar year per step, with actual dates in the scrub readouts, data table and CSV. These starts are editorial comparison anchors, not econometrically identified equivalent cycle positions. There is no time warping, peak matching, min/max normalization, correlation score, or estimated crisis date. Both lines share one y-axis. Raw USD billions are the default and are not adjusted for inflation, exchange rates or economic size. The optional index is **value / that series' fixed start-year value × 100**; missing, zero or negative baselines yield a missing index, never an automatic replacement base year. Negative later flows remain negative.
+
+The expansion overlay's history stops at relative year 10 (1990), while Taiwan's 2026 partial observation remains at year 11; the corresponding historical value is explicitly outside the selected window. The full-history overlay extends to year 20 (2000), with Taiwan blank after relative year 11. It never extrapolates Taiwan or maps a missing future date to an observed historical crisis. Korea's pre-1995 bilateral BOP observations stay null; an explicit empty state offers full history, and the unavailable 1980 base prevents an indexed historical Korean line. Earlier notified investment is not substituted. Exports include periods, original amounts, transformed values and basis labels. Hero, factual totals, pending Trump investment claim and clock formulas are unchanged.
+
 Update both directions and keep annual/partial periods separate. Record the snapshot date and revisions. Prefer node/yield/territorial capability observations over dollar proxies. Revise good and bad evidence symmetrically; missingness is not safety and is not failure. No estimated probability, causal coefficient, or arbitrary aggregate warning score is published.
 
 ## Cover generation

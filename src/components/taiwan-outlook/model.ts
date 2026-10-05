@@ -1,3 +1,60 @@
+export type EraObservation = {
+  year: number;
+  value: number | null;
+  partial?: boolean;
+  period?: string;
+};
+
+/** Fixed calendar starts, one year per step; no peak fitting, interpolation or annualization. */
+export function eraOverlay(
+  historical: EraObservation[],
+  modern: EraObservation[],
+  historicalEnd: number,
+  indexed: boolean,
+) {
+  const historicalStart = 1980;
+  const modernStart = 2015;
+  const baseA =
+    historical.find((p) => p.year === historicalStart)?.value ?? null;
+  const baseB = modern.find((p) => p.year === modernStart)?.value ?? null;
+  const canIndexA = baseA !== null && baseA > 0;
+  const canIndexB = baseB !== null && baseB > 0;
+  const end = Math.max(
+    historicalEnd - historicalStart,
+    ...modern.map((p) => p.year - modernStart),
+  );
+  const normalize = (value: number | null, base: number | null) =>
+    !indexed
+      ? value
+      : value === null || base === null || base <= 0
+        ? null
+        : (value / base) * 100;
+  const data = Array.from({ length: end + 1 }, (_, x) => {
+    const yearA = historicalStart + x;
+    const a =
+      yearA <= historicalEnd
+        ? historical.find((p) => p.year === yearA)
+        : undefined;
+    const b = modern.find((p) => p.year === modernStart + x);
+    const rawA = a?.value ?? null;
+    const rawB = b?.value ?? null;
+    return {
+      x,
+      a: normalize(rawA, baseA),
+      b: normalize(rawB, baseB),
+      rawA,
+      rawB,
+      yearA: yearA <= historicalEnd ? yearA : null,
+      yearB: b?.year ?? null,
+      periodA: yearA <= historicalEnd ? `${yearA} 全年` : "超出所選歷史區間",
+      periodB: b ? b.period || `${b.year} 全年` : "尚無觀察值",
+      partialB: b?.partial ?? false,
+      period: b?.partial ? b.period : undefined,
+    };
+  });
+  return { data, baseA, baseB, canIndexA, canIndexB };
+}
+
 /** Select the four source benchmarks and convert fractional shares to percentage points. */
 export function dramBenchmarks(rows: (number | string | null)[][]) {
   return rows

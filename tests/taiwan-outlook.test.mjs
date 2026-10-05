@@ -5,11 +5,113 @@ import sharp from "sharp";
 import {
   benchmarkGuide,
   dramBenchmarks,
+  eraOverlay,
   capabilityShare,
   yearsToThreshold,
   reviewDeadline,
   countdownParts,
 } from "../src/components/taiwan-outlook/model.ts";
+
+function overlayFixture(country = "美國", direction = 0) {
+  const d = JSON.parse(
+    readFileSync(
+      new URL("../src/data/taiwan-outlook/evidence.json", import.meta.url),
+    ),
+  );
+  const keys =
+    country === "美國"
+      ? ["jpUS", "usJP"]
+      : country === "韓國"
+        ? ["jpKR", "krJP"]
+        : ["jpTW", "twJP"];
+  return [
+    d.historicalPairs.map((r) => ({
+      year: r.year,
+      value: r[keys[direction]] === null ? null : r[keys[direction]] / 1000,
+    })),
+    d.modernPairs
+      .filter((r) => r[1] === country)
+      .map((r) => ({
+        year: Number(String(r[0]).slice(0, 4)),
+        value: r[2 + direction],
+        partial: String(r[0]).length > 4,
+        period: String(r[0]).length > 4 ? r[0] : undefined,
+      })),
+  ];
+}
+
+test("era overlay uses fixed starts, a common yearly axis and unchanged raw flows", () => {
+  const result = eraOverlay(...overlayFixture(), 1990, false);
+  assert.equal(result.data.length, 12);
+  assert.equal(result.baseA, 0.948);
+  assert.equal(result.baseB, 0.3624794634);
+  assert.equal(result.data[0].yearA, 1980);
+  assert.equal(result.data[0].yearB, 2015);
+  assert.equal(result.data[10].a, 18.754);
+  assert.equal(result.data[10].b, 5.1535765603);
+  assert.ok(result.data[10].b < result.data[9].b, "Retain the 2025 decline");
+});
+
+test("the expansion overlay retains 2026 YTD without annualizing or silently adding 1991", () => {
+  const result = eraOverlay(...overlayFixture(), 1990, false);
+  const last = result.data.at(-1);
+  assert.equal(last.x, 11);
+  assert.equal(last.a, null);
+  assert.equal(last.yearA, null);
+  assert.equal(last.periodA, "超出所選歷史區間");
+  assert.equal(last.yearB, 2026);
+  assert.equal(last.periodB, "2026 1–8月");
+  assert.equal(last.b, 23.7122261728);
+  assert.equal(last.partialB, true);
+});
+
+test("full history restores the Japanese downturn and never projects Taiwan's future", () => {
+  const result = eraOverlay(...overlayFixture(), 2000, false);
+  assert.equal(result.data.length, 21);
+  assert.equal(result.data[11].a, 12.782);
+  assert.equal(result.data[12].a, 4.245);
+  assert.equal(result.data.at(-1).yearA, 2000);
+  for (const row of result.data.slice(12)) {
+    assert.equal(row.b, null);
+    assert.equal(row.yearB, null);
+    assert.equal(row.periodB, "尚無觀察值");
+  }
+});
+
+test("start indices use transparent denominators, not peak matching, and retain negative flows", () => {
+  const result = eraOverlay(...overlayFixture(), 1990, true);
+  assert.equal(result.data[0].a, 100);
+  assert.equal(result.data[0].b, 100);
+  assert.equal(result.data[10].a, (18.754 / 0.948) * 100);
+  assert.equal(result.data[11].b, (23.7122261728 / 0.3624794634) * 100);
+  const inward = eraOverlay(...overlayFixture("美國", 1), 2000, true);
+  assert.equal(inward.data[11].rawA, -0.203);
+  assert.ok(inward.data[11].a < 0);
+});
+
+test("Korean missingness is not replaced by notified values or a later index base", () => {
+  const fixture = overlayFixture("韓國");
+  const expansion = eraOverlay(...fixture, 1990, false);
+  assert.ok(expansion.data.every((r) => r.a === null));
+  const full = eraOverlay(...fixture, 2000, false);
+  assert.ok(full.data.slice(15).some((r) => r.a !== null));
+  const indexed = eraOverlay(...fixture, 2000, true);
+  assert.equal(indexed.canIndexA, false);
+  assert.ok(indexed.data.every((r) => r.a === null));
+  for (const base of [0, -1, null]) {
+    const result = eraOverlay(
+      [
+        { year: 1980, value: base },
+        { year: 1981, value: 10 },
+      ],
+      fixture[1],
+      1990,
+      true,
+    );
+    assert.equal(result.canIndexA, false);
+    assert.equal(result.data[1].a, null);
+  }
+});
 
 test("benchmark guides retain observed coordinates and never turn unknowns into zero", () => {
   const d = JSON.parse(
