@@ -1,0 +1,97 @@
+---
+title: "一句話，一座 3D 台北：1 小時 46 分，和 AI 蓋出 2033 年的臺北 AI 園區"
+description: "一位網友的提問，讓我和 Claude Opus 5.5 在 1 小時 46 分鐘內做出 ai2033.taipei：OpenStreetMap 六萬棟真實建築、會亮窗光的夜景、可以開小黃切換時空的 3D 台北。文章裡可以直接試玩。"
+pubDate: "2026-10-11"
+heroImage: "../../../assets/images/ai2033-taipei/cover-v1.jpg"
+author: "juchun-ko"
+categories: ["devlog", "ai-agent"]
+---
+
+import { Image } from 'astro:assets';
+import driveShot from "../../../assets/images/ai2033-taipei/drive-2026.jpg";
+import timemachineShot from "../../../assets/images/ai2033-taipei/timemachine.jpg";
+import nightShot from "../../../assets/images/ai2033-taipei/night-aerial.jpg";
+
+# 一句話，一座 3D 台北
+
+## 一切從一個提問開始
+
+前幾天分享松機遷移、[台北 AI 園區的構想](/zh/taipei-ai-golden-century)之後，有網友在留言問：「哪裡可以找到逐字稿？未來到底長什麼樣子？」
+
+我的第一個念頭，也是整理資料、放上連結。後來忽然想到：之前不是聊過「GTA 台北」嗎？那能不能真的做一個 3D 體驗，讓大家自己開進去看看？
+
+於是，我和現今最強大的 AI 之一 Claude Opus 5.5 一起做了這個網站：<strong>[AI2033・Taipei](https://ai2033.taipei)</strong>，沉浸式體驗 2033 年松機遷移後的「AI 黃金世紀」台北 AI 園區。
+
+## Prompt 就那幾句話
+
+很多朋友以為做這種網站要寫落落長的規格書。沒有，prompt 只有幾句話，我已經在影片和貼文裡公開了。大意就是：聽說你做 3D 網站很厲害，之前也有網友做過 GTA 台北，那幫我做一個 2033 年松機遷移後的台北 AI 園區體驗吧。
+
+完整的過程與成果導覽，我剪了一支 3 分 50 秒的影片：
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/kx--g9jTgVs" title="一句話，一座 3D 台北：AI2033 Taipei" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
+## 1 小時 46 分鐘
+
+時間軸很簡單：<strong>10/9 下午 2:20 下 prompt，下午 4:06 網站就做好了</strong>。1 小時 46 分鐘，中間我大部分時間在做自己的事，偶爾回來看一眼進度。
+
+雖然很陽春，但效率真的很驚人。整個開發過程的 commit 紀錄都公開在 [GitHub](https://github.com/dAAAb/ai2033.taipei) 上，想考古的朋友可以去翻。
+
+## 網站裡有什麼（阿宅環節）
+
+<Image src={driveShot} alt="在 2026 年的敦化北路開小黃，前往松山機場" style="border-radius: 8px; margin: 1rem 0; width: 100%; height: auto;" />
+
+*開著小黃沿敦化北路往松機，這是 2026 年的台北*
+
+進去之後，你可以開著一台小黃在台北街頭跑。地圖不是隨便畫的：用的是 <strong>OpenStreetMap 六萬棟真實建築</strong>，所以敦化北路就是敦化北路，民生社區就是民生社區。
+
+<Image src={timemachineShot} alt="時光機啟動：2026 到 2033，松山機場遷移、臺北 AI 園區誕生" style="border-radius: 8px; margin: 1rem 0; width: 100%; height: auto;" />
+
+*按下時光機，從 2026 切到 2033：松機原址長出臺北 AI 園區*
+
+最好玩的是時光機：一鍵在 2026 和 2033 之間切換。切到 2033，松機原址會長出 110 公頃中央公園、100 公頃 AI 產業聚落、90 公頃國際永續生活聚落，也就是蔣萬安市長 10/8 記者會宣布的 300 公頃臺北 AI 園區願景。
+
+<Image src={nightShot} alt="2033 年臺北 AI 園區夜景，窗戶一格一格亮起" style="border-radius: 8px; margin: 1rem 0; width: 100%; height: auto;" />
+
+*入夜後的 AI 產業聚落：窗戶會一格一格亮起來*
+
+然後是我最得意的宅點：<strong>入夜後，窗戶會一格一格亮起來</strong>。這是用 three.js 的窗光 shader 做的。阿宅的職業病發作，盯著那片窗光看了好久。
+
+網站還有[逐字稿頁](https://ai2033.taipei/transcript/)和[簡報頁](https://ai2033.taipei/slides/)，回應最初那位網友的提問。
+
+## 幫忙釋疑：聚落，不是資料中心
+
+對了，幫忙釋疑一下：這是 <strong>AI 產業聚落，不是 AI 資料中心</strong>。Token 和算力只要網路通暢就能運作；當然，核電能早日重啟，還是相當重要。
+
+## 想像力，往往慢半拍
+
+做出來只花了不到兩小時；想到「原來可以這樣做」，卻是在一個網友的提問之後。AI 已經在這裡了，我卻還會因為一個提問，突然發現：「啊，原來還可以這樣玩。」這表示還有很多事情，我們根本還沒想到。
+
+新科技來了，我們的想像力，往往需要一點時間才跟得上。鐵路把人送得更遠，後來連「現在幾點」都得重新協調；汽車讓人跑得更快，接著長出整套開車旅行的生活；電網點亮了夜晚，也讓馬達走進工廠；網際網路最初只是幫科學家交換資訊，後來長出網購、影音、遠距協作，甚至讓陌生人一起寫開源。
+
+科技帶來的改變，從來不是在發明那一天就全部想清楚的。需要去用、去玩、去體會；也需要留一點時間，讓新工具和自己的經驗慢慢碰撞。
+
+我很喜歡這種感覺。還有好多東西可以試。
+
+## 直接開進 3D 台北
+
+說了這麼多，不如直接玩。下面這個視窗就是 ai2033.taipei 的 3D 台北，點進去就能開車（建議用電腦操作，鍵盤方向鍵或 WASD）：
+
+<iframe src="https://ai2033.taipei/3d/" width="100%" height="640" style="border: 1px solid rgba(0,0,0,0.1); border-radius: 8px; margin: 1rem 0;" loading="lazy" allowfullscreen title="AI2033 Taipei 3D 體驗"></iframe>
+
+視窗太小不過癮的話，[全螢幕開啟 ai2033.taipei/3d/](https://ai2033.taipei/3d/)，或從[首頁](https://ai2033.taipei)看完整版，含前後對比與問答。
+
+邀你進來逛逛，也許你會想到下一個我還沒想到的玩法。
+
+---
+
+<strong>聲明</strong>：本網站是我與 AI（Claude Opus 5.5）協作生成的非官方作品。3D 園區是願景示意，不是正式設計圖；正式內容以臺北市政府公告為準。目前「逐字稿」頁提供的是新聞稿版致詞全文與答問整理。
+
+地圖資料 © [OpenStreetMap](https://www.openstreetmap.org/copyright) 貢獻者，依 ODbL 授權使用。
+
+<strong>延伸閱讀</strong>
+
+- [心臟變強，腦也要跟著擴容：AI 黃金世紀，從台北開始](/zh/taipei-ai-golden-century)
+- [蔣市長發表會影片（寶博頻道）](https://youtu.be/0oDwWPOCNII)
+- [臺北市政府記者會完整影片](https://youtu.be/ircGbXWHRbQ)
+- [AI2033 Taipei 專案原始碼（GitHub）](https://github.com/dAAAb/ai2033.taipei)
+- [90 秒快速導覽（YouTube Shorts）](https://youtube.com/shorts/Qah0_A2q0NY)

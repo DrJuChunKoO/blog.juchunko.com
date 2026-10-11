@@ -1,0 +1,97 @@
+---
+title: "One Sentence, One 3D Taipei: Building the 2033 Taipei AI Park with AI in 1 Hour 46 Minutes"
+description: "A single question from a netizen led me and Claude Opus 5.5 to build ai2033.taipei in 1 hour 46 minutes: 60,000 real OpenStreetMap buildings, windows that light up at night, and a drivable 3D Taipei with a built-in time machine. Playable right inside this post."
+pubDate: "2026-10-11"
+heroImage: "../../../assets/images/ai2033-taipei/cover-v1.jpg"
+author: "juchun-ko"
+categories: ["devlog", "ai-agent"]
+---
+
+import { Image } from 'astro:assets';
+import driveShot from "../../../assets/images/ai2033-taipei/drive-2026.jpg";
+import timemachineShot from "../../../assets/images/ai2033-taipei/timemachine.jpg";
+import nightShot from "../../../assets/images/ai2033-taipei/night-aerial.jpg";
+
+# One Sentence, One 3D Taipei
+
+## It All Started with a Question
+
+A few days ago, after I shared the vision of [relocating Songshan Airport and building the Taipei AI Park](/en/taipei-ai-golden-century), a netizen left a comment asking: "Where can I find the full transcript? What will the future actually look like?"
+
+My first instinct was the usual one: gather the materials, post some links. Then it hit me. Didn't we joke about a "GTA Taipei" a while back? What if people could actually drive into the future and see it for themselves, in 3D?
+
+So I teamed up with one of the most capable AIs available today, Claude Opus 5.5, and built this website: <strong>[AI2033 Taipei](https://ai2033.taipei)</strong>, an immersive experience of the post-relocation "AI Golden Century" Taipei AI Park in 2033.
+
+## The Prompt Was Just a Few Sentences
+
+Many friends assume a site like this needs a lengthy spec document. It didn't. The prompt was a few sentences long, and I've shared it publicly in the video and my posts. The gist: I hear you're great at 3D websites, someone once made a GTA-style Taipei, so build me an experience of the Taipei AI Park after Songshan Airport's relocation, set in 2033.
+
+I also cut a 3-minute-50-second video walking through the whole process and the result:
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/kx--g9jTgVs" title="One Sentence, One 3D Taipei: AI2033 Taipei" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
+## 1 Hour 46 Minutes
+
+The timeline is simple: <strong>I sent the prompt at 2:20 PM on October 9, and the site was live at 4:06 PM</strong>. One hour and forty-six minutes. I spent most of that time on my own work, checking in occasionally on the progress.
+
+It's rough around the edges, but the efficiency is genuinely startling. The entire development history is public in the commit log on [GitHub](https://github.com/dAAAb/ai2033.taipei), for anyone who wants to dig through it.
+
+## What's Inside (the Nerdy Part)
+
+<Image src={driveShot} alt="Driving a yellow cab down Dunhua North Road toward Songshan Airport in 2026" style="border-radius: 8px; margin: 1rem 0; width: 100%; height: auto;" />
+
+*Driving a yellow cab along Dunhua North Road toward Songshan Airport. This is Taipei in 2026.*
+
+Once inside, you drive a yellow cab through the streets of Taipei. The map isn't hand-waved: it's built from <strong>60,000 real buildings from OpenStreetMap</strong>, so Dunhua North Road is really Dunhua North Road, and Minsheng Community is really Minsheng Community.
+
+<Image src={timemachineShot} alt="Time machine activated: from 2026 to 2033, Songshan Airport relocates and the Taipei AI Park is born" style="border-radius: 8px; margin: 1rem 0; width: 100%; height: auto;" />
+
+*Hit the time machine and jump from 2026 to 2033: the Taipei AI Park rises on the old airport grounds.*
+
+The best part is the time machine: one click toggles between 2026 and 2033. Switch to 2033, and the former airport site grows into a 110-hectare central park, a 100-hectare AI industry cluster, and a 90-hectare international sustainable living community. That is the 300-hectare Taipei AI Park vision Mayor Chiang Wan-an announced at his press conference on October 8.
+
+<Image src={nightShot} alt="Night view of the 2033 Taipei AI Park, windows lighting up one by one" style="border-radius: 8px; margin: 1rem 0; width: 100%; height: auto;" />
+
+*The AI industry cluster after dark: windows light up one by one.*
+
+And then there's my proudest nerd detail: <strong>after nightfall, the windows light up one by one</strong>, powered by a three.js window-light shader. My inner geek took over and I just sat there watching the windows glow for a long while.
+
+The site also has a [transcript page](https://ai2033.taipei/transcript/) and a [slides page](https://ai2033.taipei/slides/), answering that original netizen's question.
+
+## A Clarification: It's a Cluster, Not a Data Center
+
+One thing worth clearing up: this is an <strong>AI industry cluster, not an AI data center</strong>. Tokens and compute work fine wherever the network reaches; that said, restarting nuclear power sooner rather than later still matters a great deal.
+
+## Our Imagination Runs Half a Beat Behind
+
+Building the site took less than two hours. Realizing "oh, we could do it this way" took a netizen's question. AI is already here, and yet it took a single comment for me to suddenly see: "Ah, so this is also possible." Which means there are still so many things we simply haven't thought of yet.
+
+When a new technology arrives, our imagination usually needs some time to catch up. Railroads carried people farther, and eventually even "what time is it" had to be renegotiated across regions. Cars let people move faster, and then an entire culture of road trips grew up around them. The power grid lit up the night, and it also brought motors into factories. The internet began as a way for scientists to exchange information, and later grew into online shopping, streaming, remote collaboration, even strangers writing open source software together.
+
+The changes a technology brings are never fully understood on the day it's invented. You have to use it, play with it, feel it out; and you have to give it time, letting the new tool collide slowly with your own experience.
+
+I love this feeling. There is still so much to try.
+
+## Drive Straight into 3D Taipei
+
+Enough talking. Just play. The window below is the 3D Taipei from ai2033.taipei. Click in and start driving (best on a computer, with arrow keys or WASD):
+
+<iframe src="https://ai2033.taipei/3d/" width="100%" height="640" style="border: 1px solid rgba(0,0,0,0.1); border-radius: 8px; margin: 1rem 0;" loading="lazy" allowfullscreen title="AI2033 Taipei 3D experience"></iframe>
+
+If the window feels too small, [open ai2033.taipei/3d/ in full screen](https://ai2033.taipei/3d/), or start from the [homepage](https://ai2033.taipei) for the full version with before-and-after comparisons and an FAQ.
+
+Come wander around. Maybe you'll think of the next way to play that I haven't thought of yet.
+
+---
+
+<strong>Disclaimer</strong>: The website is an unofficial work I co-created with AI (Claude Opus 5.5). The 3D park is a visionary illustration, not an official design; for authoritative information, please refer to Taipei City Government announcements. The "transcript" page currently provides the press-release version of the full address and a compiled Q&A.
+
+Map data © [OpenStreetMap](https://www.openstreetmap.org/copyright) contributors, used under the ODbL.
+
+<strong>Further Reading</strong>
+
+- [A Stronger Heart Needs a Bigger Brain: Taipei's AI Golden Century Begins](/en/taipei-ai-golden-century)
+- [Mayor Chiang's announcement video (my channel)](https://youtu.be/0oDwWPOCNII)
+- [Taipei City Government press conference (full video)](https://youtu.be/ircGbXWHRbQ)
+- [AI2033 Taipei source code (GitHub)](https://github.com/dAAAb/ai2033.taipei)
+- [90-second quick tour (YouTube Shorts)](https://youtube.com/shorts/Qah0_A2q0NY)
