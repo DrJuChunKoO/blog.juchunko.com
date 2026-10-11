@@ -11,6 +11,7 @@ import { Image } from 'astro:assets';
 import driveShot from "../../../assets/images/ai2033-taipei/drive-2026.jpg";
 import timemachineShot from "../../../assets/images/ai2033-taipei/timemachine.jpg";
 import nightShot from "../../../assets/images/ai2033-taipei/night-aerial.jpg";
+import commitTimeline from "../../../assets/images/ai2033-taipei/commit-timeline.png";
 
 # 一句話，一座 3D 台北
 
@@ -34,9 +35,21 @@ import nightShot from "../../../assets/images/ai2033-taipei/night-aerial.jpg";
 
 時間軸很簡單：<strong>10/9 下午 2:20 下 prompt，下午 4:06 網站就做好了</strong>。1 小時 46 分鐘，中間我大部分時間在做自己的事，偶爾回來看一眼進度。
 
-雖然很陽春，但效率真的很驚人。整個開發過程的 commit 紀錄都公開在 [GitHub](https://github.com/dAAAb/ai2033.taipei) 上，想考古的朋友可以去翻。
+雖然很陽春，但效率真的很驚人。整個開發過程的 commit 紀錄都公開在 [GitHub](https://github.com/dAAAb/ai2033.taipei) 上，想考古的朋友可以去翻。我把關鍵幾筆整理成一張時間軸：
+
+<Image src={commitTimeline} alt="ai2033.taipei 公開 commit 時間軸：14:20 下 prompt，16:06 網站上線，共 53 個 commit" style="border-radius: 8px; margin: 1rem 0; width: 100%; height: auto;" />
+
+*公開 commit 時間軸（已換算台北時間）：從下 prompt 到上線，全程可考古*
+
+考古起來其實很有戲。AI 先寫好抓資料的流程，把 OpenStreetMap 的建築資料分批 commit 進 repo；下 prompt 後 50 分鐘，第一版 3D 台北、逐字稿頁、簡報就一起長出來，下一分鐘自動部署也設好了。最宅的一筆是 16:39 那個：它自己寫了 e2e 測試，<strong>讓 CI 用真實按鍵把小黃開起來</strong>，確認車開得動、路牌不會亂飄，然後自己截圖存證。
 
 ## 網站裡有什麼（阿宅環節）
+
+先看 repo 裡附的 50 秒示範影片（無聲）：開小黃上敦化北路、時光機 2026 切到 2033、最後入夜，一次看完：
+
+<video autoplay loop muted playsinline controls poster="/images/ai2033-taipei/demo-poster.jpg" src="/images/ai2033-taipei/demo.mp4" style="width: 100%; border-radius: 8px; margin: 1rem 0;" title="AI2033 Taipei 50 秒示範影片"></video>
+
+*50 秒示範：開小黃往松機、時光機啟動、入夜的園區（取自 repo docs/）*
 
 <Image src={driveShot} alt="在 2026 年的敦化北路開小黃，前往松山機場" style="border-radius: 8px; margin: 1rem 0; width: 100%; height: auto;" />
 

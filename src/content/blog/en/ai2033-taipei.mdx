@@ -11,6 +11,7 @@ import { Image } from 'astro:assets';
 import driveShot from "../../../assets/images/ai2033-taipei/drive-2026.jpg";
 import timemachineShot from "../../../assets/images/ai2033-taipei/timemachine.jpg";
 import nightShot from "../../../assets/images/ai2033-taipei/night-aerial.jpg";
+import commitTimeline from "../../../assets/images/ai2033-taipei/commit-timeline.png";
 
 # One Sentence, One 3D Taipei
 
@@ -34,9 +35,21 @@ I also cut a 3-minute-50-second video walking through the whole process and the 
 
 The timeline is simple: <strong>I sent the prompt at 2:20 PM on October 9, and the site was live at 4:06 PM</strong>. One hour and forty-six minutes. I spent most of that time on my own work, checking in occasionally on the progress.
 
-It's rough around the edges, but the efficiency is genuinely startling. The entire development history is public in the commit log on [GitHub](https://github.com/dAAAb/ai2033.taipei), for anyone who wants to dig through it.
+It's rough around the edges, but the efficiency is genuinely startling. The entire development history is public in the commit log on [GitHub](https://github.com/dAAAb/ai2033.taipei), for anyone who wants to dig through it. I compiled the key commits into a timeline:
+
+<Image src={commitTimeline} alt="Public commit timeline of ai2033.taipei: prompt at 14:20, site live at 16:06, 53 commits in total" style="border-radius: 8px; margin: 1rem 0; width: 100%; height: auto;" />
+
+*The public commit timeline (converted to Taipei time): from prompt to launch, fully auditable*
+
+The archaeology is genuinely entertaining. The AI first wrote its own data-fetching workflows and committed the OpenStreetMap building data into the repo in batches; fifty minutes after the prompt, the first version of the 3D Taipei, the transcript page, and the slide deck all appeared at once, with automated deployment set up one minute later. The nerdiest entry is the one at 16:39: it wrote its own end-to-end test that <strong>has CI drive the yellow cab with real keyboard input</strong>, verifying the car actually moves and the street labels stay put, then took screenshots of its own work as evidence.
 
 ## What's Inside (the Nerdy Part)
+
+Start with the 50-second demo video from the repo (no sound): driving the yellow cab up Dunhua North Road, flipping the time machine from 2026 to 2033, and watching night fall, all in one take:
+
+<video autoplay loop muted playsinline controls poster="/images/ai2033-taipei/demo-poster.jpg" src="/images/ai2033-taipei/demo.mp4" style="width: 100%; border-radius: 8px; margin: 1rem 0;" title="AI2033 Taipei 50-second demo"></video>
+
+*The 50-second demo: cab ride toward the airport, time machine jump, and the park at night (from the repo's docs/)*
 
 <Image src={driveShot} alt="Driving a yellow cab down Dunhua North Road toward Songshan Airport in 2026" style="border-radius: 8px; margin: 1rem 0; width: 100%; height: auto;" />
 
