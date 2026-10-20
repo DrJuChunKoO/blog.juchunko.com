@@ -169,6 +169,13 @@
       "claim": "Notice-based system activation postponement:3August to6October2026,64calendar days. Independent continuity/preventability review and accelerated qualified surveillance proposed.",
       "source": "reporting_system_milestones_20261020.json",
       "limits": "Not an independent uptime test or measured annual-report delay. Existing editing and cohort review are separate workflows; not all64days established avoidable; no deliberate motive identified."
+    },
+    {
+      "id": "I01",
+      "evidence_class": "qualitative_integration_and_policy_judgment",
+      "claim": "Documented contamination, plausible exposure/tissue pathways and cooking burdens support priority testing of a possible risk contribution in some exposed women; selected registry contrasts add surveillance urgency.",
+      "source": "https://doi.org/10.2903/j.efsa.2017.4971",
+      "limits": "Methodological reference only, not an EFSA assessment of this case. Exploratory author judgment, not an incident-specific association, formal regulatory signal classification, causal probability or unexplained residual excess. Dependence, mixed findings, historical timing and limited-model constraints retained."
     }
   ],
   "public_analytics_result": {
@@ -185,5 +192,6 @@
   "patient_data_acquired": false,
   "causal_effect_estimated": false,
   "local_path_note": "data/ paths refer to manuscript ancillary archive; public CSVs are alongside this JSON.",
-  "blog_growth_registry_revision": "2026-10-20; manuscript remains unsubmitted"
+  "blog_growth_registry_revision": "2026-10-20; manuscript remains unsubmitted",
+  "hypothesis_integration_revision": "2026-10-21"
 }
