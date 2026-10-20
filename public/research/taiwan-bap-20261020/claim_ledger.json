@@ -45,6 +45,13 @@
       "limits": "Retrospective equal-window comparison of one self-selected advocacy site. Session estimates are not people, exposure or disease. Daily/channel estimates are not exactly additive to the report total. No government/media diversion causal effect identified."
     },
     {
+      "id": "D04",
+      "evidence_class": "descriptive_timing_comparison",
+      "claim": "Recorded daily traffic first fell after its16July peak on17July; by19July it was76.4% below peak, before the20July notice; by28July it was97.9% below peak, before the29July announcement.",
+      "source": "data/oiltrace_timeline_analysis_20261020.json",
+      "limits": "Selected source-linked communication dates, not a complete media census. Peak may reflect early collection/launch publicity. No pre-collection baseline, within-day ordering, formal break-point estimate or identified causal media/government effect."
+    },
+    {
       "id": "M01",
       "evidence_class": "mechanistic_experiment",
       "claim": "Labeled PAH4 migrated from oil to fumes with a temperature-related pattern.",
@@ -140,6 +147,8 @@
     "summary": "data/oiltrace_attention_summary_20261020.json",
     "daily_site_aggregates": "data/oiltrace_daily_sessions_20261020.csv",
     "change_pct": -99.0764684152198,
+    "selected_event_timeline": "data/oiltrace_event_timeline_20261020.json",
+    "descriptive_timing_analysis": "data/oiltrace_timeline_analysis_20261020.json",
     "intentional_diversion_identified": false
   },
   "patient_data_acquired": false,

@@ -1,0 +1,247 @@
+{
+  "as_of": "2026-10-20",
+  "timezone": "Asia/Taipei",
+  "site": "https://oiltrace.tw",
+  "selection": "Exploratory purposive selection: initial disclosure, recall/relisting/test-report milestones, contrasting dated reporting near the observed decline, and later criminal-procedure reporting. Not an exhaustive or preregistered media census.",
+  "date_rule": "Markers use the publication day of the linked notice/report in Taiwan time, not automatically the underlying occurrence date. Known updates and syndication are retained. Daily GA cannot establish within-day ordering.",
+  "limitations": [
+    "An unmarked day is not a day without coverage. No article counts, airtime, headline prominence, reach or audience exposure have been measured.",
+    "Sources establish the timing and attributed content of public communication, not the truth of every claim or a causal effect on traffic.",
+    "No pre-15-July collection baseline, control website, referral-level causal linkage or validated structural-break analysis is available."
+  ],
+  "events": [
+    {
+      "id": "E01",
+      "date": "2026-07-01",
+      "kind": "government",
+      "zh": "食藥署首次公告油品超標與下架查核",
+      "en": "TFDA initial contamination disclosure",
+      "short_zh": "首次公告",
+      "short_en": "Initial disclosure",
+      "sources": [
+        {
+          "label": "食藥署",
+          "url": "https://www.fda.gov.tw/TC/newsContent.aspx?cid=4&id=t634379",
+          "published": "2026-07-01",
+          "kind": "government",
+          "archive_sha256": "153022d3c98fd4ee4600416f6cea882c130e4497e49eab002a56d901a628498d",
+          "retrieved_at_utc": "2026-10-20T09:09:19.410681+00:00"
+        }
+      ]
+    },
+    {
+      "id": "E02",
+      "date": "2026-07-09",
+      "kind": "government",
+      "zh": "食藥署擴大要求4至6月油品及產品下架，期限為7月10日中午",
+      "en": "TFDA expands recall scope; deadline noon 10 July",
+      "short_zh": "擴大下架",
+      "short_en": "Expanded recall",
+      "sources": [
+        {
+          "label": "食藥署",
+          "url": "https://www.fda.gov.tw/TC/newsContent.aspx?cid=4&id=t634464",
+          "published": "2026-07-09",
+          "kind": "government",
+          "archive_sha256": "a524ec87e11221a0f2a74a941a895de115c62720002f2cb78fe8ec9440635cef",
+          "retrieved_at_utc": "2026-10-20T09:09:19.847492+00:00"
+        }
+      ]
+    },
+    {
+      "id": "E03",
+      "date": "2026-07-14",
+      "kind": "government",
+      "zh": "食藥署說明研議預防性下架產品重新上架原則",
+      "en": "TFDA discusses conditional relisting principles",
+      "short_zh": "研議再上架原則",
+      "short_en": "Relisting principles",
+      "sources": [
+        {
+          "label": "食藥署",
+          "url": "https://www.fda.gov.tw/tc/newsContent.aspx?cid=4&id=t634488",
+          "published": "2026-07-14",
+          "kind": "government",
+          "archive_sha256": "c4beff9cb9cf70cbda65e006cd07b2eb68000355c5ca8b8249a46670fa4c9da9",
+          "retrieved_at_utc": "2026-10-20T09:09:19.378005+00:00"
+        }
+      ]
+    },
+    {
+      "id": "E04",
+      "date": "2026-07-16",
+      "kind": "mixed",
+      "zh": "食藥署公告漏報批次裁罰；TVBS報導業者致歉",
+      "en": "Undeclared-batch penalty; TVBS reports company apology",
+      "short_zh": "漏報裁罰／致歉報導",
+      "short_en": "Penalty / apology",
+      "sources": [
+        {
+          "label": "食藥署",
+          "url": "https://www.fda.gov.tw/TC/newsContent.aspx?cid=4&id=31599",
+          "published": "2026-07-16",
+          "kind": "government",
+          "archive_sha256": "c807c073f3f3aa4169084cafc8fb03198a4f01aa015c4912a64129b1a0e8ed99",
+          "retrieved_at_utc": "2026-10-20T09:09:19.902359+00:00"
+        },
+        {
+          "label": "TVBS",
+          "url": "https://news.tvbs.com.tw/life/3259627",
+          "published": "2026-07-16T21:52:00+08:00",
+          "kind": "news",
+          "syndication": "Article credits CNA; not independent replication of its underlying reporting.",
+          "archive_sha256": "984b5bf1c93413ed1e56bc8c5d11c9bc5093566754aa0cf55faf7cc0685e1b8e",
+          "retrieved_at_utc": "2026-10-20T09:09:19.735472+00:00"
+        }
+      ]
+    },
+    {
+      "id": "E05",
+      "date": "2026-07-17",
+      "kind": "news",
+      "zh": "TVBS報導新增不合格批次流向；聯合報報導受影響業者數首度未增加",
+      "en": "TVBS: more noncompliant batches; UDN: affected-firm count unchanged",
+      "short_zh": "新增批次／業者數報導",
+      "short_en": "Batch / firm-count reports",
+      "sources": [
+        {
+          "label": "TVBS",
+          "url": "https://news.tvbs.com.tw/life/3259893",
+          "published": "2026-07-17T08:22:00+08:00",
+          "kind": "news",
+          "archive_sha256": "0ab78feb91b0ff7fa2d42a283f76bc630b92a2c545fd31afbbb4293c33af5c7f",
+          "retrieved_at_utc": "2026-10-20T09:09:19.745754+00:00"
+        },
+        {
+          "label": "聯合報",
+          "url": "https://udn.com/news/story/124940/9634295",
+          "published": "2026-07-17T14:51:00+08:00",
+          "kind": "news",
+          "archive_sha256": "53c2c5234a3dd216a1ec3771c861a6a8e8a50efc1e21140f2ec2966670d63744",
+          "retrieved_at_utc": "2026-10-20T09:09:20.250247+00:00"
+        }
+      ]
+    },
+    {
+      "id": "E06",
+      "date": "2026-07-18",
+      "kind": "news",
+      "zh": "聯合報報導中央、台中市對查廠時機的爭議",
+      "en": "UDN reports central-local dispute over inspections",
+      "short_zh": "中央地方查廠爭議",
+      "short_en": "Inspection dispute",
+      "sources": [
+        {
+          "label": "聯合報",
+          "url": "https://udn.com/news/story/124940/9636178",
+          "published": "2026-07-18T16:33:00+08:00",
+          "kind": "news",
+          "archive_sha256": "e74a55b285e2636d336015502f130477a8936bcbb0033ed83709396befb7694f",
+          "retrieved_at_utc": "2026-10-20T09:09:21.378132+00:00"
+        }
+      ],
+      "limits": "Reports competing statements; does not independently establish that an agency pressured another to conceal information."
+    },
+    {
+      "id": "E07",
+      "date": "2026-07-20",
+      "kind": "government",
+      "zh": "食藥署公布逐批檢驗結果及調查、修法安排",
+      "en": "TFDA publishes batch test results and next steps",
+      "short_zh": "逐批結果與後續安排",
+      "short_en": "Batch test results",
+      "sources": [
+        {
+          "label": "食藥署",
+          "url": "https://www.fda.gov.tw/TC/newsContent.aspx?cid=4&id=t634524",
+          "published": "2026-07-20",
+          "kind": "government",
+          "archive_sha256": "81850ae3ee3b1cad0a0508b5d6ad0bd720642e8023a28775d08cd582ab0e3286",
+          "retrieved_at_utc": "2026-10-20T09:09:21.610793+00:00"
+        }
+      ]
+    },
+    {
+      "id": "E08",
+      "date": "2026-07-28",
+      "kind": "news",
+      "zh": "公視發布原料、製程與通報三環節解析；7月30日另有更新",
+      "en": "PTS publishes supply/process/reporting explainer; updated 30 July",
+      "short_zh": "公視三環節解析",
+      "short_en": "PTS explainer",
+      "sources": [
+        {
+          "label": "公視",
+          "url": "https://news.pts.org.tw/article/819674/",
+          "published": "2026-07-28T12:12:00+08:00",
+          "kind": "news",
+          "updated": "2026-07-30T11:22:00+08:00",
+          "archive_sha256": "5dffe9959cc971f31930185d03c1333a7d0d60166467ed5d2bfceb759a3f36f7",
+          "retrieved_at_utc": "2026-10-20T09:09:20.187703+00:00"
+        }
+      ],
+      "limits": "Marker is initial publication. The currently accessible text may include later revisions; not every present sentence is assigned to 28 July."
+    },
+    {
+      "id": "E09",
+      "date": "2026-07-29",
+      "kind": "government",
+      "zh": "食藥署公告調查報告公開，以及其他3家煉油廠30件抽驗合格",
+      "en": "TFDA announces report release and tests at other refineries",
+      "short_zh": "調查報告相關公告",
+      "short_en": "Report notice",
+      "sources": [
+        {
+          "label": "食藥署",
+          "url": "https://www.fda.gov.tw/TC/newsContent.aspx?cid=4&id=t634555",
+          "published": "2026-07-29",
+          "kind": "government",
+          "archive_sha256": "ff18278c06fa1f91c7057de5a79e695aa9f9371b6d2ace8a13567e5c5597274d",
+          "retrieved_at_utc": "2026-10-20T09:09:20.672911+00:00"
+        }
+      ],
+      "limits": "Marker is publication of this notice, not independently verified first availability of the investigation report. The 30 compliant samples were from other refineries, not proof that every affected or historical batch was compliant."
+    },
+    {
+      "id": "E10",
+      "date": "2026-08-18",
+      "kind": "legal_news",
+      "zh": "聯合報報導檢方起訴15人及4家公司",
+      "en": "UDN reports indictment of 15 people and four companies",
+      "short_zh": "起訴報導",
+      "short_en": "Indictment reported",
+      "sources": [
+        {
+          "label": "聯合報",
+          "url": "https://udn.com/news/story/124940/9698684",
+          "published": "2026-08-18T13:16:00+08:00",
+          "kind": "news",
+          "archive_sha256": "1c766634ece43235a89374b9df1768cc63afd628fff63f9d78c4adb2f8a7d4d5",
+          "retrieved_at_utc": "2026-10-20T09:09:21.014141+00:00"
+        }
+      ],
+      "limits": "Indictment allegations are not a final conviction or an estimate of attributable cancer."
+    },
+    {
+      "id": "E11",
+      "date": "2026-10-08",
+      "kind": "legal_news",
+      "zh": "公視報導4名關鍵被告交保，附電子監控等條件",
+      "en": "PTS reports conditional bail for four key defendants",
+      "short_zh": "附條件交保報導",
+      "short_en": "Conditional bail reported",
+      "sources": [
+        {
+          "label": "公視",
+          "url": "https://news.pts.org.tw/article/830547",
+          "published": "2026-10-08T19:39:00+08:00",
+          "kind": "news",
+          "updated": "2026-10-08T20:24:00+08:00",
+          "archive_sha256": "c54a6b30e179aa7ca90edca81905113db5871dcefbdb85221f07685234cf7c55",
+          "retrieved_at_utc": "2026-10-20T09:09:20.905900+00:00"
+        }
+      ],
+      "limits": "Bail is a procedural status, not acquittal, final liability or proof that the investigation was staged."
+    }
+  ]
+}

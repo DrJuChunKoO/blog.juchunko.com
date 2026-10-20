@@ -1,0 +1,52 @@
+{
+  "as_of": "2026-10-20",
+  "method": "Retrospective descriptive peak-relative comparisons; not a fitted change point or causal attribution.",
+  "peak": {
+    "date": "2026-07-16",
+    "sessions": 4138
+  },
+  "first_post_peak_lower_day": {
+    "date": "2026-07-17",
+    "sessions": 3312
+  },
+  "consecutive_daily_declines": [
+    "2026-07-17",
+    "2026-07-18",
+    "2026-07-19",
+    "2026-07-20",
+    "2026-07-21",
+    "2026-07-22"
+  ],
+  "before_20_july": {
+    "date": "2026-07-19",
+    "sessions": 976,
+    "change_from_peak_pct": -76.4137264378927
+  },
+  "before_29_july": {
+    "date": "2026-07-28",
+    "sessions": 85,
+    "change_from_peak_pct": -97.94586756887385
+  },
+  "thresholds": [
+    {
+      "decline_pct": 50,
+      "date": "2026-07-18",
+      "sessions": 1474
+    },
+    {
+      "decline_pct": 90,
+      "date": "2026-07-21",
+      "sessions": 281
+    },
+    {
+      "decline_pct": 95,
+      "date": "2026-07-22",
+      "sessions": 162
+    }
+  ],
+  "first_observed_day": {
+    "date": "2026-07-15",
+    "sessions": 2
+  },
+  "limit": "First observed date may be partial. Peak is the maximum in the recorded series, not necessarily the historical or population attention peak. No media-effect estimate is identified."
+}
