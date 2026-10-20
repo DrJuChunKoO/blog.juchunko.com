@@ -38,6 +38,13 @@
       "limits": "Different Korean report vintages and Japan 2016 transition retained. Singapore annual history unverified."
     },
     {
+      "id": "D03",
+      "evidence_class": "first_party_descriptive_analytics",
+      "claim": "Oiltrace exported session-estimate sums were10828 on16-22July2026 and100 on13-19October2026, a99.1% decline.",
+      "source": "data/oiltrace_attention_summary_20261020.json",
+      "limits": "Retrospective equal-window comparison of one self-selected advocacy site. Session estimates are not people, exposure or disease. Daily/channel estimates are not exactly additive to the report total. No government/media diversion causal effect identified."
+    },
+    {
       "id": "M01",
       "evidence_class": "mechanistic_experiment",
       "claim": "Labeled PAH4 migrated from oil to fumes with a temperature-related pattern.",
@@ -129,7 +136,12 @@
       "limits": "Requires historical dose, appropriate time windows, linked outcomes, person-time and confounder/screening control."
     }
   ],
-  "public_analytics_result": null,
+  "public_analytics_result": {
+    "summary": "data/oiltrace_attention_summary_20261020.json",
+    "daily_site_aggregates": "data/oiltrace_daily_sessions_20261020.csv",
+    "change_pct": -99.0764684152198,
+    "intentional_diversion_identified": false
+  },
   "patient_data_acquired": false,
   "causal_effect_estimated": false,
   "local_path_note": "data/ paths refer to manuscript ancillary archive; public CSVs are alongside this JSON."

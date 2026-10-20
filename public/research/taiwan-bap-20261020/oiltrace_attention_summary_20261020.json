@@ -1,0 +1,122 @@
+{
+  "as_of": "2026-10-20",
+  "site": "https://oiltrace.tw",
+  "property_label": "油跡可循",
+  "report": "Traffic acquisition: session primary channel group, with full calendar date secondary dimension",
+  "timezone": "GMT+08:00 Taiwan time (read from property details)",
+  "requested_range": {
+    "start": "2026-07-01",
+    "end": "2026-10-19"
+  },
+  "first_observed_date": "2026-07-15",
+  "last_observed_date": "2026-10-19",
+  "reported_totals": {
+    "sessions": 13232,
+    "engaged_sessions": 6322,
+    "event_count": 58061
+  },
+  "daily_channel_row_sums": {
+    "sessions": 13245,
+    "engaged_sessions": 6314,
+    "event_count": 58061
+  },
+  "channel_row_sums": {
+    "sessions": 13112,
+    "engaged_sessions": 6311,
+    "event_count": 58061
+  },
+  "counting_method": "Daily and period comparisons sum the exported date-by-channel session estimates. These are not separately deduplicated period totals.",
+  "estimation_reference": "https://developers.google.com/analytics/blog/2022/hll",
+  "peak_day": {
+    "date": "2026-07-16",
+    "sessions": 4138,
+    "engaged_sessions": 2282,
+    "event_count": 19183
+  },
+  "first_week_after_first_observation": {
+    "start": "2026-07-16",
+    "end": "2026-07-22",
+    "days": 7,
+    "sessions": 10828,
+    "sessions_per_day": 1546.857142857143
+  },
+  "last_seven_days": {
+    "start": "2026-10-13",
+    "end": "2026-10-19",
+    "days": 7,
+    "sessions": 100,
+    "sessions_per_day": 14.285714285714286
+  },
+  "change_first_week_to_last_week_pct": -99.0764684152198,
+  "periods": [
+    {
+      "start": "2026-07-15",
+      "end": "2026-07-31",
+      "days": 17,
+      "sessions": 11748,
+      "sessions_per_day": 691.0588235294117
+    },
+    {
+      "start": "2026-08-01",
+      "end": "2026-08-31",
+      "days": 31,
+      "sessions": 772,
+      "sessions_per_day": 24.903225806451612
+    },
+    {
+      "start": "2026-09-01",
+      "end": "2026-09-30",
+      "days": 30,
+      "sessions": 466,
+      "sessions_per_day": 15.533333333333333
+    },
+    {
+      "start": "2026-10-01",
+      "end": "2026-10-19",
+      "days": 19,
+      "sessions": 259,
+      "sessions_per_day": 13.631578947368421
+    }
+  ],
+  "channels": [
+    {
+      "channel": "Direct",
+      "sessions": 7709
+    },
+    {
+      "channel": "Organic Search",
+      "sessions": 3384
+    },
+    {
+      "channel": "Organic Video",
+      "sessions": 1104
+    },
+    {
+      "channel": "Organic Social",
+      "sessions": 718
+    },
+    {
+      "channel": "Referral",
+      "sessions": 167
+    },
+    {
+      "channel": "AI Assistant",
+      "sessions": 21
+    },
+    {
+      "channel": "Unassigned",
+      "sessions": 9
+    }
+  ],
+  "limitations": [
+    "GA4 uses HLL++ distinct-count estimation. The report total (13232), channel-only row sum (13112) and date-by-channel row sum (13245) are retained separately; these estimates are not forced to be additive. Their difference alone does not establish a tracking error or explain any particular discrepancy.",
+    "Sessions are GA4-defined visits, not distinct people, searches, affected purchasers, exposure or disease outcomes.",
+    "The first observed collection day may be partial; the initial 7-day comparison starts the next day. This does not establish the historical collection completeness or launch date.",
+    "No data before the first observed date are treated as zero public interest.",
+    "Consent, blockers, tagging, bot filtering, internal traffic, outages and identity methods were not independently validated. The UI displayed 100% available data; that does not establish complete population coverage.",
+    "The site is an office-associated advocacy tool. Traffic self-selects and is affected by publicity, links, algorithms, seasonality and site changes.",
+    "Peak-to-later decline alone does not identify intentional government/media diversion or its cause. No counterfactual control or media-content causal analysis is supplied.",
+    "Page views may be affected by client-side query changes. Session counts are reported separately from page views and event counts.",
+    "Raw export headers, account/property identifiers and user-location details are not part of the public release."
+  ]
+}

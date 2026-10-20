@@ -108,6 +108,25 @@ Preserve and investigate when manufacturers, laboratories, certifiers and agenci
 
 Criminal procedure, administrative responsibility and disease causation require different evidence. Progress in one does not replace a health investigation.
 
+## First-party website data: follow-up must outlast the attention peak
+
+The office participated in the Oiltrace public product-notice lookup. With owner authorization, on 20 October we read and exported the GA4 traffic-acquisition report for oiltrace.tw, requesting **1 July–19 October 2026** in the property's Taiwan reporting time zone. The first date present in the export is **15 July**. Missing earlier observations do not mean that earlier public interest was zero.
+
+We compare two equal seven-day windows descriptively, rather than comparing a partial month with a full month. The initial window starts the day after the first observed date to avoid a potentially partial first day; this does not validate historical collection completeness.
+
+| Period (Taiwan time) | Sum of exported session estimates | Daily mean |
+|---|---:|---:|
+| 16–22 July 2026 | 10,828 | 1,546.9 |
+| 13–19 October 2026 | 100 | 14.3 |
+
+The later window is **99.1% lower**. The daily peak was 16 July, approximately **4,138 sessions**. Use of this site was concentrated around an early peak and subsequently much lower. These windows were selected retrospectively; no formal change-point or causal analysis was performed.
+
+**Sessions are not people, exposed purchasers or cancer outcomes.** Window values sum full-date-by-channel export rows; they are not separately deduplicated period totals. For the entire requested range, the report displayed 13,232 sessions, the date-by-channel rows summed to 13,245, and a channel-only export summed to 13,112. We preserve the discrepancy. GA4 uses HLL++ estimation for some counts, and estimates can differ across aggregation levels; we have not established that this alone explains the particular discrepancy. [Google's counting-method documentation](https://developers.google.com/analytics/blog/2022/hll)
+
+This is one office-associated advocacy site with a self-selected audience. Publicity, links, platform recommendations, site changes and tracking configuration can affect traffic. Consent, blocking, bots, internal traffic and collection interruptions were not independently validated. **The data describe declining attention to this website; they do not establish deliberate diversion by government or media.** We supply no control site, comprehensive media-content series or design identifying that causal effect.
+
+The policy relevance is continuity: health follow-up must outlast news attention. A durable public investigation and correction log can help sustain accountability, but traffic is not exposure or disease evidence. Deidentified daily site aggregates and a methods summary are linked below; raw GA exports remain private for audit.
+
 ## Make the unanswered questions answerable
 
 An unsupported causal accusation can damage the trust of affected families. Leaving historical exposure permanently untraceable is also unacceptable.
@@ -121,6 +140,8 @@ Our proposal is concrete: **build an auditable chain of records, measure the peo
 - [Oil-test observations and limitations (CSV)](https://blog.juchunko.com/research/taiwan-bap-20261020/oil_test_observations.csv)
 - [Household scenarios and parameters (CSV)](https://blog.juchunko.com/research/taiwan-bap-20261020/household_scenarios.csv)
 - [Claim and inference ledger (JSON)](https://blog.juchunko.com/research/taiwan-bap-20261020/claim_ledger.json)
+- [Oiltrace daily site aggregates (CSV)](https://blog.juchunko.com/research/taiwan-bap-20261020/oiltrace_daily_sessions_20261020.csv)
+- [Attention calculations, aggregation discrepancies and limits (JSON)](https://blog.juchunko.com/research/taiwan-bap-20261020/oiltrace_attention_summary_20261020.json)
 - [繁體中文版](https://blog.juchunko.com/zh/taiwan-bap-oil-womens-health/)
 
 This inquiry arose from the office's food-safety and women's-health concerns; the office also participated in the oil-tracker civic lookup project. That advocacy context is disclosed. AI assisted retrieval, translation, calculations and drafting; it does not replace primary evidence, human measurements or expert review. The manuscript remains an unsubmitted, non-peer-reviewed draft.
