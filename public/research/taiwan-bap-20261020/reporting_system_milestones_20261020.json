@@ -1,0 +1,44 @@
+{
+  "as_of": "2026-10-20",
+  "original_opening": "2026-08-03",
+  "test_logic_checks_open": "2026-08-11",
+  "formal_reporting_open": "2026-10-06",
+  "postponement_calendar_days": 64,
+  "sources": [
+    {
+      "url": "https://twcr.tw/?p=3552",
+      "notice": "115006",
+      "published": "2026-08-11",
+      "archive_sha256": "696c28f4fa9317c8bec074068cd29972af845ddd5bf0bf678c1d06b02bcdd0d8",
+      "retrieved_at_utc": "2026-10-20T14:13:55.257277+00:00"
+    },
+    {
+      "url": "https://twcr.tw/?p=3570",
+      "notice": "115007",
+      "published": "2026-10-05",
+      "archive_sha256": "4b366cf226351cb2585f69ce209bb6fbb5a632e5d69ed73b7cf38e6477c68ea1",
+      "retrieved_at_utc": "2026-10-20T14:13:55.209631+00:00"
+    },
+    {
+      "url": "https://twcr.tw/?p=3523",
+      "notice": "115003",
+      "published": "2026-03-30",
+      "archive_sha256": "00493b9004c133d0e2f3f7529a14d40c6b1ebf18756a9bd0f7f08fd5d87fede8",
+      "retrieved_at_utc": "2026-10-20T14:13:55.273002+00:00"
+    },
+    {
+      "url": "https://twcr.tw/?p=3513",
+      "notice": "115002",
+      "review_open": "2026-03-02",
+      "archive_sha256": "8f98bca8e1b1cae9a83eced0aea936f5607218571bcd96a6dcd35e9ec59a72f0",
+      "retrieved_at_utc": "2026-10-20T14:13:55.520573+00:00"
+    }
+  ],
+  "limits": [
+    "Activation postponement is not an estimated delay in annual-report publication.",
+    "Testing, formal reporting, editing existing records and diagnosis-cohort review are distinct workflows.",
+    "No current 2024/2025 received counts or completeness estimates were obtained.",
+    "Not all64days are established as preventable; no deliberate motive is identified."
+  ],
+  "policy_judgment": "Independently review preventability and continuity safeguards; minimize avoidable delay, publish recovery/completeness milestones, and assess provisional surveillance after the contamination disclosure."
+}

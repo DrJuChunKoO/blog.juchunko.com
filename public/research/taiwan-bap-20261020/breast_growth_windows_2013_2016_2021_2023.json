@@ -1,0 +1,351 @@
+{
+  "as_of": "2026-10-20",
+  "endpoint": "female invasive breast-cancer crude incidence,all ages",
+  "unit": "new cases per100,000 female population/year",
+  "formula": "100*(rate_2023/rate_start-1)",
+  "windows": [
+    {
+      "start": 2013,
+      "end": 2023,
+      "elapsed_years": 10
+    },
+    {
+      "start": 2016,
+      "end": 2023,
+      "elapsed_years": 7
+    },
+    {
+      "start": 2021,
+      "end": 2023,
+      "elapsed_years": 2
+    }
+  ],
+  "rows": [
+    {
+      "country": "台灣",
+      "year": 2013,
+      "crude_rate": 97.91,
+      "cases": 11445,
+      "original_asr": 70.09,
+      "original_standard": "WHO 2000",
+      "source": "TW"
+    },
+    {
+      "country": "台灣",
+      "year": 2016,
+      "crude_rate": 109.07,
+      "cases": 12893,
+      "original_asr": 74.26,
+      "original_standard": "WHO 2000",
+      "source": "TW"
+    },
+    {
+      "country": "台灣",
+      "year": 2021,
+      "crude_rate": 132.72,
+      "cases": 15656,
+      "original_asr": 83.61,
+      "original_standard": "WHO 2000",
+      "source": "TW"
+    },
+    {
+      "country": "台灣",
+      "year": 2022,
+      "crude_rate": 149.07,
+      "cases": 17539,
+      "original_asr": 92.86,
+      "original_standard": "WHO 2000",
+      "source": "TW"
+    },
+    {
+      "country": "台灣",
+      "year": 2023,
+      "crude_rate": 149.82,
+      "cases": 17779,
+      "original_asr": 91.2,
+      "original_standard": "WHO 2000",
+      "source": "TW"
+    },
+    {
+      "country": "日本",
+      "year": 2013,
+      "crude_rate": 117.51238759405396,
+      "source": "JP13"
+    },
+    {
+      "country": "日本",
+      "year": 2016,
+      "crude_rate": 145.54605858793562,
+      "source": "JP23"
+    },
+    {
+      "country": "日本",
+      "year": 2021,
+      "crude_rate": 153.190763457035,
+      "source": "JP23"
+    },
+    {
+      "country": "日本",
+      "year": 2022,
+      "crude_rate": 155.431616008973,
+      "source": "JP23"
+    },
+    {
+      "country": "日本",
+      "year": 2023,
+      "crude_rate": 160.653940713134,
+      "source": "JP23"
+    },
+    {
+      "country": "韓國",
+      "year": 2013,
+      "crude_rate": 68.2,
+      "source": "KR13"
+    },
+    {
+      "country": "韓國",
+      "year": 2016,
+      "crude_rate": 85.0,
+      "original_asr": 54.9,
+      "original_standard": "Segi 1960",
+      "source": "KR16"
+    },
+    {
+      "country": "韓國",
+      "year": 2021,
+      "crude_rate": 111.6,
+      "source": "KR21"
+    },
+    {
+      "country": "韓國",
+      "year": 2022,
+      "crude_rate": 114.3,
+      "source": "KR22"
+    },
+    {
+      "country": "韓國",
+      "year": 2023,
+      "crude_rate": 115.7,
+      "source": "KR23"
+    },
+    {
+      "country": "美國",
+      "year": 2013,
+      "cases": 238127,
+      "population": 160601985,
+      "crude_rate": 148.2715173165512,
+      "source": "US"
+    },
+    {
+      "country": "美國",
+      "year": 2016,
+      "cases": 251791,
+      "population": 164077985,
+      "crude_rate": 153.45812541517986,
+      "source": "US"
+    },
+    {
+      "country": "美國",
+      "year": 2021,
+      "cases": 284431,
+      "population": 167656063,
+      "crude_rate": 169.65148465880412,
+      "source": "US"
+    },
+    {
+      "country": "美國",
+      "year": 2022,
+      "cases": 284897,
+      "population": 168681389,
+      "crude_rate": 168.8965224254823,
+      "source": "US"
+    },
+    {
+      "country": "美國",
+      "year": 2023,
+      "cases": 288494,
+      "population": 170100136,
+      "crude_rate": 169.60245111150294,
+      "source": "US"
+    },
+    {
+      "country": "新加坡",
+      "year": 2013,
+      "crude_rate": null,
+      "source": "SG23"
+    },
+    {
+      "country": "新加坡",
+      "year": 2016,
+      "crude_rate": null,
+      "source": "SG23"
+    },
+    {
+      "country": "新加坡",
+      "year": 2021,
+      "crude_rate": null,
+      "source": "SG23"
+    },
+    {
+      "country": "新加坡",
+      "year": 2022,
+      "crude_rate": null,
+      "source": "SG23"
+    },
+    {
+      "country": "新加坡",
+      "year": 2023,
+      "crude_rate": 145.9,
+      "source": "SG23"
+    }
+  ],
+  "growth": [
+    {
+      "country": "台灣",
+      "growth_2013_2023_pct": 53.018077826575414,
+      "growth_2016_2023_pct": 37.36132758778765,
+      "growth_2021_2023_pct": 12.884267631103064
+    },
+    {
+      "country": "日本",
+      "growth_2013_2023_pct": 36.71234497261033,
+      "growth_2016_2023_pct": 10.38013826810058,
+      "growth_2021_2023_pct": 4.871819349730044
+    },
+    {
+      "country": "韓國",
+      "growth_2013_2023_pct": 69.64809384164224,
+      "growth_2016_2023_pct": 36.11764705882354,
+      "growth_2021_2023_pct": 3.673835125448033
+    },
+    {
+      "country": "美國",
+      "growth_2013_2023_pct": 14.38640015358541,
+      "growth_2016_2023_pct": 10.520345959293277,
+      "growth_2021_2023_pct": -0.02890251588413273
+    },
+    {
+      "country": "新加坡",
+      "growth_2013_2023_pct": null,
+      "growth_2016_2023_pct": null,
+      "growth_2021_2023_pct": null
+    }
+  ],
+  "sources": {
+    "TW": {
+      "url": "https://www.hpa.gov.tw/Pages/ashx/GetFile.ashx?lang=c&type=1&sid=9e08758933474930a69e2946e17d63ea",
+      "detail": "國健署歷年癌症CSV；2023年報第72、503頁核對Segi及WHO標準。"
+    },
+    "JP13": {
+      "url": "https://ganjoho.jp/reg_stat/statistics/data/dl/excel/cancer_incidence%281975-2015%29.xls",
+      "detail": "MCIJ全國推估；number/rate/asr工作表。"
+    },
+    "JP23": {
+      "url": "https://ganjoho.jp/reg_stat/statistics/data/dl/excel/cancer_incidenceNCR%282016-2023%29.xls",
+      "detail": "日本全國癌症登記；number/rate/asr工作表。"
+    },
+    "KR13": {
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC4843732/",
+      "detail": "2013年登記統計研究，Table 1、2；女性乳癌。"
+    },
+    "KR21": {
+      "url": "https://www.e-crt.org/upload/pdf/crt-2024-253.pdf",
+      "detail": "2021年登記統計研究，Table 1、2。"
+    },
+    "KR22": {
+      "url": "https://www.e-crt.org/upload/pdf/crt-2025-264.pdf",
+      "detail": "2022年登記統計研究，Table 1、2。"
+    },
+    "KR23": {
+      "url": "https://www.e-crt.org/upload/pdf/crt-2026-298.pdf",
+      "detail": "2023年登記統計研究，Table 1、2。"
+    },
+    "US": {
+      "url": "https://gis.cdc.gov/cancerapi/DataVizApi/GetJSON/TrendsMapData_Inci_byCancerSiteID_5",
+      "detail": "由CDC公開網站程式確認接口；YearID、SexID、RaceID均核對公開selectors；2023年齡別資料另重算Segi範圍。"
+    },
+    "SG23": {
+      "url": "https://isomer-user-content.by.gov.sg/737/a9695c77-40d5-4bbd-a4b9-347a0942b191/singapore-cancer-registry-annual-report-2023.pdf",
+      "detail": "Table 3.1.2，實體PDF第51頁；方法第7頁。"
+    },
+    "KR16": {
+      "url": "https://www.e-crt.org/upload/pdf/crt-2019-138.pdf",
+      "doi": "10.4143/crt.2019.138",
+      "detail": "Table2,physical PDF page4; female invasive breast crude85.0,Segi ASR54.9; separate publication vintage."
+    },
+    "OECD_CONTEXT": {
+      "url": "https://www.oecd.org/en/publications/delivering-high-value-cancer-care_060869fe-en/full-report/recent-epidemiological-trends-in-the-cancer-burden_c435b1b1.html",
+      "pdf_url": "https://www.oecd.org/content/dam/oecd/en/publications/reports/2026/02/delivering-high-value-cancer-care_7e7b1c40/060869fe-en.pdf",
+      "detail": "Delivering High Value Cancer Care2026,section2.4.3,Figure2.10/Table2.2; narrative at physical PDF page80."
+    },
+    "INAUGURATION": {
+      "url": "https://www.president.gov.tw/NEWS/20440",
+      "detail": "Tsai Ing-wen inauguration20May2016. Calendar2016 includes time before and after the transfer."
+    }
+  },
+  "source_artifacts": [
+    {
+      "file": "hpa_cancer_county_sex_1979_2023.csv",
+      "sha256": "40c0de26cb547a06edd770725bc13265f71e03d413b1f5a41168c529df35eddd",
+      "bytes": 4707227
+    },
+    {
+      "file": "breast_japan_mcij_1975_2015.xls",
+      "sha256": "a14185ef3f9f4c6b19d365082da7869d5649462cea42cd938dbaa21f57b0dabc",
+      "bytes": 2275328
+    },
+    {
+      "file": "breast_japan_ncr_2016_2023.xls",
+      "sha256": "0b738a50d4549d47ed8b434c841e9769f6f616b7bcc00092f75c499985931212",
+      "bytes": 1187328
+    },
+    {
+      "file": "breast_uscs_trends.json",
+      "sha256": "2b51bfeabf3d188f9c1d64d7c4133018b785fad187e2d3ec60ce6f53b106d282",
+      "bytes": 3066719
+    },
+    {
+      "file": "breast_uscs_Selectors_Year.json",
+      "sha256": "7b12c762f3d975ee08235a3455825b4da1528b0f4ee2e9fa5321838620e48a1c",
+      "bytes": 895
+    },
+    {
+      "file": "breast_korea_2016_article.pdf",
+      "sha256": "981c12c6a86638dcba18d7357f74dc3abeb5b87d27486579aa9243c55be341f9",
+      "bytes": 744187
+    },
+    {
+      "file": "breast_oecd_2026_full.pdf",
+      "sha256": "e898332315da605ed2642d63de94d4dca6f481b133cba42292fe63dbcc1e4e46",
+      "bytes": 7543479
+    },
+    {
+      "file": "breast_2016_inauguration.html",
+      "sha256": "d611c51ee1bd140c209db0f6ef9dc883817fc51a9dd98727f75678c95c87f8dc",
+      "bytes": 33383
+    }
+  ],
+  "international_aggregate_context": {
+    "publisher": "OECD/EU2026",
+    "geography": "EU24 unweighted average; excludes Greece,Luxembourg,Romania",
+    "age_group": "women15-49",
+    "age_standard": "2013 European Standard Population",
+    "period": "2000 to2022 or nearest available year",
+    "breast_asr_start": 53.3,
+    "breast_asr_end": 62.0,
+    "published_relative_increase_pct_rounded": 16,
+    "directly_comparable_to_all_age_crude_windows": false,
+    "limitation": "Different ages,age standard,years and country coverage. Not a same-window OECD/developed-country mean; do not convert it into a 2/7/10-year benchmark or infer a multiple of Taiwan risk."
+  },
+  "taiwan_who2000_growth_2016_2023_pct": 22.81174252625908,
+  "limits": [
+    "Retrospective endpoint contrasts,not annualized rates,fitted APC/AAPC or significance tests.",
+    "Crude rates normalize female population size,not age,screening,diagnosis,reporting or other risks.",
+    "2016 is a calendar baseline,not a clean post20May2016 policy exposure or a known oil-contamination onset. No party/policy/oil causal effect identified.",
+    "Japan national registration began2016;2013 is a regional-registry national estimate. Korean endpoints use different vintages.",
+    "Taiwan-Korea2016-2023 ordering is close; revisions and comparability limitations matter. No global ranking.",
+    "Singapore missing annual endpoints remain missing. Selected comparators are not an OECD/developed-country average.",
+    "Pandemic screening/diagnosis disruption and catch-up affect short windows. Longer-window differences are retained.",
+    "No matched all-age crude OECD aggregate for all three windows was verified in the inspected sources. The EU24 age-standardized young-women series is context only."
+  ]
+}

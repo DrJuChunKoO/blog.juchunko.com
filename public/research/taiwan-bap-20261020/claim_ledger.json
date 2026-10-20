@@ -33,7 +33,7 @@
     {
       "id": "D02",
       "evidence_class": "descriptive_reanalysis",
-      "claim": "Korea crude increase +69.6%; Taiwan is not uniquely highest or fastest among these comparators.",
+      "claim": "Over2013–2023,Korea crude increase69.6%exceeded Taiwan53.0%; this is a ten-year comparison,not a general ranking for all windows.",
       "source": "data/country_inputs.json",
       "limits": "Different Korean report vintages and Japan 2016 transition retained. Singapore annual history unverified."
     },
@@ -155,6 +155,20 @@
       "claim": "No estimate of event-specific BaP exposure causing breast-cancer rise is identified.",
       "source": "main.tex",
       "limits": "Requires historical dose, appropriate time windows, linked outcomes, person-time and confounder/screening control."
+    },
+    {
+      "id": "D07",
+      "evidence_class": "retrospective_descriptive_growth_windows",
+      "claim": "Taiwan2016–2023 crude increase37.36%,Korea36.12%,US10.52%,Japan10.38%; Taiwan2021–2023 increase12.88%also largest among four verified comparisons.",
+      "source": "breast_growth_windows_2013_2016_2021_2023.json",
+      "limits": "No global or developed-country-average ranking. Different vintages,age structure,screening,calendar2016 transfer and retrospective window selection retained. No party/policy/oil causal effect identified."
+    },
+    {
+      "id": "G02",
+      "evidence_class": "documented_timeline_and_policy_proposal",
+      "claim": "Notice-based system activation postponement:3August to6October2026,64calendar days. Independent continuity/preventability review and accelerated qualified surveillance proposed.",
+      "source": "reporting_system_milestones_20261020.json",
+      "limits": "Not an independent uptime test or measured annual-report delay. Existing editing and cohort review are separate workflows; not all64days established avoidable; no deliberate motive identified."
     }
   ],
   "public_analytics_result": {
@@ -170,5 +184,6 @@
   },
   "patient_data_acquired": false,
   "causal_effect_estimated": false,
-  "local_path_note": "data/ paths refer to manuscript ancillary archive; public CSVs are alongside this JSON."
+  "local_path_note": "data/ paths refer to manuscript ancillary archive; public CSVs are alongside this JSON.",
+  "blog_growth_registry_revision": "2026-10-20; manuscript remains unsubmitted"
 }
