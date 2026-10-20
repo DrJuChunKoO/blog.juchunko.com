@@ -1,0 +1,136 @@
+{
+  "as_of": "2026-10-20",
+  "study_type": "targeted evidence audit, descriptive reanalysis, conditional scenarios and proposed protocol",
+  "claims": [
+    {
+      "id": "O01",
+      "evidence_class": "observation",
+      "claim": "A supplied-oil batch was reported at 8.1 ug/kg; cited limit 2.0 ug/kg.",
+      "source": "https://www.fda.gov.tw/TC/newsContent.aspx?cid=4&id=t634379",
+      "limits": "Company self-test relayed by regulator; not random market sampling or every downstream bottle."
+    },
+    {
+      "id": "O02",
+      "evidence_class": "observation",
+      "claim": "Selected finished-product tests reported 4.3, 3.8 and 2.6 ug/kg.",
+      "source": "data/oil_test_observations.csv",
+      "limits": "See per-row original URLs. Different notices may share samples or upstream batches."
+    },
+    {
+      "id": "O03",
+      "evidence_class": "historical_selected_records",
+      "claim": "Sparse 2021-2026 tests do not establish historical sustained supra-limit finished oil exposure.",
+      "source": "https://www.fda.gov.tw/TC/includes/GetFile.ashx?id=f639209533902835574&iid=13727&type=3",
+      "limits": "Report p.27. 14.8 ug/kg intermediate oil must not be treated as a household finished-oil measurement."
+    },
+    {
+      "id": "D01",
+      "evidence_class": "descriptive_reanalysis",
+      "claim": "Taiwan 2013-2023 crude breast rate +53.0%; WHO2000 ASR +30.1%.",
+      "source": "https://www.hpa.gov.tw/Pages/ashx/GetFile.ashx?lang=c&type=1&sid=9e08758933474930a69e2946e17d63ea",
+      "limits": "Female population denominator. WHO2000 names weights, not a world rate."
+    },
+    {
+      "id": "D02",
+      "evidence_class": "descriptive_reanalysis",
+      "claim": "Korea crude increase +69.6%; Taiwan is not uniquely highest or fastest among these comparators.",
+      "source": "data/country_inputs.json",
+      "limits": "Different Korean report vintages and Japan 2016 transition retained. Singapore annual history unverified."
+    },
+    {
+      "id": "M01",
+      "evidence_class": "mechanistic_experiment",
+      "claim": "Labeled PAH4 migrated from oil to fumes with a temperature-related pattern.",
+      "source": "https://doi.org/10.1016/j.psep.2024.05.072",
+      "limits": "Abstract/partial preview; PAH4 is not a validated incident BaP coefficient or human absorption rate."
+    },
+    {
+      "id": "E01",
+      "evidence_class": "external_observational_association",
+      "claim": "Taiwan cumulative cooking exposure was associated with lung cancer; OR3.17, CI1.34-7.68.",
+      "source": "https://doi.org/10.1038/s41598-020-63656-7",
+      "limits": "Cases2002-2010; no incident-oil/BaP measurement. Not evidence of a recent exposure onset."
+    },
+    {
+      "id": "E02",
+      "evidence_class": "external_observational_heterogeneity",
+      "claim": "High associations also occur outside Taiwan; other cooking studies are null.",
+      "source": "data/cooking_comparison_audit_20261020.json",
+      "limits": "OR/HR, exposure definitions, occupations and populations differ. No valid country effect ranking."
+    },
+    {
+      "id": "M02",
+      "evidence_class": "human_tissue_experiment",
+      "claim": "Orally administered tracer reached breast tissue and formed adducts.",
+      "source": "https://doi.org/10.1016/S1383-5718(00)00134-0",
+      "limits": "Participants already awaiting cancer surgery. Not new incidence, inhaled route or a fixed mutation."
+    },
+    {
+      "id": "E03",
+      "evidence_class": "external_observational_heterogeneity",
+      "claim": "Breast-cancer studies of dietary and ambient PAH/BaP have positive and null results.",
+      "source": "data/bap_breast_evidence_20261019.json",
+      "limits": "Source types and measures differ; E3N analyses overlap; no event-specific association observed."
+    },
+    {
+      "id": "E04",
+      "evidence_class": "external_susceptibility_analysis",
+      "claim": "High PAH/high BOADICEA joint group OR4.09, CI1.38-12.13.",
+      "source": "https://doi.org/10.1038/bjc.2017.81",
+      "limits": "80 cases156 controls; interaction p0.09; not pure BRCA or oil exposure effect; not probability."
+    },
+    {
+      "id": "L01",
+      "evidence_class": "local_context",
+      "claim": "2024 survey-based summary: partnered women domestic work2.00h/day, partners0.73.",
+      "source": "https://www.iacsi.nat.gov.tw/fapi/AttFile?id=33636&type=AttFile",
+      "limits": "Official statistical summary p20; broad domestic work, not cooking exposure; no universal cultural inference."
+    },
+    {
+      "id": "S01",
+      "evidence_class": "conditional_model",
+      "claim": "Four household scenarios account for cooking for4/8 diners and near-source exposure.",
+      "source": "data/household_scenarios.csv",
+      "limits": "Assumed parameters, not mean/P95/worst-case. Oil handling is not personal intake. No measured kitchen doses."
+    },
+    {
+      "id": "S02",
+      "evidence_class": "conditional_risk_screen",
+      "claim": "Hypothetical20-year adult route-specific model outputs1.528-4.746 per million.",
+      "source": "https://iris.epa.gov/static/pdfs/0136tr.pdf",
+      "limits": "Not breast-specific, observed burden or event duration. Relative zeroBaP; omits full fumes and thermal generation."
+    },
+    {
+      "id": "G01",
+      "evidence_class": "administrative_evidence",
+      "claim": "Reporting-system delay documented; current2024/2025 cohort completeness not obtained.",
+      "source": "https://twcr.tw/?p=3570",
+      "limits": "Does not establish deliberate suppression or that agency holds only2023 records."
+    },
+    {
+      "id": "P01",
+      "evidence_class": "policy_proposal",
+      "claim": "Transparency, historical reconstruction, independent sampling/follow-up and administrative review are warranted.",
+      "source": "main.tex",
+      "limits": "Author policy judgment; lower action threshold than disease attribution; independent oversight and public correction proposed."
+    },
+    {
+      "id": "P02",
+      "evidence_class": "clinical_policy_proposal",
+      "claim": "Evaluate targeted preventive support and any extra imaging through benefit-harm assessment.",
+      "source": "https://www.uspreventiveservicestaskforce.org/uspstf/recommendation/breast-cancer-screening",
+      "limits": "Not a recommendation for all oil buyers to undergo extra MRI/mammography; screening and diagnosis differ."
+    },
+    {
+      "id": "H01",
+      "evidence_class": "unidentified_event_causal_effect",
+      "claim": "No estimate of event-specific BaP exposure causing breast-cancer rise is identified.",
+      "source": "main.tex",
+      "limits": "Requires historical dose, appropriate time windows, linked outcomes, person-time and confounder/screening control."
+    }
+  ],
+  "public_analytics_result": null,
+  "patient_data_acquired": false,
+  "causal_effect_estimated": false,
+  "local_path_note": "data/ paths refer to manuscript ancillary archive; public CSVs are alongside this JSON."
+}

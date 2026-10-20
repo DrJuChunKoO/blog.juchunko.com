@@ -1,0 +1,538 @@
+{
+  "as_of": "2026-10-20",
+  "cancer": "女性侵襲性乳癌，不含原位癌",
+  "unit": "每十萬相應女性人口／年",
+  "rows": [
+    {
+      "country": "台灣",
+      "year": 2013,
+      "cases": 11445,
+      "population": null,
+      "crude_rate": 97.91,
+      "original_asr": 70.09,
+      "original_standard": "WHO 2000",
+      "common_segi_lower": null,
+      "common_segi_upper": null,
+      "source": "TW",
+      "scope": "全國女性",
+      "note": "同一份回溯修訂 CSV；2023 Segi 率另核對年報第72頁。"
+    },
+    {
+      "country": "台灣",
+      "year": 2021,
+      "cases": 15656,
+      "population": null,
+      "crude_rate": 132.72,
+      "original_asr": 83.61,
+      "original_standard": "WHO 2000",
+      "common_segi_lower": null,
+      "common_segi_upper": null,
+      "source": "TW",
+      "scope": "全國女性",
+      "note": "同一份回溯修訂 CSV；2023 Segi 率另核對年報第72頁。"
+    },
+    {
+      "country": "台灣",
+      "year": 2022,
+      "cases": 17539,
+      "population": null,
+      "crude_rate": 149.07,
+      "original_asr": 92.86,
+      "original_standard": "WHO 2000",
+      "common_segi_lower": null,
+      "common_segi_upper": null,
+      "source": "TW",
+      "scope": "全國女性",
+      "note": "同一份回溯修訂 CSV；2023 Segi 率另核對年報第72頁。"
+    },
+    {
+      "country": "台灣",
+      "year": 2023,
+      "cases": 17779,
+      "population": null,
+      "crude_rate": 149.82,
+      "original_asr": 91.2,
+      "original_standard": "WHO 2000",
+      "common_segi_lower": 84.28,
+      "common_segi_upper": 84.28,
+      "source": "TW",
+      "scope": "全國女性",
+      "note": "同一份回溯修訂 CSV；2023 Segi 率另核對年報第72頁。"
+    },
+    {
+      "country": "日本",
+      "year": 2013,
+      "cases": 76839,
+      "population": null,
+      "crude_rate": 117.51238759405396,
+      "original_asr": 66.22880216681061,
+      "original_standard": "Segi 1960",
+      "common_segi_lower": 66.22880216681062,
+      "common_segi_upper": 66.22880216681062,
+      "calculated_who2000": 71.40937790836716,
+      "source": "JP13",
+      "scope": "全國女性",
+      "note": "2013為區域登記推估全國值；2016起為全國癌症登記。"
+    },
+    {
+      "country": "日本",
+      "year": 2021,
+      "cases": 98782,
+      "population": null,
+      "crude_rate": 153.190763457035,
+      "original_asr": 78.4989174185132,
+      "original_standard": "Segi 1960",
+      "common_segi_lower": 78.49891741851317,
+      "common_segi_upper": 78.49891741851317,
+      "calculated_who2000": 85.08141483718408,
+      "source": "JP23",
+      "scope": "全國女性",
+      "note": "2013為區域登記推估全國值；2016起為全國癌症登記。"
+    },
+    {
+      "country": "日本",
+      "year": 2022,
+      "cases": 99770,
+      "population": null,
+      "crude_rate": 155.431616008973,
+      "original_asr": 79.316722792408,
+      "original_standard": "Segi 1960",
+      "common_segi_lower": 79.31672279240807,
+      "common_segi_upper": 79.31672279240807,
+      "calculated_who2000": 85.91746850134228,
+      "source": "JP23",
+      "scope": "全國女性",
+      "note": "2013為區域登記推估全國值；2016起為全國癌症登記。"
+    },
+    {
+      "country": "日本",
+      "year": 2023,
+      "cases": 102592,
+      "population": null,
+      "crude_rate": 160.653940713134,
+      "original_asr": 80.920318824011,
+      "original_standard": "Segi 1960",
+      "common_segi_lower": 80.92031882401105,
+      "common_segi_upper": 80.92031882401105,
+      "calculated_who2000": 87.7417355543378,
+      "source": "JP23",
+      "scope": "全國女性",
+      "note": "2013為區域登記推估全國值；2016起為全國癌症登記。"
+    },
+    {
+      "country": "韓國",
+      "year": 2013,
+      "cases": 17231,
+      "population": null,
+      "crude_rate": 68.2,
+      "original_asr": 45.7,
+      "original_standard": "Segi 1960",
+      "common_segi_lower": 45.7,
+      "common_segi_upper": 45.7,
+      "source": "KR13",
+      "scope": "全國女性",
+      "note": "各診斷年度研究報告，發布版本不同；不是同一發布版本的回溯序列。"
+    },
+    {
+      "country": "韓國",
+      "year": 2021,
+      "cases": 28720,
+      "population": null,
+      "crude_rate": 111.6,
+      "original_asr": 68.6,
+      "original_standard": "Segi 1960",
+      "common_segi_lower": 68.6,
+      "common_segi_upper": 68.6,
+      "source": "KR21",
+      "scope": "全國女性",
+      "note": "各診斷年度研究報告，發布版本不同；不是同一發布版本的回溯序列。"
+    },
+    {
+      "country": "韓國",
+      "year": 2022,
+      "cases": 29391,
+      "population": null,
+      "crude_rate": 114.3,
+      "original_asr": 69.2,
+      "original_standard": "Segi 1960",
+      "common_segi_lower": 69.2,
+      "common_segi_upper": 69.2,
+      "source": "KR22",
+      "scope": "全國女性",
+      "note": "各診斷年度研究報告，發布版本不同；不是同一發布版本的回溯序列。"
+    },
+    {
+      "country": "韓國",
+      "year": 2023,
+      "cases": 29715,
+      "population": null,
+      "crude_rate": 115.7,
+      "original_asr": 69.7,
+      "original_standard": "Segi 1960",
+      "common_segi_lower": 69.7,
+      "common_segi_upper": 69.7,
+      "source": "KR23",
+      "scope": "全國女性",
+      "note": "各診斷年度研究報告，發布版本不同；不是同一發布版本的回溯序列。"
+    },
+    {
+      "country": "美國",
+      "year": 2013,
+      "cases": 238127,
+      "population": 160601985,
+      "crude_rate": 148.2715173165512,
+      "original_asr": 127.2,
+      "original_standard": "US 2000（不是 WHO 2000）",
+      "common_segi_lower": null,
+      "common_segi_upper": null,
+      "source": "US",
+      "scope": "USCS全國女性，所有族群",
+      "note": "CDC現行查詢系統同一版本；粗率由公開病例與相應人口重算。"
+    },
+    {
+      "country": "美國",
+      "year": 2021,
+      "cases": 284431,
+      "population": 167656063,
+      "crude_rate": 169.65148465880412,
+      "original_asr": 136.7,
+      "original_standard": "US 2000（不是 WHO 2000）",
+      "common_segi_lower": null,
+      "common_segi_upper": null,
+      "source": "US",
+      "scope": "USCS全國女性，所有族群",
+      "note": "CDC現行查詢系統同一版本；粗率由公開病例與相應人口重算。"
+    },
+    {
+      "country": "美國",
+      "year": 2022,
+      "cases": 284897,
+      "population": 168681389,
+      "crude_rate": 168.8965224254823,
+      "original_asr": 135.2,
+      "original_standard": "US 2000（不是 WHO 2000）",
+      "common_segi_lower": null,
+      "common_segi_upper": null,
+      "source": "US",
+      "scope": "USCS全國女性，所有族群",
+      "note": "CDC現行查詢系統同一版本；粗率由公開病例與相應人口重算。"
+    },
+    {
+      "country": "美國",
+      "year": 2023,
+      "cases": 288494,
+      "population": 170100136,
+      "crude_rate": 169.60245111150294,
+      "original_asr": 135.2,
+      "original_standard": "US 2000（不是 WHO 2000）",
+      "common_segi_lower": 97.39123742417429,
+      "common_segi_upper": 97.45907903397601,
+      "source": "US",
+      "scope": "USCS全國女性，所有族群",
+      "note": "CDC現行查詢系統同一版本；粗率由公開病例與相應人口重算。 Segi重算採抑制格0至15例的保守範圍，並非信賴區間。"
+    },
+    {
+      "country": "新加坡",
+      "year": 2013,
+      "cases": null,
+      "population": null,
+      "crude_rate": null,
+      "original_asr": null,
+      "original_standard": "Segi-Doll",
+      "common_segi_lower": null,
+      "common_segi_upper": null,
+      "source": "SG23",
+      "scope": "女性公民及永久居民",
+      "note": "2023為單年度。已讀舊年報以多年區間呈現乳癌資料；其他指定單年未核得，不以五年值代填。"
+    },
+    {
+      "country": "新加坡",
+      "year": 2021,
+      "cases": null,
+      "population": null,
+      "crude_rate": null,
+      "original_asr": null,
+      "original_standard": "Segi-Doll",
+      "common_segi_lower": null,
+      "common_segi_upper": null,
+      "source": "SG23",
+      "scope": "女性公民及永久居民",
+      "note": "2023為單年度。已讀舊年報以多年區間呈現乳癌資料；其他指定單年未核得，不以五年值代填。"
+    },
+    {
+      "country": "新加坡",
+      "year": 2022,
+      "cases": null,
+      "population": null,
+      "crude_rate": null,
+      "original_asr": null,
+      "original_standard": "Segi-Doll",
+      "common_segi_lower": null,
+      "common_segi_upper": null,
+      "source": "SG23",
+      "scope": "女性公民及永久居民",
+      "note": "2023為單年度。已讀舊年報以多年區間呈現乳癌資料；其他指定單年未核得，不以五年值代填。"
+    },
+    {
+      "country": "新加坡",
+      "year": 2023,
+      "cases": 3104,
+      "population": null,
+      "crude_rate": 145.9,
+      "original_asr": 83.3,
+      "original_standard": "Segi-Doll",
+      "common_segi_lower": 83.3,
+      "common_segi_upper": 83.3,
+      "source": "SG23",
+      "scope": "女性公民及永久居民",
+      "note": "2023為單年度。已讀舊年報以多年區間呈現乳癌資料；其他指定單年未核得，不以五年值代填。"
+    }
+  ],
+  "growth": [
+    {
+      "country": "台灣",
+      "crude_growth_2013_2023": 0.5301807782657542
+    },
+    {
+      "country": "日本",
+      "crude_growth_2013_2023": 0.36712344972610333
+    },
+    {
+      "country": "韓國",
+      "crude_growth_2013_2023": 0.6964809384164223
+    },
+    {
+      "country": "美國",
+      "crude_growth_2013_2023": 0.1438640015358541
+    },
+    {
+      "country": "新加坡",
+      "crude_growth_2013_2023": null
+    }
+  ],
+  "sources": {
+    "TW": {
+      "url": "https://www.hpa.gov.tw/Pages/ashx/GetFile.ashx?lang=c&type=1&sid=9e08758933474930a69e2946e17d63ea",
+      "detail": "國健署歷年癌症CSV；2023年報第72、503頁核對Segi及WHO標準。"
+    },
+    "JP13": {
+      "url": "https://ganjoho.jp/reg_stat/statistics/data/dl/excel/cancer_incidence%281975-2015%29.xls",
+      "detail": "MCIJ全國推估；number/rate/asr工作表。"
+    },
+    "JP23": {
+      "url": "https://ganjoho.jp/reg_stat/statistics/data/dl/excel/cancer_incidenceNCR%282016-2023%29.xls",
+      "detail": "日本全國癌症登記；number/rate/asr工作表。"
+    },
+    "KR13": {
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC4843732/",
+      "detail": "2013年登記統計研究，Table 1、2；女性乳癌。"
+    },
+    "KR21": {
+      "url": "https://www.e-crt.org/upload/pdf/crt-2024-253.pdf",
+      "detail": "2021年登記統計研究，Table 1、2。"
+    },
+    "KR22": {
+      "url": "https://www.e-crt.org/upload/pdf/crt-2025-264.pdf",
+      "detail": "2022年登記統計研究，Table 1、2。"
+    },
+    "KR23": {
+      "url": "https://www.e-crt.org/upload/pdf/crt-2026-298.pdf",
+      "detail": "2023年登記統計研究，Table 1、2。"
+    },
+    "US": {
+      "url": "https://gis.cdc.gov/cancerapi/DataVizApi/GetJSON/TrendsMapData_Inci_byCancerSiteID_5",
+      "detail": "由CDC公開網站程式確認接口；YearID、SexID、RaceID均核對公開selectors；2023年齡別資料另重算Segi範圍。"
+    },
+    "SG23": {
+      "url": "https://isomer-user-content.by.gov.sg/737/a9695c77-40d5-4bbd-a4b9-347a0942b191/singapore-cancer-registry-annual-report-2023.pdf",
+      "detail": "Table 3.1.2，實體PDF第51頁；方法第7頁。"
+    }
+  },
+  "common_2023_standard": "Segi 1960 / Doll世界標準；台灣年報稱1976世界標準，同一組年齡權重。",
+  "us_age_inputs": [
+    {
+      "age_ids": [
+        1,
+        2
+      ],
+      "population": 9113709,
+      "count_lower": 0,
+      "count_upper": 30,
+      "segi_weight": 12000
+    },
+    {
+      "age_ids": [
+        11
+      ],
+      "population": 9912913,
+      "count_lower": 0,
+      "count_upper": 15,
+      "segi_weight": 10000
+    },
+    {
+      "age_ids": [
+        3
+      ],
+      "population": 10220382,
+      "count_lower": 0,
+      "count_upper": 15,
+      "segi_weight": 9000
+    },
+    {
+      "age_ids": [
+        4
+      ],
+      "population": 10848970,
+      "count_lower": 22,
+      "count_upper": 22,
+      "segi_weight": 9000
+    },
+    {
+      "age_ids": [
+        5
+      ],
+      "population": 10793698,
+      "count_lower": 194,
+      "count_upper": 194,
+      "segi_weight": 8000
+    },
+    {
+      "age_ids": [
+        6
+      ],
+      "population": 10974079,
+      "count_lower": 1227,
+      "count_upper": 1227,
+      "segi_weight": 8000
+    },
+    {
+      "age_ids": [
+        7
+      ],
+      "population": 11761144,
+      "count_lower": 3794,
+      "count_upper": 3794,
+      "segi_weight": 6000
+    },
+    {
+      "age_ids": [
+        8
+      ],
+      "population": 11232482,
+      "count_lower": 7702,
+      "count_upper": 7702,
+      "segi_weight": 6000
+    },
+    {
+      "age_ids": [
+        9
+      ],
+      "population": 10948511,
+      "count_lower": 15684,
+      "count_upper": 15684,
+      "segi_weight": 6000
+    },
+    {
+      "age_ids": [
+        10
+      ],
+      "population": 9974556,
+      "count_lower": 21388,
+      "count_upper": 21388,
+      "segi_weight": 6000
+    },
+    {
+      "age_ids": [
+        12
+      ],
+      "population": 10407373,
+      "count_lower": 25980,
+      "count_upper": 25980,
+      "segi_weight": 5000
+    },
+    {
+      "age_ids": [
+        13
+      ],
+      "population": 10466862,
+      "count_lower": 29123,
+      "count_upper": 29123,
+      "segi_weight": 4000
+    },
+    {
+      "age_ids": [
+        14
+      ],
+      "population": 10932221,
+      "count_lower": 38044,
+      "count_upper": 38044,
+      "segi_weight": 4000
+    },
+    {
+      "age_ids": [
+        15
+      ],
+      "population": 10042785,
+      "count_lower": 42974,
+      "count_upper": 42974,
+      "segi_weight": 3000
+    },
+    {
+      "age_ids": [
+        16
+      ],
+      "population": 8331148,
+      "count_lower": 39441,
+      "count_upper": 39441,
+      "segi_weight": 2000
+    },
+    {
+      "age_ids": [
+        17
+      ],
+      "population": 6221182,
+      "count_lower": 30323,
+      "count_upper": 30323,
+      "segi_weight": 1000
+    },
+    {
+      "age_ids": [
+        18
+      ],
+      "population": 3983828,
+      "count_lower": 18436,
+      "count_upper": 18436,
+      "segi_weight": 500
+    },
+    {
+      "age_ids": [
+        19
+      ],
+      "population": 3934293,
+      "count_lower": 14161,
+      "count_upper": 14161,
+      "segi_weight": 500
+    }
+  ],
+  "singapore_periods": [
+    {
+      "period": "2013–2017",
+      "cases": 10936,
+      "crude_rate": 110.1,
+      "segi_asr": 70.5
+    },
+    {
+      "period": "2019–2023",
+      "cases": 13935,
+      "crude_rate": 134.4,
+      "segi_asr": 78.7
+    }
+  ],
+  "limitations": [
+    "年齡校正不等於校正篩檢、診斷、申報或其他風險因素。",
+    "不同國家的資料修訂、居民定義與2016日本制度變化均保留註記。",
+    "新加坡未核得的單年數值保持缺值，五年病例數與年化率不得當成單一年數字。",
+    "美國Segi區間是公開抑制格造成的可計算範圍，不是統計信賴區間。",
+    "描述性比較不能確定BaP油品造成癌症增加。"
+  ]
+}

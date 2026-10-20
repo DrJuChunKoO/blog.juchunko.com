@@ -1,0 +1,512 @@
+{
+  "checked_date_taiwan": "2026-10-20",
+  "scope": {
+    "databases": [
+      "PubMed/Europe PMC",
+      "原始期刊網站及全文",
+      "既有研究參考文獻回溯"
+    ],
+    "candidate_search_count": 184,
+    "candidate_count_is_not_eligible_study_count": true,
+    "all_184_metadata_retrieved": true,
+    "search_results": "research/raw/cooking_epmc_search_20261020.json",
+    "not_systematic_review": true,
+    "limits": [
+      "未宣稱窮盡所有封閉資料庫與非英文文獻",
+      "有些文獻僅取得摘要或出版社預覽",
+      "未取得任何研究參與者個資；未聯絡第三人",
+      "無一項比較達成相同燃料、油品批次、油溫、排煙、篩檢與暴露指標的國別對照"
+    ]
+  },
+  "studies": [
+    {
+      "id": "TW_Chen2020",
+      "region": "台灣",
+      "publication_year": 2020,
+      "case_years": "2002–2010",
+      "design": "醫院病例對照",
+      "population": "不吸菸女性",
+      "cases_enrolled": 1302,
+      "controls_enrolled": 1302,
+      "endpoint": "所有肺癌；另有肺腺癌附表",
+      "exposure": "一生每日烹調次數×年數（cooking time-years）",
+      "comparison": ">160 對 ≤10；低組包含少量烹調，非完全沒煮飯",
+      "measure": "aOR",
+      "estimate": 3.17,
+      "ci95": [
+        1.34,
+        7.68
+      ],
+      "trend_p": 0.0297,
+      "adenocarcinoma": {
+        "estimate": 3.12,
+        "ci95": [
+          1.28,
+          7.76
+        ],
+        "trend_p": 0.0366,
+        "analysis_cases": 933,
+        "analysis_controls": 787,
+        "series": [
+          1,
+          1.61,
+          1.77,
+          2.05,
+          3.12
+        ]
+      },
+      "limitations": [
+        "未量測BaP、油品品牌、批次或污染年份",
+        "植物油未拆分大豆、花生等種類",
+        "主分析完整共變項資料為1109病例與787對照",
+        "病例年代無法直接檢驗2022年後油品污染假說",
+        "OR是累積烹調指標的關聯，不是BaP劑量反應"
+      ],
+      "source": "https://www.nature.com/articles/s41598-020-63656-7",
+      "supplement": "https://media.springernature.com/original/springer-static/esm/art%3A10.1038%2Fs41598-020-63656-7/MediaObjects/41598_2020_63656_MOESM1_ESM.pdf",
+      "checked": "全文及附表2、4完整頁面目視核對"
+    },
+    {
+      "id": "HK_Yu2006",
+      "region": "香港",
+      "publication_year": 2006,
+      "case_years": "2002–2004",
+      "design": "人口病例對照",
+      "population": "不吸菸女性",
+      "cases_enrolled": 200,
+      "controls_enrolled": 285,
+      "endpoint": "所有肺癌；137例(68.5%)腺癌",
+      "exposure": "一生每日煎炒炸菜數×年數（dish-years）",
+      "comparison": ">200 對 ≤50；單位及比較組均不同於台灣",
+      "measure": "aOR（模型1）",
+      "estimate": 8.09,
+      "ci95": [
+        2.57,
+        25.45
+      ],
+      "trend_p": null,
+      "models": {
+        "model1_series": [
+          1,
+          1.31,
+          2.8,
+          3.09,
+          8.09
+        ],
+        "model4_series": [
+          1,
+          1.31,
+          4.12,
+          4.68,
+          34
+        ],
+        "model4_ci95": [
+          7.16,
+          161.39
+        ],
+        "crude_series": [
+          1,
+          1.17,
+          1.92,
+          2.26,
+          6.15
+        ],
+        "crude_trend_p": "<0.001",
+        "adenocarcinoma_crude": 8.58,
+        "adenocarcinoma_crude_ci95": [
+          2.94,
+          25.02
+        ]
+      },
+      "limitations": [
+        "最高組只有16病例與5對照，估計不穩定",
+        "控制組回應率48.7%",
+        "逐步增加共變項後估計大幅上升，不應挑34作精確真值",
+        "未量測BaP；抽油煙機及油種未顯著",
+        "2014香港聯合暴露論文重用同一女性母群，不能算獨立複驗"
+      ],
+      "source": "https://pubmed.ncbi.nlm.nih.gov/16651454/",
+      "doi": "10.1158/0008-5472.CAN-05-2932",
+      "checked": "摘要及鏡像原論文PDF表2–4目視核對；出版社下載403"
+    },
+    {
+      "id": "SG_Seow2000",
+      "region": "新加坡",
+      "publication_year": 2000,
+      "case_years": "1990年代末",
+      "design": "醫院病例對照",
+      "population": "華人女性；吸菸與不吸菸分組",
+      "cases_enrolled": 303,
+      "controls_enrolled": 765,
+      "endpoint": "所有肺癌；不吸菸病例71.6%腺癌",
+      "exposure": "過去每日炒菜、炒肉及廚房油煙",
+      "comparison": "每日炒肉等烹調習慣，非終身累積時間指標",
+      "measure": "不吸菸組未見風險增加",
+      "estimate": null,
+      "ci95": null,
+      "trend_p": null,
+      "subgroup": {
+        "never_cases": 176,
+        "never_controls": 663,
+        "smoker_daily_meat_smoky_kitchen_OR": 3.7,
+        "smoker_ci95": [
+          1.8,
+          7.5
+        ]
+      },
+      "limitations": [
+        "摘要未提供各不吸菸暴露組OR，不補造數字",
+        "3.7來自吸菸女性，不能冒充不吸菸結果",
+        "未量測BaP或同期相同油品；回溯20–30年前習慣"
+      ],
+      "source": "https://pubmed.ncbi.nlm.nih.gov/11097230/",
+      "checked": "原始文獻摘要；全文未取得"
+    },
+    {
+      "id": "CN_Gansu2002",
+      "region": "中國甘肅",
+      "publication_year": 2002,
+      "case_years": "1994–1998",
+      "design": "人口病例對照",
+      "population": "女性，多數不吸菸但不是全員",
+      "cases_enrolled": 233,
+      "controls_enrolled": 459,
+      "endpoint": "所有肺癌",
+      "exposure": "菜籽/亞麻籽油炒菜頻率",
+      "comparison": "每月≥31次相對較低頻率",
+      "measure": "OR",
+      "estimate": 2.24,
+      "ci95": null,
+      "trend_p": 0.03,
+      "series": [
+        1,
+        1.96,
+        1.73,
+        2.24
+      ],
+      "limitations": [
+        "有整體趨勢但非每級單調上升",
+        "油種與燃料條件不同，非大豆油直接對照",
+        "最高組CI未見於已取得摘要，不補造",
+        "烹調年資趨勢p<0.09，不能當p<0.05顯著"
+      ],
+      "source": "https://www.sciencedirect.com/science/article/pii/S0169500201004123",
+      "doi": "10.1016/S0169-5002(01)00412-3",
+      "checked": "出版社摘要及預覽"
+    },
+    {
+      "id": "CN_Shanghai_Zhong1999",
+      "region": "中國上海",
+      "publication_year": 1999,
+      "case_years": "1992–1994",
+      "design": "人口病例對照",
+      "population": "不吸菸女性",
+      "cases_enrolled": 504,
+      "controls_enrolled": 601,
+      "endpoint": "所有肺癌",
+      "exposure": "高溫油、明顯油煙及菜籽油",
+      "comparison": "高溫烹調油對其他",
+      "measure": "aOR",
+      "estimate": 1.64,
+      "ci95": [
+        1.24,
+        2.17
+      ],
+      "trend_p": null,
+      "other": {
+        "considerable_smokiness_OR": 2.38,
+        "smokiness_ci95": [
+          1.58,
+          3.57
+        ],
+        "rapeseed_OR": 1.84,
+        "rapeseed_ci95": [
+          1.12,
+          3.02
+        ]
+      },
+      "limitations": [
+        "油種、油溫與暴露界線不同，不宜直接比數字高低",
+        "未量測BaP",
+        "PMID10874563為討論來函而非獨立研究或已核實勘誤"
+      ],
+      "source": "https://pubmed.ncbi.nlm.nih.gov/10468420/",
+      "checked": "原始摘要"
+    },
+    {
+      "id": "CN_Shanghai_Kim2015",
+      "region": "中國上海",
+      "publication_year": 2015,
+      "online_year": 2014,
+      "case_years": "1996–2009",
+      "design": "前瞻世代",
+      "population": "71320名不吸菸女性",
+      "cases_enrolled": 429,
+      "controls_enrolled": null,
+      "endpoint": "所有肺癌",
+      "exposure": "住家燃料、排煙與油種使用史",
+      "comparison": "油種/使用年數，非烹調與完全不烹調",
+      "measure": "食用油使用未見顯著關聯",
+      "estimate": null,
+      "ci95": null,
+      "trend_p": null,
+      "other": {
+        "ever_poor_ventilation_HR": 1.49,
+        "poor_ventilation_ci95": [
+          1.15,
+          1.95
+        ],
+        "coal_poor_ventilation_20plus_HR": 2.03,
+        "coal_ci95": [
+          1.35,
+          3.05
+        ]
+      },
+      "limitations": [
+        "超過89%用過大豆油，油種對比不足",
+        "2.03是燃煤加通風差，不可標為油煙或大豆油效果",
+        "家庭條件只基線量測且未完整涵蓋所有居住史"
+      ],
+      "source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC4232458/",
+      "doi": "10.1002/ijc.29020",
+      "checked": "原始全文；正式期刊2015年2月"
+    },
+    {
+      "id": "CN_Shenyang_Yin2009",
+      "region": "中國瀋陽",
+      "publication_year": 2009,
+      "case_years": "依原文，非2023近期病例",
+      "design": "基因病例對照研究中的環境暴露分析",
+      "population": "不吸菸女性",
+      "cases_enrolled": 285,
+      "controls_enrolled": 285,
+      "endpoint": "肺腺癌",
+      "exposure": "回報烹調油煙暴露",
+      "comparison": "有對無油煙暴露",
+      "measure": "OR（表1環境暴露比較，未當完整調整模型）",
+      "estimate": 1.61,
+      "ci95": [
+        1.13,
+        2.3
+      ],
+      "trend_p": null,
+      "limitations": [
+        "主要研究目的為DNA修復基因；油煙為自述分組",
+        "非連續累積劑量分析",
+        "與台灣暴露指標不相同，CI亦重疊",
+        "未量測BaP"
+      ],
+      "source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC2797795/",
+      "doi": "10.1186/1756-9966-28-153",
+      "checked": "原始全文結果與表1"
+    },
+    {
+      "id": "KR_Jang2025",
+      "region": "韓國",
+      "publication_year": 2025,
+      "case_years": "2007–2011建立工作世代，追蹤至2022",
+      "design": "全國行政資料回溯世代",
+      "population": "女性校廚對女性文書；不吸菸匹配後各23444名",
+      "cases_enrolled": null,
+      "controls_enrolled": null,
+      "cohort_sizes_never_matched": {"school_cooks": 23444, "clerks": 23444},
+      "incident_lung_cancers_never_matched": {"school_cooks": 74, "clerks": 24},
+      "endpoint": "所有肺癌，未提供腺癌分組",
+      "exposure": "校廚職業，非個人油煙/BaP濃度",
+      "comparison": "校廚對文書，兩組可能都在家煮飯",
+      "measure": "Fine–Gray subdistribution HR（不吸菸匹配後）",
+      "estimate": 4.23,
+      "ci95": [
+        2.36,
+        7.58
+      ],
+      "trend_p": null,
+      "other": {
+        "never_before_matching_HR": 1.46,
+        "never_before_matching_ci95": [
+          1.13,
+          1.87
+        ],
+        "all_after_matching_HR": 1.72,
+        "all_after_matching_ci95": [
+          1.14,
+          2.6
+        ]
+      },
+      "limitations": [
+        "無烹調年資/次數、油種、燃料、排煙或BaP資料，不能檢驗劑量關係",
+        "收入等殘餘混雜，對照非同校同產業",
+        "估計受匹配改變明顯；HR不可與台灣OR直接相除",
+        "表2粗率欄76/23772×100000=319.7，非76/259819人年；不拿該欄作國家年度發生率"
+      ],
+      "source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11959550/",
+      "doi": "10.1016/j.shaw.2025.01.002",
+      "checked": "原始全文、表2–3與限制"
+    },
+    {
+      "id": "MULTI_Bigert2015",
+      "region": "歐洲、加拿大、紐西蘭及香港合併",
+      "publication_year": 2015,
+      "case_years": "16項病例對照研究，年代不同",
+      "design": "SYNERGY個人資料合併",
+      "population": "女性職業廚師，另有不吸菸分組",
+      "cases_enrolled": 889,
+      "controls_enrolled": 2824,
+      "exposed_cooks": {"cases": 37, "controls": 160},
+      "endpoint": "不吸菸女性所有肺癌",
+      "exposure": "曾任廚師及工作年資",
+      "comparison": "曾任對未曾任廚師；未任職者仍可能在家煮飯",
+      "measure": "OR（不吸菸女性，校正研究與年齡）",
+      "estimate": 0.7,
+      "ci95": [
+        0.48,
+        1.02
+      ],
+      "trend_p": null,
+      "other": {
+        "all_female_smoking_adjusted_OR": 1.06,
+        "all_female_ci95": [
+          0.85,
+          1.31
+        ],
+        "female_adenocarcinoma_OR": 0.94,
+        "female_adeno_ci95": [
+          0.71,
+          1.25
+        ],
+        "all_female_duration_trend_p": 0.86
+      },
+      "limitations": [
+        "未量測個人油溫、油種、排煙、BaP",
+        "多為西方職場，與中式居家高溫煎炒不同",
+        "不能把未見關聯解讀為油煙無害或國別差異的統計證明"
+      ],
+      "source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7508228/",
+      "doi": "10.1097/JOM.0000000000000337",
+      "checked": "原始全文表3、4、6"
+    },
+    {
+      "id": "SG_FriedMeat2013",
+      "region": "新加坡",
+      "publication_year": 2013,
+      "case_years": "1993–1998起始世代",
+      "design": "前瞻世代",
+      "population": "61321名華人男女，另有不吸菸女性分組",
+      "cases_enrolled": 1130,
+      "controls_enrolled": null,
+      "endpoint": "肺腺癌",
+      "exposure": "食用煎炸肉類量",
+      "comparison": "女性不吸菸最高對最低三分位",
+      "measure": "HR",
+      "estimate": 1.39,
+      "ci95": [
+        0.88,
+        2.19
+      ],
+      "trend_p": null,
+      "limitations": [
+        "測的是食入，不列入烹調油煙吸入的直接比較",
+        "男女合併不吸菸HR1.51(1.03–2.22)不可冒充女性結果",
+        "未測BaP"
+      ],
+      "source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3731803/",
+      "doi": "10.1093/carcin/bgt113",
+      "checked": "全文結果及分組敘述"
+    }
+  ],
+  "mechanistic_evidence": [
+    {
+      "year": 2024,
+      "doi": "10.1016/j.psep.2024.05.072",
+      "source": "https://www.sciencedirect.com/science/article/pii/S0957582024005846",
+      "model": "大豆油炸薯條，160/180/200°C，加入穩定同位素標記PAH4-d12",
+      "result": "BaP-d12等可被油煙微粒攜出，非純氣態揮發；溫度/時間增加促進遷移",
+      "reported_migration_ranges_percent": {
+        "160C": [
+          0.48,
+          1.08
+        ],
+        "180C": [
+          0.96,
+          1.21
+        ],
+        "200C": [
+          2.98,
+          3.6
+        ]
+      },
+      "limits": [
+        "只取得摘要、導論與部分方法/結果預覽",
+        "最終油中加標濃度與完整回收率/空白控制未取得，不能視為本案8.1μg/kg劑量重現",
+        "遷移比例不是人體吸入比例或癌症發生率",
+        "實驗為油炸，非鐵鍋快炒；性別與腺癌發生率未研究"
+      ]
+    },
+    {
+      "year": 2026,
+      "doi": "10.1016/j.foodchem.2026.150156",
+      "source": "https://www.sciencedirect.com/science/article/pii/S0308814626023150",
+      "first_publication_epmc": "2026-06-29",
+      "publisher_issue_date": "2026-09-30",
+      "model": "菜籽油油炸，穩定同位素PAH4-d12",
+      "result": "氧化與醛類生成和PAH4遷移相關；小於2.1μm顆粒攜帶已遷移量58.01–72.90%",
+      "limits": [
+        "比例分母是已遷移的PAH4，不是原油總污染量或吸入量",
+        "與2024研究有作者重疊，不算獨立團隊複驗",
+        "僅核實摘要/預覽與文獻資料庫，未取得完整方法"
+      ]
+    },
+    {
+      "year": 2015,
+      "doi": "10.1371/journal.pone.0120023",
+      "source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC4373935/",
+      "model": "328名新加坡不吸菸華人女性，尿液生物標記",
+      "result": "炒鍋烹調較頻繁者，丙烯醛與丁烯醛代謝物較高，有頻率趨勢；苯代謝物無同樣趨勢",
+      "limits": [
+        "沒有追蹤肺癌發生",
+        "不是BaP生物標記，不能視為特定油品污染證據",
+        "2010較小前導研究HBMA數值另有勘誤，2015文已揭露"
+      ]
+    },
+    {
+      "year": 2024,
+      "doi": "10.1016/j.envpol.2023.123215",
+      "source": "https://pubmed.ncbi.nlm.nih.gov/38145635/",
+      "model": "不同精煉程度大豆油的加熱油煙",
+      "result": "PAHs、顆粒與醛酮類排放隨精煉程度不同；酸價與顆粒濃度相關",
+      "limits": [
+        "風險數值為模型而非觀察到癌症",
+        "不直接驗證BaP超標油與合格油的現實劑量差"
+      ]
+    }
+  ],
+  "causal_checks": [
+    "不同研究的顯著與不顯著，不等於國家之間顯著不同",
+    "OR和HR及不同暴露對比不能直接排名或相除",
+    "料理相近不等於污染物濃度與累積吸入劑量相同",
+    "高OR與劑量趨勢在香港及其他亞洲資料也出現，台灣獨特性前提未獲支持",
+    "Chen2020是2002–2010病例；無法由它驗證近年新增污染",
+    "目前沒有同期、同定義、控制篩檢差異的國際女性肺腺癌發生率分析，不能聲稱只有台灣上升",
+    "暴露機轉、風險管理責任與個別癌症因果是不同待證問題"
+  ],
+  "accountability": {
+    "assessment": "足以支持重大食安調查報導與監管問責；現有材料尚不足以指定某官員對某群癌症患者負因果責任",
+    "taiwan_primary": "https://www.fda.gov.tw/TC/newsContent.aspx?cid=4&id=t634544",
+    "industry_management_findings": "高風險原料、製程、檢驗監測多項缺失已載於報告；仍需檢核原始數據與獨立性",
+    "government_missing": [
+      "各主管機關何時收到哪些警訊",
+      "當時檢驗/查核義務與風險評估",
+      "收到警訊後實際作為及可避免的暴露",
+      "中央、地方、第三方驗證及企業各自權責"
+    ],
+    "us_example": "https://www.oig.hhs.gov/reports/all/2024/the-food-and-drug-administrations-inspection-and-recall-process-should-be-improved-to-ensure-the-safety-of-the-infant-formula-supply/",
+    "us_reporting": "https://apnews.com/article/1c45a6714b2d415784671dcfc8516946"
+  },
+  "next_priority": [
+    "取得2024/2026遷移研究全文與補充方法，核對加標濃度、氣粒相採樣、空白值與回收率",
+    "用本案實測濃度附近的加標油及真實留樣，與合格同類油做溫度×使用時間對照；分別測BaP/PAH4、醛類、粒徑及可吸入量",
+    "取得歷史原料/成品檢驗與批次供應鏈，確立污染時間窗；不要把2026結果外推至所有歷史年份",
+    "病例比較以供應鏈暴露、烹調強度、排煙及年資分組，控制年齡、吸菸/二手菸、氡、戶外污染及篩檢",
+    "同步建構警訊、稽查、檢驗與處理的行政時間線，檢驗監管失職而不以癌症歸因作為啟動前提"
+  ]
+}

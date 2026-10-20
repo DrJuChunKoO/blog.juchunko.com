@@ -1,0 +1,119 @@
+{
+  "checked_date_taiwan": "2026-10-19",
+  "question": "Evidence linking benzo[a]pyrene exposure with female breast cancer incidence",
+  "diet_uruguay_2011": {
+    "pmid": "22126482",
+    "cases": 460,
+    "controls": 638,
+    "design": "hospital case-control",
+    "exposure": "estimated dietary BaP",
+    "Q4_vs_Q1_OR": 2.0,
+    "CI95": [
+      1.2,
+      3.3
+    ],
+    "checked": "primary abstract only",
+    "limitations": [
+      "recall and selection bias possible",
+      "not a contaminated-oil intervention"
+    ]
+  },
+  "diet_NIHAARP_2009": {
+    "pmcid": "PMC3491884",
+    "women": 120755,
+    "incident_cases": 3818,
+    "design": "prospective cohort",
+    "exposure": "estimated meat-derived BaP",
+    "Q5_vs_Q1_adjusted_HR": 0.96,
+    "CI95": [
+      0.88,
+      1.06
+    ],
+    "p_trend": 0.68,
+    "checked": "full primary article Table 4",
+    "limitations": [
+      "postmenopausal population",
+      "meat-based exposure is not whole-diet or contaminated-oil BaP"
+    ]
+  },
+  "diet_E3N_2025": {
+    "pmid": "40373460",
+    "doi": "10.1016/j.envint.2025.109505",
+    "women": 67879,
+    "incident_cases": 5686,
+    "mean_followup_years": 17.6,
+    "design": "prospective cohort",
+    "BaP_Q2_vs_Q1_HR": 1.08,
+    "BaP_Q2_CI95": [
+      0.99,
+      1.17
+    ],
+    "BaP_Q3_vs_Q1_HR": 1.07,
+    "BaP_Q3_CI95": [
+      0.98,
+      1.16
+    ],
+    "PAH4_Q3_vs_Q1_HR": 1.1,
+    "PAH4_Q3_CI95": [
+      1.01,
+      1.2
+    ],
+    "checked": "publisher and primary indexed abstracts; complete tables not obtained",
+    "limitations": [
+      "do not attribute PAH4 result solely to BaP",
+      "BaP intervals include the null",
+      "not monotonic evidence",
+      "estimated food intake combined with French total-diet contamination data"
+    ]
+  },
+  "air_E3N_2021": {
+    "doi": "10.1016/j.envint.2021.106399",
+    "cases": 5222,
+    "matched_controls": 5222,
+    "design": "nested case-control in prospective cohort",
+    "OR_per_IQR_cumulative_modeled_air_BaP": 1.15,
+    "CI95": [
+      1.04,
+      1.27
+    ],
+    "checked": "publisher abstract and indexed primary tables",
+    "limitations": [
+      "ambient modeled exposure not cooking-fume or oil exposure",
+      "correlated pollutants and residual confounding possible"
+    ]
+  },
+  "air_E3N_trajectories_2024": {
+    "pmcid": "PMC11380782",
+    "doi": "10.1186/s12940-024-01106-x",
+    "result": "No association with BaP trajectory classes; positive PCB153 result",
+    "checked": "full primary article",
+    "limitations": [
+      "same parent E3N population as 2021; not independent replication",
+      "different exposure parameterization"
+    ]
+  },
+  "animal_oral_1995": {
+    "pmid": "7859378",
+    "doi": "10.1093/carcin/16.2.431",
+    "model": "female CD rats",
+    "dose": "50 micromol per rat per week for 8 weeks, gavage in trioctanoin",
+    "result": "mammary adenocarcinoma incidence significantly higher than vehicle",
+    "checked": "primary abstract",
+    "limitations": [
+      "high experimental dose; cannot transfer incidence or dose-response to daily low-dose human oil consumption"
+    ]
+  },
+  "mechanism_2025": {
+    "pmid": "41336283",
+    "doi": "10.1371/journal.pone.0337395",
+    "model": "T47D breast cancer cell line, NOT normal primary mammary cells",
+    "dose": "4 micromolar BaP in cell culture",
+    "result": "DNA/protein adduct formation; reactive metabolite transfer supports mechanistic plausibility",
+    "checked": "full primary article",
+    "limitations": [
+      "not human incidence evidence",
+      "not proof of transformation of normal cells"
+    ]
+  },
+  "synthesis": "Mammary carcinogenic potential is supported experimentally; human BaP-specific dietary associations remain inconsistent. No inference of a Taiwan oil-event causal effect or dose-specific risk can be made from these studies alone."
+}
