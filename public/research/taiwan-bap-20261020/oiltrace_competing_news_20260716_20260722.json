@@ -1,0 +1,290 @@
+{
+  "as_of": "2026-10-20",
+  "window": [
+    "2026-07-16",
+    "2026-07-22"
+  ],
+  "timezone": "Asia/Taipei",
+  "selection": "Exploratory candidates from dated primary publisher reports, two weekly editorial roundups and all five weekday PTS evening-bulletin descriptions in the user-specified window. Not a national media census or a preregistered causal study.",
+  "coding": "Positions are order in the written podcast synopsis, not measured broadcast running order, airtime or prominence. Oil items explicitly concern affected oils/recalls/litigation; broader food-safety policy is coded separately. Only summaries were coded, not full audio or TV programmes.",
+  "publisher": "Taiwan Public Television Service; primary publisher descriptions distributed via Apple Podcasts. These are not an independent second newsroom.",
+  "coverage": "All five weekday bulletin descriptions in the window; the programme describes its evening bulletins as weekday releases. No weekend TV coverage or all-day output is coded.",
+  "sources": {
+    "G01": {
+      "publisher": "Google Analytics",
+      "url": "https://support.google.com/analytics/answer/9756891?hl=en",
+      "archive_sha256": "9606a978d45ee14b6efa736f6d27bcee386add3bf89a3c041974f6fc26a4bf4e",
+      "retrieved_at_utc": "2026-10-20T12:04:26.112275+00:00"
+    },
+    "G02": {
+      "publisher": "Google Analytics",
+      "url": "https://support.google.com/analytics/answer/15258820?hl=en",
+      "archive_sha256": "62442d7e325561c15e3227df6ba85da8994639ae3ddf719fa25b8ba20cbc524e",
+      "retrieved_at_utc": "2026-10-20T12:04:26.230010+00:00"
+    },
+    "P01": {
+      "publisher": "Taiwan Public Television Service, distributed on Apple Podcasts",
+      "url": "https://podcasts.apple.com/ca/podcast/%E6%99%9A%E9%96%93%E6%96%B0%E8%81%9E%E9%80%9F%E5%A0%B1-20260716/id1519821634?i=1000777036703",
+      "published_at": "2026-07-16T08:49:00Z",
+      "archive_sha256": "f7a7934ee109328e8fd266c7edca154848abc822ae1b3ca7b58fbf4b06a210da",
+      "retrieved_at_utc": "2026-10-20T12:04:24.792514+00:00"
+    },
+    "P02": {
+      "publisher": "Taiwan Public Television Service, distributed on Apple Podcasts",
+      "url": "https://podcasts.apple.com/us/podcast/%E6%99%9A%E9%96%93%E6%96%B0%E8%81%9E%E9%80%9F%E5%A0%B1-20260717/id1519821634?i=1000777190737",
+      "published_at": "2026-07-17T08:55:00Z",
+      "archive_sha256": "34e529463069a984804c1e00df7f75d3c06b112d33ffe680efdd5a3c3264903e",
+      "retrieved_at_utc": "2026-10-20T12:04:24.966992+00:00"
+    },
+    "P03": {
+      "publisher": "Taiwan Public Television Service, distributed on Apple Podcasts",
+      "url": "https://podcasts.apple.com/us/podcast/%E6%99%9A%E9%96%93%E6%96%B0%E8%81%9E%E9%80%9F%E5%A0%B1-20260720/id1519821634?i=1000777533107",
+      "published_at": "2026-07-20T09:26:00Z",
+      "archive_sha256": "641670daeb0f0715b62f50b57db9c590078520119f12e3a529b063eb45e466aa",
+      "retrieved_at_utc": "2026-10-20T12:04:25.724913+00:00"
+    },
+    "P04": {
+      "publisher": "Taiwan Public Television Service, distributed on Apple Podcasts",
+      "url": "https://podcasts.apple.com/us/podcast/%E6%99%9A%E9%96%93%E6%96%B0%E8%81%9E%E9%80%9F%E5%A0%B1-20260721/id1519821634?i=1000777686439",
+      "published_at": "2026-07-21T08:29:00Z",
+      "archive_sha256": "3c90ab7faf08f786ccbeeb23518b52073fe0736fc8c6e0ca2e2fa92b791e67e4",
+      "retrieved_at_utc": "2026-10-20T12:04:25.514012+00:00"
+    },
+    "P05": {
+      "publisher": "Taiwan Public Television Service, distributed on Apple Podcasts",
+      "url": "https://podcasts.apple.com/us/podcast/%E6%99%9A%E9%96%93%E6%96%B0%E8%81%9E%E9%80%9F%E5%A0%B1-20260722/id1519821634?i=1000777855252",
+      "published_at": "2026-07-22T09:04:00Z",
+      "archive_sha256": "de1a51aebc500f4cee8bbf2fdb9085d4adfd5c8ed526ed41b85dab74e160534b",
+      "retrieved_at_utc": "2026-10-20T12:04:25.921969+00:00"
+    },
+    "S01": {
+      "publisher": "PTS",
+      "url": "https://news.pts.org.tw/article/817903",
+      "published_at": "2026-07-16T13:45:00+08:00",
+      "archive_sha256": "8c86a63ca6482bf8d16d6b425c159cd6dca1d95c799a8501622d913c458994ad",
+      "retrieved_at_utc": "2026-10-20T12:04:25.891695+00:00"
+    },
+    "S02": {
+      "publisher": "PTS",
+      "url": "https://news.pts.org.tw/article/818200",
+      "published_at": "2026-07-17T19:40:00+08:00",
+      "archive_sha256": "f83a9478f0277a0bf8d606d061d40e6553338892aa0991f3caf4ccb9db794e16",
+      "retrieved_at_utc": "2026-10-20T12:04:26.072047+00:00"
+    },
+    "S03": {
+      "publisher": "PTS",
+      "url": "https://news.pts.org.tw/article/818246",
+      "published_at": "2026-07-18T12:35:00+08:00",
+      "archive_sha256": "48ec221a136f2e6dfc7094d8de20500e7b6bb209098cb5af2134f0326741771c",
+      "retrieved_at_utc": "2026-10-20T12:04:26.158377+00:00"
+    },
+    "S04": {
+      "publisher": "PTS",
+      "url": "https://news.pts.org.tw/article/818372",
+      "published_at": "2026-07-20T07:34:00+08:00",
+      "archive_sha256": "395462fd4aca4c4887491810fc19fed2edfaa51e5d72de3d4ac92b5d6c61fba6",
+      "retrieved_at_utc": "2026-10-20T12:04:26.324875+00:00"
+    },
+    "S05": {
+      "publisher": "PTS",
+      "url": "https://news.pts.org.tw/article/818621",
+      "published_at": "2026-07-21T13:44:00+08:00",
+      "archive_sha256": "43bcf8b74a1bdd6745a159feae17713b302d2926d4e0f7f4d4eebe6f6988931b",
+      "retrieved_at_utc": "2026-10-20T12:04:26.424349+00:00"
+    },
+    "S06": {
+      "publisher": "CNA",
+      "url": "https://www.cna.com.tw/news/afe/202607170132.aspx",
+      "published_at": "2026-07-17T13:55:00+08:00",
+      "archive_sha256": "23ff9ba501b18b87d5131575de40906af2097f73c5154a8c15df15d92d0126eb",
+      "retrieved_at_utc": "2026-10-20T12:04:26.692328+00:00"
+    },
+    "R01": {
+      "publisher": "UDN",
+      "url": "https://udn.com/news/story/7314/9636506",
+      "published_at": "2026-07-19T01:51:00+08:00",
+      "archive_sha256": "8ff1a3e7187b5d266d402e6a532405a5133fcae7d872c7a914c460c0682257fa",
+      "retrieved_at_utc": "2026-10-20T12:04:26.949224+00:00"
+    },
+    "R02": {
+      "publisher": "PTS",
+      "url": "https://news.pts.org.tw/article/818315",
+      "published_at": "2026-07-19T17:08:00+08:00",
+      "archive_sha256": "40b88c9475ace2fc2a57cc5db9dbb7952f839f736d36c745ae16b9283d54f2ea",
+      "retrieved_at_utc": "2026-10-20T12:04:27.029429+00:00"
+    }
+  },
+  "competing_news_candidates": [
+    {
+      "id": "N01",
+      "date": "2026-07-16",
+      "zh": "青安3.0與台積電法說相關新聞",
+      "en": "Housing-loan policy and TSMC earnings news",
+      "sources": [
+        "S01",
+        "R01",
+        "P01"
+      ],
+      "timing": "same day as the recorded site peak; no pre-peak baseline"
+    },
+    {
+      "id": "N02",
+      "date": "2026-07-17",
+      "zh": "台股大跌約2953點",
+      "en": "Taiwan stock-market fall of about 2,953 points",
+      "sources": [
+        "S02",
+        "S06",
+        "P02"
+      ],
+      "timing": "same day as Direct/Video decreases, while site Organic Search rose"
+    },
+    {
+      "id": "N03",
+      "date": "2026-07-17",
+      "through": "2026-07-18",
+      "zh": "萬里溪堰塞湖警戒與溢流預估",
+      "en": "Wanli Creek barrier-lake warnings and overflow forecasts",
+      "sources": [
+        "P02",
+        "S03",
+        "R02"
+      ],
+      "timing": "overlaps the early decline; no audience-displacement estimate"
+    },
+    {
+      "id": "N04",
+      "date": "2026-07-20",
+      "zh": "世界盃決賽落幕及賽後新聞",
+      "en": "World Cup final and aftermath",
+      "sources": [
+        "S04",
+        "P03"
+      ],
+      "timing": "later than the 17 July onset; cannot explain that initial onset alone"
+    },
+    {
+      "id": "N05",
+      "date": "2026-07-21",
+      "zh": "台積電前主管涉國安案件起訴報導",
+      "en": "Indictment reporting involving a former TSMC manager",
+      "sources": [
+        "S05",
+        "P04"
+      ],
+      "timing": "later than onset; indictment is an allegation, not a final conviction"
+    },
+    {
+      "id": "N06",
+      "date": "2026-07-22",
+      "zh": "紅霞颱風可能形成與影響預報",
+      "en": "Forecasts concerning potential Typhoon Hongxia formation and impacts",
+      "sources": [
+        "P05"
+      ],
+      "timing": "later than onset; the sourced item is a forecast, not proof of an actual impact"
+    }
+  ],
+  "weekday_bulletin_panel": [
+    {
+      "date": "2026-07-16",
+      "source": "P01",
+      "first_item_zh": "青安3.0房貸政策",
+      "first_item_en": "New housing-loan policy",
+      "oil_item_positions": [
+        4
+      ],
+      "broader_food_policy_positions": [],
+      "oil_summary_zh": "摘要第4項為油品流向與受影響業者",
+      "oil_summary_en": "Oil distribution and affected firms appear at position 4.",
+      "competing_topics_zh": [
+        "房貸政策",
+        "香港書店搜索",
+        "台積電財報",
+        "美伊情勢"
+      ]
+    },
+    {
+      "date": "2026-07-17",
+      "source": "P02",
+      "first_item_zh": "台股盤中大跌",
+      "first_item_en": "Intraday stock-market plunge",
+      "oil_item_positions": [
+        3
+      ],
+      "broader_food_policy_positions": [],
+      "oil_summary_zh": "摘要第3項為行政院長為中聯案致歉及行政責任",
+      "oil_summary_en": "Premier apology and administrative responsibility appear at position 3.",
+      "competing_topics_zh": [
+        "台股大跌",
+        "萬里溪堰塞湖",
+        "駐巴紐辦事處",
+        "美中選舉爭議"
+      ]
+    },
+    {
+      "date": "2026-07-20",
+      "source": "P03",
+      "first_item_zh": "食安法修法攻防",
+      "first_item_en": "Food-safety legislation debate",
+      "oil_item_positions": [],
+      "broader_food_policy_positions": [
+        1
+      ],
+      "oil_summary_zh": "第1項屬較廣義的食安法修法；摘要未直接點名中聯",
+      "oil_summary_en": "The first item is broader food-safety legislation; the synopsis does not explicitly name Zhonglian.",
+      "competing_topics_zh": [
+        "涉貪判決",
+        "萬里溪堰塞湖",
+        "股市波動",
+        "俄烏戰爭",
+        "世足決賽後續"
+      ]
+    },
+    {
+      "date": "2026-07-21",
+      "source": "P04",
+      "first_item_zh": "六都食安會議及政治回應",
+      "first_item_en": "Municipal food-safety meeting",
+      "oil_item_positions": [
+        2
+      ],
+      "broader_food_policy_positions": [
+        1
+      ],
+      "oil_summary_zh": "第2項為問題油團體訴訟，第1項另為食安會議",
+      "oil_summary_en": "Problem-oil collective litigation appears at position 2; a food-safety meeting is first.",
+      "competing_topics_zh": [
+        "台積電前主管涉國安案件起訴",
+        "外送平台併購",
+        "幼兒園爭議"
+      ]
+    },
+    {
+      "date": "2026-07-22",
+      "source": "P05",
+      "first_item_zh": "19批油品恢復上架",
+      "first_item_en": "Relisting of 19 oil batches",
+      "oil_item_positions": [
+        1
+      ],
+      "broader_food_policy_positions": [],
+      "oil_summary_zh": "第1項即為預防性下架油品重新上架",
+      "oil_summary_en": "Relisting previously precautionarily withdrawn oils is the first listed item.",
+      "competing_topics_zh": [
+        "紅霞颱風預報",
+        "股市反彈",
+        "場館建設",
+        "兒少社群規範"
+      ]
+    }
+  ],
+  "limitations": [
+    "Dated coverage establishes competing topics existed, not that they reduced oil attention.",
+    "No impression, rating, headline-duration, platform-recommendation or same-person cross-topic browsing data are available.",
+    "Daily GA cannot identify whether a news report preceded any particular site visit within that day.",
+    "Organic Search increased on 17 July, inconsistent with a uniform simultaneous decline across all recorded channels.",
+    "Oil/food-policy items remain visible in these summaries; this does not quantify all outlets or rule out changes in total reach.",
+    "Launch publicity, promotion, day-of-week effects, referral loss and natural attention decay are competing explanations. No isolated causal effect is estimated."
+  ]
+}

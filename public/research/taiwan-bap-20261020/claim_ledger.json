@@ -52,6 +52,20 @@
       "limits": "Selected source-linked communication dates, not a complete media census. Peak may reflect early collection/launch publicity. No pre-collection baseline, within-day ordering, formal break-point estimate or identified causal media/government effect."
     },
     {
+      "id": "D05",
+      "evidence_class": "descriptive_channel_decomposition",
+      "claim": "On17July Direct fell29.8%, Organic Video45.6% and Organic Social3.4%, while Organic Search rose64.1%; Search first fell on18July within the selected window.",
+      "source": "data/oiltrace_channel_analysis_20261020.json",
+      "limits": "Exported daily session estimates, not people or national searches. Direct can lack referral information. Daily data cannot order within-day decreases or identify source/medium, promotion or news effects."
+    },
+    {
+      "id": "D06",
+      "evidence_class": "exploratory_competing_news_audit",
+      "claim": "Dated stock-market and barrier-lake reporting overlaps the early decline; oil/food-policy items remain visible in five weekday PTS written bulletins.",
+      "source": "data/oiltrace_competing_news_20260716_20260722.json",
+      "limits": "Candidates are not ranked by reach. One publisher distributed on Apple Podcasts, not an independent second newsroom or a full media census. Synopsis order is not verified airtime or broadcast order; mutable pages checked20October. No attention-displacement or deliberate-diversion effect estimated."
+    },
+    {
       "id": "M01",
       "evidence_class": "mechanistic_experiment",
       "claim": "Labeled PAH4 migrated from oil to fumes with a temperature-related pattern.",
@@ -149,6 +163,9 @@
     "change_pct": -99.0764684152198,
     "selected_event_timeline": "data/oiltrace_event_timeline_20261020.json",
     "descriptive_timing_analysis": "data/oiltrace_timeline_analysis_20261020.json",
+    "channel_aggregates": "data/oiltrace_channels_20260716_20260722.csv",
+    "channel_analysis": "data/oiltrace_channel_analysis_20261020.json",
+    "competing_news_audit": "data/oiltrace_competing_news_20260716_20260722.json",
     "intentional_diversion_identified": false
   },
   "patient_data_acquired": false,

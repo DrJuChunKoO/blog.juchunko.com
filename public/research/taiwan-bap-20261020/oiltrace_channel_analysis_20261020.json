@@ -1,0 +1,385 @@
+{
+  "as_of": "2026-10-20",
+  "site": "https://oiltrace.tw",
+  "timezone": "Asia/Taipei",
+  "period": [
+    "2026-07-16",
+    "2026-07-22"
+  ],
+  "input_rows": 43,
+  "channels": [
+    "Direct",
+    "Organic Search",
+    "Organic Social",
+    "Organic Video",
+    "Referral",
+    "AI Assistant",
+    "Unassigned"
+  ],
+  "daily": [
+    {
+      "date": "2026-07-16",
+      "Direct": 2875,
+      "Organic Search": 482,
+      "Organic Social": 176,
+      "Organic Video": 517,
+      "Referral": 85,
+      "AI Assistant": 2,
+      "Unassigned": 1,
+      "total": 4138
+    },
+    {
+      "date": "2026-07-17",
+      "Direct": 2019,
+      "Organic Search": 791,
+      "Organic Social": 170,
+      "Organic Video": 281,
+      "Referral": 45,
+      "AI Assistant": 3,
+      "Unassigned": 3,
+      "total": 3312
+    },
+    {
+      "date": "2026-07-18",
+      "Direct": 893,
+      "Organic Search": 352,
+      "Organic Social": 124,
+      "Organic Video": 92,
+      "Referral": 12,
+      "AI Assistant": 1,
+      "Unassigned": 0,
+      "total": 1474
+    },
+    {
+      "date": "2026-07-19",
+      "Direct": 592,
+      "Organic Search": 215,
+      "Organic Social": 82,
+      "Organic Video": 81,
+      "Referral": 5,
+      "AI Assistant": 0,
+      "Unassigned": 1,
+      "total": 976
+    },
+    {
+      "date": "2026-07-20",
+      "Direct": 251,
+      "Organic Search": 138,
+      "Organic Social": 57,
+      "Organic Video": 34,
+      "Referral": 3,
+      "AI Assistant": 1,
+      "Unassigned": 1,
+      "total": 485
+    },
+    {
+      "date": "2026-07-21",
+      "Direct": 159,
+      "Organic Search": 81,
+      "Organic Social": 22,
+      "Organic Video": 16,
+      "Referral": 0,
+      "AI Assistant": 3,
+      "Unassigned": 0,
+      "total": 281
+    },
+    {
+      "date": "2026-07-22",
+      "Direct": 85,
+      "Organic Search": 61,
+      "Organic Social": 9,
+      "Organic Video": 6,
+      "Referral": 1,
+      "AI Assistant": 0,
+      "Unassigned": 0,
+      "total": 162
+    }
+  ],
+  "initial_change": {
+    "start": "2026-07-16",
+    "end": "2026-07-17",
+    "total_start": 4138,
+    "total_end": 3312,
+    "net_decline": 826,
+    "channels": [
+      {
+        "channel": "Direct",
+        "start": 2875,
+        "end": 2019,
+        "delta": -856,
+        "pct_change": -29.773913043478263,
+        "contribution_to_net_decline_pct": 103.6319612590799
+      },
+      {
+        "channel": "Organic Search",
+        "start": 482,
+        "end": 791,
+        "delta": 309,
+        "pct_change": 64.10788381742738,
+        "contribution_to_net_decline_pct": -37.409200968523
+      },
+      {
+        "channel": "Organic Social",
+        "start": 176,
+        "end": 170,
+        "delta": -6,
+        "pct_change": -3.409090909090906,
+        "contribution_to_net_decline_pct": 0.7263922518159807
+      },
+      {
+        "channel": "Organic Video",
+        "start": 517,
+        "end": 281,
+        "delta": -236,
+        "pct_change": -45.64796905222437,
+        "contribution_to_net_decline_pct": 28.57142857142857
+      },
+      {
+        "channel": "Referral",
+        "start": 85,
+        "end": 45,
+        "delta": -40,
+        "pct_change": -47.05882352941176,
+        "contribution_to_net_decline_pct": 4.842615012106537
+      },
+      {
+        "channel": "AI Assistant",
+        "start": 2,
+        "end": 3,
+        "delta": 1,
+        "pct_change": 50.0,
+        "contribution_to_net_decline_pct": -0.12106537530266344
+      },
+      {
+        "channel": "Unassigned",
+        "start": 1,
+        "end": 3,
+        "delta": 2,
+        "pct_change": 200.0,
+        "contribution_to_net_decline_pct": -0.24213075060532688
+      }
+    ]
+  },
+  "second_change": {
+    "start": "2026-07-17",
+    "end": "2026-07-18",
+    "total_start": 3312,
+    "total_end": 1474,
+    "net_decline": 1838,
+    "channels": [
+      {
+        "channel": "Direct",
+        "start": 2019,
+        "end": 893,
+        "delta": -1126,
+        "pct_change": -55.77018325903913,
+        "contribution_to_net_decline_pct": 61.26224156692056
+      },
+      {
+        "channel": "Organic Search",
+        "start": 791,
+        "end": 352,
+        "delta": -439,
+        "pct_change": -55.49936788874842,
+        "contribution_to_net_decline_pct": 23.884657236126223
+      },
+      {
+        "channel": "Organic Social",
+        "start": 170,
+        "end": 124,
+        "delta": -46,
+        "pct_change": -27.058823529411768,
+        "contribution_to_net_decline_pct": 2.50272034820457
+      },
+      {
+        "channel": "Organic Video",
+        "start": 281,
+        "end": 92,
+        "delta": -189,
+        "pct_change": -67.25978647686833,
+        "contribution_to_net_decline_pct": 10.2829162132753
+      },
+      {
+        "channel": "Referral",
+        "start": 45,
+        "end": 12,
+        "delta": -33,
+        "pct_change": -73.33333333333334,
+        "contribution_to_net_decline_pct": 1.7954298150163224
+      },
+      {
+        "channel": "AI Assistant",
+        "start": 3,
+        "end": 1,
+        "delta": -2,
+        "pct_change": -66.66666666666667,
+        "contribution_to_net_decline_pct": 0.1088139281828074
+      },
+      {
+        "channel": "Unassigned",
+        "start": 3,
+        "end": 0,
+        "delta": -3,
+        "pct_change": -100.0,
+        "contribution_to_net_decline_pct": 0.1632208922742111
+      }
+    ]
+  },
+  "full_window_endpoint_change": {
+    "start": "2026-07-16",
+    "end": "2026-07-22",
+    "total_start": 4138,
+    "total_end": 162,
+    "net_decline": 3976,
+    "channels": [
+      {
+        "channel": "Direct",
+        "start": 2875,
+        "end": 85,
+        "delta": -2790,
+        "pct_change": -97.04347826086956,
+        "contribution_to_net_decline_pct": 70.17102615694165
+      },
+      {
+        "channel": "Organic Search",
+        "start": 482,
+        "end": 61,
+        "delta": -421,
+        "pct_change": -87.34439834024896,
+        "contribution_to_net_decline_pct": 10.588531187122737
+      },
+      {
+        "channel": "Organic Social",
+        "start": 176,
+        "end": 9,
+        "delta": -167,
+        "pct_change": -94.88636363636364,
+        "contribution_to_net_decline_pct": 4.2002012072434605
+      },
+      {
+        "channel": "Organic Video",
+        "start": 517,
+        "end": 6,
+        "delta": -511,
+        "pct_change": -98.8394584139265,
+        "contribution_to_net_decline_pct": 12.852112676056338
+      },
+      {
+        "channel": "Referral",
+        "start": 85,
+        "end": 1,
+        "delta": -84,
+        "pct_change": -98.82352941176471,
+        "contribution_to_net_decline_pct": 2.112676056338028
+      },
+      {
+        "channel": "AI Assistant",
+        "start": 2,
+        "end": 0,
+        "delta": -2,
+        "pct_change": -100.0,
+        "contribution_to_net_decline_pct": 0.05030181086519115
+      },
+      {
+        "channel": "Unassigned",
+        "start": 1,
+        "end": 0,
+        "delta": -1,
+        "pct_change": -100.0,
+        "contribution_to_net_decline_pct": 0.025150905432595575
+      }
+    ]
+  },
+  "channel_series": [
+    {
+      "channel": "Direct",
+      "peak_date_in_window": "2026-07-16",
+      "peak": 2875,
+      "first_daily_decrease_in_window": "2026-07-17",
+      "exported_sessions_sum": 6874
+    },
+    {
+      "channel": "Organic Search",
+      "peak_date_in_window": "2026-07-17",
+      "peak": 791,
+      "first_daily_decrease_in_window": "2026-07-18",
+      "exported_sessions_sum": 2120
+    },
+    {
+      "channel": "Organic Social",
+      "peak_date_in_window": "2026-07-16",
+      "peak": 176,
+      "first_daily_decrease_in_window": "2026-07-17",
+      "exported_sessions_sum": 640
+    },
+    {
+      "channel": "Organic Video",
+      "peak_date_in_window": "2026-07-16",
+      "peak": 517,
+      "first_daily_decrease_in_window": "2026-07-17",
+      "exported_sessions_sum": 1027
+    },
+    {
+      "channel": "Referral",
+      "peak_date_in_window": "2026-07-16",
+      "peak": 85,
+      "first_daily_decrease_in_window": "2026-07-17",
+      "exported_sessions_sum": 151
+    },
+    {
+      "channel": "AI Assistant",
+      "peak_date_in_window": "2026-07-17",
+      "peak": 3,
+      "first_daily_decrease_in_window": "2026-07-18",
+      "exported_sessions_sum": 10
+    },
+    {
+      "channel": "Unassigned",
+      "peak_date_in_window": "2026-07-17",
+      "peak": 3,
+      "first_daily_decrease_in_window": "2026-07-18",
+      "exported_sessions_sum": 6
+    }
+  ],
+  "total_exported_sessions_sum": 10828,
+  "missing_date_channel_pairs": [
+    {
+      "date": "2026-07-18",
+      "channel": "Unassigned"
+    },
+    {
+      "date": "2026-07-19",
+      "channel": "AI Assistant"
+    },
+    {
+      "date": "2026-07-21",
+      "channel": "Referral"
+    },
+    {
+      "date": "2026-07-21",
+      "channel": "Unassigned"
+    },
+    {
+      "date": "2026-07-22",
+      "channel": "AI Assistant"
+    },
+    {
+      "date": "2026-07-22",
+      "channel": "Unassigned"
+    }
+  ],
+  "limitations": [
+    "Daily resolution cannot order Direct, Organic Social and Organic Video decreases within17July. Search first decreases on18July within this window.",
+    "Sessions are GA estimates, not distinct people or all national searches. Sums and changes refer to exported date-by-channel rows, not separately deduplicated totals.",
+    "An absent date-channel row contributes0 to the exported-row sum; it is not proof that real traffic was zero. The four main channels have a row on every studied date.",
+    "Organic Social and Organic Video retain separate GA labels. They are not silently merged. Other in the display groups Referral, AI Assistant and Unassigned.",
+    "Direct can include missing referral/tagging information; it does not identify typing/bookmarks, private messages or any named platform separately.",
+    "Percent contributions are arithmetic decomposition of net exported-row decline, not causal effects. Offsetting increases can make a component exceed100%.",
+    "No within-day series, search queries, source/medium identities, promotion schedule, counterfactual control or causal media-effect estimate is supplied."
+  ],
+  "references": [
+    "https://support.google.com/analytics/answer/9756891?hl=en",
+    "https://support.google.com/analytics/answer/15258820?hl=en",
+    "https://developers.google.com/analytics/blog/2022/hll"
+  ]
+}
