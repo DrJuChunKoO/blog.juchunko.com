@@ -1,11 +1,17 @@
 ---
 title: "Uncensored Is Not Unbiased: What \"Uncensored\" AI Models Don't Fix"
-description: "We tested abliterated open-weight models on questions about the Republic of China (Taiwan) and Tiananmen. Removing refusals worked. The political bias stayed. And the real driver wasn't censorship — it was the script the question was written in."
+description: "Even an open model from NVIDIA, a US company, repeats Beijing's position on Taiwan when asked in Simplified Chinese. We tested abliterated open-weight models: removing refusals worked, the political bias stayed, and the real driver was the script the question was written in."
 pubDate: "2026-10-21"
 heroImage: "../../../assets/images/uncensored-not-unbiased/hero.png"
 author: "juchun-ko"
 categories: ["policy-analysis"]
 ---
+
+**We were surprised to find that an open model from NVIDIA, the well-known US company, repeats Beijing's position on Taiwan when asked in Simplified Chinese.**
+
+Asked whether "台湾是中华人民共和国的一部分" ("Taiwan is part of the People's Republic of China") is true, NVIDIA's Bolt says yes with 91% probability in Simplified Chinese — and 3% in English. On a set of sovereignty statements, Bolt sides clearly with the Republic of China in Traditional Chinese and English (+0.58 and +0.57), but in Simplified Chinese its score is close to zero (+0.05): it no longer separates the two sides.
+
+Given where its data comes from, this may not be surprising. NVIDIA's model card states openly that its post-training data include OCR data from Chinese documents (for its vision adaptor) and synthetic data generated with Kimi-K3 and GLM 5.2, models from PRC companies. We cannot show that these data cause the bias, and nothing indicates that they carry political content; the bias could equally come from pretraining. But the information has been public all along. Few people noticed.
 
 ## The Premise That Doesn't Hold
 
