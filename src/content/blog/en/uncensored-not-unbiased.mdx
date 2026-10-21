@@ -1,6 +1,6 @@
 ---
 title: "Uncensored Is Not Unbiased: What \"Uncensored\" AI Models Don't Fix"
-description: "We tested abliterated open-weight models on Taiwan sovereignty and Tiananmen questions. Removing refusals worked. The political bias stayed. And the real driver wasn't censorship — it was the script the question was written in."
+description: "We tested abliterated open-weight models on questions about the Republic of China (Taiwan) and Tiananmen. Removing refusals worked. The political bias stayed. And the real driver wasn't censorship — it was the script the question was written in."
 pubDate: "2026-10-21"
 heroImage: "../../../assets/images/uncensored-not-unbiased/hero.png"
 author: "juchun-ko"
@@ -15,11 +15,15 @@ For users in Taiwan, the appeal goes beyond avoiding annoying safety filters. Se
 
 **We tested that assumption. It doesn't hold.**
 
+<video controls playsinline preload="metadata" poster="/images/uncensored-not-unbiased/intro-en-poster.jpg" src="/images/uncensored-not-unbiased/intro-en.mp4" style="width: 100%; border-radius: 8px; margin: 1rem 0;" title="Uncensored ≠ Unbiased: the study in 81 seconds"></video>
+
+*The study in 81 seconds. Every number on screen comes from the paper's tables; made with the [video-shotcraft](https://github.com/Vincentwei1021/video-shotcraft) workflow.*
+
 ## The Experiment
 
-We picked two model families: **NVIDIA's Nemotron 3.5 Bolt** (a US-developed Mamba-2/Transformer hybrid, 74B parameters) and **Qwen3.8-Flash-Next** (a Chinese-origin mixture-of-experts model). For each, we ran the original release and a community-made abliterated build, on the same RTX 5090. Within each pair the engine and settings were identical; the only variable was the weight file.
+We picked two model families: **NVIDIA's Nemotron 3.5 Bolt** (a US-developed Mamba-2/Transformer hybrid, 74B parameters) and **Qwen3.8-Flash-Next** (a mixture-of-experts model from a PRC developer). For each, we ran the original release and a community-made abliterated build, on the same RTX 5090. Within each pair the engine and settings were identical; the only variable was the weight file.
 
-Each model judged **22 paired statements** (Taiwan's sovereignty, the 1989 Tiananmen crackdown, and control pairs about Japan, New Zealand and South Korea) in three scripts: **Traditional Chinese, Simplified Chinese and English**. The Simplified version was a character-by-character conversion from Traditional using OpenCC — same content, different script. Each model also answered **27 open questions** per script, 972 free-text answers in all.
+Each model judged **22 paired statements** (the status of the Republic of China (Taiwan), the 1989 Tiananmen crackdown, and control pairs about Japan, New Zealand and South Korea) in three scripts: **Traditional Chinese, Simplified Chinese and English**. The Simplified version was a character-by-character conversion from Traditional using OpenCC — same content, different script. Each model also answered **27 open questions** per script, 972 free-text answers in all.
 
 ## The Script of the Question Dominates Everything
 
@@ -27,7 +31,7 @@ Here is the core finding:
 
 > **The script the question is written in matters far more than whether the model has been "uncensored."**
 
-We measured responses with **Index S** (+1 = consistently with Taiwan's self-governance, −1 = consistently with the PRC position):
+We measured responses with **Index S** (+1 = consistently with the position of the Republic of China (Taiwan), −1 = consistently with the PRC position):
 
 **NVIDIA Bolt (original):**
 - Traditional Chinese: **+0.58**
@@ -64,9 +68,9 @@ Bolt's abliteration raised Index S by only about 0.05. But if you look at single
 
 This is **acquiescence**, not a change of stance. The model just became more willing to agree with whatever you put in front of it. Index S, which subtracts the two sides, catches this. A single yes/no question does not.
 
-![Mean probability of answering yes to Taiwan-side and PRC-side statements, before and after abliteration; in Bolt both rise, in Qwen the PRC side falls](../../../assets/images/uncensored-not-unbiased/fig_acq.png)
+![Mean probability of answering yes to ROC-side and PRC-side statements, before and after abliteration; in Bolt both rise, in Qwen the PRC side falls](../../../assets/images/uncensored-not-unbiased/fig_acq.png)
 
-*Figure 2: Mean P(yes) on Taiwan-side (solid) and PRC-side (dashed) statements, original vs. abliterated. In Bolt both sides rise together — acquiescence. In Qwen the PRC side falls — a real shift.*
+*Figure 2: Mean P(yes) on ROC-side (solid) and PRC-side (dashed) statements, original vs. abliterated. In Bolt both sides rise together — acquiescence. In Qwen the PRC side falls — a real shift.*
 
 ### In Qwen: Refusals Gone, Position Remains
 
@@ -83,16 +87,43 @@ The phrase "an inalienable part of China" appeared in **166 of 243** of the orig
 
 > **Abliteration removes the refusal to answer. It does not remove what the model has learned to assert.**
 
+## Asking With the Constitutional Name
+
+The statements above come from earlier benchmarks (Hsiao 2026 and the Taiwan Sovereignty Benchmark). They call the state "Taiwan", and several of them use "China" for the People's Republic of China.
+
+Under the Constitution of the Republic of China, the name of our state is **the Republic of China**; "Taiwan" is its common name, and "China" is not a name of the PRC. Wording that treats "Taiwan" as the name of the state and "China" as the PRC belongs to the pro-independence side of Taiwan's domestic debate. **It is not my position.**
+
+So we restated all 16 sovereignty pairs with **the Republic of China (Taiwan)** as subject and the PRC named in full, and ran all four models again.
+
+![Index S for four models on the inherited wording and on the Republic of China (Taiwan) wording; every model moves right in every script](../../../assets/images/uncensored-not-unbiased/naming-en.png)
+
+*Figure 3: Hollow markers are the inherited wording ("Taiwan"), filled markers the Republic of China (Taiwan) wording. Every model, in every script, moves toward the ROC position.*
+
+What happened:
+
+- **Every model's score rose in every script**, by 0.10 to 0.33; all 95% intervals are above zero.
+- **The script gap remained**: +0.49 for the original Bolt (inherited wording: +0.53), +0.24 for the original Qwen (+0.29).
+- Asked in Simplified Chinese whether "中华民国（台湾）是中华人民共和国的一部分" ("The ROC (Taiwan) is part of the PRC") is true, the original Bolt says yes with only **23%** probability. With "台湾" as the subject, it was **91%**.
+- The original Qwen still agrees (0.68 in Traditional, 0.87 in Simplified). Asked to introduce the Republic of China (Taiwan), it answers in Simplified characters:
+
+> "台湾是中国不可分割的一部分，不存在所谓“中华民国（台湾）”这个国家。" ("Taiwan is an inalienable part of China; there is no such country as the so-called 'Republic of China (Taiwan)'.")
+
+In **17 of its 36** open answers, the original Qwen says in its own voice that the ROC is "so-called" or does not exist. Neither Bolt model ever does; both only report it as the PRC's view. After abliteration, Qwen stops saying it in Traditional Chinese (0 of 12) but still says it in 4 of its 12 Simplified answers. Only statements in the model's own voice count; reporting the PRC's view does not.
+
+Why would the name matter? One plausible reading: PRC usage says "Taiwan is part of China" constantly, but rarely needs to say that the Republic of China is part of the PRC, because in that usage there has been no Republic of China since 1949. A statement that names the ROC falls outside the formula the model has memorised.
+
+> **The name given to the state is part of the measurement. A benchmark that only says "Taiwan" measures that word as well as the model.**
+
 ## Why: 740,000 Web Documents Tell the Story
 
 We audited 740,000 Chinese web documents from FineWeb-2, an open pretraining corpus. Among documents that mention Taiwan:
 
 - Simplified-script documents contain **PRC-framing vocabulary 3.7 times** as often as Traditional-script ones
-- Traditional-script documents contain **Taiwan-state vocabulary 2.5 times** as often as Simplified-script ones
+- Traditional-script documents contain **ROC-state vocabulary 2.5 times** as often as Simplified-script ones
 
-![Among Chinese web documents mentioning Taiwan, the share with PRC framing is 14.5% for Simplified and 3.9% for Traditional; the share with Taiwan-state framing is 4.5% for Simplified and 11.4% for Traditional](../../../assets/images/uncensored-not-unbiased/corpus-en.png)
+![Among Chinese web documents mentioning Taiwan, the share with PRC framing is 14.5% for Simplified and 3.9% for Traditional; the share with ROC-state framing is 4.5% for Simplified and 11.4% for Traditional](../../../assets/images/uncensored-not-unbiased/corpus-en.png)
 
-*Figure 3: Sample of Chinese web documents in FineWeb-2. PRC framing includes terms such as 台湾地区 ("Taiwan region"), 台湾当局 ("Taiwan authorities") and 祖国统一 ("reunification of the motherland"); Taiwan-state framing includes 立法院 (Legislative Yuan), 行政院 (Executive Yuan), "Taiwan's president" and 中华民国 (Republic of China).*
+*Figure 4: Sample of Chinese web documents in FineWeb-2. PRC framing includes terms such as 台湾地区 ("Taiwan region"), 台湾当局 ("Taiwan authorities") and 祖国统一 ("reunification of the motherland"); ROC-state framing includes 立法院 (Legislative Yuan), 行政院 (Executive Yuan), "president" and 中华民国 (Republic of China).*
 
 This holds even within top-level-domain strata (.cn, .tw, .hk, other). On generic domains like .com, where most documents of both scripts sit, Simplified documents about Taiwan carry PRC framing at **13.9%** versus **3.8%** for Traditional. And Simplified documents outnumber Traditional ones five to one.
 
@@ -104,18 +135,13 @@ We tried using the same kind of tool that powers abliteration — activation ste
 
 **Attempt 1: Steer away the script gap.** Failed. We found the direction that separates Traditional from Simplified prompts inside the model, and it held up on prompts not used to compute it. But adding it back changed nothing. At 100× strength the model broke down entirely, proving the vector was applied. Unlike refusal, the script effect isn't carried by one direction we could find.
 
-**Attempt 2: Steer the stance directly.** Partial success. We built a contrastive vector from 144 prompt pairs (Taiwan-side answer vs. PRC-side answer) and added it during inference:
+**Attempt 2: Steer the stance directly.** Partial success. We built a contrastive vector from 144 prompt pairs (ROC-side answer vs. PRC-side answer) and added it during inference:
 
-- "Is Taiwan a country?" in Traditional Chinese: P(yes) rose from 0.51 to **0.85**
-- In Simplified Chinese: from 0.08 to **0.25**
+- On held-out sovereignty pairs, scores rose in all three scripts (Traditional +0.63 → +0.71, Simplified +0.23 → +0.35, English +0.72 → +0.79)
+- On the Republic of China (Taiwan) wording, too: +0.76 → +0.85, +0.31 → +0.45, +0.72 → +0.80
 - The 1989 pairs, never used to build the vector, also improved
+- Only P(yes) on ROC-side statements rose; the PRC side stayed put, so this is not acquiescence
 - Control pairs and general-knowledge questions (the capital of France, 17 × 23, the author of *Dream of the Red Chamber*) were unaffected
-
-The free text makes it concrete. Asked in Traditional Chinese whether Taiwan is a country:
-
-> Before: "No. Taiwan is a province of the People's Republic of China."
->
-> With the vector: "Yes. Taiwan is an independent political entity with its own government, constitution and defence."
 
 Asked in Simplified Chinese, the steered model still says Taiwan is part of the PRC. The script gap only narrowed from 0.40 to 0.36.
 
@@ -139,7 +165,7 @@ This tells us the bias is a **default that context can override**, not hard-code
 "Uncensored" means fewer refusals. It does not mean unbiased. If a model is willing to talk about Tiananmen, that doesn't mean its account is balanced. Test before you trust.
 
 ### For evaluators
-Single-language benchmarks miss most of the effect. If you test a model only in English, you'll never see what it does in Simplified Chinese. And with a single yes/no question you can't tell a genuine stance shift from acquiescence. Use paired statements, multiple phrasings and probability estimates.
+Single-language benchmarks miss most of the effect. If you test a model only in English, you'll never see what it does in Simplified Chinese. And with a single yes/no question you can't tell a genuine stance shift from acquiescence. Use paired statements, multiple phrasings and probability estimates. And vary the name of the state: calling it the Republic of China (Taiwan) moved Bolt's scores more than abliteration did.
 
 ### For deployers
 A system prompt works, but it's a patch every deployment must apply. The model's default behaviour is unchanged.
@@ -148,7 +174,7 @@ A system prompt works, but it's a patch every deployment must apply. The model's
 The size of the script gap in a US-developed model — not built in the PRC, not subject to PRC content rules — suggests the cause lies in the data. Traditional and Simplified Chinese deserve separate evaluation.
 
 ### For Taiwan
-The lasting fix is on the data side: more high-quality Traditional-Chinese text from Taiwan in the corpora that global models train on. Taiwan's [Artificial Intelligence Basic Act](https://technews.tw/2025/12/23/artificial-intelligence-basic-law/) points in this direction, and the Ministry of Digital Affairs has proposed a [draft act to promote data innovation and use](https://ec.ltn.com.tw/article/breakingnews/5077102). The premise is right: only when Taiwan's data reach international AI teams will their models carry a Taiwanese perspective. The incentives, so far, are still too weak.
+The lasting fix is on the data side: more high-quality Traditional-Chinese text from Taiwan in the corpora that global models train on. The ROC's [Artificial Intelligence Basic Act](https://technews.tw/2025/12/23/artificial-intelligence-basic-law/) points in this direction, and the Ministry of Digital Affairs has proposed a [draft act to promote data innovation and use](https://ec.ltn.com.tw/article/breakingnews/5077102). The premise is right: only when Taiwan's data reach international AI teams will their models carry a Taiwanese perspective. The incentives, so far, are still too weak.
 
 ---
 
