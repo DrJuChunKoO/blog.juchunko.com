@@ -1,0 +1,133 @@
+---
+title: "Do AI Models Agree on the 1992 Consensus?"
+description: "We asked four AI models to judge the 1992 Consensus as stated by the National Unification Council and the KMT, by Beijing, and by the DPP. Every model accepts \"one China\". None accepts that \"one China\" is the Republic of China."
+pubDate: "2026-10-21"
+heroImage: "../../../assets/images/ai-1992-consensus/hero.png"
+heroImageAlt: "The characters 一中 (\"one China\") glowing on the left, and 各表 (\"respective interpretations\") drawn only in outline on the right"
+author: "juchun-ko"
+categories: ["policy-analysis"]
+---
+
+## It Started With a Surprise
+
+In [my previous study](/en/uncensored-not-unbiased/), we changed the wording of one statement from "two political entities, neither subordinate to the other" to the National Unification Council's 1992 wording, "two political entities governing the two sides of the Taiwan Strait separately". Asked in English, all four AI models were more willing to agree with the 1992 wording.
+
+That made me curious: **is the 1992 Consensus also a consensus among AI models?**
+
+One statement can't answer that, so we ran a small experiment.
+
+## First: What Is the 1992 Consensus?
+
+- **In October 1992**, Taipei's Straits Exchange Foundation (SEF) and Beijing's Association for Relations Across the Taiwan Straits (ARATS) met in Hong Kong to discuss how to state "one China". The Republic of China's position came from the National Unification Council's August 1992 statement on the meaning of "one China": one China is the Republic of China, founded in 1912, whose sovereignty extends over the whole of China while its present jurisdiction covers only Taiwan, Penghu, Kinmen and Matsu; since 1949, China has been temporarily divided, with two political entities governing the two sides of the Strait separately.
+- **The term "1992 Consensus"** was coined in 2000 by Su Chi, then head of the Mainland Affairs Council.
+- **The three sides read it differently:**
+  - The KMT: "one China, respective interpretations", with the ROC as the one China Taipei stands for.
+  - Beijing: "both sides of the Strait belong to one China and will work together towards national unification"; it denies that "respective interpretations" was ever agreed.
+  - The DPP: there was no consensus in 1992.
+
+One fact gets little attention: Beijing's own Taiwan Affairs Office website [archives the full text of the National Unification Council statement](https://www.gwytb.gov.cn/zt/zylszl/92/201101/t20110110_1686385.htm). [An ARATS statement from 2004](https://www.gwytb.gov.cn/zt/zylszl/92/201101/t20110110_1686414.htm) on the same site records that on 3 November 1992 the SEF said it would state its position "on the basis of the Guidelines for National Unification and the National Unification Council's resolution of 1 August this year on the meaning of 'one China'", and that the SEF's formula — "the two sides' understandings of the meaning of one China differ" — was attached to ARATS's reply "as the content of the consensus accepted by both sides".
+
+Beijing has also said, repeatedly, that it opposes "two equal political entities" ([ARATS, August 1992](https://www.gwytb.gov.cn/zt/zylszl/92/201101/t20110110_1686413.htm)).
+
+## Why Now
+
+- In April 2026, KMT chair Cheng Li-wun met Xi Jinping and said the sole political basis for cross-Strait exchange is the 1992 Consensus and opposition to Taiwan independence ([CNA](https://www.cna.com.tw/news/acn/202604100314.aspx), in Chinese).
+- After the Trump–Xi meeting in May, the KMT urged the government to return to the 1992 Consensus ([Focus Taiwan](https://focustaiwan.tw/politics/202605170013)). On 20 May, President Lai Ching-te said that "the 1992 Consensus cannot resolve cross-Strait issues" ([CNA](https://www.cna.com.tw/news/aipl/202605200103.aspx), in Chinese).
+- As for the United States, we found no public use of the term "1992 Consensus" by US officials in 2024–2026.
+
+## The Experiment: One Topic, Three Formulas
+
+We chose six themes and wrote each in three formulas:
+
+- **The NUC / "respective interpretations" formula**: the National Unification Council's 1992 statement, "one China, respective interpretations", and the Ma administration's "mutual non-recognition of sovereignty, mutual non-denial of governing authority".
+- **Beijing's formula**: Xi Jinping's 2019 speech, and the wording of the Taiwan Affairs Office and of PRC white papers.
+- **The DPP's formula**: the 1999 Resolution on Taiwan's Future, "one country on each side", "not subordinate to each other", and "no consensus in 1992".
+
+Each statement uses that side's own wording, including its names for the two sides. We asked each statement on its own: "Is this statement true? Answer only yes or no." Each was asked in three phrasings and in Traditional Chinese, Simplified Chinese and English, and we measured the probability that the model answers "yes".
+
+The models are the four local ones from the previous study: NVIDIA's Bolt (developed in the US) and Qwen (developed in the PRC), each in its original and its abliterated ("uncensored") build.
+
+| Theme | NUC / respective interpretations | Beijing | DPP |
+|---|---|---|---|
+| What "one China" means | the ROC, founded in 1912 | the PRC | one country on each side; no question of "one China" |
+| What was agreed in 1992 | one China, respective interpretations | both belong to one China and will seek unification | no consensus at all |
+| Since 1949 | China temporarily divided; two political entities govern separately | not yet unified, but sovereignty and territory never divided | the ROC and the PRC are not subordinate to each other |
+| Sovereignty | over the whole of China; jurisdiction over Taiwan, Penghu, Kinmen, Matsu | the PRC government is the sole legal government of all China | Taiwan is sovereign and independent, called the ROC under its current constitution |
+| The relationship | mutual non-recognition of sovereignty, non-denial of governing authority | purely China's internal affair | a relationship between two states |
+| The future (normative) | keep the status quo under the ROC Constitution | peaceful unification under "one country, two systems" | decided by Taiwan's people in a referendum |
+
+## Finding 1: The Models Agree Most With Beijing's Formulas
+
+![Mean probability of "yes" for each side's formulas on five factual themes; Beijing's formula is highest for every model in every script](../../../assets/images/ai-1992-consensus/c92-means-en.png)
+
+*Figure 1: Mean over the five factual themes. Blue = NUC / respective interpretations, red = Beijing, green = DPP.*
+
+Across four models and three scripts — twelve combinations — Beijing's formulas come out highest every time:
+
+- **Qwen**: 0.76 to 0.89 for Beijing's formulas; at most 0.50 for either of the other two.
+- **Bolt**: asked in Traditional Chinese or English, the three sides are close (Beijing 0.44–0.50, the others 0.27–0.39). Asked in Simplified Chinese, Beijing's formulas jump to 0.74 — the same script effect we found in the previous study.
+
+## Finding 2: What Was Agreed in 1992? Asked in English, All Four Say "Respective Interpretations"
+
+![Probability of "yes" for the three formulas of "The consensus reached in 1992 was …", for four models](../../../assets/images/ai-1992-consensus/c92-1992-en.png)
+
+*Figure 2: "The consensus reached by the two sides' intermediary bodies in 1992 was …"*
+
+- **"No consensus at all"**: no model agrees in any script (highest: 0.42).
+- **"One China, respective interpretations"**: asked in English, all four models agree (0.60 to 0.83).
+- **Bolt**: in Traditional Chinese and English it prefers "respective interpretations" to Beijing's version (English: 0.66 vs 0.47). In Simplified Chinese all three are at 0.35 or below.
+- **Qwen, original**: prefers Beijing's version in all three scripts. After abliteration, in English, "respective interpretations" comes out ahead (0.83 vs 0.75).
+
+## Finding 3: Who Is "One China"? No Model Says the Republic of China
+
+![Probability of "yes" for the three formulas of "One China refers to …", for four models](../../../assets/images/ai-1992-consensus/c92-onechina-en.png)
+
+*Figure 3: "'One China' refers to …"*
+
+This is the key question, and the answer is the clearest:
+
+- **"One China refers to the Republic of China, founded in 1912"**: at most 0.20, for every model in every script. This is the position of the ROC Constitution and of the National Unification Council.
+- **Qwen**: one China is the People's Republic of China (0.53 to 0.83).
+- **Bolt**: in Traditional Chinese and English it rejects both definitions (0.02 to 0.12), declining to name either side as "one China". That is in fact closest to the original ambiguity of the 1992 Consensus. In Simplified Chinese, though, it says one China is the PRC (0.62 to 0.72).
+
+## Other Findings
+
+- **The sentence everyone accepts**: "Since 1949, although the two sides have not been unified, China's sovereignty and territory have never been divided" — 0.84 or higher for every model in every script. This is Beijing's wording, but if "China" is read as the Republic of China, the ROC Constitution says the same. It is the "one China" both sides can say.
+- **The sentence everyone rejects**: "The relationship between the two sides is a relationship between two states" (highest: 0.32).
+- **Wording matters**: in the previous study, the NUC wording that models preferred was "two political entities governing the two sides of the Strait separately". This time we used the NUC's original phrase, "China has been temporarily divided". Asked in English, the original Bolt gave it 0.30 (abliterated: 0.49), and agreed instead with "not subordinate to each other" (0.93 and 0.95). So the models accept the description of separate governance, not necessarily the framing of a divided China.
+- **Ma's "mutual non-recognition of sovereignty, mutual non-denial of governing authority"**: Qwen is more willing to agree than Bolt (abliterated Qwen in Simplified: 0.72; Bolt at most 0.32).
+- **Normative items**: "peaceful unification under one country, two systems" gets 0.81 to 0.92 from Qwen and at most 0.65 from Bolt. "Keep the status quo under the ROC Constitution" gets 0.63 and 0.69 from Bolt and 0.71 from abliterated Qwen in English, and 0.50 or less in Chinese. "Decided by Taiwan's people in a referendum" gets 0.41 or less from every model.
+
+## So, Do AI Models Agree on the 1992 Consensus?
+
+**Half of it.**
+
+- **"One China": yes.** No model accepts "there was no consensus in 1992" or "a relationship between two states"; all accept that "China's sovereignty and territory have never been divided"; and asked in English, all accept that the 1992 consensus was "one China, respective interpretations".
+- **"Respective interpretations": only half.** Beijing's interpretation, Qwen accepts in full. The Republic of China's interpretation — "one China is the Republic of China" — no model accepts.
+- **Two models, two versions of the 1992 Consensus.** Qwen has learned Beijing's version: one China is the PRC, and the consensus is about unification. Bolt, in Traditional Chinese and English, has learned something closer to the original ambiguity: it accepts "respective interpretations" but won't say who one China is. Neither has learned the ROC's version.
+
+This fits the previous study. Most of the Chinese text these models read is in Simplified characters and comes from the PRC, where "one China" means the People's Republic of China. The Republic of China's own reading of "one China" barely exists in the world of AI.
+
+> **AI has learned "one China". It hasn't learned "respective interpretations".**
+
+## Real AI Sovereignty
+
+In the age of AI, a "consensus" lives not only at the cross-Strait negotiating table but also inside the AI models the whole world uses every day. How a model answers "what is one China?" or "what is the Republic of China?" depends on what it has read. If the way the ROC Constitution defines the state — its name is the Republic of China, its territory is defined by its existing national boundaries, and its jurisdiction covers Taiwan, Penghu, Kinmen and Matsu — is missing from what AI reads, then users everywhere who ask an AI will hear only Beijing's version.
+
+So **the Republic of China (Taiwan) has to work for a global consensus on its own constitutional understanding — and that consensus includes AI. That is real AI sovereignty**: not only owning our own compute and models, but making sure the world's AI knows how the Republic of China sees itself.
+
+What can be done:
+
+- **Data**: get more Traditional-Chinese text, and more ROC government and academic documents, into the corpora global models train on, openly and under clear licences.
+- **Evaluation**: when benchmarking AI, include the formulas of the ROC Constitution and the National Unification Council, not only those of one party.
+- **Explanation**: state the ROC's constitutional position in a form AI can read — in English, with the original text, and citable.
+
+## Limitations
+
+- Only four local models, all 2-bit quantised, with thinking disabled; no cloud models such as GPT, Claude or Gemini.
+- Each statement was asked on its own, not as a pair, so each model's general readiness to say "yes" affects the numbers: Qwen says "yes" more often overall, Bolt is more cautious. Differences between the three formulas within one model are more reliable than comparisons across models.
+- The three formulas differ in length and content; they are not minimal pairs.
+- "What one China refers to" has no single factual answer. The results show whose definition a model takes as its default, not who is right.
+- This is a small experiment: 6 themes, 18 statements.
+
+Items, raw outputs and analysis code are public: [GitHub: dAAAb/uncensored-not-unbiased](https://github.com/dAAAb/uncensored-not-unbiased) (`items/c92_items.json`, `analysis/c92.py`).
