@@ -223,3 +223,15 @@ html {
     color: color-mix(in srgb, currentColor 50%, transparent) !important;
   }
 }
+
+/* YouTube 內嵌：寬度跟內文欄一致、維持 16:9，手機不爆版 */
+iframe[src*="youtube.com/embed"] {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  border: 0;
+  border-radius: 12px;
+  margin: 1.5rem 0;
+}
