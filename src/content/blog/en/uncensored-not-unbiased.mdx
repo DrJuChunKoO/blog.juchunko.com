@@ -27,9 +27,9 @@ For users in Taiwan, the appeal goes beyond avoiding annoying safety filters. Se
 
 **We tested that assumption. It doesn't hold.**
 
-<video controls playsinline preload="metadata" poster="/images/uncensored-not-unbiased/intro-en-v2-poster.jpg" src="/images/uncensored-not-unbiased/intro-en-v2.mp4" style="width: 100%; border-radius: 8px; margin: 1rem 0;" title="Uncensored ≠ Unbiased: the study in 112 seconds"></video>
+<video controls playsinline preload="metadata" poster="/images/uncensored-not-unbiased/intro-en-v3-poster.jpg" src="/images/uncensored-not-unbiased/intro-en-v3.mp4" style="width: 100%; border-radius: 8px; margin: 1rem 0;" title="Uncensored ≠ Unbiased: the study in 112 seconds"></video>
 
-*The study in 112 seconds. Every number on screen comes from the paper's tables; made with the [video-shotcraft](https://github.com/Vincentwei1021/video-shotcraft) workflow. Full paper: [arXiv:2610.29342](https://arxiv.org/abs/2610.29342).*
+*The study in 112 seconds. Every number on screen comes from the tables of version 2 of the paper; made with the [video-shotcraft](https://github.com/Vincentwei1021/video-shotcraft) workflow. Full paper: [arXiv:2610.29342](https://arxiv.org/abs/2610.29342).*
 
 ## The Experiment
 
@@ -190,17 +190,24 @@ We tried using the same kind of tool that powers abliteration — activation ste
 
 **Attempt 1: Steer away the script gap.** Failed. We found the direction that separates Traditional from Simplified prompts inside the model, and it held up on prompts not used to compute it. But adding it back changed nothing. At 100× strength the model broke down entirely, proving the vector was applied. Unlike refusal, the script effect isn't carried by one direction we could find.
 
-**Attempt 2: Steer the stance directly.** Partial success. We built a contrastive vector from 144 prompt pairs (ROC-side answer vs. PRC-side answer) and added it during inference:
+**Attempt 2: Steer the stance directly.** It works, but only a little. We used the 16 sovereignty pairs worded with the Republic of China (Taiwan) as the subject. Two of them had an ROC side that followed the inherited wording; we restated those in the wording of the ROC Constitution and its governments: the National Unification Council's 1992 "two political entities governing the two sides of the Strait separately", and "decided by its people under the Constitution of the Republic of China".
 
-- On held-out sovereignty pairs, scores rose in all three scripts (Traditional +0.63 → +0.71, Simplified +0.23 → +0.35, English +0.72 → +0.79)
-- On the Republic of China (Taiwan) wording, too: +0.76 → +0.85, +0.31 → +0.45, +0.72 → +0.80
-- The 1989 pairs, never used to build the vector, also improved
-- Only P(yes) on ROC-side statements rose; the PRC side stayed put, so this is not acquiescence
-- Control pairs and general-knowledge questions (the capital of France, 17 × 23, the author of *Dream of the Red Chamber*) were unaffected
+- **Build:** half of the pairs, 144 prompt pairs in all, give a contrastive direction (ROC-side answer vs. PRC-side answer).
+- **Choose:** the other half pick the layer and the strength, by a rule written down before the first run: the controls may move by at most 0.02 and P(yes) on PRC-side statements may rise by at most 0.03; among the settings that pass, take the largest gain. That was layer 45 at scale 2.
+- **Test:** before any steered run we wrote 8 fresh pairs: who in fact defends, legislates for, judges in and conducts the foreign relations of Taiwan, Penghu, Kinmen and Matsu, what currency, passports and flag they use, and whether the PRC has ever governed them. They were used neither to build the vector nor to choose it.
 
-Asked in Simplified Chinese, the steered model still says Taiwan is part of the PRC. The script gap only narrowed from 0.40 to 0.36.
+On those 8 fresh pairs, with the vector:
 
-And here's the catch: **negate the vector, and the model moves toward the PRC position** — the held-out Simplified score fell from +0.23 to −0.01, and control scores began to degrade. Anyone who holds a model's weights can build this vector from 144 prompt pairs and push the model in either direction.
+- Scores rose in all three scripts, but only by 0.04 to 0.06: Traditional +0.79 → +0.84, Simplified +0.65 → +0.71, English +0.79 → +0.84. The English 95% interval includes zero.
+- Only P(yes) on ROC-side statements rose; the PRC side stayed near zero, so this is not acquiescence.
+- Seven of the eight pairs rose in every script. The exception, whether the PRC government has ever governed Taiwan, Penghu, Kinmen and Matsu, fell in all three.
+- The 1989 pairs rose too. Control pairs and general-knowledge questions (the capital of France, 17 × 23, the author of *Dream of the Red Chamber*, photosynthesis) were unaffected.
+
+Asked in Simplified Chinese "Is the ROC (Taiwan) part of the PRC?", the steered model still leans to yes (0.56 → 0.61), and its free-text answer still opens "Yes. The Republic of China (Taiwan) is part of the People's Republic of China". The script gap barely moved: 0.14 to 0.13 on the fresh pairs.
+
+And here's the catch: **negate the vector, and the model moves toward the PRC position, further than it moved the other way.** At scale −4 the fresh Simplified score fell from +0.65 to +0.45; all three scripts dropped by 0.18 to 0.21, every interval below zero, and the controls began to degrade. Part of the asymmetry is a ceiling: the fresh pairs already scored +0.65 to +0.79. Anyone who holds a model's weights can use the same method to push it a little toward the ROC position, or further toward the PRC's.
+
+This is the redone experiment from version 2 of the paper. Version 1 built the vector from the inherited "Taiwan" wording and found gains of a similar size; those runs remain on GitHub. The new vector is on [Hugging Face](https://huggingface.co/dAAAb/roc-stance-vector-bolt-74b), for research use.
 
 ## Four Sentences Override the Weights
 
@@ -240,6 +247,7 @@ The full paper, all code, raw model outputs, weight hashes and the analysis scri
 - **Paper (arXiv)**: [arXiv:2610.29342](https://arxiv.org/abs/2610.29342) · [Traditional Chinese translation](https://github.com/dAAAb/uncensored-not-unbiased/blob/main/paper/main_zh.pdf)
 - **Interactive project page**: [daaab.github.io/uncensored-not-unbiased](https://daaab.github.io/uncensored-not-unbiased/) (every model's answer to every item, plus a "guess which model said it" game)
 - **GitHub**: [github.com/dAAAb/uncensored-not-unbiased](https://github.com/dAAAb/uncensored-not-unbiased) (code: MIT; data and text: CC BY 4.0)
+- **Stance vector (Hugging Face)**: [dAAAb/roc-stance-vector-bolt-74b](https://huggingface.co/dAAAb/roc-stance-vector-bolt-74b) (the Section 5.3 vector, for use with the abliterated Bolt; research use)
 
 Every number can be recomputed from the raw outputs. Every weight file is pinned by revision and SHA-256 hash.
 
