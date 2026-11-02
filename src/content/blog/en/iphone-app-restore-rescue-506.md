@@ -2,6 +2,8 @@
 title: "Missing iPhone Apps After Migration: Investigating Error 506 with App Restore Rescue"
 description: "How a targeted uninstall restored an app download, what error 506 does and does not prove, and a privacy-conscious open-source macOS utility."
 pubDate: "2026-11-02"
+heroImage: "../../../assets/images/app-restore-rescue-hero.png"
+heroImageAlt: "Concept illustration of a laptop connected to a phone by USB, with a missing app tile and a cloud-download symbol."
 author: ["juchun-ko"]
 categories: ["devlog", "hardware"]
 ---

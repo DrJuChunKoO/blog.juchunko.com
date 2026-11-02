@@ -2,6 +2,8 @@
 title: "換機後 App 消失、雲朵下載沒反應？用 App Restore Rescue 排查 506 回復衝突"
 description: "從 X 無法重新下載的真實排查，整理 ASDErrorDomain 506 的證據、單一 App 卸載方法，以及重視隱私的開源 macOS 工具。"
 pubDate: "2026-11-02"
+heroImage: "../../../assets/images/app-restore-rescue-hero.png"
+heroImageAlt: "概念插圖：透過 USB 連接的筆電與手機，呈現缺少的 App 圖示及雲朵下載符號。"
 author: ["juchun-ko"]
 categories: ["devlog", "hardware"]
 ---
