@@ -1,0 +1,196 @@
+---
+title: "三個專案、三個作者、三個日期：「政見島抄襲政策島」是怎麼被拼出來的"
+description: "AI2033 是我 10 月 9 日做的，比 HEART 政策島早約 12 天上線；「台北施政島」是網友 Josh 的作品，他第一天就寫明參考了誰；安可大舞台是收錄大家作品的電視台。三件事被剪成一件，再扣到我頭上。這篇把 GitHub、伺服器部署紀錄和網際網路檔案館的原始紀錄攤開，誰都可以自己查。"
+pubDate: "2026-11-12"
+heroImage: "../../../assets/images/encore-stage-fact-check/hero-zh.png"
+heroImageAlt: "三個專案、三個作者、三個日期：AI2033（葛如鈞，10/9）、台北施政島（網友 Josh，10/23）、安可大舞台（10/28），HEART 政策島 10/22 公開"
+author: "juchun-ko"
+categories: ["devlog", "ai-agent"]
+---
+
+*這篇寫給這兩週在網路上看到「葛如鈞抄襲沈伯洋政策島」的朋友。不用相信我，下面每一條都附原始連結，點進去就能自己查。所有時間都換算成台灣時間（UTC+8）。*
+
+---
+
+## 先講結論
+
+1. <strong>大家吵的，其實是三個不同的專案。</strong>作者不同、日期不同、長得也不一樣，卻被剪接成同一件事。
+2. <strong>AI2033 台北 AI 園區是我 10 月 9 日做的。</strong>GitHub 伺服器的部署紀錄、網際網路檔案館的存檔都查得到，比 HEART 政策島公開早了約 12 天。它的提示詞和程式碼裡，沒有一個字提到政策島。
+3. <strong>「互動手感參考 puma.taipei/heart-island」這句話，是網友 Josh 為他自己的作品「台北施政島」寫的提示詞，不是我寫的。</strong>他從第一天就在網站上註明參考了政策島的互動概念，程式碼沒有沿用。
+4. <strong>網路上流傳的那張截圖，剛好把作者欄剪掉了。</strong>剩下的下半段，被配上「葛如鈞下的 AI 指令」。
+
+![時間軸：AI2033 在 10/9 動工並部署，10/10 被網際網路檔案館存檔，10/11 發表部落格；HEART 政策島 10/18 仍是 404、10/22 公開；安可大舞台 10/23 00:53 第一個 commit；網友 Josh 的台北施政島 10/23 06:25 第一個 commit，當天就註明參考；10/24 上架大舞台第 2034 台；10/28 大舞台發表；10/28 22:24 Josh 自己補上參考 HEART 的說明](../../../assets/images/encore-stage-fact-check/timeline-zh.png)
+
+## 三個專案，一張表
+
+<div style={{ overflowX: "auto" }}>
+
+| | AI2033 台北 AI 園區 | 安可大舞台 | 台北施政島（第 2034 台） |
+|---|---|---|---|
+| 作者 | 葛如鈞 | 葛如鈞 | **網友 Josh** |
+| 開始製作 | 10/9 14:20 | 10/23 00:53 | 10/23 06:25 |
+| 公開 | 10/9 部署、10/11 發文 | 10/28 記者會 | 10/24 |
+| 長什麼樣 | 3D 台北，開小黃看松山機場變成 AI 園區 | 一台電視，每一台是一位市民用 AI 做的作品 | 用「島嶼地圖」呈現蔣萬安市長的施政 |
+| 跟政策島的關係 | 早了約 12 天，提示詞沒有提到 | 收錄作品的平台，公開每一台的提示詞 | 作者第一天就註明參考互動概念，程式碼沒有沿用 |
+| 原始碼 | [dAAAb/ai2033.taipei](https://github.com/dAAAb/ai2033.taipei) | [dAAAb/encore-taipei](https://github.com/dAAAb/encore-taipei) | [bounce12340/chiang-wanan-policy-island](https://github.com/bounce12340/chiang-wanan-policy-island) |
+
+</div>
+
+## 一、AI2033：10 月 9 日就上線了
+
+10 月 8 日，蔣萬安市長宣布遷移松山機場、打造「臺北AI園區」。隔天 10 月 9 日下午 2:20，我在一位網友的提問下，對 AI 送出第一則需求；下午 4:06，網站初版完成，前後 1 小時 46 分。過程寫在公開的[製作紀錄](https://github.com/dAAAb/ai2033.taipei/blob/HEAD/docs/MAKING-OF.md)裡。
+
+這是當時給 AI 的提示詞，全文如下，也公開在大舞台第 2033 台的頻道資訊裡：
+
+> 可否製作逐字稿 以及 PPT PDF 和 清晰字大的互動式網站 都給我公開連結 感謝：AI黃金世紀，從臺北開始！！大台北 = 亞洲新矽谷 蔣萬安 + 李四川 = 大台北新矽谷（附記者會影片連結）可以使用 three js 做台北的 3D 模擬 點進去可以有一個類似 台北 GTA（你上網查）的沈浸式互動頁面 可以體驗 松機變成 台北 AI 園區 和110公頃綠地的感覺 根據這個發表會和網路上的官方訊息 製作超級厲害的網頁介紹 要穿插蔣萬安市長的照片 謝謝
+
+裡面沒有政策島，因為那時候政策島還沒公開。不只我這樣說，有三種不是我自己填寫的紀錄可以對照：
+
+<div style={{ overflowX: "auto" }}>
+
+| 紀錄 | 時間（UTC） | 台灣時間 | 誰記下的 |
+|---|---|---|---|
+| AI2033 第一次部署上線 | 2026-10-09 07:11:33 | **10/9 15:11** | GitHub 伺服器（[公開 API](https://api.github.com/repos/dAAAb/ai2033.taipei/deployments)） |
+| ai2033.taipei 第一次被存檔 | 2026-10-10 15:17:32 | **10/10 23:17** | 網際網路檔案館（[存檔](https://web.archive.org/web/20261010151732/http://ai2033.taipei/)） |
+| ai2033.taipei 完整頁面存檔 | 2026-10-11 22:58:43 | 10/12 06:58 | 網際網路檔案館（[存檔](https://web.archive.org/web/20261011225843/https://ai2033.taipei/)） |
+| puma.taipei/heart-island 仍是 404 | 2026-10-18 | 10/18 | 網際網路檔案館（[查詢](https://web.archive.org/cdx/search/cdx?url=puma.taipei/heart-island)） |
+| puma.taipei/heart-island 第一次正常存檔 | 2026-10-22 04:13:02 | **10/22 12:13** | 網際網路檔案館 |
+
+</div>
+
+GitHub 的部署時間是伺服器寫的，不是 commit 上可以自己改的日期；網際網路檔案館是第三方。另外，我 10 月 11 日下午就在這個部落格發了〈[一句話，一座 3D 台北](/zh/ai2033-taipei/)〉，這個部落格的原始碼也是公開的，[那次提交](https://github.com/DrJuChunKoO/blog.juchunko.com/commit/b8e1213)時間是 10/11 14:49。
+
+![網際網路檔案館的 ai2033.taipei 存檔：工具列顯示最早存檔為 2026 年 10 月 10 日，這張存檔為 10 月 11 日 UTC](../../../assets/images/encore-stage-fact-check/wayback-zh.png)
+
+所以我說「10 月初就做了」，說的是 AI2033，有紀錄可查。
+
+## 二、「23 日凌晨才開始」說的是另外兩個專案
+
+有人拿 GitHub 紀錄說：「他們的專案 23 日凌晨才開始，晚於政策島，所以葛如鈞說謊。」
+
+23 日凌晨開始的，是**安可大舞台**（第一個 commit 10/23 00:53）和網友 Josh 的**台北施政島**（第一個 commit 10/23 06:25）。這兩個專案，我從來沒有說過是 10 月初做的。
+
+拿 B 專案的日期，去反駁我講 A 專案的話，這就是張冠李戴。
+
+安可大舞台也不是「島」。它是一台可以轉台的電視，每一台是一位市民用 AI 做的作品：第 2026 台是台北安可之夜，第 2033 台是 AI2033，第 2034 台是 Josh 的台北施政島。10 月 28 日在記者會上公開。
+
+至於有媒體說「透過共同作者的信箱發現，葛如鈞就是共同作者」：大舞台本來就是我做的，我在記者會上親自發表，從來沒有隱瞞。台北施政島的 46 個 commit 裡，作者只有 bounce12340、Josh Tsai，以及 AI 助手 Claude，沒有我。
+
+## 三、「台北施政島」是網友 Josh 的作品
+
+[台北施政島](https://chiang-wanan-policy-island.pages.dev/)有自己的 [GitHub 專案](https://github.com/bounce12340/chiang-wanan-policy-island)。Josh 在 10/23 動工，10/24 投稿到大舞台，通過審核後上架第 2034 台。
+
+在大舞台點開第 2034 台的「頻道資訊」，最上面寫著作者 **by Josh**，簡介最後一句是「**非官方整理，與任何政黨或市府無關**」。再往下，才是他公開的提示詞，第一段就寫「互動手感參考 puma.taipei/heart-island」。
+
+只要截下半段，作者就不見了。
+
+![大舞台第 2034 台的頻道資訊：上半段有作者 Josh 與「非官方整理，與任何政黨或市府無關」，下半段是提示詞「互動手感參考 puma.taipei/heart-island」。只轉傳下半段，就被說成葛如鈞下的 AI 指令](../../../assets/images/encore-stage-fact-check/crop-zh.png)
+
+你可以自己打開 [encore.taipei/2034/info/](https://encore.taipei/2034/info/) 看完整的畫面。
+
+## 四、他從第一天就說了參考誰
+
+Josh 沒有藏。
+
+- **10/23 06:25，第一個 commit**，網站「關於本站」就寫著：「互動概念參考了『政策島』類型的資訊視覺化網站」。（[原始提交](https://github.com/bounce12340/chiang-wanan-policy-island/commit/4d6cf3f)）
+- **10/24，投稿大舞台**時，他把完整提示詞一起公開，裡面寫明參考網址。
+- **10/28 22:24**，他自己再補一段「更正與補充」（[原始提交](https://github.com/bounce12340/chiang-wanan-policy-island/commit/bda5d2d)）：
+
+> 本站的互動形式（島嶼地圖、領域編號、時間軸等）參考了 HEART 政策島（2026/10/22 上線），謝謝 HEART 團隊先做出這麼好的示範。
+>
+> 程式碼沒有沿用 HEART，政見查核與市政資料由作者另外整理、查證，每項都附公開來源。
+
+![GitHub 提交紀錄 bda5d2d：提交者是 bounce12340，也就是施政島作者本人；新增的段落寫著謝謝 HEART 團隊、程式碼沒有沿用 HEART](../../../assets/images/encore-stage-fact-check/commit-zh.png)
+
+這段更正，後來在報紙投書的圖說裡，變成「台北市長蔣萬安競選團隊發布的互動網站更新說明，坦承互動形式確實參考……」。但提交者是 bounce12340 本人，寫在他自己的 repo。
+
+參考別人做得好的互動手感、寫明出處、謝謝對方、程式碼自己寫。在開源社群，這叫做禮貌，不叫抄襲。
+
+## 五、最諷刺的地方：提示詞是我們自己公開的
+
+為什麼大家看得到 Josh 的提示詞？
+
+因為大舞台鼓勵每一位投稿者公開「製作這台用的 prompt」，放在頻道資訊裡給所有人看，讓大家知道這些作品是怎麼用 AI 做出來的。
+
+有人拿我們主動公開的東西，剪掉作者，換上我的名字，再說我們「被抓包」。如果這樣做可以得逞，以後還有誰敢把過程公開？
+
+這次被傷得最深的不是我，是 Josh。一位用自己時間做網站的普通市民，在網路上承受了排山倒海的「抄襲」指控。在這裡再一次謝謝你，也向你致歉。
+
+## 六、關於「跟著」
+
+我 10 月 28 日說，沈伯洋團隊「跟著」採用了同樣的技術。我指的是工具：兩邊都用了 Three.js 這類 3D 網頁技術（政策島的網頁原始碼裡就載入了 three.js）。這就像大家都用同一套繪圖工具，不代表誰抄了誰的創意。
+
+說得更精確一點：政策島的作者說，政策島是他國慶連假的 side project；AI2033 也是同一個連假做的。兩邊各做各的、各自公開，沒有誰抄誰。
+
+誰先誰後，可以查紀錄。查到最後會發現，「葛如鈞的提示詞參考了政策島」這件事，從頭到尾沒有發生。
+
+## 看到一張截圖，先問三個問題
+
+1. <strong>這是誰做的？</strong>找作者欄。
+2. <strong>是哪一個專案？</strong>名稱、網址、日期對得上嗎？
+3. <strong>完整的畫面長怎樣？</strong>原始連結在哪裡？
+
+這三個問題，這次每一個都有答案，而且都公開在網路上。
+
+---
+
+## 案外案：第 2031 台的作者也被網暴
+
+大舞台第 2031 台「[安可應援小站](https://taipeiencore.info/)」，是另一位支持者 Kimi 自己做的網站，和施政島無關，卻也在同一段時間被攻擊。
+
+她的政策對照頁上，用最大的字寫著「**公開資料查無市府起始日期，無法比較時間先後**」，下面還註明「未查得日期的紀錄先列示；已知日期依時間排序」。結果這頁先被網友轉傳成「竄改時間序」，接著上了新聞標題：三立新聞網〈蔣萬安「政策島」爆倒果為因？網友抓包疑偷運動驛站政策竄改時間序〉，鏡週刊網站轉載的版本則是〈蔣陣營遭抓包！疑偷運動驛站政策改時間序〉。
+
+![第 2031 台：網站原文寫「公開資料查無市府起始日期，無法比較時間先後」，新聞標題卻寫「竄改時間序」，還把網站叫成「蔣萬安政策島」](../../../assets/images/encore-stage-fact-check/kimi-zh.png)
+
+Kimi 在[她的聲明](https://taipeiencore.info/media-response/)裡指出：
+
+- 網站裡沒有任何一座「島」，它叫「安可應援小站」，每一頁都註明「支持者自主製作・非官方網站」。
+- 新聞附的截圖裡，「查無起始日期」那行字清清楚楚。
+- 報導刊出前，沒有任何媒體來信求證；她回覆質疑的留言，還被檢舉成垃圾訊息移除。
+
+她也特別請大家不要去打擾當初提出質疑的網友。我同意。可以批評、可以質疑，但請對著事實，不要對著人。Kimi 現在已經把小站收起來了（她說小站已經完成任務），那篇聲明還留著，值得一讀。
+
+---
+
+## 原始資料，自己查
+
+**AI2033 台北 AI 園區**
+
+- 原始碼：[github.com/dAAAb/ai2033.taipei](https://github.com/dAAAb/ai2033.taipei)
+- 製作紀錄：[docs/MAKING-OF.md](https://github.com/dAAAb/ai2033.taipei/blob/HEAD/docs/MAKING-OF.md)
+- GitHub Pages 部署紀錄（公開 API）：[api.github.com/repos/dAAAb/ai2033.taipei/deployments](https://api.github.com/repos/dAAAb/ai2033.taipei/deployments)
+- 網際網路檔案館：[2026-10-10 存檔](https://web.archive.org/web/20261010151732/http://ai2033.taipei/)、[2026-10-11 存檔](https://web.archive.org/web/20261011225843/https://ai2033.taipei/)
+- 部落格：〈[一句話，一座 3D 台北](/zh/ai2033-taipei/)〉，[提交紀錄 b8e1213](https://github.com/DrJuChunKoO/blog.juchunko.com/commit/b8e1213)
+
+**HEART 政策島**
+
+- 網際網路檔案館存檔列表：[puma.taipei/heart-island](https://web.archive.org/cdx/search/cdx?url=puma.taipei/heart-island)
+
+**安可大舞台**
+
+- 原始碼：[github.com/dAAAb/encore-taipei](https://github.com/dAAAb/encore-taipei)，[第一個 commit](https://github.com/dAAAb/encore-taipei/commit/1ca7a30)
+- 第 2034 台頻道資訊：[encore.taipei/2034/info/](https://encore.taipei/2034/info/)
+
+**台北施政島（網友 Josh）**
+
+- 網站：[chiang-wanan-policy-island.pages.dev](https://chiang-wanan-policy-island.pages.dev/)
+- 原始碼：[github.com/bounce12340/chiang-wanan-policy-island](https://github.com/bounce12340/chiang-wanan-policy-island)
+- 第一個 commit（10/23 06:25）：[4d6cf3f](https://github.com/bounce12340/chiang-wanan-policy-island/commit/4d6cf3f)
+- 補充參考來源（10/28 22:24）：[bda5d2d](https://github.com/bounce12340/chiang-wanan-policy-island/commit/bda5d2d)
+
+**我的說明**
+
+- 10/28 發布會（鏡電視直播）：[YouTube](https://www.youtube.com/watch?v=s0c3MJusxr4)
+- 10/29 說明（中時新聞網）：[YouTube](https://www.youtube.com/watch?v=I8pFHd3zvFY)
+
+**相關報導與投書**
+
+- 自由時報，2026/10/29：[〈才嗆完就被挖出下達AI指令抄襲沈伯洋 葛如鈞急改口〉](https://news.ltn.com.tw/news/politics/breakingnews/5621927)
+- 自由時報，2026/10/29：[〈不認抄襲 葛如鈞僅向「台北施政島」作者致歉〉](https://news.ltn.com.tw/news/politics/breakingnews/5622676)
+- 自由開講，2026/11/05：[〈葛如鈞，開源不是遮羞布，感謝不是道歉書！〉](https://talk.ltn.com.tw/article/breakingnews/5625833)
+- 自由開講，2026/11/11：[〈對政治符號敏感 對創作權益無感的蔣團隊〉](https://talk.ltn.com.tw/article/breakingnews/5633859)
+
+**案外案（第 2031 台）**
+
+- Kimi 的聲明：[taipeiencore.info/media-response/](https://taipeiencore.info/media-response/)
+- 三立新聞網：[原文](https://www.setn.com/news/1930524)（[存檔](https://web.archive.org/web/20261029131043/https://www.setn.com/news/1930524)）；鏡週刊網站轉載：[連結](https://www.mirrormedia.mg/external/setn_1930524)
