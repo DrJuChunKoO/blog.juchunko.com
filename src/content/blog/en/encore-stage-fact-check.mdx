@@ -8,21 +8,6 @@ author: "juchun-ko"
 categories: ["devlog", "ai-agent"]
 ---
 
-export const faq = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  mainEntity: [
-    ["Did Ju-Chun Ko copy Puma Shen’s HEART Policy Island?", "No. The prompt cited as proof, “interaction feel: reference puma.taipei/heart-island”, was written by a citizen, Josh Tsai, for his own project, the Taipei Policy Island. Ju-Chun Ko’s own project, AI2033, went online on October 9, 2026, about 12 days before the HEART Policy Island went public, and its prompt does not mention the Policy Island."],
-    ["Who made the Taipei Policy Island?", "Josh Tsai, GitHub user bounce12340. He started it on October 23, 2026 and submitted it to the Taipei Encore Stage as channel 2034 on October 24, ticking a required box agreeing to publish the project’s name, URL, his name, description and prompt."],
-    ["Is Josh Tsai the same person as Ju-Chun Ko?", "No. bounce12340 (Josh Tsai, registered 2023) and dAAAb (Ju-Chun Ko, registered 2012) are two different GitHub accounts with their own projects and commit histories. Ju-Chun Ko does not appear anywhere in the Taipei Policy Island’s commit history."],
-    ["Did the Taipei Policy Island reuse HEART’s code?", "Its author says none of HEART’s code was reused. He borrowed the interaction design, said so on the site from the very first version, and added a named credit and thanks on October 28."],
-    ["When did AI2033 go online?", "GitHub’s server-side record shows its first deployment on October 9, 2026 at 15:11 Taiwan time, and the Internet Archive captured ai2033.taipei on October 10. The HEART Policy Island’s URL still returned 404 on October 18 and went public on October 22."],
-    ["What is the Taipei Encore Stage?", "A submission platform built by Ju-Chun Ko. It works like a TV you flip through, and each channel is a website a citizen made with AI. Contributors agree to publish their work and prompt. It launched on October 28, 2026."],
-  ].map(([q, a]) => ({ "@type": "Question", name: q, acceptedAnswer: { "@type": "Answer", text: a } })),
-};
-
-<script type="application/ld+json" set:html={JSON.stringify(faq)} />
-
 *Some background for readers outside Taiwan: Taipei is electing its mayor in 2026. Mayor Chiang Wan-an is running for re-election; Puma Shen (沈伯洋) is the DPP candidate. I am a legislator and part of Mayor Chiang’s campaign. Shen’s team published an interactive site called the “HEART Policy Island”. Over the past two weeks, a claim spread online that I had copied it. You don’t have to take my word for anything below: every point links to a primary record. All times are Taiwan time (UTC+8).*
 
 ---
