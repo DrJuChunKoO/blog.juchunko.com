@@ -1,0 +1,40 @@
+name: IndexNow
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/content/blog/**"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  submit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v45
+        with:
+          files: src/content/blog/**
+
+      - uses: actions/setup-node@v4
+        if: steps.changed-files.outputs.any_changed == 'true' || steps.changed-files.outputs.any_deleted == 'true'
+        with:
+          node-version: 22
+
+      # Give the Cloudflare deploy time to finish before search engines crawl.
+      - name: Wait for deploy
+        if: steps.changed-files.outputs.any_changed == 'true' || steps.changed-files.outputs.any_deleted == 'true'
+        run: sleep 180
+
+      - name: Submit to IndexNow
+        if: steps.changed-files.outputs.any_changed == 'true' || steps.changed-files.outputs.any_deleted == 'true'
+        run: node scripts/indexnow.mjs ${{ steps.changed-files.outputs.all_changed_files }} ${{ steps.changed-files.outputs.deleted_files }}
