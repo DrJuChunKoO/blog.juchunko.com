@@ -11,7 +11,7 @@
     "dev:astro": "astro dev",
     "build": "astro build && node scripts/generate-video-manifest.mjs && pagefind --site dist",
     "preview": "astro preview",
-    "deploy": "wrangler deploy",
+    "deploy": "node scripts/deploy.mjs",
     "preview:worker": "wrangler dev",
     "search:dev:index": "node scripts/clean-dev-search.mjs && astro build && pagefind --site dist --output-path public/pagefind",
     "search:dev:clean": "node scripts/clean-dev-search.mjs",

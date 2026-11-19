@@ -1,10 +1,14 @@
-#!/usr/bin/env node
-// Submit changed blog post URLs to IndexNow (Bing, Yandex, Seznam, Naver…).
-// Usage: node scripts/indexnow.mjs src/content/blog/zh/foo.mdx [...]
-// Env: INDEXNOW_WAIT_SECONDS — how long to wait for new pages to go live (default 900).
+// IndexNow (Bing, Yandex, Seznam, Naver…): tell search engines which post URLs changed.
+// The deployed site carries /indexnow-manifest.json (post URL -> source hash); a deploy
+// diffs the live manifest against the new one and submits only what changed.
 
-const HOST = "blog.juchunko.com";
-const KEY = "f12fd3e60b3209216ffc4325cda9dc16";
+import { createHash } from "node:crypto";
+import { readdirSync, readFileSync } from "node:fs";
+import { join } from "node:path";
+
+export const HOST = "blog.juchunko.com";
+export const KEY = "f12fd3e60b3209216ffc4325cda9dc16";
+export const MANIFEST_PATH = "indexnow-manifest.json";
 const BLOG_DIR = "src/content/blog/";
 
 export function postUrl(file) {
@@ -15,28 +19,28 @@ export function postUrl(file) {
   return `https://${HOST}/${path}/`;
 }
 
-async function waitUntilLive(url, deadline) {
-  while (Date.now() < deadline) {
-    const res = await fetch(url, { method: "HEAD", redirect: "manual" }).catch(() => null);
-    if (res?.status === 200) return true;
-    await new Promise((r) => setTimeout(r, 15_000));
+export function buildManifest() {
+  const manifest = {};
+  for (const rel of readdirSync(BLOG_DIR, { recursive: true }).sort()) {
+    const file = join(BLOG_DIR, rel);
+    const url = postUrl(file);
+    if (url) manifest[url] = createHash("sha1").update(readFileSync(file)).digest("hex");
   }
-  return false;
+  return manifest;
 }
 
-async function main() {
-  const urls = [...new Set(process.argv.slice(2).map(postUrl).filter(Boolean))];
-  if (urls.length === 0) {
-    console.log("IndexNow: no post URLs to submit.");
-    return;
-  }
+export function changedUrls(before, after) {
+  const changed = Object.keys(after).filter((url) => before[url] !== after[url]);
+  const removed = Object.keys(before).filter((url) => !(url in after));
+  return [...changed, ...removed];
+}
 
-  const deadline = Date.now() + Number(process.env.INDEXNOW_WAIT_SECONDS ?? 900) * 1000;
-  for (const url of urls) {
-    const live = await waitUntilLive(url, deadline);
-    console.log(`${live ? "live " : "not live (submitting anyway)"} ${url}`);
-  }
+export async function fetchLiveManifest() {
+  const res = await fetch(`https://${HOST}/${MANIFEST_PATH}`, { cache: "no-store" });
+  return res.ok ? res.json() : null;
+}
 
+export async function submit(urls) {
   const res = await fetch("https://api.indexnow.org/indexnow", {
     method: "POST",
     headers: { "Content-Type": "application/json; charset=utf-8" },
@@ -47,11 +51,5 @@ async function main() {
       urlList: urls,
     }),
   });
-  console.log(`IndexNow: HTTP ${res.status} for ${urls.length} URL(s).`);
-  if (!res.ok && res.status !== 202) {
-    console.error(await res.text());
-    process.exit(1);
-  }
+  return { status: res.status, ok: res.ok, body: res.ok ? "" : await res.text() };
 }
-
-if (import.meta.url === `file://${process.argv[1]}`) await main();

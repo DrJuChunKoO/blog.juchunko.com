@@ -191,7 +191,7 @@ pnpm preview      # 在本地測試 dist/
 ### 7-2. 部署指令
 
 ```bash
-pnpm deploy       # 部署 Worker 到 Cloudflare
+pnpm run deploy   # 部署 Worker 到 Cloudflare，並把有變動的文章網址提交給 IndexNow
 ```
 
 ---
