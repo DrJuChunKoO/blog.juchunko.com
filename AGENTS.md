@@ -82,3 +82,11 @@ To match the existing professional, minimalist look (see `.agents/skills/blog-de
     <Image src={myImage} alt="Description" width={400} height={600} />
     ```
 *   **Post-build Compression**: `@playform/compress` is enabled in `astro.config.mjs` to automatically perform fine-tuned post-build compression on all compiled images, HTML, CSS, and JS output files in the `dist/` directory, specifying `quality: 80` for WebP and `quality: 75` for AVIF.
+
+---
+
+## 6. Git Workflow for Writing Posts
+
+*   **Write posts directly on `main`**: When writing or editing blog posts (`src/content/blog/**`), commit straight to the `main` branch.
+*   **Do NOT create a separate branch** (e.g. `post/<slug>`) or open a pull request for post work, and do not use a worktree for it.
+*   Keep history linear: if `main` has moved, use `git pull --rebase` — never create merge commits.
